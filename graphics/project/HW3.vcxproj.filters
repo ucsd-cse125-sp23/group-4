@@ -218,5 +218,11 @@
     <ClInclude Include="C:\Users\dude1\Downloads\imgui-1.89.4\misc\cpp\imgui_stdlib.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="include\Obj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
