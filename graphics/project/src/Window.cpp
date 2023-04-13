@@ -121,8 +121,8 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects()
 {
-	//bunny = new Obj();
-	//bunny->init("models/bunny2.obj");
+	bunny = new Obj();
+	bunny->init("models/sphere.obj");
 
 
 	// Load in skeleton
@@ -174,7 +174,7 @@ void Window::setInputFiles(const std::vector<std::string> filepaths) {
 
 void Window::cleanObjects() {
 	// Deallcoate the objects.
-	//if (bunny) delete bunny;		// NEW
+	if (bunny) delete bunny;		// NEW
 
 	if (skeleton) delete skeleton;
 	if (skin) delete skin;
@@ -317,7 +317,7 @@ void Window::displayCallback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 	// Render the objects.
-	//bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);	// broken?
+	bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);	// broken?
 
 	glPolygonMode(GL_FRONT_AND_BACK, wireframeMode ? GL_LINE : GL_FILL);
 	if(skeleton && showSkelMode) skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
