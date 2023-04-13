@@ -17,6 +17,8 @@ Skin* Window::skin;
 AnimationClip* Window::animClip;
 AnimationPlayer* Window::anim;
 
+Obj* Window::bunny;
+
 // Camera Properties
 Camera* Cam;
 
@@ -119,6 +121,10 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects()
 {
+	bunny = new Obj();
+	bunny->init("models/bunny.obj");
+
+
 	// Load in skeleton
 	skeleton = new Skeleton();
 	if (!skeleton->Load(skelfile.c_str())) {
@@ -168,6 +174,8 @@ void Window::setInputFiles(const std::vector<std::string> filepaths) {
 
 void Window::cleanObjects() {
 	// Deallcoate the objects.
+	if (bunny) delete bunny;		// NEW
+
 	if (skeleton) delete skeleton;
 	if (skin) delete skin;
 
@@ -286,6 +294,7 @@ void Window::idleCallback(float deltaTime)
 {
 	// Perform any updates as necessary. 
 	Cam->Update();
+	
 
 	if (anim && animClip) {
 		anim->Update(deltaTime);
@@ -308,6 +317,8 @@ void Window::displayCallback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 	// Render the objects.
+	bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+
 	glPolygonMode(GL_FRONT_AND_BACK, wireframeMode ? GL_LINE : GL_FILL);
 	if(skeleton && showSkelMode) skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
 
@@ -337,7 +348,11 @@ void Window::resetCamera()
 	Cam->SetAspect(float(Window::width) / float(Window::height));
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 
 // callbacks - for Interaction 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
