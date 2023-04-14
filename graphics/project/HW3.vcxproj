@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Scene.inl" />
     <None Include="shaders\depth.frag" />
     <None Include="shaders\lighting.frag" />
     <None Include="shaders\projective.vert" />
@@ -162,6 +163,7 @@
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="src\AnimationClip.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Cube.cpp" />
@@ -195,9 +197,13 @@
     <ClInclude Include="include\Joint.h" />
     <ClInclude Include="include\Keyframe.h" />
     <ClInclude Include="include\main.h" />
+    <ClInclude Include="include\Material.h" />
     <ClInclude Include="include\Mesh.h" />
+    <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\Node.h" />
     <ClInclude Include="include\Obj.h" />
     <ClInclude Include="include\Pose.h" />
+    <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\Skeleton.h" />
     <ClInclude Include="include\Skin.h" />

@@ -92,12 +92,14 @@ public:
         std::cout << "done." << std::endl;
     }
 
+    // deprecated vvv, use Model.h instead
     void draw(const glm::mat4& viewProjMtx, GLuint shader)
     {
         // actiavte the shader program 
         glUseProgram(shader);
 
-        // get the locations and send the uniforms to the shader 
+        // get the locations and send the uniforms to the shader
+        // TODO: create a "setUniforms" method
         glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
         glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
         glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
