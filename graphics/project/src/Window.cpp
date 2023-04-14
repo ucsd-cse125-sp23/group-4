@@ -10,26 +10,16 @@
 // Window Properties
 int Window::width;
 int Window::height;
-const char* Window::windowTitle = "CSE 125 graphics engine";
+const char* Window::windowTitle = "CSE 125 graphics engine :)";
 
-// Objects to render
+// Game stuff to render
 Scene* Window::gameScene;
-Skeleton* Window::skeleton;
-Skin* Window::skin;
-AnimationClip* Window::animClip;
-AnimationPlayer* Window::anim;
 
-Obj* Window::bunny;
-
-// Camera Properties
 Camera* Cam;
 
 // Interaction Variables
 bool LeftDown, RightDown;
 int MouseX, MouseY;
-
-// The shader program id
-GLuint Window::shaderProgram;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,8 +30,8 @@ std::string animfile = "";
 bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
-float step_size = 0.75;
 
+/*
 void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 
 	// model window
@@ -94,6 +84,11 @@ void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 		ImGui::End();
 	}
 }
+*/
+
+bool fileIsType(std::string n, std::string type = ".txt") {
+	return n.find(type) != std::string::npos;
+}
 
 // Constructors and desconstructors 
 bool Window::initializeProgram(GLFWwindow* window) {
@@ -107,90 +102,20 @@ bool Window::initializeProgram(GLFWwindow* window) {
 	ImGui_ImplOpenGL3_Init("#version 330");
 	// --
 
-
-	// Create a shader program with a vertex shader and a fragment shader.
-	shaderProgram = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
-
-	// Check the shader program.
-	if (!shaderProgram)
-	{
-		std::cerr << "Failed to initialize shader program" << std::endl;
-		return false;
-	}
-
 	return true;
 }
 
 bool Window::initializeObjects()
 {
-
 	gameScene = new Scene();
 	gameScene->init();
-	bunny = new Obj();
-	bunny->init("models/bunny.obj");
-
-
-	// Load in skeleton
-	skeleton = new Skeleton();
-	if (!skeleton->Load(skelfile.c_str())) {
-		delete skeleton;
-		skeleton = nullptr;
-	}
-
-	// Load in skin
-	skin = new Skin();
-	if (!skin->Load(skinfile.c_str())) {
-		delete skin;
-		skin = nullptr;
-	}
-
-	// Load in anim
-	bool hasAnim = true;
-	anim = new AnimationPlayer();
-
-	animClip = new AnimationClip();
-	if (!animClip->Load(animfile.c_str())) {
-		delete animClip;
-		animClip = nullptr;
-
-		hasAnim = false;
-	}
-	else anim->SetClip(animClip);
 
 	return true;
 }
 
-void Window::resetPlayback() {
-	if (anim) anim->Play();
-}
-
-bool fileIsType(std::string n, std::string type = ".txt") {
-	return n.find(type) != std::string::npos;
-}
-
-void Window::setInputFiles(const std::vector<std::string> filepaths) {
-	// Set file vars
-	for(std::string f : filepaths) {
-		if (fileIsType(f, ".skel")) skelfile = f;
-		else if (fileIsType(f, ".skin")) skinfile = f;
-		else if (fileIsType(f, ".anim")) animfile = f;
-	}
-}
-
 void Window::cleanObjects() {
 	// Deallcoate the objects.
-	if (bunny) delete bunny;		// NEW
-
-	if (skeleton) delete skeleton;
-	if (skin) delete skin;
-
-	skeleton = nullptr;
-	skin = nullptr;
-	
-
-	delete anim;
-	if (animClip) delete animClip;
-	animClip = nullptr;
+	delete gameScene;
 }
 
 void Window::cleanUp()
@@ -200,9 +125,6 @@ void Window::cleanUp()
 	// stop imgui
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
-
-	// Delete the shader program.
-	glDeleteProgram(shaderProgram);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,7 +211,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 
 	Cam->SetAspect(float(width) / float(height));
 
-	// ImGui::WindowSize(w, h)???
+	// ImGui::WindowSize(w, h)?
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -299,15 +221,8 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime)
 {
 	// Perform any updates as necessary. 
 	Cam->Update();
-
-	if (skeleton) {
-		skeleton->Update();
-		skeleton->Move(window, Cam, deltaTime, anim, step_size);
-	}
-
-	if (skin) skin->Update(skeleton);
-
-	Cam->KeyInput(window);
+	
+	//gameScene->update();
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -320,24 +235,22 @@ void Window::displayCallback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 	// Render the objects.
-	//if (!skeleton && !skin) bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
 	gameScene->draw(Cam->GetViewProjectMtx());
 
-	glPolygonMode(GL_FRONT_AND_BACK, wireframeMode ? GL_LINE : GL_FILL);
-	if(skeleton && showSkelMode) skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	if(skin) skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
 
 	// imgui new frame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	imguiDraw(skeleton, animClip);	// simple helper method
+	//imguiDraw(skeleton, animClip);	// simple helper method
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
 
 	// Swap buffers.										******
 	glfwSwapBuffers(window);
@@ -376,7 +289,6 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
 		case GLFW_KEY_R:
 			resetCamera();
-			if (anim) anim->Play();
 			break;
 
 		case GLFW_KEY_C:
