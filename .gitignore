@@ -6,6 +6,9 @@
 build
 compile_commands.json
 
+## Dear ImGui artifacts
+**/imgui.ini
+
 # User-specific files
 *.rsuser
 *.suo
