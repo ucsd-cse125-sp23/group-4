@@ -368,3 +368,4 @@ MigrationBackup/
 GL/
 GLFW/
 glm/
+out/*
