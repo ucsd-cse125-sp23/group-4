@@ -8,7 +8,7 @@ int sign(float f) {
 		return 0;
 	else if (f > 0)
 		return 1;
-	return 0;
+	return -1;
 }
 class CylinderShape : public ConvexShape {
 private:
