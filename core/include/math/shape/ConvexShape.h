@@ -16,7 +16,7 @@ protected:
 	 */
 	virtual vec4f furthestPoint(vec3f dir) const = 0;
 	bool collides(const ConvexShape* other, const mat4f& thisMtx, const mat3f& thisIMtx, const mat4f& otherMtx, const mat3f& otherIMtx) const;
-	vec3f mtv(const ConvexShape* other, const mat4f& thisMtx, const mat3f& thisIMtx, const mat4f& otherMtx, const mat3f& otherIMtx) const;
+	vec4f mtv(const ConvexShape* other, const mat4f& thisMtx, const mat3f& thisIMtx, const mat4f& otherMtx, const mat3f& otherIMtx) const;
 public:
 	ConvexShape() {
 		self = (const ConvexShape**)malloc(sizeof(const ConvexShape**));
@@ -27,8 +27,8 @@ public:
 	}
 	bool collides(const BoundingShape* other, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const override;
 	bool collides(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const override;
-	vec3f mtv(const BoundingShape* other, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const override;
-	vec3f mtv(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const override;
+	vec4f mtv(const BoundingShape* other, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const override;
+	vec4f mtv(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const override;
 
 	const ConvexShape** seperate() const override { return self; }
 	const size_t count() const override { return 1; }

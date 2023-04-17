@@ -6,6 +6,7 @@
 #include "math/shape/Simplex.h"
 
 //https://blog.winter.dev/2020/gjk-algorithm/
+//https://blog.winter.dev/2020/epa-algorithm/
 vec3f ConvexShape::support(const ConvexShape* shape0, const mat4f& mtx0, const mat3f& iMtx0,
 						   const ConvexShape* shape1, const mat4f& mtx1, const mat3f& iMtx1,
 						   vec3f dir)
@@ -198,7 +199,7 @@ void addIfUniqueEdge(
 		edges.emplace_back(faces[a], faces[b]);
 	}
 }
-vec3f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat3f& thisIMtx, const mat4f& otherMtx, const mat3f& otherIMtx) const
+vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat3f& thisIMtx, const mat4f& otherMtx, const mat3f& otherIMtx) const
 {
 	//GJK
 	vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, { 1,0,0 });
@@ -210,7 +211,7 @@ vec3f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 		while (true) {
 			support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, dir);
 			if (dot(support, dir) <= 0)
-				return vec3f(0, 0, 0);
+				return vec4f(0, 0, 0, 0);
 			pts.push(support);
 			if (nextSimplex(pts, dir)) {
 				break;
@@ -233,6 +234,12 @@ vec3f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 	}
 
 	//EPA
+	//Safety loop escape condition
+	float scale = 0.001f;
+	float gMin = FLT_MAX;
+	vec4f gNorm = vec4f(0, 0, 0, 0);
+
+
 	std::vector<vec3f> polytope(pts.begin(), pts.end());
 	std::vector<size_t> faces = {
 		0, 1, 2,
@@ -253,9 +260,19 @@ vec3f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 		
 		vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, minNormal);
 		float sDistance = dot(minNormal, support);
-		std::cout << normals.size() << " " << abs(sDistance - minDistance) << std::endl;
 
-		if (abs(sDistance - minDistance) > 0.05f) {
+		float diff = abs(sDistance - minDistance);
+		if (diff > scale) {
+			if (diff < gMin)
+			{
+				gMin = diff;
+				scale = 0.001f;
+				gNorm = vec4f(-minNormal, minDistance);
+			}
+			else
+				scale *= 2.0f;
+
+
 			minDistance = FLT_MAX;
 			std::vector<std::pair<size_t, size_t>> uniqueEdges;
 
@@ -304,9 +321,11 @@ vec3f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 		}
 	}
 
-	return normalize(minNormal) * minDistance;
+	if (gNorm.w < minDistance)
+		return gNorm;
+	return vec4f(-minNormal, minDistance);
 }
-vec3f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat4f& otherMtx) const
+vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat4f& otherMtx) const
 {
 	mat3f thisIMtx = mat3f(thisMtx);
 	if (thisIMtx != mat3f::identity())
@@ -336,7 +355,7 @@ bool ConvexShape::collides(const BoundingShape* other, const mat4f& thisMtx, con
 	return false;
 }
 
-vec3f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx, const mat4f& otherMtx) const
+vec4f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx, const mat4f& otherMtx) const
 {
 	mat3f thisIMtx = mat3f(thisMtx);
 	if (thisIMtx != mat3f::identity())
@@ -345,18 +364,17 @@ vec3f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx, const m
 	if (otherIMtx != mat3f::identity())
 		otherIMtx = inverse(otherIMtx);
 
-	vec3f min = vec3f(0.0f, 0.0f, 0.0f);
+	vec4f min = vec4f(0.0f, 0.0f, 0.0f, 0.0f);
 	float minLS = std::numeric_limits<float>::max();
 	const ConvexShape** ptr = other->seperate();
 	for (int i = 0; i < other->count(); i++)
 	{
-		vec3f v = ptr[i]->mtv(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
-		float ls = length_squared(v);
-		if (minLS > ls)
+		vec4f v = ptr[i]->mtv(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
+		if (v.w > 0 && minLS > v.w)
 		{
 			min = v;
-			minLS = ls;
+			minLS = v.w;
 		}
 	}
-	return min;
+	return -min;
 }
