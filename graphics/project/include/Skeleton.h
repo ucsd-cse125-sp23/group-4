@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "core.h"
 #include "Pose.h"
 #include "Joint.h"
@@ -33,7 +35,13 @@ public:
 	glm::mat4 GetWorldMatrix(int joint);
 
 	void SetPose(const Pose pose);
-
+	void MoveForward();
+	void MoveBackward();
+	void MoveRight();
+	void MoveLeft();
+	void TurnAround();
+	void TurnLeft();
+	void TurnRight();
 private:
 	std::vector<Joint*> joints;	// random access
 

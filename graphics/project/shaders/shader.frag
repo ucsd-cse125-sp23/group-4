@@ -23,7 +23,7 @@ void main()
 
 	vec3 lightsum = vec3(0.0);
 
-	for (int i = 0; i < LightDirections.length; i++){
+	for (int i = 0; i < 2; i++){
         lightsum += LightColors[i] * max(0, dot(LightDirections[i], fragNormal));
     }
 
