@@ -1,14 +1,26 @@
 cmake_minimum_required(VERSION 3.26)
+include(FetchContent)
 
-project(tagguys VERSION 1.0
-  DESCRIPTION "Real-time Multiplayer Tag")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_library(core
-  src/core/lib.cpp include/core/lib.hpp)
+project(tagguys DESCRIPTION "Real-time Multiplayer Tag")
+
+FetchContent_Declare(boost GIT_REPOSITORY https://github.com/boostorg/boost.git)
+FetchContent_Declare(glew GIT_REPOSITORY https://github.com/nigels-com/glew.git)
+FetchContent_Declare(glfw GIT_REPOSITORY https://github.com/glfw/glfw.git)
+FetchContent_Declare(glm GIT_REPOSITORY https://github.com/g-truc/glm.git)
+FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git)
+FetchContent_Declare(
+  catch
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.3.2)
+
+FetchContent_MakeAvailable(boost glew glfw glm imgui catch)
+
+add_library(core src/core/lib.cpp include/core/lib.hpp)
 target_include_directories(core PUBLIC include)
 
-add_library(network
-  src/network/lib.cpp include/network/lib.hpp)
+add_library(network src/network/lib.cpp include/network/lib.hpp)
 target_include_directories(network PUBLIC include)
 
 add_executable(client src/client/main.cpp)
