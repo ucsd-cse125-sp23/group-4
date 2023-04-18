@@ -24,6 +24,7 @@ public:
     void draw(void) {
         glBindVertexArray(vao);
         glDrawElements(mode, count, type, 0);
+        glBindVertexArray(0);
     }
 
 
