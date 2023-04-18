@@ -1,7 +1,7 @@
 #pragma once
 
-#include "math/vector.h"
-#include "math/matrix.h"
+#include "core/math/vector.h"
+#include "core/math/matrix.h"
 
 
 class Player {

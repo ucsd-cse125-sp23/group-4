@@ -2,8 +2,8 @@
 
 #include <limits>
 #include <vector>
-#include "math/shape/ConvexShape.h"
-#include "math/shape/Simplex.h"
+#include "core/math/shape/ConvexShape.h"
+#include "core/math/shape/Simplex.h"
 
 //https://blog.winter.dev/2020/gjk-algorithm/
 //https://blog.winter.dev/2020/epa-algorithm/
@@ -277,7 +277,8 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 			std::vector<std::pair<size_t, size_t>> uniqueEdges;
 
 			for (size_t i = 0; i < normals.size(); i++) {
-				if (sameDir(normals[i], support)) {
+				if (sameDir(normals[i], support - polytope[faces[3*i]])) {
+				//if (sameDir(normals[i], support)) {
 					size_t f = i * 3;
 
 					addIfUniqueEdge(uniqueEdges, faces, f, f + 1);
@@ -320,6 +321,12 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 			normals.insert(normals.end(), newNormals.begin(), newNormals.end());
 		}
 	}
+
+	for (int i = 0; i < polytope.size(); i++)
+		std::cout << i << ":" << polytope[i] << std::endl;
+	for (int i = 0; i < faces.size(); i += 3)
+		std::cout << faces[i] << " " << faces[i + 1] << " " << faces[i + 2] << std::endl;
+		
 
 	if (gNorm.w < minDistance)
 		return gNorm;
