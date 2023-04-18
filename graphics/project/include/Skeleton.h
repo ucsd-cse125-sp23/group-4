@@ -35,10 +35,10 @@ public:
 	glm::mat4 GetWorldMatrix(int joint);
 
 	void SetPose(const Pose pose);
-	void MoveForward();
-	void MoveBackward();
-	void MoveRight();
-	void MoveLeft();
+	void MoveForward(float delta = 0.25);
+	void MoveBackward(float delta = 0.25);
+	void MoveRight(float delta = 0.25);
+	void MoveLeft(float delta = 0.25);
 	void TurnAround();
 	void TurnLeft();
 	void TurnRight();

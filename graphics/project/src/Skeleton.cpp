@@ -138,27 +138,27 @@ Joint* Skeleton::FindJointInTree(int j) {
 	return nullptr;
 }
 
-void Skeleton::MoveForward() {
+void Skeleton::MoveForward(float delta) {
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[2] -= 1;
+	root_pos[2] -= delta;
 	root->SetPosition(root_pos);
 }
 
-void Skeleton::MoveBackward() {
+void Skeleton::MoveBackward(float delta) {
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[2] += 1;
+	root_pos[2] += delta;
 	root->SetPosition(root_pos);
 }
 
-void Skeleton::MoveRight() {
+void Skeleton::MoveRight(float delta) {
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[0] += 1;
+	root_pos[0] += delta;
 	root->SetPosition(root_pos);
 }
 
-void Skeleton::MoveLeft() {
+void Skeleton::MoveLeft(float delta) {
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[0] -= 1;
+	root_pos[0] -= delta;
 	root->SetPosition(root_pos);
 }
 
