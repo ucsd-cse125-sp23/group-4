@@ -1,5 +1,6 @@
 #include "Skeleton.h"
 
+
 static Joint* BuildJointArray(Joint* root, std::vector<Joint*>* arr) {
 	// Traverses tree, depth-first
 
@@ -135,4 +136,43 @@ Joint* Skeleton::FindJointInTree(int j) {
 	}
 
 	return nullptr;
+}
+
+void Skeleton::MoveForward() {
+	glm::vec3 root_pos = root->GetPosition();
+	root_pos[2] -= 1;
+	root->SetPosition(root_pos);
+}
+
+void Skeleton::MoveBackward() {
+	glm::vec3 root_pos = root->GetPosition();
+	root_pos[2] += 1;
+	root->SetPosition(root_pos);
+}
+
+void Skeleton::MoveRight() {
+	glm::vec3 root_pos = root->GetPosition();
+	root_pos[0] += 1;
+	root->SetPosition(root_pos);
+}
+
+void Skeleton::MoveLeft() {
+	glm::vec3 root_pos = root->GetPosition();
+	root_pos[0] -= 1;
+	root->SetPosition(root_pos);
+}
+
+void Skeleton::TurnAround() {
+	std::vector<DOF> root_dofs = root->GetDOFS();
+	root->SetDOF(1, root_dofs[1].GetValue() + M_PI);
+}
+
+void Skeleton::TurnLeft() {
+	std::vector<DOF> root_dofs = root->GetDOFS();
+	root->SetDOF(1, root_dofs[1].GetValue() + (M_PI / 2));
+}
+
+void Skeleton::TurnRight() {
+	std::vector<DOF> root_dofs = root->GetDOFS();
+	root->SetDOF(1, root_dofs[1].GetValue() - (M_PI / 2));
 }

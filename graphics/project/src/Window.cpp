@@ -6,6 +6,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+enum class Direction {
+	Forward,
+	Backward,
+	Left,
+	Right
+};
 // Window Properties
 int Window::width;
 int Window::height;
@@ -38,7 +44,7 @@ std::string animfile = "";
 bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
-
+Direction facing = Direction::Forward;
 
 void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 
@@ -58,6 +64,7 @@ void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 		Window::initializeObjects();
 		ImGui::EndGroup();
 		ImGui::End();
+		facing = Direction::Forward;
 		return;
 	}
 	ImGui::EndGroup();
@@ -317,7 +324,7 @@ void Window::displayCallback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 	// Render the objects.
-	bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+	if (!skeleton && !skin) bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
 
 	glPolygonMode(GL_FRONT_AND_BACK, wireframeMode ? GL_LINE : GL_FILL);
 	if(skeleton && showSkelMode) skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
@@ -374,7 +381,66 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 			resetCamera();
 			if (anim) anim->Play();
 			break;
-
+		case GLFW_KEY_W:
+			if (skeleton) {
+				if (facing == Direction::Backward) {
+					skeleton->TurnAround();
+				}
+				if (facing == Direction::Left) {
+					skeleton->TurnRight();
+				}
+				if (facing == Direction::Right) {
+					skeleton->TurnLeft();
+				}
+				facing = Direction::Forward;
+				skeleton->MoveForward();
+			}
+			break;
+		case GLFW_KEY_S:
+			if (skeleton) {
+				if (facing == Direction::Forward) {
+					skeleton->TurnAround();
+				}
+				if (facing == Direction::Left) {
+					skeleton->TurnLeft();
+				}
+				if (facing == Direction::Right) {
+					skeleton->TurnRight();
+				}
+				facing = Direction::Backward;
+				skeleton->MoveBackward();
+			}
+			break;
+		case GLFW_KEY_D:
+			if (skeleton) {
+				if (facing == Direction::Forward) {
+					skeleton->TurnRight();
+				}
+				if (facing == Direction::Backward) {
+					skeleton->TurnLeft();
+				}
+				if (facing == Direction::Left) {
+					skeleton->TurnAround();
+				}
+				facing = Direction::Right;
+				skeleton->MoveRight();
+			}
+			break;
+		case GLFW_KEY_A:
+			if (skeleton) {
+				if (facing == Direction::Forward) {
+					skeleton->TurnLeft();
+				}
+				if (facing == Direction::Backward) {
+					skeleton->TurnRight();
+				}
+				if (facing == Direction::Right) {
+					skeleton->TurnAround();
+				}
+				facing = Direction::Left;
+				skeleton->MoveLeft();
+			}
+			break;
 		default:
 			break;
 		}
