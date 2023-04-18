@@ -1,11 +1,11 @@
 #include <iostream>
-#include "Player.h"
+#include "core/Player.h"
 
-#include "math/shape/BoundingShape.h"
-#include "math/shape/ConvexShape.h"
-#include "math/shape/SphereShape.h"
-#include "math/shape/CylinderShape.h"
-#include "math/shape/AABShape.h"
+#include "core/math/shape/BoundingShape.h"
+#include "core/math/shape/ConvexShape.h"
+#include "core/math/shape/SphereShape.h"
+#include "core/math/shape/CylinderShape.h"
+#include "core/math/shape/AABShape.h"
 
 int main(int argc, char* argv[])
 {

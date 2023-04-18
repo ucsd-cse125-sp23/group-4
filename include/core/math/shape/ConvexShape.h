@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
-#include "math/shape/BoundingShape.h"
+#include "core/math/shape/BoundingShape.h"
 
 //https://blog.winter.dev/2020/gjk-algorithm/
 class ConvexShape : public BoundingShape {

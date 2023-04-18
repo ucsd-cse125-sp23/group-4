@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/vector.h"
+#include "core/math/vector.h"
 
 template <typename T>
 struct TMat4 {
@@ -593,7 +593,7 @@ TMat3<T> inverse(const TMat3<T>& m) {
         return TMat3<T>{};
     }
 
-    T inv_det = 1.0 / det;
+    T inv_det = T(1.0) / det;
 
     inv *= inv_det;
 
