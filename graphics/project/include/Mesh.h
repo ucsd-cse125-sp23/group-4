@@ -24,7 +24,9 @@ public:
     void draw(void) {
         glBindVertexArray(vao);
         glDrawElements(mode, count, type, 0);
+        glBindVertexArray(0);
     }
+
 
     void bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<unsigned int> indices) {
         unsigned int n = indices.size(); // #(triangles)*3
