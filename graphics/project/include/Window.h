@@ -6,8 +6,9 @@
 #include "Skin.h"
 #include "AnimationPlayer.h"
 #include "shader.h"
-#include "Camera.h"
 #include "Obj.h"
+#include "Scene.h"
+#include "Camera.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -26,7 +27,7 @@ public:
 	static AnimationClip* animClip;
 	static AnimationPlayer* anim;
 	static Obj* bunny;
-
+	static Scene* gameScene;
 	// Shader Program
 	static GLuint shaderProgram;
 

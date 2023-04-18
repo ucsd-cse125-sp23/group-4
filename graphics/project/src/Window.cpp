@@ -18,6 +18,7 @@ int Window::height;
 const char* Window::windowTitle = "CSE 125 graphics engine";
 
 // Objects to render
+Scene* Window::gameScene;
 Skeleton* Window::skeleton;
 Skin* Window::skin;
 AnimationClip* Window::animClip;
@@ -128,6 +129,9 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects()
 {
+
+	gameScene = new Scene();
+	gameScene->init();
 	bunny = new Obj();
 	bunny->init("models/bunny.obj");
 
@@ -324,7 +328,8 @@ void Window::displayCallback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 	// Render the objects.
-	if (!skeleton && !skin) bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+	//if (!skeleton && !skin) bunny->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+	gameScene->draw(Cam->GetViewProjectMtx());
 
 	glPolygonMode(GL_FRONT_AND_BACK, wireframeMode ? GL_LINE : GL_FILL);
 	if(skeleton && showSkelMode) skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);

@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <vector>
+#include <string>
 #include <ctype.h>
 
 inline float modu(float x, float y) {
