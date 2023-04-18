@@ -5,17 +5,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(tagguys DESCRIPTION "Real-time Multiplayer Tag")
 
-FetchContent_Declare(boost GIT_REPOSITORY https://github.com/boostorg/boost.git)
 FetchContent_Declare(glew GIT_REPOSITORY https://github.com/nigels-com/glew.git)
 FetchContent_Declare(glfw GIT_REPOSITORY https://github.com/glfw/glfw.git)
 FetchContent_Declare(glm GIT_REPOSITORY https://github.com/g-truc/glm.git)
 FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git)
 FetchContent_Declare(
-  catch
+  Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG v3.3.2)
 
-FetchContent_MakeAvailable(boost glew glfw glm imgui catch)
+FetchContent_MakeAvailable(glew glfw glm imgui Catch2)
+find_package(Boost REQUIRED)
 
 add_library(core src/core/lib.cpp include/core/lib.hpp)
 target_include_directories(core PUBLIC include)
