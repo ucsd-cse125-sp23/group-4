@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/shape/ConvexMeshShape.h"
+#include "core/math/shape/ConvexMeshShape.h"
 
 
 class AABShape : public ConvexMeshShape {
