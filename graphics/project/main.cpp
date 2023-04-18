@@ -63,22 +63,6 @@ int main(int argc, char* argv[])
 	GLFWwindow* window = Window::createWindow(800, 600);
 	if (!window) exit(EXIT_FAILURE);
 
-	if (argc > 1) {
-		std::string f1 = argv[1];
-		std::string f2 = "";
-		std::string f3 = "";
-		
-		if (argc > 2) {
-			f2 = argv[2];
-		}
-
-		if (argc > 3) {
-			f3 = argv[3];
-		}
-
-		Window::setInputFiles({ f1, f2, f3 });
-	}
-
 	// Print OpenGL and GLSL versions.
 	print_versions();
 	// Setup callbacks.
