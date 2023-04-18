@@ -12,9 +12,12 @@ void Scene::init(void) {
     sceneResources = new SceneResourceMap();
 
     // Create a mesh palette
-    //sceneResources->meshes["cube"] = new Cube();
+    sceneResources->meshes["cube"] = new Cube();
     sceneResources->meshes["teapot"] = new Obj();
     sceneResources->meshes["bunny"] = new Obj();
+
+    sceneResources->meshes["wasp"] = new SkinnedMesh(); // can only be tied to one object? (not a static resource)
+    sceneResources->meshes["wasp"]->init("wasp.skin");
 
     //sceneResources->meshes["cube"]->init();
     sceneResources->meshes["teapot"]->init("models/teapot.obj");
@@ -27,7 +30,7 @@ void Scene::init(void) {
     sceneResources->materials["wood"] = new Material;
     sceneResources->materials["wood"]->shader = sceneResources->shaderPrograms["basic"];
     sceneResources->materials["wood"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-    sceneResources->materials["wood"]->diffuse = vec4(0.3f, 0.15f, 0.1f, 1.0f);
+    sceneResources->materials["wood"]->diffuse = vec4(0.4f, 0.15f, 0.1f, 1.0f);
     sceneResources->materials["wood"]->specular = vec4(0.3f, 0.15f, 0.1f, 1.0f);
     sceneResources->materials["wood"]->shininess = 100.0f;
 
@@ -58,6 +61,13 @@ void Scene::init(void) {
     sceneResources->models["bunny1"]->mesh = sceneResources->meshes["bunny"];
     sceneResources->models["bunny1"]->material = sceneResources->materials["wood"];
     sceneResources->models["bunny1"]->transformMtx = rotate(60.0f, vec3(0.0f, 1.0f, 0.0f));
+    sceneResources->models["cube1"] = new Model;
+    sceneResources->models["cube1"]->mesh = sceneResources->meshes["cube"];
+    sceneResources->models["cube1"]->material = sceneResources->materials["silver"];
+
+    sceneResources->models["wasp"] = new Model;
+    sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
+    sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
     ///////////////////////////////////////////////////////
 
@@ -65,20 +75,29 @@ void Scene::init(void) {
     node["teapot1"] = new Node;
     node["teapot2"] = new Node;
     node["bunny"] = new Node;
+    node["wasp"] = new Node;
+    node["cube"] = new Node;
 
     node["teapot1"]->transformMtx = translate(vec3(2.0f, 0.0f, 0.0f));
     node["teapot1"]->model = sceneResources->models["teapot1"];
 
-    node["teapot2"]->transformMtx = translate(vec3(0.0f, 2.0f, 0.0f));
+    node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
     node["teapot2"]->model = sceneResources->models["teapot2"];
 
     node["bunny"]->transformMtx = translate(vec3(-4.0f, 0.0f, 0.0f));
     node["bunny"]->model = sceneResources->models["bunny1"];
 
+    node["wasp"]->model = sceneResources->models["wasp"];
+
+    node["cube"]->transformMtx = translate(vec3(-1.0f, -6.0f, 0.0f));
+    node["cube"]->model = sceneResources->models["cube1"];
+
     // "world" node already exists
     node["world"]->childnodes.push_back(node["teapot1"]);
     node["teapot1"]->childnodes.push_back(node["teapot2"]);
     node["world"]->childnodes.push_back(node["bunny"]);
+    node["world"]->childnodes.push_back(node["cube"]);
+    node["world"]->childnodes.push_back(node["wasp"]);
 
     // Put a camera
     camera = new Camera;

@@ -18,6 +18,7 @@
 #include "Camera.h"
 //#include "Light.h"
 #include "Mesh.h"
+#include "SkinnedMesh.h"
 #include "shader.h"
 #include "Material.h"
 #include "Model.h"
