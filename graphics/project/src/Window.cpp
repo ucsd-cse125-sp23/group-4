@@ -337,6 +337,67 @@ void Window::displayCallback(GLFWwindow* window)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if(skin) skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
 
+	if (skeleton && (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)) {
+		if (skeleton) {
+			if (facing == Direction::Backward) {
+				skeleton->TurnAround();
+			}
+			if (facing == Direction::Left) {
+				skeleton->TurnRight();
+			}
+			if (facing == Direction::Right) {
+				skeleton->TurnLeft();
+			}
+			facing = Direction::Forward;
+			skeleton->MoveForward();
+		}
+	}
+	if (skeleton && (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)) {
+		if (skeleton) {
+			if (facing == Direction::Forward) {
+				skeleton->TurnAround();
+			}
+			if (facing == Direction::Left) {
+				skeleton->TurnLeft();
+			}
+			if (facing == Direction::Right) {
+				skeleton->TurnRight();
+			}
+			facing = Direction::Backward;
+			skeleton->MoveBackward();
+		}
+	}
+	if (skeleton && (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)) {
+		if (skeleton) {
+			if (facing == Direction::Forward) {
+				skeleton->TurnRight();
+			}
+			if (facing == Direction::Backward) {
+				skeleton->TurnLeft();
+			}
+			if (facing == Direction::Left) {
+				skeleton->TurnAround();
+			}
+			facing = Direction::Right;
+			skeleton->MoveRight();
+		}
+	}
+	if (skeleton && (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
+		if (skeleton) {
+			if (facing == Direction::Forward) {
+				skeleton->TurnLeft();
+			}
+			if (facing == Direction::Backward) {
+				skeleton->TurnRight();
+			}
+			if (facing == Direction::Right) {
+				skeleton->TurnAround();
+			}
+			facing = Direction::Left;
+			skeleton->MoveLeft();
+		}
+	}
+
 	// imgui new frame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -385,66 +446,6 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_R:
 			resetCamera();
 			if (anim) anim->Play();
-			break;
-		case GLFW_KEY_W:
-			if (skeleton) {
-				if (facing == Direction::Backward) {
-					skeleton->TurnAround();
-				}
-				if (facing == Direction::Left) {
-					skeleton->TurnRight();
-				}
-				if (facing == Direction::Right) {
-					skeleton->TurnLeft();
-				}
-				facing = Direction::Forward;
-				skeleton->MoveForward();
-			}
-			break;
-		case GLFW_KEY_S:
-			if (skeleton) {
-				if (facing == Direction::Forward) {
-					skeleton->TurnAround();
-				}
-				if (facing == Direction::Left) {
-					skeleton->TurnLeft();
-				}
-				if (facing == Direction::Right) {
-					skeleton->TurnRight();
-				}
-				facing = Direction::Backward;
-				skeleton->MoveBackward();
-			}
-			break;
-		case GLFW_KEY_D:
-			if (skeleton) {
-				if (facing == Direction::Forward) {
-					skeleton->TurnRight();
-				}
-				if (facing == Direction::Backward) {
-					skeleton->TurnLeft();
-				}
-				if (facing == Direction::Left) {
-					skeleton->TurnAround();
-				}
-				facing = Direction::Right;
-				skeleton->MoveRight();
-			}
-			break;
-		case GLFW_KEY_A:
-			if (skeleton) {
-				if (facing == Direction::Forward) {
-					skeleton->TurnLeft();
-				}
-				if (facing == Direction::Backward) {
-					skeleton->TurnRight();
-				}
-				if (facing == Direction::Right) {
-					skeleton->TurnAround();
-				}
-				facing = Direction::Left;
-				skeleton->MoveLeft();
-			}
 			break;
 		default:
 			break;
