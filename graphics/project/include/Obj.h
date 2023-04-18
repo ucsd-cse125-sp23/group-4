@@ -16,16 +16,14 @@ that loads an obj file.
 
 class Obj : public Mesh {
 public:
-
-    glm::mat4 model;
-    glm::vec3 color;
-
+    Obj() {
+        creategl();
+    }
     ~Obj() {
         cleargl();
     }
 
     void init(const char* filename) {
-        color = glm::vec3(0.7f, 0.25f, 0.1f);
 
         std::vector< glm::vec3 > temp_vertices, vertices;
         std::vector< glm::vec3 > temp_normals, normals;
@@ -90,29 +88,6 @@ public:
         bindgl(vertices, normals, indices);
 
         std::cout << "done." << std::endl;
-    }
-
-    // deprecated vvv, use Model.h instead
-    void draw(const glm::mat4& viewProjMtx, GLuint shader)
-    {
-        // actiavte the shader program 
-        glUseProgram(shader);
-
-        // get the locations and send the uniforms to the shader
-        // TODO: create a "setUniforms" method
-        glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
-        glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
-        glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
-
-        // Bind the VAO
-        glBindVertexArray(vao);
-
-        // draw the points using triangles, indexed with the EBO
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
-
-        // Unbind the VAO and shader program
-        glBindVertexArray(0);
-        glUseProgram(0);
     }
 };
 

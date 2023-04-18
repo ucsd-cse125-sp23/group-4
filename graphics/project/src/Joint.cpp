@@ -80,7 +80,7 @@ bool Joint::Load(Tokenizer& t) {
 		else t.SkipLine(); // Unrecognized token
 	}
 
-	box = new Cube(bmin, bmax);
+	//box = new Cube(bmin, bmax);
 
 	return true;
 }
@@ -91,7 +91,7 @@ void Joint::Update(const glm::mat4& parent)
 	glm::mat4 world = parent * local;
 
 	worldMatrix = world;
-	box->setMatrix(world);
+	//box->setMatrix(world);
 
 	// children
 	for (Joint* j : children) {
@@ -101,7 +101,7 @@ void Joint::Update(const glm::mat4& parent)
 
 void Joint::Draw(const glm::mat4& viewProjMtx, GLuint shader)
 {
-	box->draw(viewProjMtx, shader);
+	//box->draw(viewProjMtx, shader);
 
 	// children
 	for (Joint* j : children) {
