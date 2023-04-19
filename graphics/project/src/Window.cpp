@@ -244,6 +244,8 @@ void Window::displayCallback(GLFWwindow* window)
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
+	gameScene->gui();
+
 	//imguiDraw(skeleton, animClip);	// simple helper method
 
 	ImGui::Render();

@@ -75,12 +75,14 @@ public:
         sceneResources = new SceneResourceMap();
 
         // the default scene graph already has one node named "world."
-        node["world"] = new Node;
+        node["world"] = new Node("world");
     }
 
     void init(void);
     void update(float);
     void draw(const glm::mat4& viewProjMtx);
+
+    void gui();
 
     // destructor
     ~Scene() {
