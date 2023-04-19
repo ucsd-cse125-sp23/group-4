@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
 
 template <typename T>
 struct TVector4;
@@ -69,9 +70,11 @@ inline std::ostream& operator<<(std::ostream& os, const TVector4<T>& v) {
 }
 
 using vec3ull = TVector3<size_t>;
+
 using vec3i = TVector3<int>;
 using vec3f = TVector3<float>;
 using vec3d = TVector3<double>;
+using vec4i = TVector4<int>;
 using vec4f = TVector4<float>;
 using vec4d = TVector4<double>;
 
@@ -112,6 +115,13 @@ inline TVector3<T> operator-(const T& s, const TVector3<T>& v) {
 template <typename T>
 inline TVector3<T> operator-(const TVector3<T>& v, const T& s) {
     return TVector3<T>(v.x - s, v.y - s, v.z - s);
+}
+template <typename T>
+inline TVector3<T>& operator-=(TVector3<T>& v0, const TVector3<T>& v1) {
+    v0.x -= v1.x;
+    v0.y -= v1.y;
+    v0.z -= v1.z;
+    return v0;
 }
 template <typename T>
 inline TVector3<T>& operator-=(TVector3<T>& v, const T& s) {
@@ -212,19 +222,19 @@ inline T average(const TVector3<T>& v) {
 }
 template <typename T>
 inline T max(const TVector3<T>& v) {
-    return max(max(v.x, v.y), v.z);
+    return std::max(std::max(v.x, v.y), v.z);
 }
 template <typename T>
 inline T min(const TVector3<T>& v) {
-    return min(min(v.x, v.y), v.z);
+    return std::min(std::min(v.x, v.y), v.z);
 }
 template <typename T>
 inline TVector3<T> min(const TVector3<T>& v0, const TVector3<T>& v1) {
-    return TVector3<T>{min(v0.x, v1.x), min(v0.y, v1.y), min(v0.z, v1.z)};
+    return TVector3<T>{std::min(v0.x, v1.x), std::min(v0.y, v1.y), std::min(v0.z, v1.z)};
 }
 template <typename T>
 inline TVector3<T> max(const TVector3<T>& v0, const TVector3<T>& v1) {
-    return TVector3<T>{max(v0.x, v1.x), max(v0.y, v1.y), max(v0.z, v1.z)};
+    return TVector3<T>{std::max(v0.x, v1.x), std::max(v0.y, v1.y), std::max(v0.z, v1.z)};
 }
 
 
@@ -267,6 +277,14 @@ inline TVector4<T> operator-(const T& s, const TVector4<T>& v) {
 template <typename T>
 inline TVector4<T> operator-(const TVector4<T>& v, const T& s) {
     return TVector4<T>(v.x - s, v.y - s, v.z - s, v.w - s);
+}
+template <typename T>
+inline TVector4<T>& operator-=(TVector4<T>& v0, const TVector4<T>& v1) {
+    v0.x -= v1.x;
+    v0.y -= v1.y;
+    v0.z -= v1.z;
+    v0.w -= v1.w;
+    return v0;
 }
 template <typename T>
 inline TVector4<T>& operator-=(TVector4<T>& v, const T& s) {
@@ -363,17 +381,17 @@ inline T average(const TVector4<T>& v) {
 }
 template <typename T>
 inline T max(const TVector4<T>& v) {
-    return max(max(v.x, v.y), max(v.z, v.w));
+    return std::max(std::max(v.x, v.y), std::max(v.z, v.w));
 }
 template <typename T>
 inline T min(const TVector4<T>& v) {
-    return min(min(v.x, v.y), min(v.z, v.w));
+    return std::min(std::min(v.x, v.y), std::min(v.z, v.w));
 }
 template <typename T>
 inline TVector4<T> min(const TVector4<T>& v0, const TVector4<T>& v1) {
-    return TVector4<T>{min(v0.x, v1.x), min(v0.y, v1.y), min(v0.z, v1.z), min(v0.w, v1.w)};
+    return TVector4<T>{std::min(v0.x, v1.x), std::min(v0.y, v1.y), std::min(v0.z, v1.z), std::min(v0.w, v1.w)};
 }
 template <typename T>
 inline TVector4<T> max(const TVector4<T>& v0, const TVector4<T>& v1) {
-    return TVector4<T>{max(v0.x, v1.x), max(v0.y, v1.y), max(v0.z, v1.z), max(v0.w, v1.w)};
+    return TVector4<T>{std::max(v0.x, v1.x), std::max(v0.y, v1.y), std::max(v0.z, v1.z), std::max(v0.w, v1.w)};
 }

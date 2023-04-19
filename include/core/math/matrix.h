@@ -177,6 +177,19 @@ inline TVector3<T> operator*(const TMat3<T>& m, const TVector3<T>& v) {
                     m(1, 0) * v[0] + m(1, 1) * v[1] + m(1, 2) * v[2],
                     m(2, 0) * v[0] + m(2, 1) * v[1] + m(2, 2) * v[2]);
 }
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const TMat4<T>& v) {
+    return os << "(" << v(0, 0) << ", " << v(0, 1) << ", " << v(0, 2) << ", " << v(0, 3) << "," << std::endl
+              << " " << v(1, 0) << ", " << v(1, 1) << ", " << v(1, 2) << ", " << v(1, 3) << "," << std::endl
+              << " " << v(2, 0) << ", " << v(2, 1) << ", " << v(2, 2) << ", " << v(2, 3) << "," << std::endl
+              << " " << v(3, 0) << ", " << v(3, 1) << ", " << v(3, 2) << ", " << v(3, 3) << ")" << std::endl;
+}
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const TMat3<T>& v) {
+    return os << "(" << v(0, 0) << ", " << v(0, 1) << ", " << v(0, 2) << "," << std::endl
+              << " " << v(1, 0) << ", " << v(1, 1) << ", " << v(1, 2) << "," << std::endl
+              << " " << v(2, 0) << ", " << v(2, 1) << ", " << v(2, 2) << ")" << std::endl;
+}
 
 
 template <typename T>
@@ -196,10 +209,18 @@ inline TMat4<T> operator-(const TMat4<T>& m0, const TMat4<T>& m1) {
     return ret;
 }
 template <typename T>
+inline TMat4<T> operator-(const TMat4<T>& m) {
+    TMat4<T> ret;
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            ret(i, j) = -m(i, j);
+    return ret;
+}
+template <typename T>
 inline TMat4<T>& operator+=(const TMat4<T>& m0, const TMat4<T>& m1) {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            m0(i, j) += + m1(i, j);
+            m0(i, j) += m1(i, j);
     return m0;
 }
 template <typename T>
@@ -438,7 +459,7 @@ TMat4<T> inverse(const TMat4<T>& m) {
 }
 template <typename T>
 TMat4<T> transpose(const TMat4<T>& m) {
-    return TMat4(m(0, 0), m(1, 0), m(2, 0), m(3, 0),
+    return TMat4<T>(m(0, 0), m(1, 0), m(2, 0), m(3, 0),
                  m(0, 1), m(1, 1), m(2, 1), m(3, 1),
                  m(0, 2), m(1, 2), m(2, 2), m(3, 2),
                  m(0, 3), m(1, 3), m(2, 3), m(3, 3));
@@ -464,6 +485,14 @@ inline TMat3<T> operator-(const TMat3<T>& m0, const TMat3<T>& m1) {
     return ret;
 }
 template <typename T>
+inline TMat3<T> operator-(const TMat3<T>& m) {
+    TMat3<T> ret;
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            ret(i, j) = -m(i, j);
+    return ret;
+}
+template <typename T>
 inline TMat3<T>& operator+=(const TMat3<T>& m0, const TMat3<T>& m1) {
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
@@ -484,7 +513,7 @@ inline TMat3<T> operator*(const TMat3<T>& m0, const TMat3<T>& m1) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             ret(i, j) = T(0);
-            for (int k = 0; k < 4; k++) {
+            for (int k = 0; k < 3; k++) {
                 ret(i, j) += m0(i, k) * m1(k, j);
             }
         }
@@ -601,7 +630,7 @@ TMat3<T> inverse(const TMat3<T>& m) {
 }
 template <typename T>
 TMat3<T> transpose(const TMat3<T>& m) {
-    return TMat3(m(0, 0), m(1, 0), m(2, 0),
+    return TMat3<T>(m(0, 0), m(1, 0), m(2, 0),
                  m(0, 1), m(1, 1), m(2, 1),
                  m(0, 2), m(1, 2), m(2, 2));
 }
@@ -616,17 +645,23 @@ TMat4<T> translate(TVector3<T> pos) {
                     T(0), T(0), T(0), T(1));
 }
 template <typename T>
-TMat4<T> rotate(TVector3<T> rollpitchyaw) {
-    T ys = sin(rollpitchyaw[0]);
-    T yc = cos(rollpitchyaw[0]);
-    T ps = sin(rollpitchyaw[1]);
-    T pc = cos(rollpitchyaw[1]);
-    T rs = sin(rollpitchyaw[2]);
-    T rc = cos(rollpitchyaw[2]);
-    return TMat4<T>(yc*pc, yc*ps*rs-ys*rc, yc*ps*rc+ys*rs, T(0),
+TMat4<T> rotate(TVector3<T> yawpitchroll) {
+    T ys = sin(yawpitchroll[0]);
+    T yc = cos(yawpitchroll[0]);
+    T ps = sin(yawpitchroll[1]);
+    T pc = cos(yawpitchroll[1]);
+    T rs = sin(yawpitchroll[2]);
+    T rc = cos(yawpitchroll[2]);
+    TMat3<T> R = TMat3<T>(yc, T(0), ys, T(0), T(1), T(0), -ys, T(0), yc)
+               * TMat3<T>(pc, -ps, T(0), ps, pc, T(0), T(0), T(0), T(1))
+               * TMat3<T>(T(1), T(0), T(0), T(0), rc, -rs, T(0), rs, rc);
+    return TMat4<T>(R(0, 0), R(0, 1), R(0, 2), T(0), R(1, 0), R(1, 1), R(1, 2), T(0), R(2, 0), R(2, 1), R(2, 2), T(0), T(0), T(0), T(0), T(1));
+    /*
+    return TMat4<T>(yc * pc, yc * ps * rs - ys * rc, yc * ps * rc + ys * rs, T(0),
                     ys*pc, ys*ps*rs+yc*rc, ys*ps*rc-yc*rs, T(0),
                     -ps, pc*rs, pc*rc, T(0),
                     T(0), T(0), T(0), T(1));
+    */
 }
 template <typename T>
 TMat4<T> scale(TVector3<T> s) {
