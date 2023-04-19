@@ -32,11 +32,12 @@ public:
 	void SetDistance(float d)				{Distance=d;}
 	void SetAzimuth(float a)				{Azimuth=a;}
 	void SetIncline(float i)				{Incline=i;}
+	void UpdateWorld();
 
 	float GetDistance()						{return Distance;}
 	float GetAzimuth()						{return Azimuth;}
 	float GetIncline()						{return Incline;}
-
+	bool GetFixed()							{return Fixed;}
 	const glm::mat4 &GetViewProjectMtx()	{return ViewProjectMtx;}
 
 private:
@@ -50,6 +51,8 @@ private:
 	float Distance;		// Distance of the camera eye position to the origin (meters)
 	float Azimuth;		// Rotation of the camera eye position around the Y axis (degrees)
 	float Incline;		// Angle of the camera eye position over the XZ plane (degrees)
+	float XTranslation; // Left/Right Translation of Camera
+	float ZTranslation; // Forward/Back Translation of Camera
 
 	bool Fixed;
 	glm::mat4 World;
