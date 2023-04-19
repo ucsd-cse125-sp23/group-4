@@ -6,12 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum class Direction {
-	Forward,
-	Backward,
-	Left,
-	Right
-};
+
 // Window Properties
 int Window::width;
 int Window::height;
@@ -45,7 +40,6 @@ std::string animfile = "";
 bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
-Direction facing = Direction::Forward;
 
 void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 
@@ -65,7 +59,6 @@ void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 		Window::initializeObjects();
 		ImGui::EndGroup();
 		ImGui::End();
-		facing = Direction::Forward;
 		return;
 	}
 	ImGui::EndGroup();
@@ -301,11 +294,10 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::idleCallback(float deltaTime)
+void Window::idleCallback(GLFWwindow* window, float deltaTime)
 {
 	// Perform any updates as necessary. 
 	Cam->Update();
-	
 
 	if (anim && animClip) {
 		anim->Update(deltaTime);
@@ -313,7 +305,10 @@ void Window::idleCallback(float deltaTime)
 		if (skeleton) skeleton->SetPose(anim->GetCurrentPose());
 	}
 
-	if (skeleton) skeleton->Update();
+	if (skeleton) {
+		skeleton->Update();
+		skeleton->Move(window, Cam);
+	}
 
 	if (skin) skin->Update(skeleton);
 }
@@ -336,67 +331,6 @@ void Window::displayCallback(GLFWwindow* window)
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if(skin) skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-
-	if (skeleton && (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)) {
-		if (skeleton) {
-			if (facing == Direction::Backward) {
-				skeleton->TurnAround();
-			}
-			if (facing == Direction::Left) {
-				skeleton->TurnRight();
-			}
-			if (facing == Direction::Right) {
-				skeleton->TurnLeft();
-			}
-			facing = Direction::Forward;
-			skeleton->MoveForward();
-		}
-	}
-	if (skeleton && (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)) {
-		if (skeleton) {
-			if (facing == Direction::Forward) {
-				skeleton->TurnAround();
-			}
-			if (facing == Direction::Left) {
-				skeleton->TurnLeft();
-			}
-			if (facing == Direction::Right) {
-				skeleton->TurnRight();
-			}
-			facing = Direction::Backward;
-			skeleton->MoveBackward();
-		}
-	}
-	if (skeleton && (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)) {
-		if (skeleton) {
-			if (facing == Direction::Forward) {
-				skeleton->TurnRight();
-			}
-			if (facing == Direction::Backward) {
-				skeleton->TurnLeft();
-			}
-			if (facing == Direction::Left) {
-				skeleton->TurnAround();
-			}
-			facing = Direction::Right;
-			skeleton->MoveRight();
-		}
-	}
-	if (skeleton && (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
-		if (skeleton) {
-			if (facing == Direction::Forward) {
-				skeleton->TurnLeft();
-			}
-			if (facing == Direction::Backward) {
-				skeleton->TurnRight();
-			}
-			if (facing == Direction::Right) {
-				skeleton->TurnAround();
-			}
-			facing = Direction::Left;
-			skeleton->MoveLeft();
-		}
-	}
 
 	// imgui new frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -446,6 +380,10 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_R:
 			resetCamera();
 			if (anim) anim->Play();
+			break;
+
+		case GLFW_KEY_C:
+			Cam->ToggleFixedCamera(window);
 			break;
 		default:
 			break;

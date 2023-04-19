@@ -5,7 +5,13 @@
 #pragma once
 
 #include "core.h"
-
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+#include <GLFW/glfw3.h>
 ////////////////////////////////////////////////////////////////////////////////
 
 // The Camera class provides a simple means to controlling the 3D camera. It could
@@ -18,6 +24,8 @@ public:
 
 	void Update();
 	void Reset();
+	void ToggleFixedCamera(GLFWwindow* window);
+	void Move(GLFWwindow* window, float delta = 0.25);
 
 	// Access functions
 	void SetAspect(float a)					{Aspect=a;}
@@ -42,6 +50,9 @@ private:
 	float Distance;		// Distance of the camera eye position to the origin (meters)
 	float Azimuth;		// Rotation of the camera eye position around the Y axis (degrees)
 	float Incline;		// Angle of the camera eye position over the XZ plane (degrees)
+
+	bool Fixed;
+	glm::mat4 World;
 
 	// Computed data
 	glm::mat4 ViewProjectMtx;

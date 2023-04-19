@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 		lastTime = nowTime;
 
 		// Idle callback. Updating objects, etc. can be done here.
-		Window::idleCallback(deltaTime);
+		Window::idleCallback(window, deltaTime);
 
 		// Main render display callback. Rendering of objects is done here.
 		Window::displayCallback(window);
