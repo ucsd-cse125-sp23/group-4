@@ -248,5 +248,8 @@
     <ClInclude Include="include\SkinnedMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameThing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

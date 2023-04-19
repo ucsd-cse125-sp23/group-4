@@ -222,7 +222,7 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime)
 	// Perform any updates as necessary. 
 	Cam->Update();
 	
-	//gameScene->update();
+	gameScene->update(deltaTime);
 }
 
 void Window::displayCallback(GLFWwindow* window)
