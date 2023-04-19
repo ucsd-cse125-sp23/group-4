@@ -445,6 +445,7 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
 		const float rate = 0.5f;
 		Cam->SetAzimuth(Cam->GetAzimuth() + dx * rate);
 		Cam->SetIncline(glm::clamp(Cam->GetIncline() - dy * rate, -90.0f, 90.0f));
+		Cam->UpdateWorld();
 	}
 	// Zoom moved to scroll wheel
 }

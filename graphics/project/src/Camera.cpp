@@ -17,9 +17,9 @@ Camera::Camera() {
 
 void Camera::Update() {
 	//// Compute camera world matrix
-	//glm::mat4 world(1);
-	//world[3][2]=Distance;
-	//world=glm::eulerAngleY(glm::radians(-Azimuth)) * glm::eulerAngleX(glm::radians(-Incline)) * world;
+	/*World = glm::mat4(1);
+	World[3][2]=Distance;
+	World=glm::eulerAngleY(glm::radians(-Azimuth)) * glm::eulerAngleX(glm::radians(-Incline)) * World;*/
 
 	// Compute view matrix (inverse of world matrix)
 	glm::mat4 view=glm::inverse(World);
@@ -33,6 +33,15 @@ void Camera::Update() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Camera::UpdateWorld() {
+	//World = glm::eulerAngleY(glm::radians(-Azimuth)) * glm::eulerAngleX(glm::radians(-Incline)) * World;
+	World = glm::mat4(1);
+	World[3][2] = Distance;
+	World = glm::eulerAngleY(glm::radians(-Azimuth)) * glm::eulerAngleX(glm::radians(-Incline)) * World;
+
+	World = glm::translate(glm::vec3(XTranslation, 0, ZTranslation)) * World;
+}
+
 void Camera::Reset() {
 	FOV=45.0f;
 	Aspect=1.33f;
@@ -42,6 +51,9 @@ void Camera::Reset() {
 	Distance=10.0f;
 	Azimuth=0.0f;
 	Incline=20.0f;
+
+	XTranslation = 0.0f;
+	ZTranslation = 0.0f;
 
 	World = glm::mat4(1);
 	World[3][2] = Distance;
@@ -64,15 +76,19 @@ void Camera::Move(GLFWwindow* window, float delta) {
 	if (!Fixed) {
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 			World = glm::translate(glm::vec3(0, 0, -delta)) * World;
+			ZTranslation -= delta;
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 			World = glm::translate(glm::vec3(0, 0, delta)) * World;
+			ZTranslation += delta;
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 			World = glm::translate(glm::vec3(delta,0, 0)) * World;
+			XTranslation += delta;
 		}
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 			World = glm::translate(glm::vec3(-delta, 0, 0)) * World;
+			XTranslation -= delta;
 		}
 	}	
 }
