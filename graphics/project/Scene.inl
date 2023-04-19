@@ -82,14 +82,15 @@ void Scene::init(void) {
 
     // Add stuff to game updateables
     GameThing* thing_example = new GameThing;
+    thing_example->name = "GT_teapot";
     gamethings.push_back(thing_example);
 
     // Build the scene graph
     node["teapot1"] = thing_example;
-    node["teapot2"] = new Node;
-    node["bunny"] = new Node;
-    node["ground"] = new Node;
-    node["wasp"] = new Node;
+    node["teapot2"] = new Node("teapotChild");
+    node["bunny"] = new Node("bunny");
+    node["ground"] = new Node("ground");
+    node["wasp"] = new Node("wasp");
 
     thing_example->transform.position = vec3(2.0f, 0.0f, 0.0f); // gamething only
     node["teapot1"]->model = sceneResources->models["teapot1"];
@@ -109,7 +110,7 @@ void Scene::init(void) {
             if ((i + j) % 2 == 0) {
                 std::string currcube = "cube." + std::to_string(i) + ", " + std::to_string(j);
 
-                node[currcube] = new Node;
+                node[currcube] = new Node(currcube);
                 node[currcube]->transformMtx = translate(vec3(i, 0, j));
                 node[currcube]->model = sceneResources->models["cubeF"];
 
