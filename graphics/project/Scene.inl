@@ -9,8 +9,6 @@ Scene.inl contains the definition of the scene graph
 
 using namespace glm;
 void Scene::init(void) {
-    sceneResources = new SceneResourceMap();
-
     // Create a mesh palette
     sceneResources->meshes["cube"] = new Cube();
     sceneResources->meshes["teapot"] = new Obj();
@@ -48,6 +46,13 @@ void Scene::init(void) {
     sceneResources->materials["silver"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
     sceneResources->materials["silver"]->shininess = 50.0f;
 
+    sceneResources->materials["marble"] = new Material;
+    sceneResources->materials["marble"]->shader = sceneResources->shaderPrograms["basic"];
+    sceneResources->materials["marble"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+    sceneResources->materials["marble"]->diffuse = vec4(0.97f, 0.89f, 0.75f, 1.0f);
+    sceneResources->materials["marble"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+    sceneResources->materials["marble"]->shininess = 50.0f;
+
     // Create a model palette
     sceneResources->models["teapot1"] = new Model;
     sceneResources->models["teapot1"]->mesh = sceneResources->meshes["teapot"];
@@ -64,6 +69,10 @@ void Scene::init(void) {
     sceneResources->models["cube1"] = new Model;
     sceneResources->models["cube1"]->mesh = sceneResources->meshes["cube"];
     sceneResources->models["cube1"]->material = sceneResources->materials["silver"];
+    sceneResources->models["cubeF"] = new Model;
+    sceneResources->models["cubeF"]->transformMtx = scale(vec3(1.0f, 0.1f, 1.0f)) * scale(vec3(0.5f));
+    sceneResources->models["cubeF"]->mesh = sceneResources->meshes["cube"];
+    sceneResources->models["cubeF"]->material = sceneResources->materials["marble"];
 
     sceneResources->models["wasp"] = new Model;
     sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
@@ -71,14 +80,18 @@ void Scene::init(void) {
 
     ///////////////////////////////////////////////////////
 
+    // Add stuff to game updateables
+    GameThing* thing_example = new GameThing;
+    gamethings.push_back(thing_example);
+
     // Build the scene graph
-    node["teapot1"] = new Node;
+    node["teapot1"] = thing_example;
     node["teapot2"] = new Node;
     node["bunny"] = new Node;
+    node["ground"] = new Node;
     node["wasp"] = new Node;
-    node["cube"] = new Node;
 
-    node["teapot1"]->transformMtx = translate(vec3(2.0f, 0.0f, 0.0f));
+    thing_example->transform.position = vec3(2.0f, 0.0f, 0.0f); // gamething only
     node["teapot1"]->model = sceneResources->models["teapot1"];
 
     node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
@@ -89,16 +102,28 @@ void Scene::init(void) {
 
     node["wasp"]->model = sceneResources->models["wasp"];
 
-    node["cube"]->transformMtx = translate(vec3(-1.0f, -6.0f, 0.0f));
-    node["cube"]->model = sceneResources->models["cube1"];
+    node["ground"]->transformMtx = translate(vec3(-10, -1.0f, -10));
+    int checkers = 16;
+    for (int i = 1; i <= checkers; i++) {
+        for (int j = 1; j <= checkers; j++) {
+            if ((i + j) % 2 == 0) {
+                std::string currcube = "cube." + std::to_string(i) + ", " + std::to_string(j);
+
+                node[currcube] = new Node;
+                node[currcube]->transformMtx = translate(vec3(i, 0, j));
+                node[currcube]->model = sceneResources->models["cubeF"];
+
+                node["ground"]->childnodes.push_back(node[currcube]);
+            }
+        }
+    }
 
     // "world" node already exists
     node["world"]->childnodes.push_back(node["teapot1"]);
     node["teapot1"]->childnodes.push_back(node["teapot2"]);
     node["world"]->childnodes.push_back(node["bunny"]);
-    node["world"]->childnodes.push_back(node["cube"]);
+    node["world"]->childnodes.push_back(node["ground"]);
     node["world"]->childnodes.push_back(node["wasp"]);
 
-    // Put a camera
-    camera = new Camera;
+
 }

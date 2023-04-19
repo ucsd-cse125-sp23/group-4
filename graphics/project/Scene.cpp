@@ -10,6 +10,15 @@ adapted from CSE 167 - Matthew
 
 
 using namespace glm;
+
+void Scene::update(float deltaTime) {
+    //if (player) player->update(deltaTime);
+
+    for (auto e : gamethings) {
+        e->update(deltaTime);
+    }
+}
+
 void Scene::draw(const glm::mat4& viewProjMtx) {
     // Pre-draw sequence:
     //camera->computeMatrices();
