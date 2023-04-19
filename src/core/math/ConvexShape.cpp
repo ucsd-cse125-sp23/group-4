@@ -5,8 +5,11 @@
 #include "core/math/shape/ConvexShape.h"
 #include "core/math/shape/Simplex.h"
 
+#define MAX_ITERATIONS 100
+
 //https://blog.winter.dev/2020/gjk-algorithm/
 //https://blog.winter.dev/2020/epa-algorithm/
+//https://stackoverflow.com/questions/48979868/implementing-the-expanding-polytope-algorithm-in-3d-space
 vec3f ConvexShape::support(const ConvexShape* shape0, const mat4f& mtx0, const mat3f& iMtx0,
 						   const ConvexShape* shape1, const mat4f& mtx1, const mat3f& iMtx1,
 						   vec3f dir)
@@ -128,8 +131,9 @@ bool ConvexShape::collides(const ConvexShape* other, const mat4f& thisMtx, const
 	Simplex pts;
 	pts.push(support);
 
+	size_t ite = 0;
 	vec3f dir = -support;
-	while (true) {
+	while (ite++ < MAX_ITERATIONS) {
 		support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, dir);
 		if (dot(support,dir) <= 0)
 			return false;
@@ -223,6 +227,7 @@ size_t reconstruct(std::vector<vec3f>& polytope, std::vector<vec3ull>& faces, st
 }
 vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat3f& thisIMtx, const mat4f& otherMtx, const mat3f& otherIMtx) const
 {
+	size_t ite = 0;
 	//GJK
 	Simplex pts;
 	{
@@ -231,7 +236,7 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 		if (length_squared(support) != 0)
 		{
 			vec3f dir = -support;
-			while (true) {
+			while (ite++ < MAX_ITERATIONS) {
 				support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, dir);
 				if (dot(support, dir) <= 0)
 					return vec4f(0, 0, 0, 0);
@@ -256,6 +261,7 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 		}
 	}
 
+	ite = 0;
 	//EPA
 	vec4f min;
 	{
@@ -269,7 +275,7 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 		std::vector<vec4f> normals;
 
 		size_t minFace = computeMinNormal(polytope, faces, normals);
-		while (true)
+		while (ite++ < MAX_ITERATIONS)
 		{
 			min = normals[minFace];
 			vec3f minNorm = vec3f(min);
