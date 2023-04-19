@@ -14,10 +14,12 @@
 #include <stack>
 
 #include "Node.h"
+#include "GameThing.h"
 
 #include "Camera.h"
 //#include "Light.h"
 #include "Mesh.h"
+#include "SkinnedMesh.h"
 #include "shader.h"
 #include "Material.h"
 #include "Model.h"
@@ -66,14 +68,21 @@ public:
     // The container of nodes will be the scene graph after we connect the nodes by setting the child_nodes.
     std::map< std::string, Node* > node;
 
+    std::vector< GameThing* > gamethings;
+
     Scene() {
+        camera = new Camera;
+        sceneResources = new SceneResourceMap();
+
         // the default scene graph already has one node named "world."
-        node["world"] = new Node;
+        node["world"] = new Node("world");
     }
 
     void init(void);
-    void update(void);  // TODO: use a separate map of nodes for updateables? "Updated" interface?
+    void update(float);
     void draw(const glm::mat4& viewProjMtx);
+
+    void gui();
 
     // destructor
     ~Scene() {

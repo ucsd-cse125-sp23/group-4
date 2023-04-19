@@ -221,7 +221,7 @@ void Window::idleCallback(float deltaTime)
 	// Perform any updates as necessary. 
 	Cam->Update();
 	
-	//gameScene->update();
+	gameScene->update(deltaTime);
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -242,6 +242,8 @@ void Window::displayCallback(GLFWwindow* window)
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+
+	gameScene->gui();
 
 	//imguiDraw(skeleton, animClip);	// simple helper method
 

@@ -9,6 +9,10 @@
 // drawable, with a model and child nodes. maybe extend this class later
 class Node {
 public:
+    std::string name = "node";
+    Node() { }
+    Node(std::string name) { this->name = name; }
+
     glm::mat4 transformMtx;
     
     Model* model = nullptr;

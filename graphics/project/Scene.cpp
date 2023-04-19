@@ -10,6 +10,15 @@ adapted from CSE 167 - Matthew
 
 
 using namespace glm;
+
+void Scene::update(float deltaTime) {
+    //if (player) player->update(deltaTime);
+
+    for (auto e : gamethings) {
+        e->update(deltaTime);
+    }
+}
+
 void Scene::draw(const glm::mat4& viewProjMtx) {
     // Pre-draw sequence:
     //camera->computeMatrices();
@@ -55,4 +64,67 @@ void Scene::draw(const glm::mat4& viewProjMtx) {
 }
 
 
+#include "imgui/imgui.h"
+void treeChildren(ImGuiTreeNodeFlags node_flags, bool isOpen, Node* par)
+{
+    if (isOpen)
+    {
+        for (auto child : par->childnodes)
+        {
+            if (child->childnodes.empty())
+            {
+                node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
+                //ImGui::TreeNodeEx((void*)(intptr_t)par, node_flags, child.name.c_str());
+            }
+            else
+            {
+                //bool o = ImGui::TreeNodeEx((void*)(intptr_t)par, node_flags, child.name.c_str());
+                ImGui::TreePop();
+                //treeChildren(node_flags, o, p);
+            }
+        }
+        ImGui::TreePop();
+    }
+}
 
+void Scene::gui() {
+    ImGui::Begin("Scene Info");
+
+    //show a list of game objects
+    //ImGui::LabelText("", "gfx nodes");
+
+    if (ImGui::TreeNode("--- node[] tree ---"))
+    {
+        std::stack < Node* > dfs_stack_gui;
+        Node* cur = node["world"]; // root of the tree
+        dfs_stack_gui.push(cur);
+
+        int gui_id = 0;
+        while (!dfs_stack_gui.empty()) {
+            ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize() * 3);
+
+            // top-pop the stacks
+            cur = dfs_stack_gui.top();
+            dfs_stack_gui.pop();
+
+            ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+            if (cur->childnodes.empty()) node_flags |= ImGuiTreeNodeFlags_Leaf;
+            bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)gui_id, node_flags, cur->name.c_str());
+
+            if (node_open) {
+                for (unsigned int i = 0; i < cur->childnodes.size(); i++) {
+                    dfs_stack_gui.push(cur->childnodes[i]);
+                }
+                ImGui::TreePop();
+            }
+            gui_id++;
+
+            ImGui::PopStyleVar();
+
+        } // End of DFS while loop
+
+        ImGui::TreePop();
+    }
+
+    ImGui::End();
+}
