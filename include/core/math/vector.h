@@ -68,6 +68,7 @@ inline std::ostream& operator<<(std::ostream& os, const TVector4<T>& v) {
     return os << "(" << v[0] << ", " << v[1] << ", " << v[2] <<", " << v[3] << ")";
 }
 
+using vec3ull = TVector3<size_t>;
 using vec3i = TVector3<int>;
 using vec3f = TVector3<float>;
 using vec3d = TVector3<double>;

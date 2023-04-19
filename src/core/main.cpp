@@ -18,24 +18,23 @@ int main(int argc, char* argv[])
 	mat4f m = translate(b);
 	m = rotate(b);
 	m = scale(b);
-
+	/*
 	std::cout << (shape0->collides(shape0) ? "hits" : "misses") << std::endl;
 	std::cout << (shape0->collides(shape0, translate(vec3f(0.5f, 0.0f, 0.0f))) ? "hits" : "misses") << std::endl;
 	std::cout << (shape0->collides(shape0, translate(vec3f(1.4f, 0.0f, 1.4f))) ? "hits" : "misses") << std::endl;
 	std::cout << (shape0->collides(shape0, translate(vec3f(0.0f, 0.9f, 0.0f))) ? "hits" : "misses") << std::endl;
 	std::cout << (shape0->collides(shape0, translate(vec3f(0.0f, 1.9f, 0.0f))) ? "hits" : "misses") << std::endl;
 	std::cout << (shape0->collides(shape0, translate(vec3f(1.5f, 0.0f, 1.5f))) ? "hits" : "misses") << std::endl;
-
+	*/
 	vec4f v;
 	//std::cout << (v=shape0->mtv(shape0, translate(vec3f(1.9f, 0.0f, 0.0f)))) << std::endl;
 	//std::cout << (shape0->collides(shape0, translate(vec3f(1.9f, 0.0f, 0.0f) - vec3f(v) * (v.w + 0.01f))) ? "hits" : "misses") << std::endl;
 	//std::cout << shape0->mtv(shape0, translate(vec3f(1.4f, 0.0f, 1.4f))) << std::endl;
 
-	AABShape* aab = new AABShape(vec3f(-1,-1,-1), vec3f(1,1,1));
+	AABShape* aab = new AABShape(vec3f(-1, -1, -1), vec3f(1, 1, 1));
 	
-	std::cout << (v=aab->mtv(aab, translate(vec3f(1.4f, 0.0f, 0.0f)), scale(vec3f(0.5f, 1.0f, 0.5f)))) << std::endl;
-	std::cout << (shape0->collides(shape0, translate(vec3f(1.4f, 0.0f, 0.0f) + vec3f(v.x*(v.w+0.03f),0.0f,0.0f)), scale(vec3f(0.5f, 1.0f, 0.5f))) ? "hits" : "misses") << std::endl;
-	std::cout << (shape0->collides(shape0, translate(vec3f(1.4f, 0.0f, 0.0f) + vec3f(v)*(v.w + 0.03f)), scale(vec3f(0.5f, 1.0f, 0.5f))) ? "hits" : "misses") << std::endl;
+	std::cout << (v=aab->mtv(aab, translate(vec3f(1.4f, 0.1f, 0.0f)), scale(vec3f(0.5f, 1.0f, 0.5f)))) << std::endl;
+	std::cout << (shape0->collides(shape0, translate(vec3f(1.4f, 0.0f, 0.0f) + vec3f(v)*(v.w + 0.001f)), scale(vec3f(0.5f, 1.0f, 0.5f))) ? "hits" : "misses") << std::endl;
 
 	delete shape0;
 	delete aab;
