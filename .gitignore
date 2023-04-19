@@ -3,8 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+
 ## Dear ImGui artifacts
 **/imgui.ini
+
+build
+compile_commands.json
+
 
 # User-specific files
 *.rsuser
