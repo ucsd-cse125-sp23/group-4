@@ -46,6 +46,7 @@ bool Skeleton::Load(const char* file) {
 
 	// Initializes joints array
 	BuildJointArray(root, &joints);
+	facing = Direction::Forward;
 
 	return true;
 }
@@ -175,4 +176,61 @@ void Skeleton::TurnLeft() {
 void Skeleton::TurnRight() {
 	std::vector<DOF> root_dofs = root->GetDOFS();
 	root->SetDOF(1, root_dofs[1].GetValue() - (M_PI / 2));
+}
+
+void Skeleton::Move(GLFWwindow* window, Camera* camera, float delta) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		if (facing == Direction::Backward) {
+			TurnAround();
+		}
+		if (facing == Direction::Left) {
+			TurnRight();
+		}
+		if (facing == Direction::Right) {
+			TurnLeft();
+		}
+		facing = Direction::Forward;
+		MoveForward();
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		if (facing == Direction::Forward) {
+			TurnAround();
+		}
+		if (facing == Direction::Left) {
+			TurnLeft();
+		}
+		if (facing == Direction::Right) {
+			TurnRight();
+		}
+		facing = Direction::Backward;
+		MoveBackward();
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		if (facing == Direction::Forward) {
+			TurnRight();
+		}
+		if (facing == Direction::Backward) {
+			TurnLeft();
+		}
+		if (facing == Direction::Left) {
+			TurnAround();
+		}
+		facing = Direction::Right;
+		MoveRight();
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		if (facing == Direction::Forward) {
+			TurnLeft();
+		}
+		if (facing == Direction::Backward) {
+			TurnRight();
+		}
+		if (facing == Direction::Right) {
+			TurnAround();
+		}
+		facing = Direction::Left;
+		MoveLeft();
+	}
+
+	camera->Move(window, delta);
 }

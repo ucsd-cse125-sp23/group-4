@@ -7,9 +7,24 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+#include <GLFW/glfw3.h>
 #include "core.h"
 #include "Pose.h"
 #include "Joint.h"
+#include "Camera.h"
+
+enum class Direction {
+	Forward,
+	Backward,
+	Left,
+	Right
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +46,7 @@ public:
 	void Update();
 	void Draw(const glm::mat4& viewProjMtx, GLuint shader);
 	void Show();	// GUI
+	void Move(GLFWwindow* window, Camera* camera, float delta = 0.25);
 
 	glm::mat4 GetWorldMatrix(int joint);
 
@@ -50,6 +66,7 @@ private:
 	void SetJointDOFs(int joint, glm::vec3 dof);
 	Joint* GetJoint(int j);
 	Joint* FindJointInTree(int j);
+	Direction facing;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

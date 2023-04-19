@@ -44,7 +44,7 @@ public:
 	static void resizeCallback(GLFWwindow* window, int width, int height);
 
 	// update and draw functions
-	static void idleCallback(float deltaTime);
+	static void idleCallback(GLFWwindow* window, float deltaTime);
 	static void displayCallback(GLFWwindow*);
 
 	// helper to reset the camera
