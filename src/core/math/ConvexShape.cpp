@@ -134,9 +134,8 @@ bool ConvexShape::collides(const ConvexShape* other, const mat4f& thisMtx, const
 		if (dot(support,dir) <= 0)
 			return false;
 		pts.push(support);
-		if (nextSimplex(pts, dir)) {
+		if (nextSimplex(pts, dir))
 			return true;
-		}
 	}
 }
 bool ConvexShape::collides(const ConvexShape* other, const mat4f& thisMtx, const mat4f& otherMtx) const
@@ -227,82 +226,62 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 	//GJK
 	Simplex pts;
 	{
-	vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, { 1,0,0 });
-	pts.push(support);
-	if (length_squared(support) != 0)
-	{
-		vec3f dir = -support;
-		while (true) {
-			support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, dir);
-			if (dot(support, dir) <= 0)
-				return vec4f(0, 0, 0, 0);
-			pts.push(support);
-			if (nextSimplex(pts, dir)) {
-				break;
+		vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, { 1,0,0 });
+		pts.push(support);
+		if (length_squared(support) != 0)
+		{
+			vec3f dir = -support;
+			while (true) {
+				support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, dir);
+				if (dot(support, dir) <= 0)
+					return vec4f(0, 0, 0, 0);
+				pts.push(support);
+				if (nextSimplex(pts, dir))
+					break;
 			}
+		}
+
+		//Fix simplex
+		if (pts.size() == 2)
+		{
+			vec3f l = normalize(pts[0] - pts[1]);
+			vec3f p = vec3f(-l.y, l.x, l.z);
+			pts.push(ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, p - dot(l, p) * l));
+		}
+		if (pts.size() == 3)
+		{
+			vec3f ba = pts[1] - pts[0];
+			vec3f ca = pts[2] - pts[0];
+			pts.push(ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, cross(ba, ca)));
 		}
 	}
 
-	//Fix simplex
-	if (pts.size() == 2)
-	{
-		vec3f l = normalize(pts[0] - pts[1]);
-		vec3f p = vec3f(-l.y, l.x, l.z);
-		pts.push(ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, p - dot(l, p) * l));
-	}
-	if (pts.size() == 3)
-	{
-		vec3f ba = pts[1] - pts[0];
-		vec3f ca = pts[2] - pts[0];
-		pts.push(ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, cross(ba, ca)));
-	}
-	}
-
 	//EPA
-	//Safety loop escape condition
-	/*float scale = 0.001f;
-	float gMin = std::numeric_limits<float>::max();
-	vec4f gNorm = vec4f(0, 0, 0, 0);
-	*/
-
-
-	std::vector<vec3f> polytope(pts.begin(), pts.end());
-	std::vector<vec3ull> faces = {
-		vec3ull(0, 1, 2),
-		vec3ull(0, 3, 1),
-		vec3ull(0, 2, 3),
-		vec3ull(1, 3, 2)
-	};
-	std::vector<vec4f> normals;
-
 	vec4f min;
-	size_t minFace = computeMinNormal(polytope, faces, normals);
-	while (true)
 	{
-		for (int i = 0; i < polytope.size(); i++)
-			std::cout << "v " << polytope[i].x << " " << polytope[i].y << " " << polytope[i].z << std::endl;
-		for (int i = 0; i < faces.size(); i++)
-			std::cout << "f " << (faces[i].x+1) << " " << (faces[i].y + 1) << " " << (faces[i].z + 1) << std::endl;
-		std::cout << std::endl;
-		min = normals[minFace];
-		vec3f minNorm = vec3f(min);
-		vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, minNorm);
+		std::vector<vec3f> polytope(pts.begin(), pts.end());
+		std::vector<vec3ull> faces = {
+			vec3ull(0, 1, 2),
+			vec3ull(0, 3, 1),
+			vec3ull(0, 2, 3),
+			vec3ull(1, 3, 2)
+		};
+		std::vector<vec4f> normals;
 
-		float dist = dot(support, minNorm) - min.w;
-		/*
-		std::cout << dist << " " << support << " " << std::endl;
-		std::cout << dot(support, minNorm) << " " << minFace.second << std::endl;
-		std::cout << dot(support, polytope[faces[minFace.first].x]) << " " << dot(support, polytope[faces[minFace.first].y]) << " " << dot(support, polytope[faces[minFace.first].z]) << std::endl;
-		std::cout << polytope[faces[minFace.first].x] << " " << polytope[faces[minFace.first].y] << " " << polytope[faces[minFace.first].z] << std::endl << std::endl;
-		*/
-		if (dist < 0.0001f)
-			break;
+		size_t minFace = computeMinNormal(polytope, faces, normals);
+		while (true)
+		{
+			min = normals[minFace];
+			vec3f minNorm = vec3f(min);
+			vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, minNorm);
 
-		minFace = reconstruct(polytope, faces, normals, support);
+			if (dot(support, minNorm) - min.w < 0.0001f)
+				break;
+
+			minFace = reconstruct(polytope, faces, normals, support);
+		}
 	}
 
-	//if (gNorm.w < minDistance)
-	//	return gNorm;
 	return vec4f(-min.x, -min.y, -min.z, min.w);
 }
 vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat4f& otherMtx) const
@@ -356,5 +335,5 @@ vec4f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx, const m
 			minLS = v.w;
 		}
 	}
-	return -min;
+	return vec4f(-min.x, -min.y, -min.z, min.w);
 }
