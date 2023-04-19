@@ -151,59 +151,83 @@ bool ConvexShape::collides(const ConvexShape* other, const mat4f& thisMtx, const
 	return this->collides(other, thisMtx, thisIMtx, otherMtx, otherIMtx);
 }
 
-std::pair<std::vector<vec4f>, size_t> getFaceNormals(const std::vector<vec3f>& polytope, const std::vector<size_t>& faces)
+size_t computeMinNormal(const std::vector<vec3f>& polytope, const std::vector<vec3ull>& faces, std::vector<vec4f>& normals)
 {
-	std::vector<vec4f> normals;
-	size_t minTriangle = 0;
-	float  minDistance = FLT_MAX;
+	size_t minI = 0;
+	float minDist = std::numeric_limits<float>::max();
 
-	for (size_t i = 0; i < faces.size(); i += 3) {
-		vec3f a = polytope[faces[i]];
-		vec3f b = polytope[faces[i + 1]];
-		vec3f c = polytope[faces[i + 2]];
-
-		vec3f normal = normalize(cross(b - a, c - a));
-		float distance = dot(normal, a);
-
-		if (distance < 0) {
-			normal = -normal;
-			distance *= -1;
+	int initSize = normals.size();
+	for(int i = 0; i < initSize; i++)
+		if (normals[i].w < minDist)
+		{
+			minDist = normals[i].w;
+			minI = i;
 		}
 
-		normals.push_back(vec4f(normal, distance));
+	for (size_t i = 0; i < faces.size(); i++)
+	{
+		vec3ull face = faces[i];
+		vec3f norm = normalize(cross(polytope[face.y] - polytope[face.x], polytope[face.z] - polytope[face.x]));
+		float dist = dot(polytope[face.x], norm);
+		if (dist < 0)
+		{
+			norm = -norm;
+			dist = -dist;
+		}
+		normals.push_back(vec4f(norm, dist));
 
-		if (distance < minDistance) {
-			minTriangle = i / 3;
-			minDistance = distance;
+		if (dist < minDist)
+		{
+			minDist = dist;
+			minI = initSize + i;
 		}
 	}
 
-	return { normals, minTriangle };
+	return minI;
 }
-void addIfUniqueEdge(
-	std::vector<std::pair<size_t, size_t>>& edges,
-	const std::vector<size_t>& faces,
-	size_t a,
-	size_t b)
+size_t reconstruct(std::vector<vec3f>& polytope, std::vector<vec3ull>& faces, std::vector<vec4f>& normals, vec3f support)
 {
-	auto reverse = std::find(              //      0--<--3
-		edges.begin(),                     //     / \ B /   A: 2-0
-		edges.end(),                       //    / A \ /    B: 0-2
-		std::make_pair(faces[b], faces[a]) //   1-->--2
-	);
+	std::vector<std::pair<size_t, size_t>> edges;
 
-	if (reverse != edges.end()) {
-		edges.erase(reverse);
+	for (int i = 0; i < faces.size(); i++)
+	{
+		vec3ull face = faces[i];
+		if (dot(vec3f(normals[i]), support - polytope[face.x]) >= 0)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				auto edge = std::find(edges.begin(), edges.end(), std::make_pair(face[(i + 1) % 3], face[i]));
+
+				if (edge != edges.end())
+					edges.erase(edge);
+				else
+					edges.push_back(std::make_pair(face[i], face[(i + 1) % 3]));
+			}
+
+			faces[i] = faces.back(); faces.pop_back();
+			normals[i] = normals.back(); normals.pop_back();
+			i--;
+		}
 	}
-	else {
-		edges.emplace_back(faces[a], faces[b]);
+
+	std::vector<vec3ull> newFaces;
+	for (auto edge : edges)
+	{
+		newFaces.push_back(vec3ull(edge.first, edge.second, polytope.size()));
 	}
+	polytope.push_back(support);
+
+	size_t ret = computeMinNormal(polytope, newFaces, normals);
+	faces.insert(faces.end(), newFaces.begin(), newFaces.end());
+
+	return ret;
 }
 vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat3f& thisIMtx, const mat4f& otherMtx, const mat3f& otherIMtx) const
 {
 	//GJK
-	vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, { 1,0,0 });
 	Simplex pts;
+	{
+	vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, { 1,0,0 });
 	pts.push(support);
 	if (length_squared(support) != 0)
 	{
@@ -232,105 +256,54 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat
 		vec3f ca = pts[2] - pts[0];
 		pts.push(ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, cross(ba, ca)));
 	}
+	}
 
 	//EPA
 	//Safety loop escape condition
-	float scale = 0.001f;
-	float gMin = FLT_MAX;
+	/*float scale = 0.001f;
+	float gMin = std::numeric_limits<float>::max();
 	vec4f gNorm = vec4f(0, 0, 0, 0);
+	*/
 
 
 	std::vector<vec3f> polytope(pts.begin(), pts.end());
-	std::vector<size_t> faces = {
-		0, 1, 2,
-		0, 3, 1,
-		0, 2, 3,
-		1, 3, 2
+	std::vector<vec3ull> faces = {
+		vec3ull(0, 1, 2),
+		vec3ull(0, 3, 1),
+		vec3ull(0, 2, 3),
+		vec3ull(1, 3, 2)
 	};
-	std::pair<std::vector<vec4f>, size_t> pair = getFaceNormals(polytope, faces);
-	std::vector<vec4f> normals = pair.first;
-	size_t minFace = pair.second;
+	std::vector<vec4f> normals;
 
-	vec3f minNormal;
-	float minDistance = FLT_MAX;
+	vec4f min;
+	size_t minFace = computeMinNormal(polytope, faces, normals);
+	while (true)
+	{
+		for (int i = 0; i < polytope.size(); i++)
+			std::cout << "v " << polytope[i].x << " " << polytope[i].y << " " << polytope[i].z << std::endl;
+		for (int i = 0; i < faces.size(); i++)
+			std::cout << "f " << (faces[i].x+1) << " " << (faces[i].y + 1) << " " << (faces[i].z + 1) << std::endl;
+		std::cout << std::endl;
+		min = normals[minFace];
+		vec3f minNorm = vec3f(min);
+		vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, minNorm);
 
-	while (minDistance == FLT_MAX) {
-		minNormal = vec3f(normals[minFace]);
-		minDistance = normals[minFace].w;
-		
-		vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx, otherIMtx, minNormal);
-		float sDistance = dot(minNormal, support);
+		float dist = dot(support, minNorm) - min.w;
+		/*
+		std::cout << dist << " " << support << " " << std::endl;
+		std::cout << dot(support, minNorm) << " " << minFace.second << std::endl;
+		std::cout << dot(support, polytope[faces[minFace.first].x]) << " " << dot(support, polytope[faces[minFace.first].y]) << " " << dot(support, polytope[faces[minFace.first].z]) << std::endl;
+		std::cout << polytope[faces[minFace.first].x] << " " << polytope[faces[minFace.first].y] << " " << polytope[faces[minFace.first].z] << std::endl << std::endl;
+		*/
+		if (dist < 0.0001f)
+			break;
 
-		float diff = abs(sDistance - minDistance);
-		if (diff > scale) {
-			if (diff < gMin)
-			{
-				gMin = diff;
-				scale = 0.001f;
-				gNorm = vec4f(-minNormal, minDistance);
-			}
-			else
-				scale *= 2.0f;
-
-
-			minDistance = FLT_MAX;
-			std::vector<std::pair<size_t, size_t>> uniqueEdges;
-
-			for (size_t i = 0; i < normals.size(); i++) {
-				//if (sameDir(normals[i], support - polytope[faces[3*i]])) {
-				if (sameDir(normals[i], support)) {
-					size_t f = i * 3;
-
-					addIfUniqueEdge(uniqueEdges, faces, f, f + 1);
-					addIfUniqueEdge(uniqueEdges, faces, f + 1, f + 2);
-					addIfUniqueEdge(uniqueEdges, faces, f + 2, f);
-
-					faces[f + 2] = faces.back(); faces.pop_back();
-					faces[f + 1] = faces.back(); faces.pop_back();
-					faces[f] = faces.back(); faces.pop_back();
-
-					normals[i] = normals.back(); normals.pop_back();
-
-					i--;
-				}
-			}
-			std::vector<size_t> newFaces;
-			for (auto pair : uniqueEdges) {
-				newFaces.push_back(pair.first);
-				newFaces.push_back(pair.second);
-				newFaces.push_back(polytope.size());
-			}
-			polytope.push_back(support);
-
-			std::pair<std::vector<vec4f>, size_t> pair = getFaceNormals(polytope, newFaces);
-			std::vector<vec4f> newNormals = pair.first;
-			size_t newMinFace = pair.second;
-			float oldMinDistance = FLT_MAX;
-			for (size_t i = 0; i < normals.size(); i++) {
-				if (normals[i].w < oldMinDistance) {
-					oldMinDistance = normals[i].w;
-					minFace = i;
-				}
-			}
-
-			if (newNormals[newMinFace].w < oldMinDistance) {
-				minFace = newMinFace + normals.size();
-			}
-
-			faces.insert(faces.end(), newFaces.begin(), newFaces.end());
-			normals.insert(normals.end(), newNormals.begin(), newNormals.end());
-		}
+		minFace = reconstruct(polytope, faces, normals, support);
 	}
 
-	for (int i = 0; i < polytope.size(); i++)
-		std::cout << "v " << polytope[i].x << " " << polytope[i].y << " " << polytope[i].z << std::endl;
-	for (int i = 0; i < faces.size(); i += 3)
-		std::cout << "f " << faces[i] << " " << faces[i + 1] << " " << faces[i + 2] << std::endl;
-		
-
-	if (gNorm.w < minDistance)
-		return gNorm;
-	return vec4f(-minNormal, minDistance);
+	//if (gNorm.w < minDistance)
+	//	return gNorm;
+	return vec4f(-min.x, -min.y, -min.z, min.w);
 }
 vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx, const mat4f& otherMtx) const
 {
