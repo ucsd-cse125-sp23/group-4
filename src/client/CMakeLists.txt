@@ -12,7 +12,44 @@ FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
   GIT_TAG master)
+
+# FetchContent_Declare(
+#   assimp
+#   GIT_REPOSITORY https://github.com/assimp/assimp.git
+# )
+# FetchContent_GetProperties(assimp)
+# if(NOT assimp_POPULATED)
+#   FetchContent_Populate(assimp)
+#   add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
+# endif()
 FetchContent_MakeAvailable(glew glfw glm)
 
-add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp)
-target_link_libraries(client PRIVATE core network libglew_static glfw glm)
+set(SOURCES
+  graphics/AnimationClip.cpp
+  graphics/Camera.cpp
+  graphics/Cube.cpp
+  graphics/Joint.cpp
+  graphics/Scene.cpp
+  graphics/shader.cpp
+  graphics/Skeleton.cpp
+  graphics/Skin.cpp
+  graphics/SkinnedMesh.cpp
+  graphics/Tokenizer.cpp
+  graphics/Window.cpp
+)
+
+add_executable(client main.cpp ${SOURCES})
+target_include_directories(client
+  PUBLIC
+    ${CMAKE_SOURCE_DIR}/include/client/graphics
+)
+target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui)
+target_compile_features(client PUBLIC cxx_std_11)
+target_compile_options(client
+  PUBLIC -Wno-deprecated-declarations
+)
+
+# add_custom_command(
+#   TARGET client POST_BUILD
+#   COMMAND cp ${PROJECT_BINARY_DIR}/client ${CMAKE_SOURCE_DIR}/client
+# )
