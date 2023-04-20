@@ -58,6 +58,7 @@ void AnimationClip::Evaluate(float time, Pose& pose) {
 
 	if (pose.size() != channels.size()) pose.resize(channels.size());
 
+	// skip root translation and rotation channels (handled by input)
 	for (int i = 0; i < pose.size(); i++) {
 		pose[i] = channels[i].Evaluate(currTime);
 	}

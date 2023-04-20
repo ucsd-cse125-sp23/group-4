@@ -18,6 +18,7 @@
 #include "Pose.h"
 #include "Joint.h"
 #include "Camera.h"
+#include "AnimationPlayer.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +40,7 @@ public:
 	void Update();
 	void Draw(const glm::mat4& viewProjMtx, GLuint shader);
 	void Show();	// GUI
-	void Move(GLFWwindow* window, Camera* camera, float delta = 0.25);
+	void Move(GLFWwindow* window, Camera* camera, float deltaTime, AnimationPlayer* anim, float delta = 0.25);
 
 	glm::mat4 GetWorldMatrix(int joint);
 

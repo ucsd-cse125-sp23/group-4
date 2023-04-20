@@ -40,7 +40,7 @@ std::string animfile = "";
 bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
-float step_size = 0.5;
+float step_size = 0.25;
 
 void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 
@@ -300,15 +300,9 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime)
 	// Perform any updates as necessary. 
 	Cam->Update();
 
-	if (anim && animClip) {
-		anim->Update(deltaTime);
-
-		if (skeleton) skeleton->SetPose(anim->GetCurrentPose());
-	}
-
 	if (skeleton) {
 		skeleton->Update();
-		skeleton->Move(window, Cam, step_size);
+		skeleton->Move(window, Cam, deltaTime, anim, step_size);
 	}
 
 	if (skin) skin->Update(skeleton);
