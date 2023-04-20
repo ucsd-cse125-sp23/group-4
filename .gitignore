@@ -351,3 +351,16 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# macOS
+.DS_Store
+
+# Visual Studio Code
+.vscode/
+
+# Ignoring assest files for now
+assets/
+3rd_party/
+GL/
+GLFW/
+glm/
