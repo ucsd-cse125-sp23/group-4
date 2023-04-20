@@ -1,5 +1,6 @@
 #include "Skeleton.h"
 
+// get the camera forward direction
 glm::vec3 GetForward(Camera* camera) {
 	float azimuth = camera->GetAzimuth();
 	float x = glm::sin(glm::radians(azimuth)); // x component of forward axis
@@ -8,6 +9,7 @@ glm::vec3 GetForward(Camera* camera) {
 	return glm::vec3(x, 0.0f, z);
 }
 
+// get the camera side direction
 glm::vec3 GetSide(Camera* camera) {
 	float azimuth = camera->GetAzimuth();
 	float x = glm::cos(glm::radians(azimuth));
@@ -281,18 +283,50 @@ void Skeleton::MoveLeft(Camera* camera, float delta) {
 }
 
 
-void Skeleton::Move(GLFWwindow* window, Camera* camera, float delta) {
+void Skeleton::Move(GLFWwindow* window, Camera* camera, float deltaTime, AnimationPlayer* anim, float delta) {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		MoveForward(camera, delta);
+		glm::vec3 root_pos = root->GetPosition();
+		std::vector<DOF> root_rot = root->GetDOFS();
+		anim->Update(deltaTime);
+		SetPose(anim->GetCurrentPose());
+		root->SetPosition(root_pos);
+		root->SetDOF(0, root_rot[0].GetValue());
+		root->SetDOF(1, root_rot[1].GetValue());
+		root->SetDOF(2, root_rot[2].GetValue());
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		MoveBackward(camera, delta);
+		glm::vec3 root_pos = root->GetPosition();
+		std::vector<DOF> root_rot = root->GetDOFS();
+		anim->Update(deltaTime);
+		SetPose(anim->GetCurrentPose());
+		root->SetPosition(root_pos);
+		root->SetDOF(0, root_rot[0].GetValue());
+		root->SetDOF(1, root_rot[1].GetValue());
+		root->SetDOF(2, root_rot[2].GetValue());
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		MoveRight(camera, delta);
+		glm::vec3 root_pos = root->GetPosition();
+		std::vector<DOF> root_rot = root->GetDOFS();
+		anim->Update(deltaTime);
+		SetPose(anim->GetCurrentPose());
+		root->SetPosition(root_pos);
+		root->SetDOF(0, root_rot[0].GetValue());
+		root->SetDOF(1, root_rot[1].GetValue());
+		root->SetDOF(2, root_rot[2].GetValue());
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		MoveLeft(camera, delta);
+		glm::vec3 root_pos = root->GetPosition();
+		std::vector<DOF> root_rot = root->GetDOFS();
+		anim->Update(deltaTime);
+		SetPose(anim->GetCurrentPose());
+		root->SetPosition(root_pos);
+		root->SetDOF(0, root_rot[0].GetValue());
+		root->SetDOF(1, root_rot[1].GetValue());
+		root->SetDOF(2, root_rot[2].GetValue());
 	}
 
 	camera->Move(window, delta);
