@@ -77,8 +77,10 @@ if(WIN32 OR MSVC OR MSYS OR MINGW)
 
 endif()
 
-# add_custom_command(
-#   TARGET client POST_BUILD
-#   COMMAND cp ${PROJECT_BINARY_DIR}/client ${CMAKE_SOURCE_DIR}/client
-# )
-
+# Copy assets folder to executable root directory
+add_custom_command(
+  TARGET client POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/assets" 
+    "${PROJECT_BINARY_DIR}/assets"
+)
