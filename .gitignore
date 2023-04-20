@@ -364,7 +364,6 @@ MigrationBackup/
 
 # Ignoring assest files for now
 assets/
-3rd_party/
 GL/
 GLFW/
 glm/

@@ -9,6 +9,7 @@ add_subdirectory(src/core)
 add_subdirectory(src/network)
 add_subdirectory(src/client)
 add_subdirectory(src/server)
+add_subdirectory(3rd_party/imgui)
 
 enable_testing()
 add_subdirectory(tests)
