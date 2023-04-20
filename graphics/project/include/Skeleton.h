@@ -19,13 +19,6 @@
 #include "Joint.h"
 #include "Camera.h"
 
-enum class Direction {
-	Forward,
-	Backward,
-	Left,
-	Right
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // The Skeleton class for holding joints of a skeleton tree structure.
@@ -51,13 +44,10 @@ public:
 	glm::mat4 GetWorldMatrix(int joint);
 
 	void SetPose(const Pose pose);
-	void MoveForward(float delta = 0.25);
-	void MoveBackward(float delta = 0.25);
-	void MoveRight(float delta = 0.25);
-	void MoveLeft(float delta = 0.25);
-	void TurnAround();
-	void TurnLeft();
-	void TurnRight();
+	void MoveForward(Camera* camera, float delta);
+	void MoveBackward(Camera* camera, float delta);
+	void MoveRight(Camera* camera, float delta);
+	void MoveLeft(Camera* camera, float delta);
 private:
 	std::vector<Joint*> joints;	// random access
 
@@ -66,7 +56,6 @@ private:
 	void SetJointDOFs(int joint, glm::vec3 dof);
 	Joint* GetJoint(int j);
 	Joint* FindJointInTree(int j);
-	Direction facing;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,20 @@
 #include "Skeleton.h"
 
+glm::vec3 GetForward(Camera* camera) {
+	float azimuth = camera->GetAzimuth();
+	float x = glm::sin(glm::radians(azimuth)); // x component of forward axis
+	float z = glm::cos(glm::radians(azimuth)); // z component of forward axis
+
+	return glm::vec3(x, 0.0f, z);
+}
+
+glm::vec3 GetSide(Camera* camera) {
+	float azimuth = camera->GetAzimuth();
+	float x = glm::cos(glm::radians(azimuth));
+	float z = -1 * glm::sin(glm::radians(azimuth));
+
+	return glm::vec3(x, 0.0f, z);
+}
 
 static Joint* BuildJointArray(Joint* root, std::vector<Joint*>* arr) {
 	// Traverses tree, depth-first
@@ -46,7 +61,6 @@ bool Skeleton::Load(const char* file) {
 
 	// Initializes joints array
 	BuildJointArray(root, &joints);
-	facing = Direction::Forward;
 
 	return true;
 }
@@ -139,97 +153,146 @@ Joint* Skeleton::FindJointInTree(int j) {
 	return nullptr;
 }
 
-void Skeleton::MoveForward(float delta) {
+void Skeleton::MoveForward(Camera* camera, float delta) {
+	//orient skeleton to face forward
+	root->SetDOF(1, glm::radians(-1.0 * camera->GetAzimuth()));
+
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[2] -= delta;
+
+	// rotate axis (0, 0, 1) to get the current forward axis
+	glm::vec3 forward_axis = GetForward(camera);
+	float forwardX = forward_axis[0];
+	float forwardZ = forward_axis[2];
+
+	float dx;
+	float dz;
+	if (abs(int(forwardZ)) == 1) {
+		dx = 0;
+		dz = forwardZ * delta;
+	}
+	else if (abs(int(forwardX)) == 1) {
+		dz = 0;
+		dx = forwardX * delta;
+	}
+	else {
+		float m = forwardZ / forwardX;
+		dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) / (2 * (1 + pow(m, 2)));
+		if (forwardX < 0) {
+			dx *= -1;
+		}
+		dz = dx * m;
+	}
+	root_pos[0] += dx;
+	root_pos[2] -= dz;
 	root->SetPosition(root_pos);
 }
 
-void Skeleton::MoveBackward(float delta) {
+void Skeleton::MoveBackward(Camera* camera, float delta) {
+	root->SetDOF(1, glm::radians((- 1.0 * camera->GetAzimuth()) + 180.0f));
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[2] += delta;
+
+	// rotate axis (0, 0, 1) to get the current forward axis
+	glm::vec3 forward_axis = GetForward(camera);
+	float forwardX = forward_axis[0];
+	float forwardZ = forward_axis[2];
+
+	float dx;
+	float dz;
+	if (abs(int(forwardZ)) == 1) {
+		dx = 0;
+		dz = forwardZ * delta;
+	}
+	else if (abs(int(forwardX)) == 1) {
+		dz = 0;
+		dx = forwardX * delta;
+	}
+	else {
+		float m = forwardZ / forwardX;
+		dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) / (2 * (1 + pow(m, 2)));
+		if (forwardX < 0) {
+			dx *= -1;
+		}
+		dz = dx * m;
+	}
+	root_pos[0] -= dx;
+	root_pos[2] += dz;
 	root->SetPosition(root_pos);
 }
 
-void Skeleton::MoveRight(float delta) {
+void Skeleton::MoveRight(Camera* camera, float delta) {
+	root->SetDOF(1, glm::radians((-1.0 * camera->GetAzimuth()) - 90.0f));
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[0] += delta;
+
+	// rotate (1, 0, 0) to get the new left/right axis
+	glm::vec3 side_axis = GetSide(camera);
+	float sideX = side_axis[0]; //x component of left/right axis
+	float sideZ = side_axis[2];
+	float dx, dz;
+
+	if (abs(int(sideX)) == 1) {
+		dz = 0;
+		dx = sideX * delta;
+	}
+	else if (abs(int(sideZ)) == 1) {
+		dx = 0;
+		dz = -1 * sideZ * delta;
+	}
+	else {
+		float m = sideZ / sideX;
+		dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) / (2 * (1 + pow(m, 2)));
+		if (sideX < 0) {
+			dx *= -1;
+		}
+		dz = -1 * dx * m;
+	}
+	root_pos[0] += dx;
+	root_pos[2] += dz;
 	root->SetPosition(root_pos);
 }
 
-void Skeleton::MoveLeft(float delta) {
+void Skeleton::MoveLeft(Camera* camera, float delta) {
+	root->SetDOF(1, glm::radians(( - 1.0 * camera->GetAzimuth()) + 90.0f));
 	glm::vec3 root_pos = root->GetPosition();
-	root_pos[0] -= delta;
+
+	glm::vec3 side_axis = GetSide(camera);
+	float sideX = side_axis[0]; //x component of left/right axis
+	float sideZ = side_axis[2];
+	float dx, dz;
+
+	if (abs(int(sideX)) == 1) {
+		dz = 0;
+		dx = sideX * delta;
+	}
+	else if (abs(int(sideZ)) == 1) {
+		dx = 0;
+		dz = -1 * sideZ * delta;
+	}
+	else {
+		float m = sideZ / sideX;
+		dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) / (2 * (1 + pow(m, 2)));
+		if (sideX < 0) {
+			dx *= -1;
+		}
+		dz = -1 * dx * m;
+	}
+	root_pos[0] -= dx;
+	root_pos[2] -= dz;
 	root->SetPosition(root_pos);
 }
 
-void Skeleton::TurnAround() {
-	std::vector<DOF> root_dofs = root->GetDOFS();
-	root->SetDOF(1, root_dofs[1].GetValue() + M_PI);
-}
-
-void Skeleton::TurnLeft() {
-	std::vector<DOF> root_dofs = root->GetDOFS();
-	root->SetDOF(1, root_dofs[1].GetValue() + (M_PI / 2));
-}
-
-void Skeleton::TurnRight() {
-	std::vector<DOF> root_dofs = root->GetDOFS();
-	root->SetDOF(1, root_dofs[1].GetValue() - (M_PI / 2));
-}
 
 void Skeleton::Move(GLFWwindow* window, Camera* camera, float delta) {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		if (facing == Direction::Backward) {
-			TurnAround();
-		}
-		if (facing == Direction::Left) {
-			TurnRight();
-		}
-		if (facing == Direction::Right) {
-			TurnLeft();
-		}
-		facing = Direction::Forward;
-		MoveForward();
+		MoveForward(camera, delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		if (facing == Direction::Forward) {
-			TurnAround();
-		}
-		if (facing == Direction::Left) {
-			TurnLeft();
-		}
-		if (facing == Direction::Right) {
-			TurnRight();
-		}
-		facing = Direction::Backward;
-		MoveBackward();
+		MoveBackward(camera, delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		if (facing == Direction::Forward) {
-			TurnRight();
-		}
-		if (facing == Direction::Backward) {
-			TurnLeft();
-		}
-		if (facing == Direction::Left) {
-			TurnAround();
-		}
-		facing = Direction::Right;
-		MoveRight();
+		MoveRight(camera, delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		if (facing == Direction::Forward) {
-			TurnLeft();
-		}
-		if (facing == Direction::Backward) {
-			TurnRight();
-		}
-		if (facing == Direction::Right) {
-			TurnAround();
-		}
-		facing = Direction::Left;
-		MoveLeft();
+		MoveLeft(camera, delta);
 	}
 
 	camera->Move(window, delta);

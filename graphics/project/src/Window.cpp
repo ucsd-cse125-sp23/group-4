@@ -40,6 +40,7 @@ std::string animfile = "";
 bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
+float step_size = 0.5;
 
 void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 
@@ -307,10 +308,12 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime)
 
 	if (skeleton) {
 		skeleton->Update();
-		skeleton->Move(window, Cam);
+		skeleton->Move(window, Cam, step_size);
 	}
 
 	if (skin) skin->Update(skeleton);
+
+	Cam->KeyInput(window);
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -385,6 +388,9 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_C:
 			Cam->ToggleFixedCamera(window);
 			break;
+		case GLFW_KEY_F:
+			Cam->SetAzimuth(Cam->GetAzimuth() + 90);
+			Cam->UpdateWorld();
 		default:
 			break;
 		}

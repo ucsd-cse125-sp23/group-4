@@ -26,6 +26,7 @@ public:
 	void Reset();
 	void ToggleFixedCamera(GLFWwindow* window);
 	void Move(GLFWwindow* window, float delta = 0.25);
+	void KeyInput(GLFWwindow* window, float delta = 0.5);
 
 	// Access functions
 	void SetAspect(float a)					{Aspect=a;}
