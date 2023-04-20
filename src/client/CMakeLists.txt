@@ -3,15 +3,18 @@ project(client DESCRIPTION "tagguys client executable")
 FetchContent_Declare(
   glew
   GIT_REPOSITORY https://github.com/Perlmint/glew-cmake
-  GIT_TAG master)
+  GIT_TAG master
+)
 FetchContent_Declare(
   glfw
   GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG master)
+  GIT_TAG 3.3.8
+)
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG master)
+  GIT_TAG 0.9.9.8
+)
 
 # FetchContent_Declare(
 #   assimp
@@ -45,9 +48,14 @@ target_include_directories(client
 )
 target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui)
 target_compile_features(client PUBLIC cxx_std_11)
-target_compile_options(client
-  PUBLIC -Wno-deprecated-declarations
-)
+if(APPLE)
+  target_compile_options(client
+    PUBLIC -Wno-deprecated-declarations
+  )
+endif()
+if(WIN32 OR MSVC OR MSYS OR MINGW)
+
+endif()
 
 # add_custom_command(
 #   TARGET client POST_BUILD
