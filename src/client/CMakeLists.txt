@@ -68,9 +68,14 @@ target_link_libraries(
           imgui
           assimp)
 target_compile_features(client PUBLIC cxx_std_11)
-target_compile_options(client
-  PUBLIC -Wno-deprecated-declarations
-)
+if(APPLE)
+  target_compile_options(client
+    PUBLIC -Wno-deprecated-declarations
+  )
+endif()
+if(WIN32 OR MSVC OR MSYS OR MINGW)
+
+endif()
 
 # add_custom_command(
 #   TARGET client POST_BUILD
