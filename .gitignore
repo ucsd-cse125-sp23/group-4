@@ -362,8 +362,7 @@ MigrationBackup/
 # Visual Studio Code
 .vscode/
 
-# Ignoring assest files for now
-assets/
+# temp ignore
 GL/
 GLFW/
 glm/
