@@ -40,7 +40,7 @@ std::string animfile = "";
 bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
-float step_size = 0.25;
+float step_size = 0.75;
 
 void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
 

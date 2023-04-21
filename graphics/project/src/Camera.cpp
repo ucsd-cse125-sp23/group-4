@@ -168,7 +168,7 @@ void Camera::Move(GLFWwindow* window, float delta) {
 			}
 			else if (abs(int(sideZ) == 1)) {
 				dz = -1 * sideZ * delta;
-				World = glm::translate(glm::vec3(0, 0, -dx)) * World;
+				World = glm::translate(glm::vec3(0, 0, -dz)) * World;
 				ZTranslation -= dz;
 			}
 			else {
