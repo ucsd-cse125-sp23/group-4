@@ -15,17 +15,13 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/g-truc/glm.git
   GIT_TAG 0.9.8.5
 )
-
-# FetchContent_Declare(
-#   assimp
-#   GIT_REPOSITORY https://github.com/assimp/assimp.git
-# )
-# FetchContent_GetProperties(assimp)
-# if(NOT assimp_POPULATED)
-#   FetchContent_Populate(assimp)
-#   add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
-# endif()
-FetchContent_MakeAvailable(glew glfw glm)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+FetchContent_Declare(
+  assimp
+  GIT_REPOSITORY https://github.com/assimp/assimp.git
+  GIT_TAG v5.2.5
+)
+FetchContent_MakeAvailable(glew glfw glm assimp)
 
 set(SOURCES
   graphics/AnimationClip.cpp
@@ -46,7 +42,7 @@ target_include_directories(client
   PUBLIC
     ${CMAKE_SOURCE_DIR}/include/client/graphics
 )
-target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui)
+target_link_libraries(client PRIVATE core network libglew_static glfw glm assimp ImGui)
 target_compile_features(client PUBLIC cxx_std_11)
 if(APPLE)
   target_compile_options(client
