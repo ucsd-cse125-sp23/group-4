@@ -35,6 +35,9 @@ set(SOURCES
   graphics/SkinnedMesh.cpp
   graphics/Tokenizer.cpp
   graphics/Window.cpp
+  graphics/AssimpMesh.cpp
+  graphics/AssimpModel.cpp
+  graphics/AssimpNode.cpp
 )
 
 add_executable(client main.cpp ${SOURCES})
@@ -51,6 +54,19 @@ if(APPLE)
 endif()
 if(WIN32 OR MSVC OR MSYS OR MINGW)
 
+endif()
+
+add_executable(assimpLoad main_assimp.cpp ${SOURCES})
+target_include_directories(assimpLoad
+  PUBLIC
+    ${CMAKE_SOURCE_DIR}/include/client/graphics
+)
+target_link_libraries(assimpLoad PRIVATE core network libglew_static glfw glm assimp ImGui)
+target_compile_features(assimpLoad PUBLIC cxx_std_11)
+if(APPLE)
+  target_compile_options(assimpLoad
+    PUBLIC -Wno-deprecated-declarations
+  )
 endif()
 
 # Copy assets folder to executable root directory

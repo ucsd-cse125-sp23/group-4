@@ -13,6 +13,8 @@ const char* Window::windowTitle = "CSE 125 graphics engine :)";
 
 // Game stuff to render
 Scene* Window::gameScene;
+GLuint Window::shaderAssimp;
+AssimpModel* Window::assimpModel;
 
 Camera* Cam;
 
@@ -112,9 +114,21 @@ bool Window::initializeObjects()
 	return true;
 }
 
+bool Window::initializeObjectsFromAssimp(const char* path) {
+	assimpModel = new AssimpModel();
+	shaderAssimp = LoadShaders("assets/shaders/shader.vert",
+							   "assets/shaders/shader.frag");
+	return assimpModel->loadAssimp(path);
+}
+
 void Window::cleanObjects() {
 	// Deallcoate the objects.
-	delete gameScene;
+	if(gameScene) {
+		delete gameScene;
+	}
+	if(assimpModel) {
+		delete assimpModel;
+	}
 }
 
 void Window::cleanUp()
@@ -221,7 +235,9 @@ void Window::idleCallback(float deltaTime)
 	// Perform any updates as necessary. 
 	Cam->Update();
 	
-	gameScene->update(deltaTime);
+	if(gameScene) {
+		gameScene->update(deltaTime);
+	}
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -234,8 +250,14 @@ void Window::displayCallback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 	// Render the objects.
-	gameScene->draw(Cam->GetViewProjectMtx());
+	if(gameScene) {
+		gameScene->draw(Cam->GetViewProjectMtx());
+	}
 
+	if(assimpModel) {
+		glUseProgram(shaderAssimp);
+		assimpModel->draw(Cam->GetViewProjectMtx(), shaderAssimp);
+	}
 
 
 	// imgui new frame
@@ -243,7 +265,9 @@ void Window::displayCallback(GLFWwindow* window)
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	gameScene->gui();
+	if(gameScene) {
+		gameScene->gui();
+	}
 
 	//imguiDraw(skeleton, animClip);	// simple helper method
 

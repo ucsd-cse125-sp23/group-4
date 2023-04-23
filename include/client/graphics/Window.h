@@ -4,6 +4,7 @@
 #include "main.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "AssimpModel.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -18,10 +19,13 @@ public:
 
 	// Objects to render
 	static Scene* gameScene;
+	static GLuint shaderAssimp;
+	static AssimpModel* assimpModel;
 
 	// Act as Constructors and desctructors 
 	static bool initializeProgram(GLFWwindow* window);
 	static bool initializeObjects();
+	static bool initializeObjectsFromAssimp(const char* path);
 	
 	static void cleanObjects();
 	static void cleanUp();
