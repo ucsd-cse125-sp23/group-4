@@ -362,3 +362,6 @@ MigrationBackup/
 GL/
 GLFW/
 glm/
+
+# ImGui files
+imgui.ini
