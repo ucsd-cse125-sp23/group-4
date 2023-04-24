@@ -21,6 +21,14 @@ void Scene::init(void) {
     sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
     sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
 
+    sceneResources->skeletons["wasp"] = new Skeleton();
+    sceneResources->skeletons["wasp"]->Load("assets/models/wasp.skel");
+
+    AnimationClip* animClip = new AnimationClip();
+    animClip->Load("assets/models/wasp_walk.anim");
+    sceneResources->animations["wasp"]["walk"] = new AnimationPlayer();
+    sceneResources->animations["wasp"]["walk"]->SetClip(animClip);
+    
     // Create a shader program with a vertex shader and a fragment shader.
     sceneResources->shaderPrograms["basic"] = LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
 
@@ -74,7 +82,12 @@ void Scene::init(void) {
     sceneResources->models["cubeF"]->mesh = sceneResources->meshes["cube"];
     sceneResources->models["cubeF"]->material = sceneResources->materials["marble"];
 
-    sceneResources->models["wasp"] = new Model;
+    PlayerModel* waspModel = new PlayerModel;
+    waspModel->skel = sceneResources->skeletons["wasp"];
+    waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
+    waspModel->anims = sceneResources->animations["wasp"];
+
+    sceneResources->models["wasp"] = waspModel;
     sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
     sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
@@ -85,12 +98,17 @@ void Scene::init(void) {
     thing_example->name = "GT_teapot";
     gamethings.push_back(thing_example);
 
+    
+    Player* player = new Player;
+    player->mod = waspModel;
+    gamethings.push_back(player);
+
     // Build the scene graph
     node["teapot1"] = thing_example;
     node["teapot2"] = new Node("teapotChild");
     node["bunny"] = new Node("bunny");
     node["ground"] = new Node("ground");
-    node["wasp"] = new Node("wasp");
+    node["wasp"] = player;
 
     thing_example->transform.position = vec3(2.0f, 0.0f, 0.0f); // gamething only
     node["teapot1"]->model = sceneResources->models["teapot1"];

@@ -11,11 +11,11 @@ adapted from CSE 167 - Matthew
 
 using namespace glm;
 
-void Scene::update(float deltaTime) {
+void Scene::update(GLFWwindow* window, Camera* camera, float delta, float step) {
     //if (player) player->update(deltaTime);
 
     for (auto e : gamethings) {
-        e->update(deltaTime);
+        e->update(window, camera, delta, step);
     }
 }
 

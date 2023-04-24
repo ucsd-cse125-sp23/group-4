@@ -1,6 +1,13 @@
 #pragma once
 
 #define _USE_MATH_DEFINES
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
@@ -10,6 +17,7 @@
 
 
 #include "Node.h"
+#include "Camera.h"
 //#include "Input.h"
 
 struct Transform {
@@ -29,7 +37,7 @@ class GameThing : public Node {
 public:
     Transform transform;
 
-    void update(float dt) {
+    virtual void update(GLFWwindow* window, Camera* camera, float dt, float step = 0.25) {
         // --- example ---
         transform.rotation += glm::vec3(0, 30 * dt, 0); // spin on y axis
 

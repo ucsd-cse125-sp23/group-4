@@ -166,3 +166,7 @@ Joint* Joint::GetChildReversed(int child) {
 
 	return children[children.size() - (child + 1)];
 }
+
+glm::vec3 Joint::GetPosition() { return offset; }
+
+std::vector<DOF> Joint::GetDOFS() { return phi; }
