@@ -38,6 +38,7 @@ set(SOURCES
   graphics/AssimpMesh.cpp
   graphics/AssimpModel.cpp
   graphics/AssimpNode.cpp
+  graphics/AssimpAnimation.cpp
 )
 
 add_executable(client main.cpp ${SOURCES})

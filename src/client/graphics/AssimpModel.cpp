@@ -1,6 +1,13 @@
 #include "AssimpModel.h"
 
-AssimpModel::AssimpModel() : name("N/A"), rootNode(nullptr) { }
+#include "AssimpMath.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
+AssimpModel::AssimpModel() 
+        : name("N/A"), rootNode(nullptr), numNode(0), isAnimated(0), 
+          currentAnimation(-1) { }
 
 bool AssimpModel::loadAssimp(const char* path) {
     if(rootNode) {
@@ -18,12 +25,131 @@ bool AssimpModel::loadAssimp(const char* path) {
         printf("ERR::ASSIMP::%s\n", import.GetErrorString());
         return false;
     }
+    name = std::string(path);
+    name = name.substr(name.find_last_of('/')+1);
 
-    rootNode = new AssimpNode();
-    AssimpNode::count = 0;
-    AssimpNode::nodeMap.clear();
-    rootNode->loadFromAssimp(scene->mRootNode, scene);
+    nodeMap.clear();
+    rootNode = new AssimpNode(numNode++);
+    loadAssimpHelperNode(rootNode, scene->mRootNode, scene);
+    loadAssimpHelperAnim(scene);
     return true;
+}
+
+void AssimpModel::loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const aiScene *scene) {
+    node->name = aiNode->mName.C_Str();
+    nodeMap[node->name] = node;
+    // process all the node's meshes (if any)
+    for (unsigned int i = 0; i < aiNode->mNumMeshes; i++) {
+        // TODO: this implmentation will create duplicate
+        //       AssimpMesh if mesh has multiple reference aiNode
+        aiMesh* mesh = scene->mMeshes[aiNode->mMeshes[i]];
+        AssimpMesh* childMesh = new AssimpMesh();
+        childMesh->node = node;
+        loadAssimpHelperMesh(childMesh, mesh, scene);
+        node->meshes.push_back(childMesh);
+        meshes.push_back(childMesh);
+        meshVisibilities.push_back(true);
+    }
+    // then do the same for each of its children
+    for (unsigned int i = 0; i < aiNode->mNumChildren; i++) {
+        AssimpNode* childNode = new AssimpNode(numNode++);
+        childNode->parent = node;
+        loadAssimpHelperNode(childNode, aiNode->mChildren[i], scene);
+        node->children.push_back(childNode);
+    }
+    node->localTransform = aiMatToMat4x4(aiNode->mTransformation);
+}
+
+void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene) {
+    // Is it possible to use vector.resize() & index?
+
+    for(unsigned int i = 0; i < aiMesh->mNumVertices; i++) {
+        Vertex vertex;
+        vertex.position = glm::vec3(aiMesh->mVertices[i].x,
+                                    aiMesh->mVertices[i].y,
+                                    aiMesh->mVertices[i].z);
+        vertex.normal = glm::vec3(aiMesh->mNormals[i].x,
+                                  aiMesh->mNormals[i].y,
+                                  aiMesh->mNormals[i].z);
+        mesh->vertices.push_back(vertex);
+    }
+
+    for(unsigned int i = 0; i < aiMesh->mNumFaces; i++) {
+        aiFace f = aiMesh->mFaces[i];
+        for(unsigned int j = 0; j < f.mNumIndices; j++) {
+            mesh->indices.push_back(f.mIndices[j]);
+        }
+    }
+
+    if(aiMesh->mNumBones > 0) {
+        loadAssimpHelperSkel(mesh, aiMesh, scene);
+    }
+}
+
+void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene) {
+    for(unsigned int i = 0; i < aiMesh->mNumBones; i++) {
+        aiBone* bone = aiMesh->mBones[i];
+        AssimpJoint* joint = new AssimpJoint();
+
+        joint->ind = i;
+        joint->name = bone->mName.C_Str();
+        joint->matBindingInv = aiMatToMat4x4(bone->mOffsetMatrix);
+        joint->matBindingNormalInv = glm::inverse(glm::transpose(joint->matBindingInv));
+        for(int i = 0; i < bone->mNumWeights; i++) {
+            VertexWeight vw;
+            vw.vertexInd = bone->mWeights[i].mVertexId;
+            vw.weight    = bone->mWeights[i].mWeight;
+            joint->weights.push_back(vw);
+        }
+        joint->node = nodeMap[joint->name];
+
+        mesh->joints.push_back(joint);
+    }
+}
+
+void AssimpModel::loadAssimpHelperAnim(const aiScene *scene) {
+    for(int i = 0; i < scene->mNumAnimations; i++) {
+        aiAnimation* aiAnimation = scene->mAnimations[i];
+        AssimpAnimation animation;
+        animation.duration = aiAnimation->mDuration;
+        animation.tps = aiAnimation->mTicksPerSecond;
+        for(int j = 0; j < aiAnimation->mNumChannels; j++) {
+            aiNodeAnim* aiChannel = aiAnimation->mChannels[j];
+            AssimpChannel channel;
+            channel.name = aiChannel->mNodeName.C_Str();
+            channel.node = nodeMap[channel.name];
+            for(int k = 0; k < aiChannel->mNumPositionKeys; k++) {
+                channel.positions.push_back(
+                    std::make_pair(
+                        aiChannel->mPositionKeys[k].mTime,
+                        aiVecToVec3(aiChannel->mPositionKeys[k].mValue)
+                    )
+                );
+            }
+            for(int k = 0; k < aiChannel->mNumRotationKeys; k++) {
+                channel.rotations.push_back(
+                    std::make_pair(
+                        aiChannel->mRotationKeys[k].mTime,
+                        aiChannel->mRotationKeys[k].mValue
+                    )
+                );
+            }
+            for(int k = 0; k < aiChannel->mNumScalingKeys; k++) {
+                channel.scalings.push_back(
+                    std::make_pair(
+                        aiChannel->mScalingKeys[k].mTime,
+                        aiVecToVec3(aiChannel->mScalingKeys[k].mValue)
+                    )
+                );
+            }
+            channel.extrapPre = AssimpChannel::loadExtrapMode(
+                aiChannel->mPreState);
+            channel.extrapPost = AssimpChannel::loadExtrapMode(
+                aiChannel->mPostState);
+            animation.channels.push_back(channel);
+        }
+        animations.push_back(animation);
+    }
 }
 
 void AssimpModel::draw(const glm::mat4& viewProjMtx, GLuint shader) {
@@ -38,5 +164,61 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, GLuint shader) {
             glm::vec3(0,-2,-0)
         ),
         glm::vec3(0.025f));
-    rootNode->draw(viewProjMtx * betterViewMat, shader);
+    for(int i = 0; i < meshes.size(); i++) {
+        if(meshVisibilities[i]) {
+            meshes[i]->draw(viewProjMtx * betterViewMat, shader);
+        }
+    }
+}
+
+void AssimpModel::imGui() {
+    ImGui::Begin("Assimp Model Info");
+
+    ImGui::Text("File: %s", name.c_str());
+    long numTreeNode = 0;
+
+    // Node Tree
+    ImGui::SeparatorText("Node Tree");
+    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Node Tree (%lu)", nodeMap.size())) {
+        rootNode->imGui();
+        ImGui::TreePop();
+    }
+
+    // TODO: Meshes
+    ImGui::SeparatorText("Meshes");
+    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Meshes (%lu)", meshes.size())) {
+        for(int i = 0; i < meshes.size(); i++) {
+            if (ImGui::TreeNode((void*)(intptr_t)i, "Mesh %d", i)) {
+                bool visibility = meshVisibilities[i];
+                ImGui::Checkbox("visible", &visibility);
+                meshVisibilities[i] = visibility;
+                meshes[i]->imGui();
+                ImGui::TreePop();
+            }
+        }
+        ImGui::TreePop();
+    }
+
+    // TODO: Animations
+    ImGui::SeparatorText("Animations");
+
+    ImGui::End();
+}
+
+void AssimpModel::useMesh() {
+    isAnimated = false;
+}
+
+void AssimpModel::useAnimation(unsigned int animationInd) {
+    isAnimated = true;
+    currentAnimation = animationInd;
+    animations[currentAnimation].restart();
+}
+
+void AssimpModel::update(float deltaTimeInMs) {
+    if(!isAnimated) {
+        return;
+    }
+
+    animations[currentAnimation].update(deltaTimeInMs);
 }

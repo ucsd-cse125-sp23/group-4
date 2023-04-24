@@ -116,9 +116,13 @@ bool Window::initializeObjects()
 
 bool Window::initializeObjectsFromAssimp(const char* path) {
 	assimpModel = new AssimpModel();
-	shaderAssimp = LoadShaders("assets/shaders/shader.vert",
+	shaderAssimp = LoadShaders("assets/shaders/shader_skinning.vert",
 							   "assets/shaders/shader.frag");
-	return assimpModel->loadAssimp(path);
+	if(!assimpModel->loadAssimp(path)) {
+		return false;
+	}
+	assimpModel->useAnimation(0);
+	return true;
 }
 
 void Window::cleanObjects() {
@@ -238,6 +242,10 @@ void Window::idleCallback(float deltaTime)
 	if(gameScene) {
 		gameScene->update(deltaTime);
 	}
+
+	if(assimpModel) {
+		assimpModel->update(deltaTime);
+	}
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -267,6 +275,10 @@ void Window::displayCallback(GLFWwindow* window)
 
 	if(gameScene) {
 		gameScene->gui();
+	}
+
+	if(assimpModel) {
+		assimpModel->imGui();
 	}
 
 	//imguiDraw(skeleton, animClip);	// simple helper method

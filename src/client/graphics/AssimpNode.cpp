@@ -1,49 +1,38 @@
 #include "AssimpNode.h"
 
-#include "AssimpMath.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
-unsigned int AssimpNode::count = 0;
-std::map<aiNode*, AssimpNode*> AssimpNode::nodeMap;
-
-AssimpNode::AssimpNode()
-        : id(++count), isLoaded(false), parent(nullptr), localTransform(1.0f) {
+AssimpNode::AssimpNode(unsigned int id)
+        : id(id), parent(nullptr), localTransform(1.0f) {
     name = std::to_string(id);
 }
 
-void AssimpNode::loadFromAssimp(aiNode* node, const aiScene* scene) {
-    name = node->mName.C_Str();
-    if (node->mParent != nullptr) {
-        if (nodeMap.find(node->mParent) != nodeMap.end()) {
-            parent = nodeMap[node->mParent];
-        } else {
-        // this should not happen if the tree hirarechy is correct
+void AssimpNode::imGui() {
+    ImGui::Text("id    : %u %s", id, name.c_str());
+    ImGui::Text("parent: %u %s",
+        parent ? parent->id : 0,
+        parent ? parent->name.c_str() : "none");
+    if(meshes.size() > 0) {
+        if (ImGui::TreeNode((void*)(intptr_t)0, "Meshes (%lu)", meshes.size())) {
+            for(int i = 0; i < meshes.size(); i++) {
+                if (ImGui::TreeNode((void*)(intptr_t)i, "Mesh %d", i)) {
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
         }
     }
-    // process all the node's meshes (if any)
-    for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        // TODO: this implmentation will create duplicate
-        //       AssimpMesh if mesh has multiple reference node
-        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        AssimpMesh* childMesh = new AssimpMesh();
-        childMesh->loadFromAssimp(mesh, scene);
-        meshes.push_back(childMesh);
-    }
-    // then do the same for each of its children
-    for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        AssimpNode* childNode = new AssimpNode();
-        childNode->loadFromAssimp(node->mChildren[i], scene);
-        children.push_back(childNode);
-    }
-    localTransform = aiMatToMat4x4(node->mTransformation);
-
-    nodeMap[node] = this;
-}
-
-void AssimpNode::draw(const glm::mat4& viewProjMtx, GLuint shader) {
-    for (unsigned int i = 0; i < meshes.size(); i++) {
-        meshes[i]->draw(viewProjMtx * localTransform, shader);
-    }
-    for (unsigned int i = 0; i < children.size(); i++) {
-        children[i]->draw(viewProjMtx * localTransform, shader);
+    if(children.size() > 0) {
+        if (ImGui::TreeNode((void*)(intptr_t)0, "Children (%lu)", children.size())) {
+            for(int i = 0; i < children.size(); i++) {
+                if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i)) {
+                    children[i]->imGui();
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
+        }
     }
 }
