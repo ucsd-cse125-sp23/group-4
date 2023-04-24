@@ -3,8 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-## Dear ImGui artifacts
-**/imgui.ini
+build
+compile_commands.json
 
 # User-specific files
 *.rsuser
@@ -352,3 +352,14 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# macOS
+.DS_Store
+
+# Visual Studio Code
+.vscode/
+
+# temp ignore
+GL/
+GLFW/
+glm/
