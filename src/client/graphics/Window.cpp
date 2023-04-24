@@ -20,6 +20,7 @@ Camera* Cam;
 bool LeftDown, RightDown;
 int MouseX, MouseY;
 
+float stepSize = 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -216,12 +217,12 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::idleCallback(float deltaTime)
+void Window::idleCallback(GLFWwindow* window, float deltaTime)
 {
 	// Perform any updates as necessary. 
-	Cam->Update();
+	Cam->Update(window);
 	
-	gameScene->update(deltaTime);
+	gameScene->update(window, Cam, deltaTime, stepSize);
 }
 
 void Window::displayCallback(GLFWwindow* window)

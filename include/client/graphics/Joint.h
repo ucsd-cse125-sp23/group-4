@@ -46,6 +46,8 @@ public:
 	glm::mat4 GetWorldMatrix();
 	Joint* GetChild(int index);
 	Joint* GetChildReversed(int index);
+    glm::vec3 GetPosition();
+    std::vector<DOF> GetDOFS();
 
 private:
 	std::string name = "bone";

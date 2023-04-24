@@ -14,7 +14,7 @@ struct Model {
     Material* material;
     // TODO, consider adding skin stuff here
 
-    void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx)
+    virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx)
     {
         if (!material || !mesh)
             return;
