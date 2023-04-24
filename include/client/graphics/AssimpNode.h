@@ -9,6 +9,7 @@
 #include <map>
 
 class AssimpMesh;
+struct AssimpJoint;
 
 class AssimpNode {
 public:
@@ -18,12 +19,15 @@ public:
     const unsigned int id;
     std::string name;
     std::vector<AssimpMesh*> meshes;
+    /** This matrix make node's meshes to go from node space to global space */
     glm::mat4 localTransform;
+    /** This matrix is calculated by the animation system */
     glm::mat4 animationTransform;
 
     AssimpNode* parent;
     std::vector<AssimpNode*> children;
+    std::vector<AssimpJoint*> joints;
 
-    // void draw(const glm::mat4& viewProjMtx, GLuint shader);
+    void update(const glm::mat4& parentWorldTransform);
     void imGui();
 };

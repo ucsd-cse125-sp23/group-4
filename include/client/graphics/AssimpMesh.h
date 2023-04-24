@@ -19,9 +19,9 @@ struct AssimpJoint {
     unsigned int ind;
     std::string name;
     glm::mat4 matBindingInv;
-    glm::mat4 matBindingNormalInv;
-    std::vector<VertexWeight> weights;  // TODO
-    AssimpNode* node;
+    glm::mat4 matWorldTransform;
+    std::vector<VertexWeight> weights;
+    AssimpNode *node, *meshNode;
 
     glm::mat4 update();
 };
@@ -29,8 +29,8 @@ struct AssimpJoint {
 struct Vertex {
     glm::vec3  position;
     glm::vec3  normal;
-    glm::uvec4 boneInds;                          // TODO
-    glm::vec4  boneWeights = glm::vec4(1,0,0,0);  // TODO
+    glm::uvec4 boneInds    = glm::vec4(0,0,0,0);
+    glm::vec4  boneWeights = glm::vec4(1,0,0,0);
 };
 
 class AssimpMesh {
@@ -43,6 +43,8 @@ public:
     std::vector<AssimpJoint*> joints;
     glm::mat4 matBindingInvs[200];
 
+    void setDraw(bool useMesh);
+
     void update();
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
     void gl_load();
@@ -50,5 +52,5 @@ public:
     void imGui();
 private:
     unsigned int VAO, VBO, EBO;
-    bool isLoaded;
+    bool isLoaded, isDrawMesh;
 };

@@ -1,20 +1,38 @@
 #include "AssimpMesh.h"
 
+#include <glm/gtx/string_cast.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
 glm::mat4 AssimpJoint::update() {
-    return glm::mat4(1.0f);
+    return matWorldTransform * matBindingInv;
 }
 
 AssimpMesh::AssimpMesh() 
-        : node(nullptr), isLoaded(false) { }
+        : node(nullptr), isLoaded(false), isDrawMesh(true) {
+    matBindingInvs[0] = glm::mat4(1.0f);
+}
+
+void AssimpMesh::setDraw(bool useMesh) {
+    if(!useMesh) { 
+        isDrawMesh = false;
+        return;
+    }
+
+    for(int i = 0; i < joints.size(); i++) {
+        matBindingInvs[i] = glm::mat4(1.0f);
+    }
+    isDrawMesh = true;
+}
 
 void AssimpMesh::update() {
+    if(isDrawMesh) {
+        return;
+    }
+
     for(int i = 0; i < joints.size(); i++) {
-        AssimpJoint* joint = joints[i];
-        matBindingInvs[i] = joint->update();
+        matBindingInvs[i] = joints[i]->update();
     }
 }
 
@@ -81,9 +99,56 @@ void AssimpMesh::gl_delete() {
 }
 
 void AssimpMesh::imGui() {
+    long numTreeNode = 0;
+
     ImGui::Text("nodeId: %u %s", node->id, node->name.c_str());
-    ImGui::Text("vertex (%lu)", joints.size());
+    ImGui::Text("vertex (%lu)", vertices.size());
     ImGui::SameLine();
-    ImGui::Text("index  (%lu)", indices.size());
+    ImGui::Text("index (%lu)", indices.size());
     ImGui::Text("joints (%lu)", joints.size());
+    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Verticies (%lu)", vertices.size())) {
+        for(int i = 0; i < vertices.size(); i++) {
+            if (ImGui::TreeNode((void*)(intptr_t)i, "Vertex %d", i)) {
+                ImGui::Text("Pos (%f,%f,%f)", 
+                    vertices[i].position.x,
+                    vertices[i].position.y,
+                    vertices[i].position.z);
+                ImGui::Text("Norm(%f,%f,%f)",
+                    vertices[i].normal.x,
+                    vertices[i].normal.y,
+                    vertices[i].normal.z);
+                ImGui::Text("Bone Indices: %u,%u,%u,%u", 
+                    vertices[i].boneInds.x,
+                    vertices[i].boneInds.y,
+                    vertices[i].boneInds.z,
+                    vertices[i].boneInds.w);
+                ImGui::Text("Bone Weights: %f,%f,%f,%f", 
+                    vertices[i].boneWeights.x,
+                    vertices[i].boneWeights.y,
+                    vertices[i].boneWeights.z,
+                    vertices[i].boneWeights.w);
+                ImGui::TreePop();
+            }
+        }
+        ImGui::TreePop();
+    }
+    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Joints (%lu)", joints.size())) {
+        for(int i = 0; i < joints.size(); i++) {
+            if (ImGui::TreeNode((void*)(intptr_t)i, "Joint %5d (%5lu) %s", i, joints[i]->weights.size(), joints[i]->node->name.c_str())) {
+                AssimpJoint* joint = joints[i];
+                for(int j = 0; j < joint->weights.size(); j++) {
+                    ImGui::Text("MatBInv %s", glm::to_string(joints[i]->matBindingInv).c_str());
+                    ImGui::Text("MatW    %s", glm::to_string(joints[i]->matWorldTransform).c_str());
+                    if(ImGui::TreeNode("Vertex - Weight")) {
+                        ImGui::Text("vInd: %u", joint->weights[j].vertexInd);
+                        ImGui::SameLine();
+                        ImGui::Text("vWgt: %f", joint->weights[j].weight);
+                        ImGui::TreePop();
+                    }
+                }
+                ImGui::TreePop();
+            }
+        }
+        ImGui::TreePop();
+    }
 }

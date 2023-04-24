@@ -6,8 +6,8 @@
 #include <imgui_impl_opengl3.h>
 
 AssimpModel::AssimpModel() 
-        : name("N/A"), rootNode(nullptr), numNode(0), isAnimated(0), 
-          currentAnimation(-1) { }
+        : name("N/A"), rootNode(nullptr), numNode(0), isAnimated(false), 
+          isPaused(true), currentAnimation(0), animModes(nullptr) { }
 
 bool AssimpModel::loadAssimp(const char* path) {
     if(rootNode) {
@@ -32,12 +32,16 @@ bool AssimpModel::loadAssimp(const char* path) {
     rootNode = new AssimpNode(numNode++);
     loadAssimpHelperNode(rootNode, scene->mRootNode, scene);
     loadAssimpHelperAnim(scene);
+    loadAssimpHelperImgui();
+    useAnimation(0);
     return true;
 }
 
 void AssimpModel::loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const aiScene *scene) {
     node->name = aiNode->mName.C_Str();
     nodeMap[node->name] = node;
+    node->localTransform = aiMatToMat4x4(aiNode->mTransformation);
+    node->animationTransform = glm::mat4(1.0f);
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < aiNode->mNumMeshes; i++) {
         // TODO: this implmentation will create duplicate
@@ -46,6 +50,9 @@ void AssimpModel::loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const a
         AssimpMesh* childMesh = new AssimpMesh();
         childMesh->node = node;
         loadAssimpHelperMesh(childMesh, mesh, scene);
+        for(int j = 0; j < childMesh->joints.size(); j++) {
+            childMesh->joints[j]->meshNode = node;
+        }
         node->meshes.push_back(childMesh);
         meshes.push_back(childMesh);
         meshVisibilities.push_back(true);
@@ -57,7 +64,6 @@ void AssimpModel::loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const a
         loadAssimpHelperNode(childNode, aiNode->mChildren[i], scene);
         node->children.push_back(childNode);
     }
-    node->localTransform = aiMatToMat4x4(aiNode->mTransformation);
 }
 
 void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene) {
@@ -94,7 +100,7 @@ void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const a
         joint->ind = i;
         joint->name = bone->mName.C_Str();
         joint->matBindingInv = aiMatToMat4x4(bone->mOffsetMatrix);
-        joint->matBindingNormalInv = glm::inverse(glm::transpose(joint->matBindingInv));
+        joint->matWorldTransform = glm::mat4(1.0f);
         for(int i = 0; i < bone->mNumWeights; i++) {
             VertexWeight vw;
             vw.vertexInd = bone->mWeights[i].mVertexId;
@@ -104,6 +110,36 @@ void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const a
         joint->node = nodeMap[joint->name];
 
         mesh->joints.push_back(joint);
+        nodeMap[joint->name]->joints.push_back(joint);
+    }
+
+    std::vector<int> vertexBindedBones(mesh->vertices.size(), 0);
+    for(int i = 0; i < mesh->joints.size(); i++) {
+        AssimpJoint* joint = mesh->joints[i];
+        for(int j = 0; j < joint->weights.size(); j++) {
+            VertexWeight& vw = joint->weights[j];
+            switch (vertexBindedBones[vw.vertexInd]) {
+            case 0:
+                mesh->vertices[vw.vertexInd].boneInds.x = i;
+                mesh->vertices[vw.vertexInd].boneWeights.x = vw.weight;
+                break;
+            case 1:
+                mesh->vertices[vw.vertexInd].boneInds.y = i;
+                mesh->vertices[vw.vertexInd].boneWeights.y = vw.weight;
+                break;
+            case 2:
+                mesh->vertices[vw.vertexInd].boneInds.z = i;
+                mesh->vertices[vw.vertexInd].boneWeights.z = vw.weight;
+                break;
+            case 3:
+                mesh->vertices[vw.vertexInd].boneInds.w = i;
+                mesh->vertices[vw.vertexInd].boneWeights.w = vw.weight;
+                break;
+            default:
+                break;
+            }
+            vertexBindedBones[vw.vertexInd]++;
+        }
     }
 }
 
@@ -130,7 +166,7 @@ void AssimpModel::loadAssimpHelperAnim(const aiScene *scene) {
                 channel.rotations.push_back(
                     std::make_pair(
                         aiChannel->mRotationKeys[k].mTime,
-                        aiChannel->mRotationKeys[k].mValue
+                        aiQuaternionToVec4(aiChannel->mRotationKeys[k].mValue)
                     )
                 );
             }
@@ -171,6 +207,17 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, GLuint shader) {
     }
 }
 
+void AssimpModel::loadAssimpHelperImgui() {
+    animModes = new char*[1+animations.size()];
+    for(int i = 0; i < animations.size()+1; i++) {
+        animModes[i] = new char[256];
+    }
+    strcpy(animModes[0],"Mesh");
+    for(int i = 0; i < animations.size(); i++) {
+        strcpy(animModes[1+i],std::string("Animation ").append(std::to_string(i+1)).c_str());
+    }
+}
+
 void AssimpModel::imGui() {
     ImGui::Begin("Assimp Model Info");
 
@@ -184,7 +231,7 @@ void AssimpModel::imGui() {
         ImGui::TreePop();
     }
 
-    // TODO: Meshes
+    // Meshes
     ImGui::SeparatorText("Meshes");
     if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Meshes (%lu)", meshes.size())) {
         for(int i = 0; i < meshes.size(); i++) {
@@ -199,26 +246,73 @@ void AssimpModel::imGui() {
         ImGui::TreePop();
     }
 
-    // TODO: Animations
+    // Animations
     ImGui::SeparatorText("Animations");
+    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Animations (%lu)", animations.size())) {
+        for(int i = 0; i < animations.size(); i++) {
+            if (ImGui::TreeNode((void*)(intptr_t)i, "Animation %d", i)) {
+                animations[i].imGui();
+                ImGui::TreePop();
+            }
+        }
+        ImGui::TreePop();
+    }
+    ImGui::SeparatorText("Current Animation");
+        if (ImGui::Button(isPaused ? "Start" : "Pause")) {
+            if(isAnimated) {
+                isPaused = !isPaused;
+            }
+        }
+    ImGui::Text("Animation: %lu", animations.size());
+    if(ImGui::BeginListBox("Current Anim")) {
+        for(int i = 0; i < animations.size()+1; i++) {
+            const bool isSelected = (currentAnimation == i);
+            if (ImGui::Selectable(animModes[i], isSelected)) {
+                if(i == 0) {
+                    useMesh();
+                } else {
+                    useAnimation(i-1);
+                }
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndListBox();
+    }
 
     ImGui::End();
 }
 
 void AssimpModel::useMesh() {
+    printf("Using mesh\n");
     isAnimated = false;
+    isPaused = true;
+    for(int i = 0; i < meshes.size(); i++) {
+        meshes[i]->setDraw(true);
+    }
+    currentAnimation = 0;
 }
 
 void AssimpModel::useAnimation(unsigned int animationInd) {
+    printf("Using %d\n", animationInd);
     isAnimated = true;
-    currentAnimation = animationInd;
-    animations[currentAnimation].restart();
+    isPaused = true;
+    for(int i = 0; i < meshes.size(); i++) {
+        meshes[i]->setDraw(false);
+    }
+    currentAnimation = animationInd + 1;
+    animations[animationInd].restart();
 }
 
 void AssimpModel::update(float deltaTimeInMs) {
-    if(!isAnimated) {
+    if(!isAnimated || isPaused) {
         return;
     }
 
-    animations[currentAnimation].update(deltaTimeInMs);
+    animations[currentAnimation-1].update(deltaTimeInMs);
+    rootNode->update(glm::mat4(1.0f));
+    for(int i = 0; i < meshes.size(); i++) {
+        meshes[i]->update();
+    }
 }

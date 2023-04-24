@@ -1,5 +1,7 @@
 #include "AssimpNode.h"
 
+#include "AssimpMath.h"
+#include <glm/gtx/string_cast.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -9,13 +11,27 @@ AssimpNode::AssimpNode(unsigned int id)
     name = std::to_string(id);
 }
 
+void AssimpNode::update(const glm::mat4& parentWorldTransform) {
+    // note: Animation data is w.r.t. world space, 
+    //       so multipying joint local transformation matrix is unwanted.
+    glm::mat4 matWorldTransform = parentWorldTransform * this->animationTransform;
+    for(int i = 0; i < joints.size(); i++) {
+        joints[i]->matWorldTransform = matWorldTransform;
+    }
+    for(int i = 0; i < children.size(); i++) {
+        children[i]->update(matWorldTransform);
+    }
+}
+
 void AssimpNode::imGui() {
+    long numTreeNode = 0;
     ImGui::Text("id    : %u %s", id, name.c_str());
     ImGui::Text("parent: %u %s",
         parent ? parent->id : 0,
         parent ? parent->name.c_str() : "none");
+    ImGui::Text("joints: %lu", joints.size());
     if(meshes.size() > 0) {
-        if (ImGui::TreeNode((void*)(intptr_t)0, "Meshes (%lu)", meshes.size())) {
+        if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Meshes (%lu)", meshes.size())) {
             for(int i = 0; i < meshes.size(); i++) {
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Mesh %d", i)) {
                     ImGui::TreePop();
@@ -25,7 +41,7 @@ void AssimpNode::imGui() {
         }
     }
     if(children.size() > 0) {
-        if (ImGui::TreeNode((void*)(intptr_t)0, "Children (%lu)", children.size())) {
+        if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Children (%lu)", children.size())) {
             for(int i = 0; i < children.size(); i++) {
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i)) {
                     children[i]->imGui();
@@ -35,4 +51,7 @@ void AssimpNode::imGui() {
             ImGui::TreePop();
         }
     }
+
+    ImGui::Text("MatLocal %s", glm::to_string(localTransform).c_str());
+    ImGui::Text("MatAnim  %s", glm::to_string(animationTransform).c_str());
 }

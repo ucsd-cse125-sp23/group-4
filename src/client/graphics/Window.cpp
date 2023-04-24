@@ -121,7 +121,6 @@ bool Window::initializeObjectsFromAssimp(const char* path) {
 	if(!assimpModel->loadAssimp(path)) {
 		return false;
 	}
-	assimpModel->useAnimation(0);
 	return true;
 }
 

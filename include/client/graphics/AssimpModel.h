@@ -36,12 +36,18 @@ private:
     std::map<std::string, AssimpJoint*> jointMap;
     std::vector<bool> meshVisibilities;
     std::vector<AssimpMesh*> meshes;
-    bool isAnimated;
-    unsigned int currentAnimation;
+    bool isAnimated, isPaused;
+    /** 0  - use mesh
+      * 1+ - use animation (n-1)
+      */
+    int currentAnimation;
     std::vector<AssimpAnimation> animations;
 
     void loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const aiScene *scene);
     void loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
     void loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
     void loadAssimpHelperAnim(const aiScene *scene);
+    void loadAssimpHelperImgui();
+
+    char** animModes;
 };

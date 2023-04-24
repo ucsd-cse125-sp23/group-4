@@ -5,6 +5,39 @@ inline glm::vec3 aiVecToVec3(const aiVector3D& vec) {
     return glm::vec3(vec.x, vec.y, vec.z);
 }
 
+inline glm::vec4 aiQuaternionToVec4(const aiQuaternion& q) {
+    return glm::vec4(q.x, q.y, q.z, q.w);
+}
+
+// References:
+// http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
+// https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/index.htm
+const float SLERP_THRESHOLD = 0.9995;
+/** tInvLerp is in (0,1) */
+inline glm::vec4 quarternionInterpolateSpherical(const glm::vec4& q0, 
+                                                 const glm::vec4& q1,
+                                                 float tInvLerp) {
+    float dot = glm::dot(q0,q1);
+    if(dot > SLERP_THRESHOLD) {
+        return glm::normalize(q0 + tInvLerp*(q1-q0));
+    }
+    float theta_0 = 
+        glm::dot(q0,q1) < 0 ?
+        glm::acos(glm::dot(-q0,q1)) :
+        glm::acos(glm::dot( q0,q1));
+    float theta = theta_0 * tInvLerp;
+    return q0*glm::cos(theta) + (q1-q0*dot)*glm::sin(theta);
+}
+
+inline glm::mat4 quarternionToRotationMat4x4(const glm::vec4& q) {
+    const float &q0 = q.x, &q1 = q.y, &q2 = q.z, &q3 = q.w;
+    // TODO: I don't understand why I need a transpose here
+    return glm::transpose(glm::mat4(glm::mat3(
+        1 - 2*q1*q1 - 2*q2*q2, 2*q0*q1 - 2*q2*q3, 2*q0*q2 + 2*q1*q3,
+        2*q0*q1 + 2*q2*q3, 1 - 2*q0*q0 - 2*q2*q2, 2*q1*q2 - 2*q0*q3,
+        2*q0*q2 - 2*q1*q3, 2*q1*q2 + 2*q0*q3, 1 - 2*q0*q0 - 2*q1*q1)));
+}
+
 inline glm::mat4 aiMatToMat4x4(const aiMatrix4x4& mat) {
     return glm::mat4(
         mat.a1, mat.b1, mat.c1, mat.d1,
