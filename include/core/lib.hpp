@@ -1,5 +1,9 @@
 #pragma once
 
-#include <string>
+#include "core/game/modifier/ControlModifier.h"
+#include "core/game/physics/Player.h"
+#include "core/util/global.h"
 
-void test_core(const std::string &source);
+void initializeLevel(Environment* environment);
+void terminateLevel();
+std::pair<Player*, ControlModifierData*> initializePlayer();

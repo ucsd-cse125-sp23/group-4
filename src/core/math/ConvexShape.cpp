@@ -329,16 +329,14 @@ vec4f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx, const m
 	if (otherIMtx != mat3f::identity())
 		otherIMtx = inverse(otherIMtx);
 
-	vec4f min = vec4f(0.0f, 0.0f, 0.0f, 0.0f);
-	float minLS = std::numeric_limits<float>::max();
+	vec4f min = vec4f(0.0f, 0.0f, 0.0f, std::numeric_limits<float>::max());
 	const ConvexShape** ptr = other->seperate();
 	for (int i = 0; i < other->count(); i++)
 	{
 		vec4f v = ptr[i]->mtv(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
-		if (v.w > 0 && minLS > v.w)
+		if (v.w > 0 && min.w > v.w)
 		{
 			min = v;
-			minLS = v.w;
 		}
 	}
 	return vec4f(-min.x, -min.y, -min.z, min.w);

@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 
+<<<<<<< HEAD
 #include <boost/asio.hpp>
 #include <config/lib.hpp>
 #include <cstdio>
@@ -137,4 +138,11 @@ int main(int argc, char* argv[]) {
   glfwTerminate();
 
   exit(EXIT_SUCCESS);
+=======
+int main(int argc, char *argv[]) {
+  //test_core("client");
+  test_network("client");
+  std::cout << "client is running!" << std::endl;
+  return 0;
+>>>>>>> 316ee1c (Partial-tested Game Engine)
 }
