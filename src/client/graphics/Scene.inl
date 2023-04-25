@@ -99,8 +99,9 @@ void Scene::init(void) {
     gamethings.push_back(thing_example);
 
     
-    Player* player = new Player;
+    Player* player = new Player();
     player->mod = waspModel;
+    player->name = "Player 1";
     gamethings.push_back(player);
 
     // Build the scene graph

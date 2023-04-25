@@ -19,11 +19,19 @@
 class Player : public GameThing {
  public:
   PlayerModel* mod;
+  float time;
+  bool tagged;
+  Player() {
+      time = 0;
+      mod = nullptr;
+      tagged = true;
+  }
   void update(GLFWwindow* window, Camera* camera, float dt, float step = 0.25) {
     Skeleton* skel = mod->skel;
     SkinnedMesh* skin = mod->skin;
     std::map<std::string, AnimationPlayer*> anims = mod->anims;
     skel->Update(window, camera, dt, anims, step);
     skin->updateSkin(skel);
+    if (tagged) time += dt;
   }
 };

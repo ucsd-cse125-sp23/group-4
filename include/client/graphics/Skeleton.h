@@ -46,6 +46,7 @@ class Skeleton {
   void MoveBackward(Camera* camera, float delta);
   void MoveRight(Camera* camera, float delta);
   void MoveLeft(Camera* camera, float delta);
+  glm::vec3 getPos();
 
  private:
   std::vector<Joint*> joints;  // random access
