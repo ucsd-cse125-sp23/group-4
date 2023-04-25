@@ -32,8 +32,8 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data)
 	if (PObject* pObj = dynamic_cast<PObject*>(obj))
 	{
 		ControlModifierData* cData = static_cast<ControlModifierData*>(data);
-		pObj->vel.x = cData->horizontalVel.x;
-		pObj->vel.z = cData->horizontalVel.z;
+		vec3f dv = clampBySign(cData->horizontalVel, cData->horizontalVel - pObj->vel) * 0.6f;
+		pObj->vel += vec3f(dv.x, 0.0f, dv.z);
 		if (pObj->onGround && cData->doJump)
 		{
 			pObj->vel.y = cData->jumpVel;
