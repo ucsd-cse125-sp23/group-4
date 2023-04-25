@@ -18,7 +18,7 @@ void Scene::init(void) {
     sceneResources->meshes["wasp"]->init("assets/models/wasp.skin");
 
     sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
-    sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
+    sceneResources->meshes["bunny"]->init("assets/models/player_v1.obj");
 
     // Create a shader program with a vertex shader and a fragment shader.
     sceneResources->shaderPrograms["basic"] = LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
@@ -77,6 +77,16 @@ void Scene::init(void) {
     sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
     sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
+    ///// maps:
+
+    sceneResources->meshes["map1"] = new Obj();
+    sceneResources->meshes["map1"]->init("assets/models/map_testing.obj");
+    sceneResources->models["map1"] = new Model;
+    sceneResources->models["map1"]->mesh = sceneResources->meshes["map1"];
+    sceneResources->models["map1"]->material = sceneResources->materials["marble"];
+    sceneResources->models["map1"]->transformMtx = translate(vec3(0,-2,0));
+
+
     ///////////////////////////////////////////////////////
 
     // Add stuff to game updateables
@@ -90,6 +100,9 @@ void Scene::init(void) {
     node["bunny"] = new Node("bunny");
     node["ground"] = new Node("ground");
     node["wasp"] = new Node("wasp");
+
+    node["map"] = new Node("_map");
+    node["map"]->model = sceneResources->models["map1"];
 
     thing_example->transform.position = vec3(2.0f, 0.0f, 0.0f); // gamething only
     node["teapot1"]->model = sceneResources->models["teapot1"];
@@ -125,5 +138,6 @@ void Scene::init(void) {
     node["world"]->childnodes.push_back(node["ground"]);
     node["world"]->childnodes.push_back(node["wasp"]);
 
+    node["world"]->childnodes.push_back(node["map"]);
 
 }
