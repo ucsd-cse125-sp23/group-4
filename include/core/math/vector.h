@@ -395,3 +395,9 @@ template <typename T>
 inline TVector4<T> max(const TVector4<T>& v0, const TVector4<T>& v1) {
     return TVector4<T>{std::max(v0.x, v1.x), std::max(v0.y, v1.y), std::max(v0.z, v1.z), std::max(v0.w, v1.w)};
 }
+
+
+template <typename T>
+inline TVector3<T> tangent(const TVector3<T>& vec, const TVector3<T>& norm) {
+    return vec - dot(vec, norm) * vec;
+}

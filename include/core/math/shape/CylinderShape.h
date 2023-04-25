@@ -3,7 +3,7 @@
 #include "core/math/shape/ConvexShape.h"
 
 
-int sign(float f) {
+static int sign(float f) {
 	if (f == 0)
 		return 0;
 	else if (f > 0)
@@ -12,16 +12,13 @@ int sign(float f) {
 }
 class CylinderShape : public ConvexShape {
 private:
-	static const vec3f up;
-	float height, radius;
+	float halfheight, radius;
 protected:
 	vec4f furthestPoint(vec3f dir) const override {
-		float d = dot(up, dir);
-		vec3f rad = dir - d * up;
-		return vec4f(normalize(rad) * radius + up * (sign(d) * height / 2), 1.0f);
+		float d = dot(vec3f(0, 1, 0), dir);
+		vec3f rad = dir - d * vec3f(0, 1, 0);
+		return vec4f(normalize(rad) * radius + vec3f(0, 1, 0) * (sign(d) * halfheight), 1.0f);
 	};
 public:
-	CylinderShape(float height, float radius) : height(height), radius(radius) {}
+	CylinderShape(float height, float radius) : halfheight(height/2), radius(radius) {}
 };
-
-const vec3f CylinderShape::up = vec3f(0, 1, 0);

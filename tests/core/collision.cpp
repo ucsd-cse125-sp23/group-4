@@ -6,6 +6,7 @@
 #include "core/math/shape/SphereShape.h"
 #include "core/math/shape/CylinderShape.h"
 #include "core/math/shape/AABShape.h"
+#include "core/math/shape/OffsetShape.h"
 
 using Catch::Matchers::WithinAbs;
 
@@ -134,5 +135,15 @@ TEST_CASE("Mixed Collision MTV", "[mtv]") {
 	test_mtv(cylinder, aab, vec3f(1.3, 0.8, 1.2), vec4f(0.827, 0.0, 0.561, 0.139), 0.001f);
 	test_mtv(cylinder, aab, vec3f(0.1, 3.8, 0.1), vec4f(0.0, 1.0, 0.0, 0.2), 0.001f);
 	delete cylinder;
+	delete aab;
+}
+TEST_CASE("Mixed Offset Collision MTV", "[mtv]") {
+	CylinderShape* cylinder = new CylinderShape(1.0, 0.5);
+	OffsetShape* offset = new OffsetShape(cylinder, vec3f(0.0f, 0.5f, 0.0f));
+	AABShape* aab = new AABShape(vec3f(-2, -4, -2), vec3f(2, -2, 2));
+	test_mtv(cylinder, aab, vec3f(0.0, -1.6, 0.0), vec4f(0.0, 1.0, 0.0, 0.1), 0.001f);
+	test_mtv(offset, aab, vec3f(0.0, -2.2, 0.0), vec4f(0.0, 1.0, 0.0, 0.2), 0.001f);
+	delete cylinder;
+	delete offset;
 	delete aab;
 }
