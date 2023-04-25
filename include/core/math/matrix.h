@@ -670,3 +670,12 @@ TMat4<T> scale(TVector3<T> s) {
                 T(0), T(0), s[2], T(0),
                 T(0), T(0), T(0), T(1));
 }
+
+
+template <typename T>
+TMat4<T> translate_scale(TVector3<T> t, TVector3<T> s) {
+    return TMat4<T>(s[0], T(0), T(0), t[0],
+                    T(0), s[1], T(0), t[1],
+                    T(0), T(0), s[2], t[2],
+                    T(0), T(0), T(0), T(1));
+}

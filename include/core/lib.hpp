@@ -1,8 +1,10 @@
-#ifndef CORE_TEST_H
-#define CORE_TEST_H
+#pragma once
 
-#include <string>
+#include "core/util/global.h"
+#include "core/game/physics/Player.h"
+#include "core/game/modifier/ControlModifier.h"
 
-void test_core(const std::string &source);
 
-#endif
+void initializeLevel(Environment* environment);
+void terminateLevel();
+std::pair<Player*,ControlModifierData*> initializePlayer();
