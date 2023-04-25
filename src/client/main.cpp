@@ -63,6 +63,8 @@ int main(int argc, char* argv[])
 	GLFWwindow* window = Window::createWindow(800, 600);
 	if (!window) exit(EXIT_FAILURE);
 
+	glutInit(&argc, argv);
+
 	// Print OpenGL and GLSL versions.
 	print_versions();
 	// Setup callbacks.

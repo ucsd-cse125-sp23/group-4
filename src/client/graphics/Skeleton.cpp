@@ -323,3 +323,5 @@ void Skeleton::Move(GLFWwindow* window, Camera* camera, float deltaTime,
 
   camera->Move(window, delta);
 }
+
+glm::vec3 Skeleton::getPos() { return root->GetPosition(); }

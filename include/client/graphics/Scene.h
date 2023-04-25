@@ -12,14 +12,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
+#include <GL/freeglut.h>
 #include <math.h>
-
 #include <stdlib.h>
 #include <vector>
 #include <string>
 #include <map>
 #include <stack>
-
+#include "core.h"
 #include "Node.h"
 #include "GameThing.h"
 #include "Player.h"
@@ -35,6 +35,13 @@
 
 #ifndef __SCENE_H__
 #define __SCENE_H__
+
+struct Character {
+  unsigned int TextureID;  // ID handle of the glyph texture
+  glm::ivec2 Size;         // Size of glyph
+  glm::ivec2 Bearing;      // Offset from baseline to left/top of glyph
+  unsigned int Advance;    // Offset to advance to next glyph
+};
 
 class SceneResourceMap {
 public:
@@ -79,6 +86,8 @@ public:
 
     std::vector< GameThing* > gamethings;
 
+    std::map<char, Character> Characters;
+
     Scene() {
         camera = new Camera;
         sceneResources = new SceneResourceMap();
@@ -89,7 +98,8 @@ public:
 
     void init(void);
     void update(GLFWwindow* window, Camera* camera, float delta, float step = 0.25);
-    void draw(const glm::mat4& viewProjMtx);
+    void drawHUD(GLFWwindow* window);
+    void draw(GLFWwindow* window, const glm::mat4& viewProjMtx);
 
     void gui();
 

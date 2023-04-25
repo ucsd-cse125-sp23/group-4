@@ -20,7 +20,7 @@ Camera* Cam;
 bool LeftDown, RightDown;
 int MouseX, MouseY;
 
-float stepSize = 0.05;
+float stepSize = 0.1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -115,7 +115,7 @@ bool Window::initializeObjects()
 
 void Window::cleanObjects() {
 	// Deallcoate the objects.
-	delete gameScene;
+	//delete gameScene;
 }
 
 void Window::cleanUp()
@@ -233,14 +233,16 @@ void Window::displayCallback(GLFWwindow* window)
 
 	// Clear the color and depth buffers.					******
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+	
+    glLoadIdentity();
 
 	// Render the objects.
-	gameScene->draw(Cam->GetViewProjectMtx());
+	gameScene->draw(window, Cam->GetViewProjectMtx());
 
 
 
 	// imgui new frame
-	ImGui_ImplOpenGL3_NewFrame();
+    /* ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
@@ -249,7 +251,7 @@ void Window::displayCallback(GLFWwindow* window)
 	//imguiDraw(skeleton, animClip);	// simple helper method
 
 	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
 
 
 
@@ -292,7 +294,9 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		case GLFW_KEY_R:
 			resetCamera();
 			break;
-
+		case GLFW_KEY_C:
+			Cam->ToggleFixedCamera();
+			break;
 		default:
 			break;
 		}
