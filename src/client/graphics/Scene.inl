@@ -17,7 +17,6 @@ void Scene::init(void) {
     sceneResources->meshes["wasp"] = new SkinnedMesh(); // can only be tied to one object? (not a static resource)
     sceneResources->meshes["wasp"]->init("assets/models/wasp.skin");
 
-    //sceneResources->meshes["cube"]->init();
     sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
     sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
 

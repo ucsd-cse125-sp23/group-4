@@ -33,6 +33,7 @@ public:
         // load obj file
         FILE* file = fopen(filename, "r");
         if (file == NULL) {
+            perror("fopen() failed");
             std::cerr << "Cannot open file: " << filename << std::endl;
             exit(-1);
         }
