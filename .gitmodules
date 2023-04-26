@@ -1,0 +1,21 @@
+[submodule "lib/glew"]
+	path = lib/glew
+	url = https://github.com/Perlmint/glew-cmake
+[submodule "lib/glfw"]
+	path = lib/glfw
+	url = https://github.com/glfw/glfw
+[submodule "lib/glm"]
+	path = lib/glm
+	url = https://github.com/g-truc/glm
+[submodule "lib/assimp"]
+	path = lib/assimp
+	url = https://github.com/assimp/assimp
+[submodule "lib/imgui"]
+	path = lib/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "lib/Catch2"]
+	path = lib/Catch2
+	url = https://github.com/catchorg/Catch2
+[submodule "lib/boost"]
+	path = lib/boost
+	url = https://github.com/boostorg/boost

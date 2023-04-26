@@ -1,0 +1,7 @@
+add_subdirectory(glew)
+add_subdirectory(glfw)
+add_subdirectory(glm)
+add_subdirectory(assimp)
+add_subdirectory(imgui)
+add_subdirectory(Catch2)
+add_subdirectory(boost)

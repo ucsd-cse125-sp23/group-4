@@ -3,6 +3,8 @@ project(tagguys DESCRIPTION "Real-time Multiplayer Tag")
 include(FetchContent)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+add_subdirectory(lib)
+
 add_subdirectory(src/core)
 add_subdirectory(src/network)
 add_subdirectory(src/client)
