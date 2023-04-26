@@ -86,6 +86,9 @@ void Scene::draw(GLFWwindow* window, const glm::mat4& viewProjMtx) {
         if(cur->model)
             cur->model->draw(viewProjMtx, cur_MMtx);
 
+        if (_gizmos && cur->_renderGizmo)
+            sceneResources->models["_gz-xyz"]->draw(viewProjMtx, cur_MMtx, true);
+
         // Continue the DFS: put all the child nodes of the current node in the stack
         for (unsigned int i = 0; i < cur->childnodes.size(); i++) {
             dfs_stack.push(cur->childnodes[i]);
@@ -122,7 +125,12 @@ void treeChildren(ImGuiTreeNodeFlags node_flags, bool isOpen, Node* par)
 }
 
 void Scene::gui() {
-    ImGui::Begin("Scene Info");
+    ImGui::Begin("scene debug +++");
+
+    ImGui::Checkbox("free camera (TODO)", &_freecam);
+    ImGui::Checkbox("show gizmos", &_gizmos);
+
+    ImGui::Separator();
 
     //show a list of game objects
     //ImGui::LabelText("", "gfx nodes");

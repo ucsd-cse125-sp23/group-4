@@ -13,12 +13,14 @@ void Scene::init(void) {
     sceneResources->meshes["cube"] = new Cube();
     sceneResources->meshes["teapot"] = new Obj();
     sceneResources->meshes["bunny"] = new Obj();
+    sceneResources->meshes["player"] = new Obj();
 
     sceneResources->meshes["wasp"] = new SkinnedMesh(); // can only be tied to one object? (not a static resource)
     sceneResources->meshes["wasp"]->init("assets/models/wasp.skin");
 
     sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
-    sceneResources->meshes["bunny"]->init("assets/models/player_v1.obj");
+    sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
+    sceneResources->meshes["player"]->init("assets/models/player_v1.obj");
 
     sceneResources->skeletons["wasp"] = new Skeleton();
     sceneResources->skeletons["wasp"]->Load("assets/models/wasp.skel");
@@ -68,11 +70,14 @@ void Scene::init(void) {
     sceneResources->models["teapot2"] = new Model;
     sceneResources->models["teapot2"]->mesh = sceneResources->meshes["teapot"];
     sceneResources->models["teapot2"]->material = sceneResources->materials["ceramic"];
-    sceneResources->models["teapot2"]->transformMtx = scale(vec3(1.0f, 1.5f, 1.0f)) * scale(vec3(0.5f));
+    sceneResources->models["teapot2"]->transformMtx = translate(vec3(0, 0, 0.1f)) * scale(vec3(1.0f, 1.5f, 1.0f)) * scale(vec3(0.5f));
     sceneResources->models["bunny1"] = new Model;
     sceneResources->models["bunny1"]->mesh = sceneResources->meshes["bunny"];
     sceneResources->models["bunny1"]->material = sceneResources->materials["wood"];
     sceneResources->models["bunny1"]->transformMtx = rotate(60.0f, vec3(0.0f, 1.0f, 0.0f));
+    sceneResources->models["player"] = new Model;
+    sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
+    sceneResources->models["player"]->material = sceneResources->materials["ceramic"];
     sceneResources->models["cube1"] = new Model;
     sceneResources->models["cube1"]->mesh = sceneResources->meshes["cube"];
     sceneResources->models["cube1"]->material = sceneResources->materials["silver"];
@@ -117,6 +122,7 @@ void Scene::init(void) {
     node["teapot1"] = thing_example;
     node["teapot2"] = new Node("teapotChild");
     node["bunny"] = new Node("bunny");
+    node["player"] = thing_player;
     node["ground"] = new Node("ground");
     node["wasp"] = player;
 
@@ -125,6 +131,9 @@ void Scene::init(void) {
 
     thing_example->transform.position = vec3(2.0f, 0.0f, 0.0f); // gamething only
     node["teapot1"]->model = sceneResources->models["teapot1"];
+
+    thing_player->transform.position = vec3(0.0f, 0.0f, 2.0f);
+    thing_player->model = sceneResources->models["player"];
 
     node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
     node["teapot2"]->model = sceneResources->models["teapot2"];
@@ -144,6 +153,7 @@ void Scene::init(void) {
                 node[currcube] = new Node(currcube);
                 node[currcube]->transformMtx = translate(vec3(i, 0, j));
                 node[currcube]->model = sceneResources->models["cubeF"];
+                node[currcube]->_renderGizmo = false;
 
                 node["ground"]->childnodes.push_back(node[currcube]);
             }
@@ -151,6 +161,7 @@ void Scene::init(void) {
     }
 
     // "world" node already exists
+    node["world"]->childnodes.push_back(node["player"]);
     node["world"]->childnodes.push_back(node["teapot1"]);
     node["teapot1"]->childnodes.push_back(node["teapot2"]);
     node["world"]->childnodes.push_back(node["bunny"]);

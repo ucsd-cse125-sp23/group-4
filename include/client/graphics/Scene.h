@@ -54,6 +54,26 @@ public:
     std::map< std::string, Model* > models;      // more complex; meshes + other info combined
     //std::map< std::string, Light* > light;
 
+    SceneResourceMap() {
+        meshes["_gz-cube"] = new Cube();
+
+        meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
+        meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+
+        shaderPrograms["unlit"] = LoadShaders(
+            "assets/shaders/unlit.vert", "assets/shaders/unlit.frag");
+
+        materials["unlit"] = new Material;
+        materials["unlit"]->shader = shaderPrograms["unlit"];
+        materials["unlit"]->diffuse =
+            glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+
+        models["_gz-xyz"] = new Model;
+        models["_gz-xyz"]->mesh = meshes["_gz-xyz"];
+        models["_gz-xyz"]->material = materials["unlit"];
+        models["_gz-xyz"]->transformMtx = glm::scale(glm::vec3(1.0f));
+    }
+
     ~SceneResourceMap() {
         // The containers of pointers own the object pointed to by the pointers.
         // All the objects should be deleted when the object palette ("prefab" list) is destructed.
@@ -77,6 +97,9 @@ public:
 
 class Scene {
 public:
+    bool _freecam = false;
+    bool _gizmos = false;
+
     Camera* camera;
     
     SceneResourceMap* sceneResources;
