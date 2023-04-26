@@ -10,12 +10,12 @@
 [submodule "lib/assimp"]
 	path = lib/assimp
 	url = https://github.com/assimp/assimp
-[submodule "lib/imgui"]
-	path = lib/imgui
-	url = https://github.com/ocornut/imgui
 [submodule "lib/Catch2"]
 	path = lib/Catch2
 	url = https://github.com/catchorg/Catch2
 [submodule "lib/boost"]
 	path = lib/boost
 	url = https://github.com/boostorg/boost
+[submodule "lib/imgui"]
+	path = lib/imgui
+	url = https://github.com/yesean/imgui
