@@ -2,6 +2,7 @@
 
 #include "core/math/shape/ConvexShape.h"
 
+#include <vector>
 
 class ConvexMeshShape : public ConvexShape {
 private:
@@ -28,6 +29,11 @@ public:
 	{
 		this->vertices = (vec3f*)malloc(sizeof(vec3f) * size);
 		memcpy(this->vertices, v, sizeof(vec3f) * size);
+	}
+	ConvexMeshShape(std::vector<vec3f> v) : size(v.size())
+	{
+		this->vertices = (vec3f*)malloc(sizeof(vec3f) * v.size());
+		std::copy(v.begin(), v.end(), this->vertices);
 	}
 	ConvexMeshShape(std::initializer_list<vec3f> v) : size(v.size())
 	{
