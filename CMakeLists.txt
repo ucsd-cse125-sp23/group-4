@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.14)
 project(tagguys DESCRIPTION "Real-time Multiplayer Tag")
 include(FetchContent)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
