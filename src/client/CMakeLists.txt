@@ -64,3 +64,4 @@ add_custom_command(
     "${CMAKE_SOURCE_DIR}/assets" 
     "${PROJECT_BINARY_DIR}/assets"
 )
+
