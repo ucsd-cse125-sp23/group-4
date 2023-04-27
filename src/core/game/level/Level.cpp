@@ -70,7 +70,7 @@ void Level::tick() {
 				break;
 
 			vec3f norm = normalize(vec3f(minMTV));
-			if (self->vel.y < 0 && minMTV.y > 0)
+			if (self->vel.y < 0 && minMTV.y / (abs(minMTV.x) + abs(minMTV.z)) > 0.05)
 				self->onGround = true;
 			if (collisions[ind]->isStatic())
 			{
@@ -78,8 +78,8 @@ void Level::tick() {
 				//Set object velocity to only tangential
 				//Apply friction on object tangent velocoty
 				self->addPos(vec3f(minMTV) * (minMTV.w + 0.0001f));
-				//self->vel = tangent(self->vel, norm);
-				//self->vel -= self->vel * minMTV.w * collisions[ind]->getBounds()->friction;
+				self->vel = tangent(self->vel, norm);
+				self->vel -= self->vel * minMTV.w * collisions[ind]->getBounds()->friction;
 			}
 			else
 			{
@@ -90,7 +90,7 @@ void Level::tick() {
 				self->vel = tangent(self->vel, norm);
 				self->vel -= self->vel * minMTV.w * collisions[ind]->getBounds()->friction * 0.5f;
 				collisions[ind]->addPos(-vec3f(minMTV) * (minMTV.w * 0.5f + 0.001f));
-				collisions[ind]->vel = tangent(collisions[ind]->vel, -vec3f(minMTV));
+				collisions[ind]->vel = tangent(collisions[ind]->vel, -norm);
 				collisions[ind]->vel -= collisions[ind]->vel * minMTV.w * self->getBounds()->friction * 0.5f;
 			}
 			collisions[ind]->onCollision(self);

@@ -399,7 +399,7 @@ inline TVector4<T> max(const TVector4<T>& v0, const TVector4<T>& v1) {
 
 template <typename T>
 inline TVector3<T> tangent(const TVector3<T>& vec, const TVector3<T>& norm) {
-    return vec - dot(vec, norm) * vec;
+    return vec - dot(vec, norm) * norm;
 }
 
 
