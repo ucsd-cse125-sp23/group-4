@@ -19,3 +19,6 @@
 [submodule "lib/imgui"]
 	path = lib/imgui
 	url = https://github.com/yesean/imgui
+[submodule "lib/freetype"]
+	path = lib/freetype
+	url = https://github.com/freetype/freetype.git
