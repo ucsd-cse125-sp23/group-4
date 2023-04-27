@@ -24,3 +24,16 @@ void Environment::addBox(vec3f min, vec3f max, float friction)
 	PObject* obj = new PObject(shape, ENVIRONMENT_LAYER, friction, true);
 	this->addPObject(obj);
 }
+
+void Environment::addConvex(std::vector<vec3f> vertices, float friction)
+{
+	BoundingShape* shape = new ConvexMeshShape(vertices);
+	PObject* obj = new PObject(shape, ENVIRONMENT_LAYER, friction, true);
+	this->addPObject(obj);
+}
+void Environment::addConvex(std::initializer_list<vec3f> vertices, float friction)
+{
+	BoundingShape* shape = new ConvexMeshShape(vertices);
+	PObject* obj = new PObject(shape, ENVIRONMENT_LAYER, friction, true);
+	this->addPObject(obj);
+}

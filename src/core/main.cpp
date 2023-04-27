@@ -12,16 +12,16 @@ int main(int argc, char* argv[])
 {
 	std::cout << "Hello world!" << std::endl;
 
-	OffsetShape* test = new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0, 1, 0));
-	/*
 	PObject* player = new Player();
-	std::cout << player->getPos() << " " << player->vel << std::endl;
+	ControlModifierData* controlData = new ControlModifierData();
+	player->addModifierInstance(new ModifierInstance(CONTROL_MODIFIER, controlData));
+	controlData->horizontalVel = vec3f(0.3f, 0.0f, 0.0f);
+	player->vel = vec3f(0.5f, 0.0f, 0.0f);
 	for (int i = 0; i < 10; i++)
 	{
-		player->tick();
 		std::cout << player->getPos() << " " << player->vel << std::endl;
+		player->tick();
 	}
-	*/
 
 	std::cout << "End" << std::endl;
 }
