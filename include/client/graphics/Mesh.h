@@ -5,7 +5,8 @@ Mesh is an abstract class for a 3D rendered object.
 #ifndef __MESH_H__
 #define __MESH_H__
 
-#include"shader.h"
+#include "client/graphics/shader.h"
+
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -37,6 +38,8 @@ public:
         unsigned int n = indices.size(); // #(triangles)*3
 
         count = n;
+
+        if (count == 0) return;
 
         glBindVertexArray(vao);
 

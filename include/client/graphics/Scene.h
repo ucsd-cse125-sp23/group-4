@@ -1,6 +1,8 @@
 /**************************************************
 
 *****************************************************/
+#pragma once
+
 #define GLM_FORCE_RADIANS
 #ifdef __APPLE__
 #define GLFW_INCLUDE_GLCOREARB
@@ -19,22 +21,20 @@
 #include <string>
 #include <map>
 #include <stack>
-#include "core.h"
-#include "Node.h"
-#include "GameThing.h"
-#include "Player.h"
 
-#include "Camera.h"
+#include "client/graphics/Node.h"
+#include "client/graphics/GameThing.h"
+
+#include "client/graphics/Camera.h"
 //#include "Light.h"
-#include "Mesh.h"
-#include "SkinnedMesh.h"
-#include "shader.h"
-#include "Material.h"
-#include "Model.h"
-#include "PlayerModel.h"
-
-#ifndef __SCENE_H__
-#define __SCENE_H__
+#include "client/graphics/Mesh.h"
+#include "client/graphics/SkinnedMesh.h"
+#include "client/graphics/shader.h"
+#include "client/graphics/Material.h"
+#include "client/graphics/Model.h"
+#include "client/graphics/Obj.h"
+#include "client/graphics/Cube.h"
+#include "client/graphics/Collider.h"
 
 struct Character {
   unsigned int TextureID;  // ID handle of the glyph texture
@@ -55,23 +55,7 @@ public:
     //std::map< std::string, Light* > light;
 
     SceneResourceMap() {
-        meshes["_gz-cube"] = new Cube();
-
-        meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-        meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
-
-        shaderPrograms["unlit"] = LoadShaders(
-            "assets/shaders/unlit.vert", "assets/shaders/unlit.frag");
-
-        materials["unlit"] = new Material;
-        materials["unlit"]->shader = shaderPrograms["unlit"];
-        materials["unlit"]->diffuse =
-            glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
-
-        models["_gz-xyz"] = new Model;
-        models["_gz-xyz"]->mesh = meshes["_gz-xyz"];
-        models["_gz-xyz"]->material = materials["unlit"];
-        models["_gz-xyz"]->transformMtx = glm::scale(glm::vec3(1.0f));
+        
     }
 
     ~SceneResourceMap() {
@@ -97,12 +81,15 @@ public:
 
 class Scene {
 public:
-    bool _freecam = false;
-    bool _gizmos = false;
+    static bool _freecam;
+    static bool _gizmos;
+    static SceneResourceMap _globalSceneResources;
 
-    Camera* camera;
-    
     SceneResourceMap* sceneResources;
+
+    Camera* camera; // TODO reimplement this
+    
+    
 
     // The container of nodes will be the scene graph after we connect the nodes by setting the child_nodes.
     std::map< std::string, Node* > node;
@@ -114,6 +101,42 @@ public:
     Scene() {
         camera = new Camera;
         sceneResources = new SceneResourceMap();
+
+        // globals --
+        _globalSceneResources.meshes["_gz-cube"] = new Cube();
+
+        _globalSceneResources.meshes["_gz-xyz"] =
+            new Obj();  // gizmo for debugging
+        _globalSceneResources.meshes["_gz-xyz"]->init(
+            "assets/models/_gizmo.obj");
+
+        _globalSceneResources.shaderPrograms["unlit"] = LoadShaders(
+            "assets/shaders/unlit.vert",
+                                              "assets/shaders/unlit.frag");
+
+        _globalSceneResources.materials["unlit"] = new Material;
+        _globalSceneResources.materials["unlit"]->shader =
+            _globalSceneResources.shaderPrograms["unlit"];
+        _globalSceneResources.materials["unlit"]->diffuse =
+            glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+
+        _globalSceneResources.models["_gz-xyz"] = new Model;
+        _globalSceneResources.models["_gz-xyz"]->mesh =
+            _globalSceneResources.meshes["_gz-xyz"];
+        _globalSceneResources.models["_gz-xyz"]->material =
+            _globalSceneResources.materials["unlit"];
+        _globalSceneResources.models["_gz-xyz"]->transformMtx =
+            glm::scale(glm::vec3(1.0f));
+
+        _globalSceneResources.models["_gz-cube"] = new Model;
+        _globalSceneResources.models["_gz-cube"]->mesh =
+            _globalSceneResources.meshes["_gz-cube"];
+        _globalSceneResources.models["_gz-cube"]->material =
+            _globalSceneResources.materials["unlit"];
+        _globalSceneResources.models["_gz-cube"]->transformMtx =
+            glm::translate(glm::vec3(0.0f));
+        // --
+
 
         // the default scene graph already has one node named "world."
         node["world"] = new Node("world");
@@ -138,5 +161,3 @@ public:
         delete camera;
     }
 };
-
-#endif 

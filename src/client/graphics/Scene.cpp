@@ -11,7 +11,12 @@ adapted from CSE 167 - Matthew
 
 using namespace glm;
 
-void Scene::update(GLFWwindow* window, Camera* camera, float delta, float step) {
+
+bool Scene::_freecam = false;
+bool Scene::_gizmos = false;
+SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
+
+void Scene::update(float deltaTime) {
     //if (player) player->update(deltaTime);
 
     for (auto e : gamethings) {
@@ -82,12 +87,12 @@ void Scene::draw(GLFWwindow* window, const glm::mat4& viewProjMtx) {
         cur_MMtx = matrix_stack.top();
         matrix_stack.pop();
 
-        // draw the model of our current node
-        if(cur->model)
-            cur->model->draw(viewProjMtx, cur_MMtx);
+        // draw the visuals of our current node
+        cur->draw(viewProjMtx, cur_MMtx);
 
-        if (_gizmos && cur->_renderGizmo)
-            sceneResources->models["_gz-xyz"]->draw(viewProjMtx, cur_MMtx, true);
+        cur->draw_debug(viewProjMtx, cur_MMtx, Scene::_gizmos,
+                        _globalSceneResources.models["_gz-xyz"],
+                        _globalSceneResources.models["_gz-cube"]);
 
         // Continue the DFS: put all the child nodes of the current node in the stack
         for (unsigned int i = 0; i < cur->childnodes.size(); i++) {
