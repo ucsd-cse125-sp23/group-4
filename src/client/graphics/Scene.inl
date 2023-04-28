@@ -4,7 +4,6 @@ Scene.inl contains the definition of the scene graph
 #include "client/graphics/Scene.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/Obj.h"
-
 #include "client/graphics/ColliderImporter.h"
 
 #define _USE_MATH_DEFINES
@@ -135,6 +134,7 @@ void Scene::init(void) {
     Player* player = new Player();
     player->mod = waspModel;
     player->name = "Player 1";
+    player->transformMtx = translate(vec3(0, 2, 0));
     gamethings.push_back(player);
 
     // Build the scene graph
@@ -160,7 +160,7 @@ void Scene::init(void) {
     node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
     node["teapot2"]->model = sceneResources->models["teapot2"];
 
-    node["bunny"]->transformMtx = translate(vec3(-4.0f, 0.0f, 0.0f));
+    node["bunny"]->transformMtx = translate(vec3(-4.0f, 2.0f, 0.0f));
     node["bunny"]->model = sceneResources->models["bunny1"];
 
     node["wasp"]->model = sceneResources->models["wasp"];

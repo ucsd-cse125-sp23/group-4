@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Model.h"
-#include "Skeleton.h"
-#include "SkinnedMesh.h"
-#include "AnimationPlayer.h"
+#include "client/graphics/Model.h"
+#include "client/graphics/Skeleton.h"
+#include "client/graphics/SkinnedMesh.h"
+#include "client/graphics/AnimationPlayer.h"
 #include <map>
 #include <string>
 

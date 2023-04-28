@@ -2,7 +2,7 @@
 // Window.cpp
 ////////////////////////////////////////
 
-#include "Window.h"
+#include "client/graphics/Window.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -19,6 +19,8 @@ Camera* Cam;
 // Interaction Variables
 bool LeftDown, RightDown;
 int MouseX, MouseY;
+
+bool _debugmode = false;
 
 float stepSize = 0.25;
 
@@ -237,24 +239,24 @@ void Window::displayCallback(GLFWwindow* window)
     glLoadIdentity();
 
 	// Render the objects.
-	gameScene->draw(window, Cam->GetViewProjectMtx());
+	gameScene->draw(Cam->GetViewProjectMtx());
+    gameScene->drawHUD(window);
 
 
+	if (_debugmode) {
+		// imgui new frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
-	// imgui new frame
-    /* ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
+		gameScene->gui();
 
-	gameScene->gui();
+		//imguiDraw(skeleton, animClip);	// simple helper method
 
-	//imguiDraw(skeleton, animClip);	// simple helper method
-
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
-
-
-
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+	
 
 	// Swap buffers.										******
 	glfwSwapBuffers(window);
@@ -278,7 +280,7 @@ void Window::resetCamera()
 // callbacks - for Interaction 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (ImGui::GetIO().WantCaptureKeyboard) return;
+	if (_debugmode && ImGui::GetIO().WantCaptureKeyboard) return;
 
 	
 	// Check for a key press.
@@ -293,6 +295,9 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
 		case GLFW_KEY_R:
 			resetCamera();
+			break;
+		case GLFW_KEY_TAB:
+			_debugmode = !_debugmode;
 			break;
 		case GLFW_KEY_C:
 			Cam->ToggleFixedCamera();
@@ -313,7 +318,7 @@ void Window::charCallback(GLFWwindow* window, unsigned int codepoint)
 
 void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (ImGui::GetIO().WantCaptureMouse) {
+	if (_debugmode && ImGui::GetIO().WantCaptureMouse) {
 		LeftDown = RightDown = false;
 		return;
 	}
@@ -328,7 +333,7 @@ void Window::mouse_callback(GLFWwindow* window, int button, int action, int mods
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	if (ImGui::GetIO().WantCaptureMouse) return;
+	if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
 	if (yoffset) {
 		const float rate = 0.05f;
@@ -346,7 +351,7 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
 	MouseX = (int)currX;
 	MouseY = (int)currY;
 
-	if (ImGui::GetIO().WantCaptureMouse) {
+	if (_debugmode && ImGui::GetIO().WantCaptureMouse) {
 		LeftDown = RightDown = false;
 		return;
 	}

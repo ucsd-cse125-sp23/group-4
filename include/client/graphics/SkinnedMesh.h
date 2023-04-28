@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core.h"
-#include "Mesh.h"
-#include "Tokenizer.h"
-#include "Skeleton.h"
+#include "client/graphics/core.h"
+#include "client/graphics/Mesh.h"
+#include "client/graphics/Tokenizer.h"
+#include "client/graphics/Skeleton.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

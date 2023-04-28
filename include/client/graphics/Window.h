@@ -1,9 +1,9 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
-#include "main.h"
-#include "Scene.h"
-#include "Camera.h"
+#include "client/graphics/main.h"
+#include "client/graphics/Scene.h"
+#include "client/graphics/Camera.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

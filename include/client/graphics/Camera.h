@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "core.h"
+#include "client/graphics/core.h"
 #ifdef __APPLE__
 #define GLFW_INCLUDE_GLCOREARB
 #include <OpenGL/gl3.h>

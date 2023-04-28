@@ -3,7 +3,7 @@ Scene.cpp contains the implementation of the draw command
 Renders all objects with DFS tree traversal
 adapted from CSE 167 - Matthew
 *****************************************************/
-#include "Scene.h"
+#include "client/graphics/Scene.h"
 
 // The scene init definition 
 #include "Scene.inl"
@@ -57,7 +57,7 @@ void Scene::drawHUD(GLFWwindow* window) {
       glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
     }
  }
-void Scene::draw(GLFWwindow* window, const glm::mat4& viewProjMtx) {
+void Scene::draw(const glm::mat4& viewProjMtx) {
     // Pre-draw sequence:
     //camera->computeMatrices();
 
@@ -101,33 +101,10 @@ void Scene::draw(GLFWwindow* window, const glm::mat4& viewProjMtx) {
         }
 
     } // End of DFS while loop.
-
-    drawHUD(window);
 }
 
 
 #include "imgui/imgui.h"
-void treeChildren(ImGuiTreeNodeFlags node_flags, bool isOpen, Node* par)
-{
-    if (isOpen)
-    {
-        for (auto child : par->childnodes)
-        {
-            if (child->childnodes.empty())
-            {
-                node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
-                //ImGui::TreeNodeEx((void*)(intptr_t)par, node_flags, child.name.c_str());
-            }
-            else
-            {
-                //bool o = ImGui::TreeNodeEx((void*)(intptr_t)par, node_flags, child.name.c_str());
-                ImGui::TreePop();
-                //treeChildren(node_flags, o, p);
-            }
-        }
-        ImGui::TreePop();
-    }
-}
 
 void Scene::gui() {
     ImGui::Begin("scene debug +++");
