@@ -14,8 +14,12 @@ public:
     Node(std::string name) { this->name = name; }
 
     glm::mat4 transformMtx;
-    
+
     Model* model = nullptr;
 
     std::vector< Node* > childnodes;
+
+    // flags to be used elsewhere
+    bool _enabled = true;
+    bool _renderGizmo = true;
 };

@@ -14,7 +14,7 @@ struct Model {
     Material* material;
     // TODO, consider adding skin stuff here
 
-    virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx)
+    void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx, const bool ignoreDepth = false)
     {
         if (!material || !mesh)
             return;
@@ -26,7 +26,11 @@ struct Model {
 
         material->setUniforms(viewProjMtx, modelMtx * transformMtx);
 
+        if (ignoreDepth) glDisable(GL_DEPTH_TEST);
+
         mesh->draw();
+
+        if (ignoreDepth) glEnable(GL_DEPTH_TEST);
 
         // deactivate the shader program    ---
         glUseProgram(0);
