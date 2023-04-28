@@ -3,7 +3,17 @@ on: [push, pull_request]
 env:
   BUILD_TYPE: Release
 
-jobs:
+jobs:  
+  lint:
+    runs-on: windows-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - run: pip install cpplint
+      
+      - name: cpplint
+        run: cpplint --recursive src
+    
   build:
     runs-on: windows-latest
 
