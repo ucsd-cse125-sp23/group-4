@@ -63,6 +63,8 @@ int main(int argc, char* argv[])
 	GLFWwindow* window = Window::createWindow(800, 600);
 	if (!window) exit(EXIT_FAILURE);
 
+	glutInit(&argc, argv);
+
 	// Print OpenGL and GLSL versions.
 	print_versions();
 	// Setup callbacks.
@@ -96,7 +98,7 @@ int main(int argc, char* argv[])
 		lastTime = nowTime;
 
 		// Idle callback. Updating objects, etc. can be done here.
-		Window::idleCallback(deltaTime);
+		Window::idleCallback(window, deltaTime);
 
 		// Main render display callback. Rendering of objects is done here.
 		Window::displayCallback(window);

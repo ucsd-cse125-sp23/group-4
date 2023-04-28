@@ -16,6 +16,25 @@ FetchContent_Declare(
   GIT_TAG 0.9.8.5
 )
 
+#FetchContent_Declare(
+#    freetype
+#    GIT_REPOSITORY https://github.com/freetype/freetype.git
+#    GIT_TAG master
+#)
+
+FetchContent_Declare(
+    freeglut
+    GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
+    GIT_TAG master
+)
+FetchContent_GetProperties(freeglut)
+if(NOT freeglut_POPULATED)
+    FetchContent_Populate(freeglut)
+    add_subdirectory(${freeglut_SOURCE_DIR} ${freeglut_BINARY_DIR})
+endif()
+FetchContent_MakeAvailable(glew glfw glm freeglut)
+
+
 # FetchContent_Declare(
 #   assimp
 #   GIT_REPOSITORY https://github.com/assimp/assimp.git
@@ -25,7 +44,6 @@ FetchContent_Declare(
 #   FetchContent_Populate(assimp)
 #   add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
 # endif()
-FetchContent_MakeAvailable(glew glfw glm)
 
 set(SOURCES
   graphics/AnimationClip.cpp
@@ -45,8 +63,11 @@ add_executable(client main.cpp ${SOURCES})
 target_include_directories(client
   PUBLIC
     ${CMAKE_SOURCE_DIR}/include/client/graphics
+    ${freeglut_SOURCE_DIR}/include
 )
-target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui)
+
+
+target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui freeglut_static)
 target_compile_features(client PUBLIC cxx_std_11)
 if(APPLE)
   target_compile_options(client

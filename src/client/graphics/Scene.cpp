@@ -11,15 +11,48 @@ adapted from CSE 167 - Matthew
 
 using namespace glm;
 
-void Scene::update(float deltaTime) {
+void Scene::update(GLFWwindow* window, Camera* camera, float delta, float step) {
     //if (player) player->update(deltaTime);
 
     for (auto e : gamethings) {
-        e->update(deltaTime);
+        e->update(window, camera, delta, step);
     }
 }
 
-void Scene::draw(const glm::mat4& viewProjMtx) {
+void Scene::drawHUD(GLFWwindow* window) { 
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+  
+    std::map<std::string, float> player_times;
+
+    for (GameThing* e : gamethings) {
+      if (dynamic_cast<Player*>(e) != nullptr) {
+        Player* player = dynamic_cast<Player*>(e);
+        std::string name = player->name;
+        PlayerModel* mod = player->mod;
+        Skeleton* skel = mod->skel;
+        glm::vec3 position = skel->getPos();
+        player_times[name] = player->time;
+        const unsigned char* cname =
+            reinterpret_cast<const unsigned char*>(name.c_str());
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glRasterPos2f(-0.1f, position[1] + 0.1);
+        glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, cname);
+      }
+    }
+
+    for (auto times : player_times) {
+      std::string str = times.first;
+      float time = times.second;
+      str += " " + to_string(time);
+      const unsigned char* string =
+          reinterpret_cast<const unsigned char*>(str.c_str());
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glWindowPos2f(10.0f, float(height) - 25);
+      glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
+    }
+ }
+void Scene::draw(GLFWwindow* window, const glm::mat4& viewProjMtx) {
     // Pre-draw sequence:
     //camera->computeMatrices();
 
@@ -64,6 +97,7 @@ void Scene::draw(const glm::mat4& viewProjMtx) {
 
     } // End of DFS while loop.
 
+    drawHUD(window);
 }
 
 

@@ -2,19 +2,27 @@
 
 *****************************************************/
 #define GLM_FORCE_RADIANS
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
+#include <GL/freeglut.h>
 #include <math.h>
-
 #include <stdlib.h>
 #include <vector>
 #include <string>
 #include <map>
 #include <stack>
-
+#include "core.h"
 #include "Node.h"
 #include "GameThing.h"
+#include "Player.h"
 
 #include "Camera.h"
 //#include "Light.h"
@@ -23,21 +31,29 @@
 #include "shader.h"
 #include "Material.h"
 #include "Model.h"
+#include "PlayerModel.h"
 #include "Obj.h"
 #include "Cube.h"
 
 #ifndef __SCENE_H__
 #define __SCENE_H__
 
-using namespace std;
+struct Character {
+  unsigned int TextureID;  // ID handle of the glyph texture
+  glm::ivec2 Size;         // Size of glyph
+  glm::ivec2 Bearing;      // Offset from baseline to left/top of glyph
+  unsigned int Advance;    // Offset to advance to next glyph
+};
 
 class SceneResourceMap {
 public:
     // The following are containers of object pointers serving as "prefabs" to be referenced across the project.
-    map< string, Mesh* > meshes;
-    map< string, GLuint > shaderPrograms;
-    map< string, Material* > materials;
-    map< string, Model* > models;      // more complex; meshes + other info combined
+    std::map< std::string, Skeleton*> skeletons;
+    std::map< std::string, Mesh* > meshes;
+    std::map< std::string, std::map<std::string, AnimationPlayer*>> animations;
+    std::map< std::string, GLuint > shaderPrograms;
+    std::map< std::string, Material* > materials;
+    std::map< std::string, Model* > models;      // more complex; meshes + other info combined
     //std::map< std::string, Light* > light;
 
     SceneResourceMap() {
@@ -95,6 +111,8 @@ public:
 
     std::vector< GameThing* > gamethings;
 
+    std::map<char, Character> Characters;
+
     Scene() {
         camera = new Camera;
         sceneResources = new SceneResourceMap();
@@ -104,8 +122,9 @@ public:
     }
 
     void init(void);
-    void update(float);
-    void draw(const glm::mat4& viewProjMtx);
+    void update(GLFWwindow* window, Camera* camera, float delta, float step = 0.25);
+    void drawHUD(GLFWwindow* window);
+    void draw(GLFWwindow* window, const glm::mat4& viewProjMtx);
 
     void gui();
 
