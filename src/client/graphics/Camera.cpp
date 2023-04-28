@@ -44,7 +44,7 @@ void Camera::UpdateWorld() {
   World = glm::eulerAngleY(glm::radians(-Azimuth)) *
           glm::eulerAngleX(glm::radians(-Incline)) * World;
 
-  World = glm::translate(glm::vec3(XTranslation, 0, ZTranslation)) * World;
+  World = glm::translate(Translations) * World;
 }
 
 void Camera::Reset() {
@@ -64,6 +64,8 @@ void Camera::Reset() {
   World[3][2] = Distance;
   World = glm::eulerAngleY(glm::radians(-Azimuth)) *
           glm::eulerAngleX(glm::radians(-Incline)) * World;
+
+  Translations = glm::vec3(0.0, 0.0, 0.0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,10 +105,10 @@ void Camera::Move(GLFWwindow* window, float delta) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
       if (abs(int(forwardZ)) == 1) {
         World = glm::translate(glm::vec3(0, 0, -delta)) * World;
-        ZTranslation -= delta;
+        Translations[2] -= delta;
       } else if (abs(int(forwardX)) == 1) {
         World = glm::translate(glm::vec3(delta, 0, 0)) * World;
-        XTranslation += delta;
+        Translations[0] += delta;
       } else {
         float m = forwardZ / forwardX;
         dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
@@ -116,17 +118,17 @@ void Camera::Move(GLFWwindow* window, float delta) {
         }
         dz = dx * m;
         World = glm::translate(glm::vec3(dx, 0, -dz)) * World;
-        XTranslation += dx;
-        ZTranslation -= dz;
+        Translations[0] += dx;
+        Translations[2] -= dz;
       }
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
       if (abs(int(forwardZ)) == 1) {
         World = glm::translate(glm::vec3(0, 0, delta)) * World;
-        ZTranslation += delta;
+        Translations[2] += delta;
       } else if (abs(int(forwardX)) == 1) {
         World = glm::translate(glm::vec3(-delta, 0, 0)) * World;
-        XTranslation -= delta;
+        Translations[0] -= delta;
       } else {
         float m = forwardZ / forwardX;
         dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
@@ -136,19 +138,19 @@ void Camera::Move(GLFWwindow* window, float delta) {
         }
         dz = dx * m;
         World = glm::translate(glm::vec3(-dx, 0, dz)) * World;
-        XTranslation -= dx;
-        ZTranslation += dz;
+        Translations[0] -= dx;
+        Translations[2] += dz;
       }
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
       if (abs(int(sideX)) == 1) {
         dx = sideX * delta;
         World = glm::translate(glm::vec3(dx, 0, 0)) * World;
-        XTranslation += dx;
+        Translations[0] += dx;
       } else if (abs(int(sideZ)) == 1) {
         dz = -1 * sideZ * delta;
         World = glm::translate(glm::vec3(0, 0, dz));
-        ZTranslation += dz;
+        Translations[2] += dz;
       } else {
         float m = sideZ / sideX;
         dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
@@ -158,19 +160,19 @@ void Camera::Move(GLFWwindow* window, float delta) {
         }
         dz = -1 * dx * m;
         World = glm::translate(glm::vec3(dx, 0, dz)) * World;
-        XTranslation += dx;
-        ZTranslation += dz;
+        Translations[0] += dx;
+        Translations[2] += dz;
       }
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
       if (abs(int(sideX)) == 1) {
         dx = sideX * delta;
         World = glm::translate(glm::vec3(-dx, 0, 0)) * World;
-        XTranslation -= dx;
+        Translations[0] -= dx;
       } else if (abs(int(sideZ) == 1)) {
         dz = -1 * sideZ * delta;
         World = glm::translate(glm::vec3(0, 0, -dz)) * World;
-        ZTranslation -= dz;
+        Translations[2] -= dz;
       } else {
         float m = sideZ / sideX;
         dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
@@ -180,8 +182,8 @@ void Camera::Move(GLFWwindow* window, float delta) {
         }
         dz = -1 * dx * m;
         World = glm::translate(glm::vec3(-dx, 0, -dz)) * World;
-        XTranslation -= dx;
-        ZTranslation -= dz;
+        Translations[0] -= dx;
+        Translations[2] -= dz;
       }
     }
   }

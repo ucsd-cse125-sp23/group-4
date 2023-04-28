@@ -20,7 +20,7 @@ Camera* Cam;
 bool LeftDown, RightDown;
 int MouseX, MouseY;
 
-float stepSize = 0.1;
+float stepSize = 0.25;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -28,11 +28,11 @@ FetchContent_Declare(
 #add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp)
 
 
-#FetchContent_Declare(
-#    freetype
-#    GIT_REPOSITORY https://github.com/freetype/freetype.git
-#    GIT_TAG master
-#)
+FetchContent_Declare(
+    freetype
+    GIT_REPOSITORY https://github.com/freetype/freetype.git
+    GIT_TAG master
+)
 
 FetchContent_Declare(
     freeglut
@@ -46,7 +46,6 @@ if(NOT freeglut_POPULATED)
 endif()
 
 
-
 # FetchContent_Declare(
 #   assimp
 #   GIT_REPOSITORY https://github.com/assimp/assimp.git
@@ -57,7 +56,7 @@ endif()
 #   add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
 # endif()
 
-FetchContent_MakeAvailable(glew glfw glm freetype imgui assimp)
+FetchContent_MakeAvailable(glew glfw glm freeglut freetype imgui assimp)
 
 set(SOURCES
   graphics/AnimationClip.cpp
@@ -88,7 +87,8 @@ target_link_libraries(
           glm
           imgui
           assimp
-          freeglut_static)
+          freeglut_static
+          freetype)
 target_compile_features(client PUBLIC cxx_std_11)
 if(APPLE)
   target_compile_options(client

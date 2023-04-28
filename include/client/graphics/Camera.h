@@ -56,7 +56,7 @@ class Camera {
       Incline;  // Angle of the camera eye position over the XZ plane (degrees)
   float XTranslation;  // Left/Right Translation of Camera
   float ZTranslation;  // Forward/Back Translation of Camera
-
+  glm::vec3 Translations;
   bool Fixed;
   glm::mat4 World;
 
