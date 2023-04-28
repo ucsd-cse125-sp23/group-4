@@ -1,8 +1,8 @@
 /**************************************************
 A model is a mesh with material (and more?? animation skeleton???)
 *****************************************************/
-#include "Mesh.h"
-#include "Material.h"
+#include "client/graphics/Mesh.h"
+#include "client/graphics/Material.h"
 
 #ifndef __MODEL_H__
 #define __MODEL_H__

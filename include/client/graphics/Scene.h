@@ -39,9 +39,6 @@
 #include "client/graphics/Cube.h"
 #include "client/graphics/Collider.h"
 
-#ifndef __SCENE_H__
-#define __SCENE_H__
-
 struct Character {
   unsigned int TextureID;  // ID handle of the glyph texture
   glm::ivec2 Size;         // Size of glyph
@@ -149,9 +146,9 @@ public:
     }
 
     void init(void);
-    void update(GLFWwindow* window, Camera* camera, float delta, float step = 0.25);
+    void update(GLFWwindow* window, Camera* camera, float delta, float step = 0.25);    // TODO
     void drawHUD(GLFWwindow* window);
-    void draw(GLFWwindow* window, const glm::mat4& viewProjMtx);
+    void draw(const glm::mat4& viewProjMtx);
 
     void gui();
 
