@@ -1,9 +1,12 @@
 /**************************************************
 Scene.inl contains the definition of the scene graph
 *****************************************************/
-#include "Scene.h"
-#include "Cube.h"
-#include "Obj.h"
+#include "client/graphics/Scene.h"
+#include "client/graphics/Cube.h"
+#include "client/graphics/Obj.h"
+
+#include "client/graphics/ColliderImporter.h"
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -105,6 +108,22 @@ void Scene::init(void) {
     sceneResources->models["map1"]->transformMtx = translate(vec3(0,-2,0));
 
 
+    sceneResources->meshes["mapColsTesting"] = new Obj();
+    sceneResources->meshes["mapColsTesting"]->init("assets/models/test_colliders.obj"); // multiple objects in one file
+    sceneResources->models["mapColsTesting"] = new Model;
+    sceneResources->models["mapColsTesting"]->mesh = sceneResources->meshes["mapColsTesting"];
+    sceneResources->models["mapColsTesting"]->material =
+        sceneResources->materials["marble"];
+    //sceneResources->models["mapColsTesting"]->transformMtx = translate(vec3(0, -2, 0));   // needs to be world space
+
+    std::vector<Collider> mapColliders = ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
+
+    node["collision"] = new Node("_colliders");
+    for(auto c : mapColliders) {
+        node["collision"]->childnodes.push_back(new Collider(c));
+    }
+    //node["collision"]->transformMtx = sceneResources->models["mapColsTesting"]->transformMtx;
+
     ///////////////////////////////////////////////////////
 
     // Add stuff to game updateables
@@ -132,10 +151,13 @@ void Scene::init(void) {
     node["map"] = new Node("_map");
     node["map"]->model = sceneResources->models["map1"];
 
+    node["map2"] = new Node("_map2");
+    node["map2"]->model = sceneResources->models["mapColsTesting"];
+
     thing_example->transform.position = vec3(2.0f, 0.0f, 0.0f); // gamething only
     node["teapot1"]->model = sceneResources->models["teapot1"];
 
-    thing_player->transform.position = vec3(0.0f, 0.0f, 2.0f);
+    thing_player->transform.position = vec3(0.0f, 2.0f, 2.0f);
     thing_player->model = sceneResources->models["player"];
 
     node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
@@ -146,7 +168,7 @@ void Scene::init(void) {
 
     node["wasp"]->model = sceneResources->models["wasp"];
 
-    node["ground"]->transformMtx = translate(vec3(-10, -1.0f, -10));
+    node["ground"]->transformMtx = translate(vec3(-10, 1.0f, -10));
     int checkers = 16;
     for (int i = 1; i <= checkers; i++) {
         for (int j = 1; j <= checkers; j++) {
@@ -168,9 +190,12 @@ void Scene::init(void) {
     node["world"]->childnodes.push_back(node["teapot1"]);
     node["teapot1"]->childnodes.push_back(node["teapot2"]);
     node["world"]->childnodes.push_back(node["bunny"]);
-    node["world"]->childnodes.push_back(node["ground"]);
     node["world"]->childnodes.push_back(node["wasp"]);
 
-    node["world"]->childnodes.push_back(node["map"]);
+    node["world"]->childnodes.push_back(node["ground"]);
+    node["world"]->childnodes.push_back(node["collision"]);
+    
+
+    node["world"]->childnodes.push_back(node["map2"]);
 
 }

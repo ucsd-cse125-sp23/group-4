@@ -16,8 +16,8 @@
 #include <vector>
 
 
-#include "Node.h"
-#include "Camera.h"
+#include "client/graphics/Camera.h"
+#include "client/graphics/Node.h"
 //#include "Input.h"
 
 struct Transform {
