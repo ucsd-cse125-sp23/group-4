@@ -15,10 +15,6 @@ FetchContent_Declare(
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/yesean/imgui
-  GIT_TAG 46cacb7)
-FetchContent_Declare(
-  imgui
-  GIT_REPOSITORY https://github.com/yesean/imgui
   GIT_TAG v1.0)
 FetchContent_Declare(
   assimp
