@@ -12,7 +12,6 @@ enum class InputAction {
 	Quit,
 	Reset,
 	Screenshot,
-	LightModeToggle,
 	MoveForward,
 	MoveBack,
 	MoveLeft,

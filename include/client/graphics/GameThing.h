@@ -37,7 +37,7 @@ class GameThing : public Node {
 public:
     Transform transform;
 
-    virtual void update(GLFWwindow* window, Camera* camera, float dt, float step = 0.25) {
+    virtual void update(float dt) {
         // --- example ---
         transform.rotation += glm::vec3(0, 30 * dt, 0); // spin on y axis
 

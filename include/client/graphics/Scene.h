@@ -146,7 +146,7 @@ public:
     }
 
     void init(void);
-    void update(GLFWwindow* window, Camera* camera, float delta, float step = 0.25);    // TODO
+    void update(float delta);
     void drawHUD(GLFWwindow* window);
     void draw(const glm::mat4& viewProjMtx);
 

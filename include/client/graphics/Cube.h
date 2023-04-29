@@ -1,8 +1,8 @@
 #ifndef _CUBE_H_
 #define _CUBE_H_
 
-#include "core.h"
-#include "Mesh.h"
+#include "client/graphics/core.h"
+#include "client/graphics/Mesh.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
