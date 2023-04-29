@@ -13,7 +13,7 @@ class PlayerModel : public Model {
   SkinnedMesh* skin;
   std::map<std::string, AnimationPlayer*> anims;
 
-  void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx) {
+  void draw(const glm::mat4& viewProjMtx, const glm::mat4& transformMtx) {
     if (!material || !mesh) return;
 
     GLuint shader = material->shader;
@@ -21,7 +21,7 @@ class PlayerModel : public Model {
     // actiavte the shader program      ---
     glUseProgram(shader);
 
-    material->setUniforms(viewProjMtx, modelMtx * transformMtx);
+    material->setUniforms(viewProjMtx, transformMtx * modelMtx);
 
     skin->draw();
 

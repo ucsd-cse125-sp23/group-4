@@ -87,7 +87,7 @@ public:
 
     SceneResourceMap* sceneResources;
 
-    Camera* camera; // TODO reimplement this
+    Camera* camera;
     
     
 
@@ -98,8 +98,9 @@ public:
 
     std::map<char, Character> Characters;
 
-    Scene() {
-        camera = new Camera;
+    Scene(Camera* camFromWindow) {
+        camera = camFromWindow;
+        node["_camera"] = camera;
         sceneResources = new SceneResourceMap();
 
         // globals --
@@ -125,7 +126,7 @@ public:
             _globalSceneResources.meshes["_gz-xyz"];
         _globalSceneResources.models["_gz-xyz"]->material =
             _globalSceneResources.materials["unlit"];
-        _globalSceneResources.models["_gz-xyz"]->transformMtx =
+        _globalSceneResources.models["_gz-xyz"]->modelMtx =
             glm::scale(glm::vec3(1.0f));
 
         _globalSceneResources.models["_gz-cube"] = new Model;
@@ -133,7 +134,7 @@ public:
             _globalSceneResources.meshes["_gz-cube"];
         _globalSceneResources.models["_gz-cube"]->material =
             _globalSceneResources.materials["unlit"];
-        _globalSceneResources.models["_gz-cube"]->transformMtx =
+        _globalSceneResources.models["_gz-cube"]->modelMtx =
             glm::translate(glm::vec3(0.0f));
         // --
 
@@ -145,7 +146,7 @@ public:
     void init(void);
     void update(float delta);
     void drawHUD(GLFWwindow* window);
-    void draw(const glm::mat4& viewProjMtx);
+    void draw();
 
     void gui();
 
@@ -158,6 +159,5 @@ public:
         }
 
         delete sceneResources;
-        delete camera;
     }
 };

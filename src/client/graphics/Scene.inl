@@ -68,15 +68,15 @@ void Scene::init(void) {
     sceneResources->models["teapot1"] = new Model;
     sceneResources->models["teapot1"]->mesh = sceneResources->meshes["teapot"];
     sceneResources->models["teapot1"]->material = sceneResources->materials["silver"];
-    sceneResources->models["teapot1"]->transformMtx = scale(vec3(1.5f));
+    sceneResources->models["teapot1"]->modelMtx = scale(vec3(1.5f));
     sceneResources->models["teapot2"] = new Model;
     sceneResources->models["teapot2"]->mesh = sceneResources->meshes["teapot"];
     sceneResources->models["teapot2"]->material = sceneResources->materials["ceramic"];
-    sceneResources->models["teapot2"]->transformMtx = translate(vec3(0, 0, 0.1f)) * scale(vec3(1.0f, 1.5f, 1.0f)) * scale(vec3(0.5f));
+    sceneResources->models["teapot2"]->modelMtx = translate(vec3(0, 0, 0.1f)) * scale(vec3(1.0f, 1.5f, 1.0f)) * scale(vec3(0.5f));
     sceneResources->models["bunny1"] = new Model;
     sceneResources->models["bunny1"]->mesh = sceneResources->meshes["bunny"];
     sceneResources->models["bunny1"]->material = sceneResources->materials["wood"];
-    sceneResources->models["bunny1"]->transformMtx = rotate(60.0f, vec3(0.0f, 1.0f, 0.0f));
+    sceneResources->models["bunny1"]->modelMtx = rotate(60.0f, vec3(0.0f, 1.0f, 0.0f));
     sceneResources->models["player"] = new Model;
     sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
     sceneResources->models["player"]->material = sceneResources->materials["ceramic"];
@@ -84,7 +84,7 @@ void Scene::init(void) {
     sceneResources->models["cube1"]->mesh = sceneResources->meshes["cube"];
     sceneResources->models["cube1"]->material = sceneResources->materials["silver"];
     sceneResources->models["cubeF"] = new Model;
-    sceneResources->models["cubeF"]->transformMtx = scale(vec3(1.0f, 0.1f, 1.0f)) * scale(vec3(0.5f));
+    sceneResources->models["cubeF"]->modelMtx = scale(vec3(1.0f, 0.1f, 1.0f)) * scale(vec3(0.5f));
     sceneResources->models["cubeF"]->mesh = sceneResources->meshes["cube"];
     sceneResources->models["cubeF"]->material = sceneResources->materials["marble"];
 
@@ -104,7 +104,7 @@ void Scene::init(void) {
     sceneResources->models["map1"] = new Model;
     sceneResources->models["map1"]->mesh = sceneResources->meshes["map1"];
     sceneResources->models["map1"]->material = sceneResources->materials["marble"];
-    sceneResources->models["map1"]->transformMtx = translate(vec3(0,-2,0));
+    sceneResources->models["map1"]->modelMtx = translate(vec3(0, -2, 0));
 
 
     sceneResources->meshes["mapColsTesting"] = new Obj();
@@ -132,6 +132,7 @@ void Scene::init(void) {
 
     
     Player* player = new Player();
+    player->camera = camera;    // give a reference to the game camera
     player->pmodel = waspModel;
     player->model = waspModel;
     player->name = "Player 1";
@@ -183,6 +184,8 @@ void Scene::init(void) {
             }
         }
     }
+
+    player->childnodes.push_back(camera);
 
     // "world" node already exists
     node["world"]->childnodes.push_back(node["player"]);

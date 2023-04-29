@@ -8,13 +8,13 @@ A model is a mesh with material (and more?? animation skeleton???)
 #define __MODEL_H__
 
 struct Model {
-    glm::mat4 transformMtx; // applied first!
+    glm::mat4 modelMtx; // applied first!
 
     Mesh* mesh;
     Material* material;
     // TODO, consider adding skin stuff here
 
-    void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx, const bool ignoreDepth = false)
+    void draw(const glm::mat4& viewProjMtx, const glm::mat4& transformMtx, const bool ignoreDepth = false)
     {
         if (!material || !mesh)
             return;
@@ -24,7 +24,7 @@ struct Model {
         // actiavte the shader program      ---
         glUseProgram(shader);
 
-        material->setUniforms(viewProjMtx, modelMtx * transformMtx);
+        material->setUniforms(viewProjMtx, transformMtx * modelMtx);
 
         if (ignoreDepth) glDisable(GL_DEPTH_TEST);
 

@@ -13,27 +13,29 @@ public:
     Node() { }
     Node(std::string name) { this->name = name; }
 
-    glm::mat4 transformMtx;
+    glm::mat4 transformMtx; // local space
+    glm::mat4 parentMtxCache;  // world space of parent (before multiplying the above)
+
+    glm::mat4 getWorldMtx() {
+        return parentMtxCache * transformMtx;
+    }
 
     Model* model = nullptr;
 
     std::vector< Node* > childnodes;
 
-    virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx) {
+    virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& parentMtx) {
+        parentMtxCache = parentMtx;
         if (model) {
-            model->draw(viewProjMtx, modelMtx);
+            model->draw(viewProjMtx, parentMtx * transformMtx);
         }
-
-        /*if (Scene::_gizmos && _renderGizmo) { // nope. header file circular dependencies are annoying :(
-            Scene::_globalSceneResources.models["_gz-xyz"]->draw(viewProjMtx, modelMtx, true);
-        }*/
     }
 
     virtual void draw_debug(const glm::mat4& viewProjMtx,
-                            const glm::mat4& modelMtx, bool gizmos,
+                            const glm::mat4& parentMtx, bool gizmos,
                             Model* gizmo_mdl, Model* gizmoCube_mdl) {
         if (gizmos && _renderGizmo) {
-            gizmo_mdl->draw(viewProjMtx, modelMtx, true);
+            gizmo_mdl->draw(viewProjMtx, parentMtx * transformMtx, true);
         }
     }
 

@@ -109,7 +109,7 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects()
 {
-	gameScene = new Scene();
+	gameScene = new Scene(Cam);
 	gameScene->init();
 
 	return true;
@@ -222,7 +222,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 void Window::idleCallback(GLFWwindow* window, float deltaTime)
 {
 	// Perform any updates as necessary. 
-	Cam->Update(window);
+	Cam->UpdateView(window);
 	
 	gameScene->update(deltaTime);
 }
@@ -239,7 +239,7 @@ void Window::displayCallback(GLFWwindow* window)
     glLoadIdentity();
 
 	// Render the objects.
-	gameScene->draw(Cam->GetViewProjectMtx());
+	gameScene->draw();
     gameScene->drawHUD(window);
 
 	Input::handle(false);
@@ -303,7 +303,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 			_debugmode = !_debugmode;
 			break;
 		case GLFW_KEY_C:
-			Cam->ToggleFixedCamera();
+			Cam->Fixed = !(Cam->Fixed);
 			break;
 		default:
 			break;

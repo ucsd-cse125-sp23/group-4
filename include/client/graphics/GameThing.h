@@ -29,6 +29,11 @@ struct Transform {
         glm::vec3 rotConv = rotation * float(M_PI) / 180.0f;
         *mtx = translate(position) * glm::eulerAngleXYZ(rotConv.x, rotConv.y, rotConv.z) * glm::scale(scale);
     }
+
+    glm::mat4 getRotationMtx() {
+        glm::vec3 rotConv = rotation * float(M_PI) / 180.0f;
+      return glm::eulerAngleXYZ(rotConv.x, rotConv.y, rotConv.z);
+    }
 };
 
 // a GameThing (tm)
@@ -39,10 +44,30 @@ public:
     virtual void update(float dt) {
         // --- example ---
         transform.rotation += glm::vec3(0, 30 * dt, 0); // spin on y axis
-
-
-
         transform.updateMtx(&transformMtx); // needed to update node matrix
+    }
+
+
+    // transform helpers
+
+    void move(glm::vec3 movement) {
+      // movement is in world space
+      this->transform.position += movement;
+      transform.updateMtx(&transformMtx);
+    }
+
+    void move_local(glm::vec3 movement) {
+      // movement is in world space
+      this->transform.position += glm::vec3(transform.getRotationMtx() * glm::vec4(movement, 1));
+      transform.updateMtx(&transformMtx);
+    }
+
+
+    glm::vec3 getForward() {
+      return glm::vec3(transform.getRotationMtx() * glm::vec4(0, 0, 1, 1));
+    }
+    glm::vec3 getRight() {
+      return glm::vec3(transform.getRotationMtx() * glm::vec4(1, 0, 0, 1));
     }
 
 };

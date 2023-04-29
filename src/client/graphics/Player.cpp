@@ -8,16 +8,16 @@ void Player::update(float dt) {
 
     // read inputs
     if (Input::GetInputState(InputAction::MoveForward) != InputState::None) {
-		moveLocal += vec3(0,0,-1);
-	}
-	if (Input::GetInputState(InputAction::MoveBack) != InputState::None) {
 		moveLocal += vec3(0,0,1);
 	}
+	if (Input::GetInputState(InputAction::MoveBack) != InputState::None) {
+		moveLocal += vec3(0,0,-1);
+	}
     if (Input::GetInputState(InputAction::MoveRight) != InputState::None) {
-		moveLocal += vec3(1,0,0);
+		moveLocal += vec3(-1,0,0);
 	}
 	if (Input::GetInputState(InputAction::MoveLeft) != InputState::None) {
-		moveLocal += vec3(-1,0,0);
+		moveLocal += vec3(1,0,0);
 	}
 
     moveLocal = normalize(moveLocal);
@@ -36,15 +36,13 @@ void Player::update(float dt) {
 }
 
 void Player::move(vec3 movement) {
-    // movement is in world space!
+	// use camera data here
+	if (camera) {
+        if (camera->Fixed) return;
 
-    // orient to face in direction
-    //this->transform.rotation = 
-    // -1.0 * camera->GetAzimuth()
+        movement = vec3(camera->getCameraRotationMtx() * vec4(-movement, 1));
+	}
 
-    this->transform.position += movement;
-
-
-    transform.updateMtx(&transformMtx);
+    GameThing::move(movement);
 }
 
