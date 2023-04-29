@@ -132,9 +132,11 @@ void Scene::init(void) {
 
     
     Player* player = new Player();
-    player->mod = waspModel;
+    player->pmodel = waspModel;
+    player->model = waspModel;
     player->name = "Player 1";
-    player->transformMtx = translate(vec3(0, 2, 0));
+    player->transform.position = vec3(0, 2, 0);
+    player->transform.updateMtx(&(player->transformMtx));
     gamethings.push_back(player);
 
     // Build the scene graph

@@ -65,9 +65,11 @@ set(SOURCES
   graphics/Joint.cpp
   graphics/Scene.cpp
   graphics/shader.cpp
+  graphics/Input.cpp
   graphics/Skeleton.cpp
   graphics/Skin.cpp
   graphics/SkinnedMesh.cpp
+  graphics/Player.cpp
   graphics/Tokenizer.cpp
   graphics/Window.cpp
 )

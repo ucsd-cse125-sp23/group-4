@@ -7,31 +7,36 @@
 #include <GL/glew.h>
 #endif
 #include <GLFW/glfw3.h>
-#include "GameThing.h"
-#include "PlayerModel.h"
-#include "Skeleton.h"
-#include "SkinnedMesh.h"
-#include "AnimationPlayer.h"
-#include "Camera.h"
+
+#include "client/graphics/GameThing.h"
+#include "client/graphics/PlayerModel.h"
+#include "client/graphics/Skeleton.h"
+#include "client/graphics/SkinnedMesh.h"
+#include "client/graphics/AnimationPlayer.h"
+#include "client/graphics/Camera.h"
+#include "client/graphics/Input.h"
+#include "client/graphics/InputListener.h"
+
 #include <map>
 #include <string>
 
-class Player : public GameThing {
- public:
-  PlayerModel* mod;
-  float time;
-  bool tagged;
-  Player() {
-      time = 0;
-      mod = nullptr;
-      tagged = true;
-  }
-  void update(GLFWwindow* window, Camera* camera, float dt, float step = 0.25) {
-    Skeleton* skel = mod->skel;
-    SkinnedMesh* skin = mod->skin;
-    std::map<std::string, AnimationPlayer*> anims = mod->anims;
-    skel->Update(window, camera, dt, anims, step);
-    skin->updateSkin(skel);
-    if (tagged) time += dt;
-  }
+class Player : public GameThing, InputListener {
+  public:
+    float speed = 10;
+
+    Camera* camera; // TODO
+
+    PlayerModel* pmodel;
+    float time;
+    bool tagged;
+
+    Player() {
+        time = 0;
+        pmodel = nullptr;
+        tagged = true;
+    }
+
+    void update(float dt);
+
+    void move(vec3 movement);
 };

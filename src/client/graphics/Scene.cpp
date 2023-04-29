@@ -16,11 +16,11 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-void Scene::update(float deltaTime) {
+void Scene::update(float delta) {
     //if (player) player->update(deltaTime);
 
     for (auto e : gamethings) {
-        e->update(window, camera, delta, step);
+        e->update(delta);
     }
 }
 
@@ -34,9 +34,7 @@ void Scene::drawHUD(GLFWwindow* window) {
       if (dynamic_cast<Player*>(e) != nullptr) {
         Player* player = dynamic_cast<Player*>(e);
         std::string name = player->name;
-        PlayerModel* mod = player->mod;
-        Skeleton* skel = mod->skel;
-        glm::vec3 position = skel->getPos();
+        glm::vec3 position = player->transform.position;
         player_times[name] = player->time;
         const unsigned char* cname =
             reinterpret_cast<const unsigned char*>(name.c_str());

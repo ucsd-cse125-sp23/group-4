@@ -224,7 +224,7 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime)
 	// Perform any updates as necessary. 
 	Cam->Update(window);
 	
-	gameScene->update(window, Cam, deltaTime, stepSize);
+	gameScene->update(deltaTime);
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -242,7 +242,7 @@ void Window::displayCallback(GLFWwindow* window)
 	gameScene->draw(Cam->GetViewProjectMtx());
     gameScene->drawHUD(window);
 
-
+	Input::handle(false);
 	if (_debugmode) {
 		// imgui new frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -282,7 +282,10 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (_debugmode && ImGui::GetIO().WantCaptureKeyboard) return;
 
-	
+	// Check for a key presses
+	Input::keyListener(window, key, scancode, action, mods);
+
+
 	// Check for a key press.
 	if (action == GLFW_PRESS)
 	{

@@ -15,11 +15,11 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include "AnimationPlayer.h"
-#include "Camera.h"
-#include "Joint.h"
-#include "Pose.h"
-#include "core.h"
+#include "client/graphics/AnimationPlayer.h"
+#include "client/graphics/Camera.h"
+#include "client/graphics/Joint.h"
+#include "client/graphics/Pose.h"
+#include "client/graphics/core.h"
 #include <map>
 #include <string>
 
@@ -33,20 +33,13 @@ class Skeleton {
   ~Skeleton() { delete root; }
 
   bool Load(const char* file);
-  void Update(GLFWwindow* window, Camera* camera, float deltaTime, std::map<std::string, AnimationPlayer*> anims, float step = 0.25);
+  void Update(float deltaTime, std::map<std::string, AnimationPlayer*> anims);
   void Draw(const glm::mat4& viewProjMtx, GLuint shader);
   void Show();  // GUI
-  void Move(GLFWwindow* window, Camera* camera, float deltaTime,
-            std::map<std::string,AnimationPlayer*> anims, float delta);
 
   glm::mat4 GetWorldMatrix(int joint);
 
   void SetPose(const Pose pose);
-  void MoveForward(Camera* camera, float delta);
-  void MoveBackward(Camera* camera, float delta);
-  void MoveRight(Camera* camera, float delta);
-  void MoveLeft(Camera* camera, float delta);
-  glm::vec3 getPos();
 
  private:
   std::vector<Joint*> joints;  // random access

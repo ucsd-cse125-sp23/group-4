@@ -5,6 +5,7 @@ using namespace glm;
 void SkinnedMesh::init(const char* filename) {
 
 	// check filetype. for now just pass to LoadCustom()
+	// TODO: use ASSIMP here if .fbx extension detected
 	LoadCustom(filename);
 }
 
