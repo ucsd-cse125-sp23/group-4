@@ -5,14 +5,18 @@ env:
 
 jobs:  
   lint:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps: 
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
       - run: pip install cpplint
+      - run: sudo apt install -y cppcheck
       
       - name: cpplint
         run: cpplint --recursive src
+        
+      - name: cppcheck
+        run: cppcheck src
     
   build:
     runs-on: windows-latest
