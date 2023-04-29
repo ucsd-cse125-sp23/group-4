@@ -24,7 +24,7 @@ class Player : public GameThing, InputListener {
   public:
     float speed = 10;
 
-    Camera* camera; // TODO
+    Camera* camera = nullptr; // TODO
 
     PlayerModel* pmodel;
     float time;
@@ -37,6 +37,5 @@ class Player : public GameThing, InputListener {
     }
 
     void update(float dt);
-
     void move(vec3 movement);
 };

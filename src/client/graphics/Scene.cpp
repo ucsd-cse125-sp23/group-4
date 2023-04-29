@@ -55,9 +55,9 @@ void Scene::drawHUD(GLFWwindow* window) {
       glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
     }
  }
-void Scene::draw(const glm::mat4& viewProjMtx) {
+void Scene::draw() {
     // Pre-draw sequence:
-    //camera->computeMatrices();
+    glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
 
     // Define stacks for depth-first search (DFS)
     std::stack < Node* > dfs_stack;
@@ -66,7 +66,7 @@ void Scene::draw(const glm::mat4& viewProjMtx) {
     // Initialize the current state variable for DFS
     Node* cur = node["world"]; // root of the tree
     //mat4 cur_VM = camera->view;   // 167 implementation uses VM, we can use model matrix
-    mat4 cur_MMtx = cur->transformMtx;
+    mat4 cur_MMtx = glm::mat4(1);
 
     dfs_stack.push(cur);
     matrix_stack.push(cur_MMtx);
@@ -95,7 +95,7 @@ void Scene::draw(const glm::mat4& viewProjMtx) {
         // Continue the DFS: put all the child nodes of the current node in the stack
         for (unsigned int i = 0; i < cur->childnodes.size(); i++) {
             dfs_stack.push(cur->childnodes[i]);
-            matrix_stack.push(cur_MMtx * (cur->childnodes[i]->transformMtx));
+            matrix_stack.push(cur_MMtx * (cur->transformMtx));
         }
 
     } // End of DFS while loop.
