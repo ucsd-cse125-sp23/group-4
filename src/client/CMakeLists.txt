@@ -19,7 +19,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/yesean/imgui
-  GIT_TAG v1.0)
+  GIT_TAG v1.1)
 FetchContent_Declare(
   assimp
   GIT_REPOSITORY https://github.com/assimp/assimp
