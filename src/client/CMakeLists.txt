@@ -23,7 +23,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   assimp
   GIT_REPOSITORY https://github.com/assimp/assimp
-  GIT_TAG v5.2.5)
+  GIT_TAG master)
 FetchContent_MakeAvailable(glew glfw glm freetype imgui assimp)
 
 add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp)
