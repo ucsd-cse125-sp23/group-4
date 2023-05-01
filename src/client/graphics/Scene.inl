@@ -31,6 +31,7 @@ void Scene::init(void) {
     animClip->Load("assets/models/wasp_walk.anim");
     sceneResources->animations["wasp"]["walk"] = new AnimationPlayer();
     sceneResources->animations["wasp"]["walk"]->SetClip(animClip);
+    sceneResources->animations["wasp"]["walk"]->speed = 4.0f;  // walk faster
     
     // Create a shader program with a vertex shader and a fragment shader.
     sceneResources->shaderPrograms["basic"] = LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
@@ -132,8 +133,9 @@ void Scene::init(void) {
     
     Player* player = new Player();
     player->camera = camera;    // give a reference to the game camera
-    player->pmodel = waspModel;
-    player->model = waspModel;
+    player->pmodel = waspModel; // updating!
+    player->model = waspModel;  // drawing!
+    player->pmodel->setAnimation("walk");   // TODO: make this automated
     player->name = "Player 1";
     player->transform.position = vec3(0, 2, 0);
     player->transform.updateMtx(&(player->transformMtx));

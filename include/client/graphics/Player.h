@@ -21,13 +21,16 @@
 #include <string>
 
 class Player : public GameThing, InputListener {
+  private:
+    float azimuth = 0;
   public:
     float speed = 10;
 
-    Camera* camera = nullptr; // TODO
+    Camera* camera = nullptr;   // a reference to the scene camera, so we know where we're going
 
-    PlayerModel* pmodel;
-    float time;
+    PlayerModel* pmodel;    // visual information
+
+    float time; // how long we've been tagged
     bool tagged;
 
     Player() {
@@ -38,4 +41,6 @@ class Player : public GameThing, InputListener {
 
     void update(float dt);
     void move(vec3 movement);
+
+    void faceDirection(vec3 direction);
 };

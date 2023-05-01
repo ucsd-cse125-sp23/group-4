@@ -39,7 +39,9 @@ void Scene::drawHUD(GLFWwindow* window) {
         const unsigned char* cname =
             reinterpret_cast<const unsigned char*>(name.c_str());
         glColor3f(1.0f, 1.0f, 1.0f);
-        glRasterPos2f(-0.1f, position[1] + 0.1);
+        //glRasterPos2f(-0.1f, position[1] + 0.1);
+        // TODO: implement world to screen-space positions
+        glRasterPos2f(-0.1f, 0.1f);
         glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, cname);
       }
     }
@@ -47,7 +49,9 @@ void Scene::drawHUD(GLFWwindow* window) {
     for (auto times : player_times) {
       std::string str = times.first;
       float time = times.second;
-      str += " " + to_string(time);
+      std::string num_text = std::to_string(time);
+      std::string rounded = num_text.substr(0, num_text.find(".") + 3);
+      str += " " + rounded;
       const unsigned char* string =
           reinterpret_cast<const unsigned char*>(str.c_str());
       glColor3f(1.0f, 1.0f, 1.0f);
@@ -107,7 +111,7 @@ void Scene::draw() {
 void Scene::gui() {
     ImGui::Begin("scene debug +++");
 
-    ImGui::Checkbox("free camera (TODO)", &_freecam);
+    ImGui::Checkbox("free camera", &camera->Fixed);
     ImGui::Checkbox("show gizmos", &_gizmos);
 
     ImGui::Separator();

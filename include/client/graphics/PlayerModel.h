@@ -13,6 +13,27 @@ class PlayerModel : public Model {
   SkinnedMesh* skin;
   std::map<std::string, AnimationPlayer*> anims;
 
+  AnimationPlayer* currAnim = nullptr;
+
+  void setAnimation(std::string animName) {
+      if (anims.find(animName) == anims.end()) {
+          return;   // anim not found!
+      }
+
+      currAnim = anims[animName];
+  }
+
+  void update(float dt) {
+    // update anim + skeleton + skin
+    if (currAnim) {
+      currAnim->Update(dt);
+      skel->SetPose(currAnim->GetCurrentPose());
+    }
+
+    skel->Update(dt);
+    skin->updateSkin(skel);
+  }
+
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& transformMtx) {
     if (!material || !mesh) return;
 

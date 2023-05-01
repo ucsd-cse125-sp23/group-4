@@ -15,7 +15,6 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include "client/graphics/AnimationPlayer.h"
 #include "client/graphics/Camera.h"
 #include "client/graphics/Joint.h"
 #include "client/graphics/Pose.h"
@@ -33,7 +32,7 @@ class Skeleton {
   ~Skeleton() { delete root; }
 
   bool Load(const char* file);
-  void Update(float deltaTime, std::map<std::string, AnimationPlayer*> anims);
+  void Update(float deltaTime);
   void Draw(const glm::mat4& viewProjMtx, GLuint shader);
   void Show();  // GUI
 
@@ -45,6 +44,8 @@ class Skeleton {
   std::vector<Joint*> joints;  // random access
 
   Joint* root;  // tree structure
+
+  bool applyToRoot = false;
 
   void SetJointDOFs(int joint, glm::vec3 dof);
   Joint* GetJoint(int j);

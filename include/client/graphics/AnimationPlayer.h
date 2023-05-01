@@ -15,6 +15,8 @@
 class AnimationPlayer
 {
 public:
+	float speed;
+
 	AnimationPlayer()
 	{
 		time = 0;
@@ -37,7 +39,7 @@ public:
 			clip->Evaluate(time, pose);
 		}
 
-		time += deltaTime;
+		time += deltaTime * speed;
 	}
 
 	void Play()

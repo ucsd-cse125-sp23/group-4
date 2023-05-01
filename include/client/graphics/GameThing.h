@@ -26,7 +26,7 @@ struct Transform {
 
     void updateMtx(glm::mat4* mtx) {
         // update mat4 in memory:
-        glm::vec3 rotConv = rotation * float(M_PI) / 180.0f;
+        glm::vec3 rotConv = glm::radians(rotation);
         *mtx = translate(position) * glm::eulerAngleXYZ(rotConv.x, rotConv.y, rotConv.z) * glm::scale(scale);
     }
 
