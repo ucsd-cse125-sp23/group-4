@@ -12,16 +12,21 @@
 class Input
 {
 private:
+	static const int num_actions = 11;
+
 	// default bindings
 	static std::map <int, InputAction> inputmap;
 
 	// raw state machine
 	static std::pair<bool, bool> pressed[400];
 
+	// one true map, and one cache that is updated mid frame
 	static std::map <InputAction, InputState> inputStates;
+	static std::map <InputAction, InputState> inputStateCache;
 
 	static void setInputState(InputAction e, InputState s) {
-		Input::inputStates[e] = s;	//bad
+		if(s > Input::inputStateCache[e])
+			Input::inputStateCache[e] = s;
 
 		// do listener function on press/release
 		if (s == InputState::Press || s == InputState::Release) {
@@ -42,12 +47,13 @@ private:
 
 public:
 	static void init() {
-		// populate states map
-		for (int i = 0; i <= 11; i++)
+		// populate states maps
+		for (int i = 0; i <= num_actions; i++)
 		{
 			InputAction e = static_cast<InputAction>(i);
 
 			Input::inputStates.insert(std::pair<InputAction, InputState>(e, InputState::None));
+			Input::inputStateCache.insert(std::pair<InputAction, InputState>(e, InputState::None));
 		}
 	}
 
@@ -68,6 +74,12 @@ public:
 	static void handle(bool gui) {
 		if(gui) ImGui::Begin("input");
 		
+		// reset state cache...
+		for (auto &state : inputStateCache) {
+			state.second = InputState::None;
+		}
+
+		// key loop
 		for (const auto &e : inputmap) {
 			std::string v = "nothing";
 			const std::pair<bool, bool>* istate = &Input::pressed[e.first];
@@ -96,6 +108,8 @@ public:
 		}
 
 		if (gui) ImGui::End();
+
+		inputStates = inputStateCache;	// end of frame: apply
 	}
 
 	static void keyListener(GLFWwindow* win, int key, int scancode, int action, int mods) {
