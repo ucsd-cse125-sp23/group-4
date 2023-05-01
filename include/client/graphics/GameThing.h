@@ -31,8 +31,8 @@ struct Transform {
     }
 
     glm::mat4 getRotationMtx() {
-        glm::vec3 rotConv = rotation * float(M_PI) / 180.0f;
-      return glm::eulerAngleXYZ(rotConv.x, rotConv.y, rotConv.z);
+        glm::vec3 rotConv = glm::radians(rotation);
+        return glm::eulerAngleXYZ(rotConv.x, rotConv.y, rotConv.z);
     }
 };
 
