@@ -43,4 +43,9 @@ class Player : public GameThing, InputListener {
     void move(vec3 movement);
 
     void faceDirection(vec3 direction);
+
+    // networking interface v00001  --
+    void setPosition(vec3 pos);
+    void setHeading(float rot);
+    //                              --
 };
