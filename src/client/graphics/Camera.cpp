@@ -21,8 +21,11 @@ Camera::Camera() {
 
 void Camera::UpdateView(GLFWwindow* window) {
   //// Compute camera world matrix
-  transformMtx = glm::mat4(1);
-  transformMtx[3][2] = Distance;
+  transform.updateMtx(&transformMtx);
+  if (!Fixed) {
+    transformMtx = glm::mat4(1);
+    transformMtx[3][2] += Distance;
+  }
   transformMtx = glm::eulerAngleY(glm::radians(-Azimuth)) *
                  glm::eulerAngleX(glm::radians(-Incline)) * transformMtx;
 
@@ -35,6 +38,23 @@ void Camera::UpdateView(GLFWwindow* window) {
 
   // Compute final view-projection matrix
   ViewProjectMtx = project * view;
+}
+
+void Camera::CamDrag(float a, float i) {
+  if (Fixed) return;    // TODO fix
+
+  const float rate = 0.5f;  // mouse sensitivity TODO
+  SetAzimuth(GetAzimuth() + a * rate);
+  SetIncline(glm::clamp(GetIncline() - i * rate, -90.0f, 90.0f));
+}
+
+void Camera::CamZoom(float y) {
+  if(Fixed) return;
+
+  const float rate = 0.05f;
+  float dist = glm::clamp(GetDistance() * (1.0f - (float)y * rate),
+                          0.01f, 1000.0f);
+  SetDistance(dist);
 }
 
 void Camera::update(float dt) {
@@ -56,9 +76,10 @@ void Camera::update(float dt) {
     moveLocal += vec3(1, 0, 0);
   }
 
+  moveLocal = -moveLocal;   // invert directions
   moveLocal = normalize(moveLocal);
 
-  moveLocal *= 8 * dt;
+  moveLocal *= 12 * dt;
 
   if (length(moveLocal) > 0) move_local(moveLocal);
 }
@@ -74,6 +95,8 @@ void Camera::Reset() {
   Distance = 10.0f;
   Azimuth = -0.0f;
   Incline = 20.0f;
+
+  transform.position = vec3(0);
 
   Fixed = false;
 }

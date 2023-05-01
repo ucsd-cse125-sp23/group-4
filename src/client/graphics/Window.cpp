@@ -1,5 +1,6 @@
 ////////////////////////////////////////
 // Window.cpp
+// please refrain from modifying this a lot
 ////////////////////////////////////////
 
 #include "client/graphics/Window.h"
@@ -338,10 +339,9 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
+	// Zoom camera
 	if (yoffset) {
-		const float rate = 0.05f;
-		float dist = glm::clamp(Cam->GetDistance() * (1.0f - (float)yoffset * rate), 0.01f, 1000.0f);
-		Cam->SetDistance(dist);
+          Cam->CamZoom(yoffset);
 	}
 }
 
@@ -359,14 +359,10 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
 		return;
 	}
 
-	// Move camera
-	// NOTE: this should really be part of Camera::Update()
+	// Rotate camera
 	if (RightDown || LeftDown) {
-		const float rate = 0.5f;
-		Cam->SetAzimuth(Cam->GetAzimuth() + dx * rate);
-		Cam->SetIncline(glm::clamp(Cam->GetIncline() - dy * rate, -90.0f, 90.0f));
+		Cam->CamDrag(dx, dy);
 	}
-	// Zoom moved to scroll wheel
 }
 
 ////////////////////////////////////////////////////////////////////////////////

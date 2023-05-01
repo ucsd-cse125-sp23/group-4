@@ -101,6 +101,9 @@ public:
     Scene(Camera* camFromWindow) {
         camera = camFromWindow;
         node["_camera"] = camera;
+        camera->name = "_camera";
+        gamethings.push_back(camera);
+
         sceneResources = new SceneResourceMap();
 
         // globals --

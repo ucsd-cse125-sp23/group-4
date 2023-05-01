@@ -66,10 +66,9 @@ bool Skeleton::Load(const char* file) {
   return true;
 }
 
-void Skeleton::Update(float deltaTime, std::map<std::string, AnimationPlayer*> anims) {
+void Skeleton::Update(float deltaTime) {
   if (root) {
     root->Update(glm::mat4(1.0));
-    //Animate(deltaTime, anims);
   }
 }
 
@@ -82,12 +81,19 @@ void Skeleton::Show() {
 }
 
 void Skeleton::SetPose(const Pose pose) {
+    
+  glm::vec3 root_pos = root->GetPosition();
+
   for (int i = 0; i < pose.size(); i += 3) {
     int j = (i / 3) - 1;  // account for root index!
 
     glm::vec3 p = glm::vec3(pose[i], pose[i + 1], pose[i + 2]);
 
     SetJointDOFs(j, p);
+  }
+
+  if (!applyToRoot) {   // do we ignore moving the root bone?
+    root->SetPosition(root_pos);
   }
 }
 

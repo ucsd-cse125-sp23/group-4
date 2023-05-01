@@ -39,6 +39,9 @@ class Camera : public GameThing {
   void SetAzimuth(float a) { Azimuth = a; }
   void SetIncline(float i) { Incline = i; }
 
+  void CamZoom(float y);
+  void CamDrag(float a, float i);
+
   float GetDistance() { return Distance; }
   float GetAzimuth() { return Azimuth; }
   float GetIncline() { return Incline; }
