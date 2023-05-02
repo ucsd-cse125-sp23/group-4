@@ -24,7 +24,9 @@ void Scene::update(float delta) {
     }
 }
 
-void Scene::drawHUD(GLFWwindow* window) { 
+void Scene::drawHUD(GLFWwindow* window) {
+    if(camera->Fixed) return;
+
     int width, height;
     glfwGetWindowSize(window, &width, &height);
   
