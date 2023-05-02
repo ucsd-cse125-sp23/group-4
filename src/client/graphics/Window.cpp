@@ -34,61 +34,6 @@ bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
 
-/*
-void imguiDraw(Skeleton* sk, AnimationClip* animClip) {
-
-	// model window
-	ImGui::SetNextWindowSize(ImVec2(240, 420), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::Begin("Model");
-
-	// File info
-	ImGui::BeginGroup();
-	ImGui::InputText("Skel path", &skelfile);
-	ImGui::InputText("Skin path", &skinfile);
-	ImGui::InputText("Anim path", &animfile);
-
-	if (ImGui::Button("Load")) {
-		Window::cleanObjects();
-		Window::initializeObjects();
-		ImGui::EndGroup();
-		ImGui::End();
-		return;
-	}
-	ImGui::EndGroup();
-
-	ImGui::Separator();
-
-	ImGui::Checkbox("Skeleton", &showSkelMode);
-	ImGui::Checkbox("Wire Mode", &wireframeMode);
-	if (ImGui::Checkbox("Cull faces", &cullingMode)) {
-		// Enable backface culling (fixes z-fighting)
-		if (cullingMode) glEnable(GL_CULL_FACE);
-		else glDisable(GL_CULL_FACE);
-	}
-
-	if (sk) sk->Show();	// improve this later
-
-	ImGui::End();
-
-	// anim window
-	if (animClip) {
-		ImGui::SetNextWindowSize(ImVec2(240, 100), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowPos(ImVec2(260, 10), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowBgAlpha(0.1f);	//TwDefine(" Animation color='150 20 0' ");
-		ImGui::Begin("Animation");
-
-		if (ImGui::Button("Play")) {
-			Window::resetPlayback();
-		}
-
-		if (animClip) animClip->Show();
-
-		ImGui::End();
-	}
-}
-*/
-
 bool fileIsType(std::string n, std::string type = ".txt") {
 	return n.find(type) != std::string::npos;
 }

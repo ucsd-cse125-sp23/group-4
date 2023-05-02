@@ -1,3 +1,10 @@
+/**************************************************
+* Player.h
+* a single local player, controlled by the user
+* stores information about visuals in PlayerModel.h
+* currently needs Node::model reference set manually
+*****************************************************/
+
 #pragma once
 
 #ifdef __APPLE__

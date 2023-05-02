@@ -1,3 +1,10 @@
+/**************************************************
+* Node.h
+* the basic building block of the scene hierarchy
+* leave "model" null to be treated as a point in space
+* only draw methods. see GameThing.h for updated things
+*****************************************************/
+
 #pragma once
 
 #include <glm/glm.hpp>

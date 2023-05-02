@@ -1,6 +1,8 @@
 /**************************************************
-Just a holder for collision data (vertices) currently.
-Also supports rendering the collision box by supplying its Mesh.
+* Collider.h
+* Special implementation of Node
+* Just a holder for collision data (vertices) currently.
+* TODO: integrate collision detection
 *****************************************************/
 #define GLM_FORCE_RADIANS
 

@@ -1,3 +1,8 @@
+/**************************************************
+* SkinnedMesh.h
+* implementation of Mesh that also supports a skeleton
+*****************************************************/
+
 #pragma once
 
 #include "client/graphics/core.h"

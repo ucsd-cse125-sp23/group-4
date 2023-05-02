@@ -1,5 +1,6 @@
 /**************************************************
-Scene.inl contains the definition of the scene graph
+* Scene.inl
+* contains the definition of the scene graph
 *****************************************************/
 #include "client/graphics/Scene.h"
 #include "client/graphics/Cube.h"

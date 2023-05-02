@@ -1,3 +1,12 @@
+/**************************************************
+* Input.h
+* static class for input management
+* make sure to call handle() in a draw/update function
+* usage:
+*	- Input::GetInputState(InputAction::MoveForward)
+*	- or see InputListener
+*****************************************************/
+
 #pragma once
 
 #include "client/graphics/InputListener.h"

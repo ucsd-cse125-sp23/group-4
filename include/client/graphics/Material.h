@@ -1,6 +1,7 @@
 /**************************************************
-Contains info about how to render the surface of a
-given mesh
+* Material.h
+* Contains info about how to render the surface of a
+* given mesh
 *****************************************************/
 #define GLM_FORCE_RADIANS
 #include "client/graphics/core.h"

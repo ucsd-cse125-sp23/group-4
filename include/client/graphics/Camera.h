@@ -1,6 +1,9 @@
-////////////////////////////////////////
-// Camera.h
-////////////////////////////////////////
+/**************************************************
+* Camera.h
+* Implementation of GameThing
+* handles rotation/movement of camera
+* and computing view projection matrices
+*****************************************************/
 
 #pragma once
 
@@ -17,10 +20,6 @@
 #endif
 #include <GLFW/glfw3.h>
 ////////////////////////////////////////////////////////////////////////////////
-
-// The Camera class provides a simple means to controlling the 3D camera. It
-// could be extended to support more interactive controls. Ultimately. the
-// camera sets the GL projection and viewing matrices.
 
 class Camera : public GameThing {
  public:

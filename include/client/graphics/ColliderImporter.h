@@ -1,7 +1,12 @@
 /**************************************************
-CollisionImporter processes collider data
-from an obj file. Used for static map geometry.
-Supports multiple separate CONVEX objects.
+* ColliderImporter.h
+* Static class
+* Processes collider data from an obj file.
+* Used for static map geometry.
+* Supports multiple separate CONVEX objects.
+*   usage:
+*   std::vector<Collider> mapColliders =
+*       ColliderImporter::ImportCollisionData("assets/models/file.obj");
 *****************************************************/
 #define GLM_FORCE_RADIANS
 
