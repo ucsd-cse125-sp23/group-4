@@ -15,14 +15,14 @@
 #include "Camera.h"
 #include <map>
 #include <string>
+#include "Timer.h"
 
 class Player : public GameThing {
  public:
   PlayerModel* mod;
-  float time;
+  Timer time;
   bool tagged;
   Player() {
-      time = 0;
       mod = nullptr;
       tagged = true;
   }
@@ -32,6 +32,6 @@ class Player : public GameThing {
     std::map<std::string, AnimationPlayer*> anims = mod->anims;
     skel->Update(window, camera, dt, anims, step);
     skin->updateSkin(skel);
-    if (tagged) time += dt;
+    if (tagged) time.Update(dt);
   }
 };

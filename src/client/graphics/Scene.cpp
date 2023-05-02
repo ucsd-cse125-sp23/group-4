@@ -17,13 +17,15 @@ void Scene::update(GLFWwindow* window, Camera* camera, float delta, float step) 
     for (auto e : gamethings) {
         e->update(window, camera, delta, step);
     }
+
+    time.Update(delta);
 }
 
 void Scene::drawHUD(GLFWwindow* window) { 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
   
-    std::map<std::string, float> player_times;
+    std::map<std::string, Timer> player_times;
 
     for (GameThing* e : gamethings) {
       if (dynamic_cast<Player*>(e) != nullptr) {
@@ -43,14 +45,48 @@ void Scene::drawHUD(GLFWwindow* window) {
 
     for (auto times : player_times) {
       std::string str = times.first;
-      float time = times.second;
-      str += " " + to_string(time);
+      Timer time = times.second;
+      str += " " + time.ToString();
       const unsigned char* string =
           reinterpret_cast<const unsigned char*>(str.c_str());
       glColor3f(1.0f, 1.0f, 1.0f);
       glWindowPos2f(10.0f, float(height) - 25);
       glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
     }
+
+    std::string game_time = time.ToString();
+    const unsigned char* gtime =
+        reinterpret_cast<const unsigned char*>(game_time.c_str());
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glWindowPos2f((float(width) / 2.0f) - 25, float(height) - 25);
+    glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, gtime);
+
+    // minimap stuff
+    int map_size = width / 4;
+    glViewport(10, 10, map_size, map_size);
+    glScissor(10, 10, map_size, map_size);
+    glEnable(GL_SCISSOR_TEST);
+    glClear(GL_COLOR_BUFFER_BIT |
+            GL_DEPTH_BUFFER_BIT); 
+    glDisable(GL_SCISSOR_TEST);
+
+    for (GameThing* e : gamethings) {
+      if (dynamic_cast<Player*>(e) != nullptr) {
+        Player* player = dynamic_cast<Player*>(e);
+        std::string name = player->name;
+        PlayerModel* mod = player->mod;
+        Skeleton* skel = mod->skel;
+        glm::vec3 position = skel->getPos();
+        glPointSize(10);
+        glBegin(GL_POINTS);
+        glVertex3f(position[0] / map_size, -position[2] / map_size, 0.0f);
+        glEnd();
+      }
+    }
+    
+
+    glViewport(0, 0, width, height);
+
  }
 void Scene::draw(GLFWwindow* window, const glm::mat4& viewProjMtx) {
     // Pre-draw sequence:

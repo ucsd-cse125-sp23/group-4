@@ -34,6 +34,7 @@
 #include "PlayerModel.h"
 #include "Obj.h"
 #include "Cube.h"
+#include "Timer.h"
 
 #ifndef __SCENE_H__
 #define __SCENE_H__
@@ -113,9 +114,13 @@ public:
 
     std::map<char, Character> Characters;
 
+    Timer time;
+
     Scene() {
         camera = new Camera;
         sceneResources = new SceneResourceMap();
+        time.time = 300.0f;
+        time.countdown = true;
 
         // the default scene graph already has one node named "world."
         node["world"] = new Node("world");
