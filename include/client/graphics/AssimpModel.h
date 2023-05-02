@@ -37,8 +37,8 @@ private:
     std::vector<bool> meshVisibilities;
     std::vector<AssimpMesh*> meshes;
     bool isAnimated, isPaused;
-    /** 0  - use mesh
-      * 1+ - use animation (n-1)
+    /** -1  - use mesh
+      * 0+ - use animation (n in total)
       */
     int currentAnimation;
     std::vector<AssimpAnimation> animations;

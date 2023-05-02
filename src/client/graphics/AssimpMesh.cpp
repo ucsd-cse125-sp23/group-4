@@ -46,9 +46,7 @@ void AssimpMesh::draw(const glm::mat4& viewProjMtx, GLuint shader) {
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&m4);
     glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
 
-    if(joints.size() > 0) {
-        glUniformMatrix4fv(glGetUniformLocation(shader, "bones"), joints.size(), GL_FALSE, (float*)&matBindingInvs);
-    }
+    glUniformMatrix4fv(glGetUniformLocation(shader, "bones"), joints.size(), GL_FALSE, (float*)&matBindingInvs);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

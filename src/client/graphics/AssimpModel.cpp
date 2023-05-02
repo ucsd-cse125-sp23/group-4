@@ -7,7 +7,7 @@
 
 AssimpModel::AssimpModel() 
         : name("N/A"), rootNode(nullptr), numNode(0), isAnimated(false), 
-          isPaused(true), currentAnimation(0), animModes(nullptr) { }
+          isPaused(true), currentAnimation(-1), animModes(nullptr) { }
 
 bool AssimpModel::loadAssimp(const char* path) {
     if(rootNode) {
@@ -33,7 +33,6 @@ bool AssimpModel::loadAssimp(const char* path) {
     loadAssimpHelperNode(rootNode, scene->mRootNode, scene);
     loadAssimpHelperAnim(scene);
     loadAssimpHelperImgui();
-    useAnimation(0);
     return true;
 }
 
@@ -202,7 +201,7 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, GLuint shader) {
         glm::vec3(0.025f));
     for(int i = 0; i < meshes.size(); i++) {
         if(meshVisibilities[i]) {
-            meshes[i]->draw(viewProjMtx * betterViewMat, shader);
+            meshes[i]->draw(viewProjMtx, shader);
         }
     }
 }
@@ -266,7 +265,7 @@ void AssimpModel::imGui() {
     ImGui::Text("Animation: %lu", animations.size());
     if(ImGui::BeginListBox("Current Anim")) {
         for(int i = 0; i < animations.size()+1; i++) {
-            const bool isSelected = (currentAnimation == i);
+            const bool isSelected = (currentAnimation+1 == i);
             if (ImGui::Selectable(animModes[i], isSelected)) {
                 if(i == 0) {
                     useMesh();
@@ -291,17 +290,21 @@ void AssimpModel::useMesh() {
     for(int i = 0; i < meshes.size(); i++) {
         meshes[i]->setDraw(true);
     }
-    currentAnimation = 0;
+    currentAnimation = -1;
 }
 
 void AssimpModel::useAnimation(unsigned int animationInd) {
+    if(animationInd < 0) {
+        useMesh();
+        return;
+    }
     printf("Using %d\n", animationInd);
     isAnimated = true;
     isPaused = true;
     for(int i = 0; i < meshes.size(); i++) {
         meshes[i]->setDraw(false);
     }
-    currentAnimation = animationInd + 1;
+    currentAnimation = animationInd;
     animations[animationInd].restart();
 }
 
@@ -310,7 +313,7 @@ void AssimpModel::update(float deltaTimeInMs) {
         return;
     }
 
-    animations[currentAnimation-1].update(deltaTimeInMs);
+    animations[currentAnimation].update(deltaTimeInMs);
     rootNode->update(glm::mat4(1.0f));
     for(int i = 0; i < meshes.size(); i++) {
         meshes[i]->update();
