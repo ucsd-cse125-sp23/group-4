@@ -1,7 +1,7 @@
 #version 330 core
 
 in vec3 fragNormal;
-in vec2 texCoord0;
+in vec2 texCoord0;	// UV coordinates
 
 uniform sampler2D gSampler;
 
@@ -38,4 +38,5 @@ void main()
 
 	// Gamma correction
 	fragColor = vec4(sqrt(reflectance) * vec3(texturedColor), 1);
+	//fragColor = texturedColor;	// testing
 }

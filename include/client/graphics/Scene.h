@@ -54,6 +54,7 @@ public:
     std::map< std::string, std::map<std::string, AnimationPlayer*>> animations;
     std::map< std::string, GLuint > shaderPrograms;
     std::map< std::string, Material* > materials;
+    std::map< std::string, Texture* > textures;
     std::map< std::string, Model* > models;      // more complex; meshes + other info combined
     //std::map< std::string, Light* > light;
 
@@ -64,6 +65,10 @@ public:
     ~SceneResourceMap() {
         // The containers of pointers own the object pointed to by the pointers.
         // All the objects should be deleted when the object palette ("prefab" list) is destructed.
+        // skeletons
+        for (auto entry : skeletons) {
+            delete entry.second;
+        }
         // mesh geometry
         for (auto entry : meshes) {
             delete entry.second;
@@ -73,6 +78,10 @@ public:
         }
         // materials
         for (auto entry : materials) {
+            delete entry.second;
+        }
+        // textures
+        for (auto entry : textures) {
             delete entry.second;
         }
         // models
