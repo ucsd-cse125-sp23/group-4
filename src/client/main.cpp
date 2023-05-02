@@ -2,7 +2,7 @@
 
 #include <core/lib.hpp>
 #include <iostream>
-#include <network/lib.hpp>
+#include <network/message.hpp>
 #include <network/tcp_client.hpp>
 
 void error_callback(int error, const char* description) {
@@ -79,9 +79,14 @@ int main(int argc, char* argv[]) {
   // NETWORK CODE
   boost::asio::io_context io_context;
   TCPClient client(io_context, argv[1], argv[2]);
-  client.write("hello world\n");
-  std::string response = client.read();
-  std::cout << "server says: " << response << std::endl;
+  struct message::Greeting g = {"Hello!"};
+  message::Message m = {message::Type::Greeting, {0, std::time(nullptr)}, g};
+
+  for (;;) {
+    client.write(m);
+    message::Message response = client.read();
+    std::cout << "Server response: " << response << std::endl;
+  }
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);

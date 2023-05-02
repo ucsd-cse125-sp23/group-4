@@ -1,17 +1,15 @@
+#include <network/message.hpp>
 #include <network/tcp_client.hpp>
 
 TCPClient::TCPClient(boost::asio::io_context& io_context, std::string host,
                      std::string port)
-    : socket_(io_context) {
+    : socket_(io_context), connection(Connection(tcp::socket(io_context))) {
   tcp::resolver resolver(io_context);
   boost::asio::connect(socket_, resolver.resolve(host, port));
 }
 
-std::string TCPClient::read() {
-  boost::asio::read(socket_, boost::asio::buffer(data, 12));
-  return data;
+message::Message TCPClient::read() {
+  return connection.read<message::Message>();
 }
 
-void TCPClient::write(std::string data) {
-  boost::asio::write(socket_, boost::asio::buffer(data));
-}
+void TCPClient::write(message::Message message) { connection.write(message); }
