@@ -1,9 +1,11 @@
 #include "client/graphics/main.h"
 
-////////////////////////////////////////////////////////////////////////////////
+#include <core/lib.hpp>
+#include <iostream>
+#include <network/lib.hpp>
+#include <network/tcp_client.hpp>
 
 void error_callback(int error, const char* description) {
-  // Print error.
   std::cerr << description << std::endl;
 }
 
@@ -48,8 +50,6 @@ void print_versions() {
 #endif
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 int main(int argc, char* argv[]) {
   char* arg_host;
   char* arg_port;
@@ -76,9 +76,12 @@ int main(int argc, char* argv[]) {
 
   std::cout << "connecting to: " << arg_host << ":" << arg_port << std::endl;
 
-  //
-  // network code here
-  //
+  // NETWORK CODE
+  boost::asio::io_context io_context;
+  TCPClient client(io_context, argv[1], argv[2]);
+  client.write("hello world\n");
+  std::string response = client.read();
+  std::cout << "server says: " << response << std::endl;
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
@@ -133,5 +136,3 @@ int main(int argc, char* argv[]) {
 
   exit(EXIT_SUCCESS);
 }
-
-////////////////////////////////////////////////////////////////////////////////

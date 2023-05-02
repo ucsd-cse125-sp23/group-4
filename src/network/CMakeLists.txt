@@ -9,6 +9,9 @@ FetchContent_Declare(
   GIT_TAG boost-1.82.0)
 FetchContent_MakeAvailable(boost)
 
-add_library(network ${PROJECT_SOURCE_DIR}/lib.cpp)
+add_library(
+  network
+  ${PROJECT_SOURCE_DIR}/lib.cpp ${PROJECT_SOURCE_DIR}/tcp_server.cpp
+  ${PROJECT_SOURCE_DIR}/tcp_client.cpp ${PROJECT_SOURCE_DIR}/session.cpp)
 target_include_directories(network PUBLIC ${tagguys_SOURCE_DIR}/include)
 target_link_libraries(network PRIVATE Boost::asio)
