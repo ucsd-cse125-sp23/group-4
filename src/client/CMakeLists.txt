@@ -69,6 +69,7 @@ set(SOURCES
   graphics/Skeleton.cpp
   graphics/Skin.cpp
   graphics/SkinnedMesh.cpp
+  graphics/Texture.cpp
   graphics/Player.cpp
   graphics/Tokenizer.cpp
   graphics/Window.cpp

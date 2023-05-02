@@ -18,6 +18,10 @@ public:
 
     GLuint vao; // vertex array object a.k.a. geometry spreadsheet
     std::vector<GLuint> buffers; // data storage
+        // position,
+        // normal,
+        // uv,
+        // indices
 
     virtual void init() {};
     virtual void init(const char* s) {};
@@ -30,11 +34,11 @@ public:
 
     void creategl() {
         glGenVertexArrays(1, &vao);
-        buffers.resize(3);
-        glGenBuffers(3, &buffers[0]);
+        buffers.resize(4);
+        glGenBuffers(4, &buffers[0]);
     }
 
-    void bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<unsigned int> indices) {
+    void bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> uvs, std::vector<unsigned int> indices) {
         unsigned int n = indices.size(); // #(triangles)*3
 
         count = n;
@@ -55,8 +59,14 @@ public:
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+        // 2nd attribute: uv (textures)
+        glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * uvs.size(), &uvs[0], GL_STATIC_DRAW);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
         // indices
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[2]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * n, &indices[0], GL_STATIC_DRAW);
 
         // unbind the buffers, vao
@@ -65,12 +75,22 @@ public:
         glBindVertexArray(0);
     }
 
+    void bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<unsigned int> indices) {
+        std::vector<glm::vec2> uvsDefault;
+        for (auto v : vertices) {
+            uvsDefault.push_back(glm::vec2(0));
+        }
+
+        bindgl(vertices, normals, uvsDefault, indices);
+    }
+
     void cleargl() {
         // Delete the VBOs and the VAO.
         glDeleteBuffers(1, &vao);
         glDeleteBuffers(1, &buffers[0]);
         glDeleteBuffers(1, &buffers[1]);
         glDeleteBuffers(1, &buffers[2]);
+        glDeleteBuffers(1, &buffers[3]);
     }
 };
 

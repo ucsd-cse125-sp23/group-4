@@ -3,13 +3,16 @@ Contains info about how to render the surface of a
 given mesh
 *****************************************************/
 #define GLM_FORCE_RADIANS
-#include "core.h"
+#include "client/graphics/core.h"
+#include "client/graphics/Texture.h"
 
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
 struct Material {
     GLuint shader;  // points to the shader program we want to use
+
+    Texture* texture = nullptr; // optional
 
     glm::vec4 ambient = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     glm::vec4 diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);  // <- only one rn
@@ -24,6 +27,11 @@ struct Material {
         glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
 
         glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &diffuse[0]);
+
+        if (texture) {
+            texture->bindgl();
+            glUniform1i(glGetUniformLocation(shader, "gSampler"), 0);
+        }
 
         // TODO: implement other shader cases + their uniform vars here! vvv
 
