@@ -1,5 +1,7 @@
 /**************************************************
-
+* Scene.h
+* stores all allocated resource objects and constructs
+* the game scene hierarchy via Scene.inl
 *****************************************************/
 #pragma once
 

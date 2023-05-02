@@ -1,3 +1,9 @@
+/**************************************************
+* Window.h
+* in charge of the game window, storing the
+* game scene, and setting up input handling
+*****************************************************/
+
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 

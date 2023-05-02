@@ -1,5 +1,6 @@
 /**************************************************
-A model is a mesh with material (and more?? animation skeleton???)
+* Model.h
+* basic data container for a Mesh + Material pair
 *****************************************************/
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Material.h"
@@ -12,7 +13,6 @@ struct Model {
 
     Mesh* mesh;
     Material* material;
-    // TODO, consider adding skin stuff here
 
     void draw(const glm::mat4& viewProjMtx, const glm::mat4& transformMtx, const bool ignoreDepth = false)
     {

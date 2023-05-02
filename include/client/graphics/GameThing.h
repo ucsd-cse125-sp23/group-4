@@ -1,3 +1,12 @@
+/**************************************************
+* GameThing.h
+* implementation of Node that can take logic updates
+* includes some advanced support for transformations
+* usage:
+*   - thing->transform.position = vec3()
+*   - thing->transform.updateMtx(&thing->transformMtx)
+*****************************************************/
+
 #pragma once
 
 #define _USE_MATH_DEFINES

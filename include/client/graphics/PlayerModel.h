@@ -1,3 +1,10 @@
+/**************************************************
+* PlayerModel.h
+* implementation of Model
+* stores extra information for skeleton + skin + anims
+* and updating them
+*****************************************************/
+
 #pragma once
 
 #include "client/graphics/Model.h"
