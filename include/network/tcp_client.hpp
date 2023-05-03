@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <memory>
 #include <network/connection.hpp>
 #include <network/message.hpp>
 #include <string>
@@ -11,11 +12,11 @@ class TCPClient {
  public:
   TCPClient(boost::asio::io_context& io_context, std::string host,
             std::string port);
-  message::Message read();
+  void read();
   void write(message::Message);
 
  private:
-  Connection connection;
+  std::unique_ptr<Connection<message::Message>> connection;
   tcp::socket socket_;
   char data[1024];
 };

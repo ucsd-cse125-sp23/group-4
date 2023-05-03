@@ -1,6 +1,6 @@
 #include "client/graphics/main.h"
 
-#include <core/lib.hpp>
+#include <boost/asio.hpp>
 #include <iostream>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
@@ -79,14 +79,7 @@ int main(int argc, char* argv[]) {
   // NETWORK CODE
   boost::asio::io_context io_context;
   TCPClient client(io_context, argv[1], argv[2]);
-  struct message::Greeting g = {"Hello!"};
-  message::Message m = {message::Type::Greeting, {0, std::time(nullptr)}, g};
-
-  for (;;) {
-    client.write(m);
-    message::Message response = client.read();
-    std::cout << "Server response: " << response << std::endl;
-  }
+  io_context.run();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);

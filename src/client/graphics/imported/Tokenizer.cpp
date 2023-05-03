@@ -6,6 +6,8 @@
 
 #include "client/graphics/imported/Tokenizer.h"
 
+#include <cstring>
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Tokenizer::Tokenizer() {

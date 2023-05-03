@@ -20,14 +20,20 @@ enum Type {
 struct Metadata {
   int player_id;
   std::time_t time;
+
+  template <typename Archive>
+  void serialize(Archive& ar, const unsigned int version) {
+    ar& player_id;
+    ar& time;
+  }
 };
 
-struct Greeting {
+struct GreetingBody {
   std::string greeting;
 
   template <typename Archive>
-  void serialize(Archive& ar) {
-    ar << greeting;
+  void serialize(Archive& ar, const unsigned int version) {
+    ar& greeting;
   }
 };
 
@@ -35,23 +41,26 @@ struct Movement {
   std::string direction;
 
   template <typename Archive>
-  void serialize(Archive& ar) {
-    ar << direction;
+  void serialize(Archive& ar, const unsigned int version) {
+    ar& direction;
   }
 };
 
 struct Message {
   Type type;
   Metadata metadata;
+  GreetingBody body;
   // std::variant<struct Greeting, struct Movement> body;
-  struct Greeting body;
 
   template <typename Archive>
-  void serialize(Archive& ar) {
-    ar << type << metadata << body;
+  void serialize(Archive& ar, const unsigned int version) {
+    ar& type;
+    ar& metadata;
+    ar& body;
   }
 
-  friend std::ostream& operator<<(std::ostream& os, const Message& dt);
+  std::string to_string() const;
+  friend std::ostream& operator<<(std::ostream&, const Message&);
 };
 
 }  // namespace message

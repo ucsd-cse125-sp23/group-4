@@ -9,6 +9,11 @@ FetchContent_Declare(
   GIT_TAG boost-1.82.0)
 FetchContent_MakeAvailable(boost)
 
-add_library(network tcp_server.cpp tcp_client.cpp connection.cpp message.cpp)
+set(_NETWORK_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/tcp_server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tcp_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/message.cpp)
+
+add_library(network ${_NETWORK_SOURCES})
 target_include_directories(network PUBLIC ${tagguys_SOURCE_DIR}/include)
-target_link_libraries(network PRIVATE Boost::asio)
+target_link_libraries(network PRIVATE Boost::asio Boost::serialization)

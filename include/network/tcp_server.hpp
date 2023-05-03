@@ -5,6 +5,8 @@
 #include <network/connection.hpp>
 #include <vector>
 
+#include "network/message.hpp"
+
 using boost::asio::ip::tcp;
 
 class TCPServer {
@@ -13,7 +15,7 @@ class TCPServer {
 
  private:
   tcp::acceptor acceptor_;
-  std::vector<std::shared_ptr<Connection>> connections_;
+  std::vector<std::shared_ptr<Connection<message::Message>>> connections_;
 
   void do_accept();
 };

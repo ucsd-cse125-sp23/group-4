@@ -1,3 +1,4 @@
+#include <boost/asio.hpp>
 #include <iostream>
 #include <network/tcp_server.hpp>
 
