@@ -144,7 +144,6 @@ void Scene::init(void) {
     GameThing* thing_example = new GameThing;
     thing_example->name = "GT_teapot";
     gamethings.push_back(thing_example);
-
     
     GameThing* thing_cube = new GameThing;
     thing_cube->name = "GT_cube";
