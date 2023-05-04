@@ -3,8 +3,6 @@
 * contains the definition of the scene graph
 *****************************************************/
 #include "client/graphics/Scene.h"
-#include "client/graphics/Cube.h"
-#include "client/graphics/Obj.h"
 #include "client/graphics/ColliderImporter.h"
 
 #define _USE_MATH_DEFINES
@@ -167,7 +165,7 @@ void Scene::init(void) {
     node["teapot2"] = new Node("teapotChild");
     node["bunny"] = new Node("bunny");
     node["cubeT"] = thing_cube;
-    node["player"] = thing_player;
+    node["player"] = player;
     node["ground"] = new Node("ground");
     node["wasp"] = player;
 
@@ -183,8 +181,8 @@ void Scene::init(void) {
     thing_cube->transform.position = vec3(2.0f, 3.0f, -4.0f);
     node["cubeT"]->model = sceneResources->models["cubeTextured"];
 
-    thing_player->transform.position = vec3(0.0f, 2.0f, 2.0f);
-    thing_player->model = sceneResources->models["player"];
+    player->transform.position = vec3(0.0f, 2.0f, 2.0f);
+    player->model = sceneResources->models["player"];
 
     node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
     node["teapot2"]->model = sceneResources->models["teapot2"];

@@ -108,7 +108,7 @@ void Scene::draw() {
 }
 
 
-#include "imgui/imgui.h"
+#include <imgui.h>
 
 void Scene::gui() {
     ImGui::Begin("scene debug +++");

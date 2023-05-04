@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <imgui/imgui.h>
+#include <imgui.h>
 #include "core.h"
 #include "Channel.h"
 #include "Pose.h"

@@ -34,6 +34,8 @@
 #include "client/graphics/shader.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Model.h"
+#include "client/graphics/Player.h"
+#include "client/graphics/PlayerModel.h"
 #include "client/graphics/Obj.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/Collider.h"

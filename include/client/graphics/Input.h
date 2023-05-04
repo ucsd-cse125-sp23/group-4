@@ -11,7 +11,7 @@
 
 #include "client/graphics/InputListener.h"
 
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 #include <GLFW/glfw3.h>
 #include <map>

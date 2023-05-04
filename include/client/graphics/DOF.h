@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 #include <stdlib.h>
 #include <sstream>

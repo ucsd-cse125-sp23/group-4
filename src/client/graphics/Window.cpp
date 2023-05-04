@@ -23,8 +23,6 @@ int MouseX, MouseY;
 
 bool _debugmode = false;
 
-float stepSize = 0.25;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 std::string skelfile = "";

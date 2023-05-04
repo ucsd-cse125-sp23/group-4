@@ -39,7 +39,7 @@ public:
         if (file == NULL) {
             perror("fopen() failed");
             std::cerr << "Cannot open file: " << filename << std::endl;
-            exit(-1);
+            return result;
         }
         std::cout << "\tLoading collider vertex data...";
 
