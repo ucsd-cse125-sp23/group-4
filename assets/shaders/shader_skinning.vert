@@ -34,5 +34,6 @@ void main()
                      boneWeights.w * bones[boneInds.w] * vec4(normal, 0);
 
     // for shading
-	fragNormal = vec3(model * temp_norm);
+    // TODO: assumes transformation does not have scaling or shearing.
+	fragNormal = vec3(model * normalize(temp_norm));
 }
