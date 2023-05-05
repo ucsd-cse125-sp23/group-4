@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "core/game/Serializable.h"
 #include "core/math/vector.h"
 #include "core/game/modifier/Modifiable.h"
 #include "core/game/modifier/ModifierInstance.h"
@@ -31,4 +32,7 @@ public:
 	virtual void tick();
 	virtual void onCollision(const PObject* other) {}
 	virtual void onTrigger(const PObject* other) {}
+
+	virtual void pack(ByteBufferBuilder& builder);
+	virtual void unpack(ByteBuffer buf);
 };

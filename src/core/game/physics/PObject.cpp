@@ -42,3 +42,23 @@ const CollisionBounds* PObject::getBounds()
 {
 	return this->bounds;
 }
+
+
+void PObject::pack(ByteBufferBuilder& builder)
+{
+	builder.writeUInt(this->id);
+	builder.writeVec3f(this->pos);
+	builder.writeInt((toRemove ? 0b10 : 0) | (onGround ? 0b01 : 0));
+	Modifiable::pack(builder);
+}
+void PObject::unpack(ByteBuffer buf)
+{
+	if (this->id == buf.nextUInt())
+	{
+		this->setPos(buf.nextVec3f());
+		int flags = buf.nextInt();
+		toRemove = (flags & 0b10) != 0;
+		onGround = (flags & 0b01) != 0;
+		Modifiable::unpack(buf);
+	}
+}

@@ -17,3 +17,19 @@ void Player::tick()
 {
 	PObject::tick();
 }
+
+
+void Player::pack(ByteBufferBuilder& builder)
+{
+	PObject::pack(builder);
+	builder.writeUInt(this->pid);
+	builder.writeVec3f(this->look);
+}
+void Player::unpack(ByteBuffer buf)
+{
+	PObject::unpack(buf);
+	if (this->pid == buf.nextUInt())
+	{
+		this->look = buf.nextVec3f();
+	}
+}

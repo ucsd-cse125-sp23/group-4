@@ -4,6 +4,7 @@ message(${PROJECT_SOURCE_DIR})
 
 set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/util/global.h
+	${tagguys_SOURCE_DIR}/include/core/util/ByteBuffer.h
 	${tagguys_SOURCE_DIR}/include/core/math/vector.h
 	${tagguys_SOURCE_DIR}/include/core/math/matrix.h
 
@@ -36,6 +37,7 @@ set( HEADERS
 
 set( SOURCES
 	${PROJECT_SOURCE_DIR}/util/global.cpp
+	${PROJECT_SOURCE_DIR}/util/ByteBuffer.cpp
 
 	${PROJECT_SOURCE_DIR}/game/level/Level.cpp
 	${PROJECT_SOURCE_DIR}/game/level/Environment.cpp

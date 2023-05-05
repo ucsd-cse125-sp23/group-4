@@ -13,4 +13,7 @@ public:
 	Player();
 	~Player();
 	void tick();
+
+	virtual void pack(ByteBufferBuilder& builder);
+	virtual void unpack(ByteBuffer buf);
 };

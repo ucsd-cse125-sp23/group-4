@@ -6,7 +6,7 @@
 
 #include "core/game/modifier/ModifierInstance.h"
 
-class Modifiable {
+class Modifiable : public Serializable {
 private:
 	std::map<Modifier*,std::vector<ModifierInstance*>> modifiers;
 public:
@@ -67,5 +67,11 @@ public:
 				pair.first->modify(this, instance->get());
 		}
 		removeMarkedModifier();
+	}
+
+
+	virtual void pack(ByteBufferBuilder& builder) {
+	}
+	virtual void unpack(ByteBuffer buf) {
 	}
 };
