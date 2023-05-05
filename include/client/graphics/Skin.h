@@ -5,10 +5,12 @@
 
 #pragma once
 
-#include "Skeleton.h"
-#include "Tokenizer.h"
-#include "core.h"
-using namespace ::glm;
+#include "client/graphics/Skeleton.h"
+#include "client/graphics/core.h"
+#include "client/graphics/imported/Tokenizer.h"
+
+using glm::mat4;
+using glm::vec3;
 
 ////////////////////////////////////////////////////////////////////////////////
 

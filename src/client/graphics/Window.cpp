@@ -25,9 +25,6 @@ bool _debugmode = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::string skelfile = "";
-std::string skinfile = "";
-std::string animfile = "";
 bool showSkelMode = true;
 bool wireframeMode = false;
 bool cullingMode = false;
@@ -201,7 +198,7 @@ void Window::displayCallback(GLFWwindow* window) {
 // helper to reset the camera
 void Window::resetCamera() {
   Cam->Reset();
-  Cam->SetAspect(float(Window::width) / float(Window::height));
+  Cam->SetAspect(static_cast<float>(Window::width) / static_cast<float>(Window::height));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
