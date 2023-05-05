@@ -163,9 +163,9 @@ void Scene::init(void) {
   node["collision"] = new Node("_colliders");
   for (auto c : mapColliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
+
+    core_env->addConvex(c.core_vertices()); // core!
   }
-  // node["collision"]->transformMtx =
-  // sceneResources->models["mapColsTesting"]->transformMtx;
 
   ///////////////////////////////////////////////////////
   printf("\nScene: done loading resources!\n");

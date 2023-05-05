@@ -154,6 +154,12 @@ class Scene {
 
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
+
+
+    // core!!!
+    core_env = new Environment;
+    initializeLevel(core_env);
+    core_playerpair = initializePlayer();
   }
 
   void init(void);
@@ -172,4 +178,8 @@ class Scene {
 
     delete sceneResources;
   }
+private:
+    // core
+    Environment* core_env;
+    std::pair<Player*, ControlModifierData*> core_playerpair;
 };
