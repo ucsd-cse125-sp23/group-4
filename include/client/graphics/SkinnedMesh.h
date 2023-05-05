@@ -7,8 +7,8 @@
 
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Skeleton.h"
-#include "client/graphics/imported/Tokenizer.h"
 #include "client/graphics/core.h"
+#include "client/graphics/imported/Tokenizer.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
