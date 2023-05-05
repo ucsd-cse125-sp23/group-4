@@ -1,5 +1,7 @@
 #include "core/util/ByteBuffer.h"
 
+#include <cstring>
+
 ByteBuffer ByteBufferBuilder::build() { return ByteBuffer(data); }
 void ByteBufferBuilder::clear() { data.clear(); }
 

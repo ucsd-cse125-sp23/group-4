@@ -69,9 +69,46 @@ public:
 		removeMarkedModifier();
 	}
 
-
 	virtual void pack(ByteBufferBuilder& builder) {
+		size_t count = 0;
+		ByteBufferBuilder modBuilder;
+		for (auto pair : modifiers)
+		{
+			if (!pair.first->isServerOnly())
+			{
+				count++;
+				std::string key = Modifier::getKey(pair.first);
+				modBuilder.writeUInt(key.length());
+				modBuilder.writeString(key);
+				modBuilder.writeUnsignedLongLong(pair.second.size());
+				for (ModifierInstance* inst : pair.second)
+				{
+					ByteBuffer buf = ByteBuffer((uint8_t*)inst->get(), pair.first->size());
+					modBuilder.writeBuffer(buf);
+				}
+			}
+		}
+		builder.writeUnsignedLongLong(count);
+		builder.writeBuffer(modBuilder.build());
 	}
 	virtual void unpack(ByteBuffer buf) {
+		size_t modCount = buf.nextUnsignedLongLong();
+		for (size_t i = 0; i < modCount; i++)
+		{
+			uint32_t strLen = buf.nextUInt();
+			std::string key = buf.nextString(strLen);
+			Modifier* modifier = Modifier::getModifier(key);
+
+			for (auto inst : modifiers[modifier])
+				delete inst;
+			modifiers[modifier].clear();
+
+			size_t instCount = buf.nextUnsignedLongLong();
+			for (size_t j = 0; j < instCount; j++)
+			{
+				ByteBuffer inst = buf.nextBuffer(modifier->size());
+				modifiers[modifier].push_back(new ModifierInstance(modifier, modifier->fromBytes(inst.getBytes())));
+			}
+		}
 	}
 };

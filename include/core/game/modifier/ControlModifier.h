@@ -12,4 +12,13 @@ struct ControlModifierData : ModifierData {
 };
 class ControlModifier : public Modifier {
 	void modify(Modifiable* obj, ModifierData* data) override;
+
+	size_t size() override {
+		return sizeof(ControlModifierData);
+	};
+	ModifierData* fromBytes(const uint8_t* data) {
+		ControlModifierData* ret = new ControlModifierData();
+		memcpy(ret, data, size());
+		return ret;
+	}
 };

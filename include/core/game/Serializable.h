@@ -4,5 +4,5 @@
 
 class Serializable {
 	virtual void pack(ByteBufferBuilder& builder) = 0;
-	virtual void unpack(ByteBuffer) = 0;
+	virtual void unpack(ByteBuffer buf) = 0;
 };
