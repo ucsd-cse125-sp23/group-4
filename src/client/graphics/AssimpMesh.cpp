@@ -14,23 +14,7 @@ AssimpMesh::AssimpMesh()
     matBindingInvs[0] = glm::mat4(1.0f);
 }
 
-void AssimpMesh::setDraw(bool useMesh) {
-    if(!useMesh) { 
-        isDrawMesh = false;
-        return;
-    }
-
-    for(int i = 0; i < joints.size(); i++) {
-        matBindingInvs[i] = glm::mat4(1.0f);
-    }
-    isDrawMesh = true;
-}
-
 void AssimpMesh::update() {
-    if(isDrawMesh) {
-        return;
-    }
-
     for(int i = 0; i < joints.size(); i++) {
         matBindingInvs[i] = joints[i]->update();
     }

@@ -27,6 +27,7 @@ void AssimpChannel::eval(double currentTick) {
             break;
         case ASSIMP_EXTRAP_MODE::LINEAR:
             // TODO: implement linear extrapolation
+            printf("LINEAR NOT SUPPORTED\n");
             break;
         case ASSIMP_EXTRAP_MODE::CYCLE:
             // TODO: not tested
@@ -34,7 +35,6 @@ void AssimpChannel::eval(double currentTick) {
             break;
         default:
             // TODO: bug - this mode does not work
-            node->animationTransform = node->localTransform;
             break;
         }
         return;

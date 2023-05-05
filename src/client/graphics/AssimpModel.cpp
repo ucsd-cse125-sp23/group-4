@@ -14,41 +14,43 @@ bool AssimpModel::loadAssimp(const char* path) {
         return false;
     }
 
+    /* Load with assimp importer, check if loading failed */
     Assimp::Importer import;
     const aiScene *scene = import.ReadFile(
         path, 
         aiProcess_Triangulate | aiProcess_FlipUVs);
-    
     if(!scene || 
        scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || 
        !scene->mRootNode) {
         printf("ERR::ASSIMP::%s\n", import.GetErrorString());
         return false;
     }
+
     name = std::string(path);
     name = name.substr(name.find_last_of('/')+1);
 
     nodeMap.clear();
     rootNode = new AssimpNode(numNode++);
-    loadAssimpHelperNode(rootNode, scene->mRootNode, scene);
+    loadAssimpHelperNode(rootNode, glm::mat4(1.0f), scene->mRootNode, scene);
     loadAssimpHelperAnim(scene);
     loadAssimpHelperImgui();
     return true;
 }
 
-void AssimpModel::loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const aiScene *scene) {
+void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform, aiNode *aiNode, const aiScene *scene) {
     node->name = aiNode->mName.C_Str();
     nodeMap[node->name] = node;
     node->localTransform = aiMatToMat4x4(aiNode->mTransformation);
+    node->accTransform = accTransform * node->localTransform;
     node->animationTransform = glm::mat4(1.0f);
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < aiNode->mNumMeshes; i++) {
         // TODO: this implmentation will create duplicate
         //       AssimpMesh if mesh has multiple reference aiNode
-        aiMesh* mesh = scene->mMeshes[aiNode->mMeshes[i]];
+        aiMesh* aiMesh = scene->mMeshes[aiNode->mMeshes[i]];
         AssimpMesh* childMesh = new AssimpMesh();
         childMesh->node = node;
-        loadAssimpHelperMesh(childMesh, mesh, scene);
+        loadAssimpHelperMesh(childMesh, aiMesh, scene);
         for(int j = 0; j < childMesh->joints.size(); j++) {
             childMesh->joints[j]->meshNode = node;
         }
@@ -60,7 +62,7 @@ void AssimpModel::loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const a
     for (unsigned int i = 0; i < aiNode->mNumChildren; i++) {
         AssimpNode* childNode = new AssimpNode(numNode++);
         childNode->parent = node;
-        loadAssimpHelperNode(childNode, aiNode->mChildren[i], scene);
+        loadAssimpHelperNode(childNode, node->accTransform, aiNode->mChildren[i], scene);
         node->children.push_back(childNode);
     }
 }
@@ -284,25 +286,30 @@ void AssimpModel::imGui() {
 }
 
 void AssimpModel::useMesh() {
-    printf("Using mesh\n");
-    isAnimated = false;
-    isPaused = true;
-    for(int i = 0; i < meshes.size(); i++) {
-        meshes[i]->setDraw(true);
-    }
-    currentAnimation = -1;
+    useAnimation(-1);
 }
 
-void AssimpModel::useAnimation(unsigned int animationInd) {
+void AssimpModel::useAnimation(int animationInd) {
+    printf("Using %d\n", animationInd);
+
     if(animationInd < 0) {
-        useMesh();
+        currentAnimation = -1;
+        isAnimated = false;
+        isPaused = true;
+        for (auto const& x : nodeMap) {
+            x.second->animationTransform = x.second->localTransform;
+        }
+        rootNode->update(glm::mat4(1.0f));
+        for(int i = 0; i < meshes.size(); i++) {
+            meshes[i]->update();
+        }
         return;
     }
-    printf("Using %d\n", animationInd);
+
     isAnimated = true;
     isPaused = true;
-    for(int i = 0; i < meshes.size(); i++) {
-        meshes[i]->setDraw(false);
+    for (auto const& x : nodeMap) {
+        x.second->animationTransform = glm::mat4(1.0f);
     }
     currentAnimation = animationInd;
     animations[animationInd].restart();

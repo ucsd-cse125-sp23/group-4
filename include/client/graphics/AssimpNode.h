@@ -19,10 +19,14 @@ public:
     const unsigned int id;
     std::string name;
     std::vector<AssimpMesh*> meshes;
-    /** This matrix make node's meshes to go from node space to global space */
+    /** This matrix is relative to parent's position */
     glm::mat4 localTransform;
+    /** This matrix make node's meshes to go from node space to global space */
+    glm::mat4 accTransform;
     /** This matrix is calculated by the animation system */
     glm::mat4 animationTransform;
+
+    glm::mat4 matWorldTransform;
 
     AssimpNode* parent;
     std::vector<AssimpNode*> children;

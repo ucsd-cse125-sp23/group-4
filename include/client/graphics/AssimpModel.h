@@ -24,7 +24,7 @@ public:
     bool loadAssimp(const char* path);
 
     void useMesh();
-    void useAnimation(unsigned int animationInd);
+    void useAnimation(int animationInd);
     void update(float deltaTimeInMs);
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
     void imGui();
@@ -43,7 +43,12 @@ private:
     int currentAnimation;
     std::vector<AssimpAnimation> animations;
 
-    void loadAssimpHelperNode(AssimpNode* node, aiNode *aiNode, const aiScene *scene);
+    /** Prepare a new AssimpNode
+      * accTransform: accumulative transform from parent node
+      * aiNode: aiNode from the importer corresponded to this node
+      * scene: the scene created by the importer
+      */
+    void loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform, aiNode *aiNode, const aiScene *scene);
     void loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
     void loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
     void loadAssimpHelperAnim(const aiScene *scene);

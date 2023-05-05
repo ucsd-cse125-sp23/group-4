@@ -43,8 +43,6 @@ public:
     std::vector<AssimpJoint*> joints;
     glm::mat4 matBindingInvs[200];
 
-    void setDraw(bool useMesh);
-
     void update();
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
     void gl_load();

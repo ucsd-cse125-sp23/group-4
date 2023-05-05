@@ -12,9 +12,7 @@ AssimpNode::AssimpNode(unsigned int id)
 }
 
 void AssimpNode::update(const glm::mat4& parentWorldTransform) {
-    // note: Animation data is w.r.t. world space, 
-    //       so multipying joint local transformation matrix is unwanted.
-    glm::mat4 matWorldTransform = parentWorldTransform * this->animationTransform;
+    matWorldTransform = parentWorldTransform * this->animationTransform;
     for(int i = 0; i < joints.size(); i++) {
         joints[i]->matWorldTransform = matWorldTransform;
     }
@@ -54,4 +52,6 @@ void AssimpNode::imGui() {
 
     ImGui::Text("MatLocal %s", glm::to_string(localTransform).c_str());
     ImGui::Text("MatAnim  %s", glm::to_string(animationTransform).c_str());
+    ImGui::Text("MatAcc   %s", glm::to_string(accTransform).c_str());
+    ImGui::Text("MatWorld %s", glm::to_string(matWorldTransform).c_str());
 }
