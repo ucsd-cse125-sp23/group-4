@@ -29,5 +29,4 @@ class TCPClient {
 
   std::unique_ptr<Connection<message::Message>> connection;
   tcp::socket socket_;
-  char data[1024];
 };

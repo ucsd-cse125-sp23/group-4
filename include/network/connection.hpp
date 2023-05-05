@@ -22,8 +22,8 @@ class Connection : std::enable_shared_from_this<Connection<T>> {
 
   Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
       : socket_(std::move(s)),
-        read_handler(std::move(rh)),
-        write_handler(std::move(wh)) {}
+        read_handler(rh),
+        write_handler(wh) {}
 
   void start();
   void read();

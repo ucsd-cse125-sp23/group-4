@@ -84,6 +84,7 @@ int main(int argc, char* argv[]) {
               << std::endl;
     message::GreetingBody g = {"Hello!"};
     message::Message m = {message::Type::Greeting, {1, std::time(nullptr)}, g};
+    std::cout << "Sending to server: " << m << std::endl;
     client.write(m);
   };
   auto read_handler = [&](const message::Message& m, TCPClient& client) {

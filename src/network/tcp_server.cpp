@@ -29,12 +29,20 @@ void TCPServer::do_accept() {
                                  std::to_string(m.metadata.player_id) + "!"};
       message::Message new_message = {
           message::Type::Greeting, {1, std::time(nullptr)}, g};
+      std::cout << "Sending to client: " << new_message << std::endl;
       write(new_message);
     };
 
     auto write_handler = [&](boost::system::error_code ec, std::size_t length) {
+      if (ec) {
+        std::cerr << "Error: " << ec.message() << std::endl;
+        return;
+      }
+
+      std::cout << "Wrote " << length << " bytes to client" << std::endl;
     };
 
+    std::cout << "Connection established with client" << std::endl;
     auto connection = std::make_shared<Connection<message::Message>>(
         socket, read_handler, write_handler);
     connections_.push_back(connection);
