@@ -168,6 +168,8 @@ void Scene::init(void) {
   // sceneResources->models["mapColsTesting"]->transformMtx;
 
   ///////////////////////////////////////////////////////
+  printf("\nScene: done loading resources!\n");
+  ///////////////////////////////////////////////////////
 
   // Add stuff to game updateables
   GameThing* thing_example = new GameThing;

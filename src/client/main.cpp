@@ -57,15 +57,15 @@ int main(int argc, char* argv[]) {
   if (argc != 3) {
     std::cout << "usage: client <host> <port>" << std::endl;
 
-    const unsigned int max_arg_length = 64;
-    char argbuff_1[max_arg_length];
-    char argbuff_2[max_arg_length];
+    const unsigned int kMaxArgLength = 64;
+    char argbuff_1[kMaxArgLength];
+    char argbuff_2[kMaxArgLength];
 
     std::cout << "enter <host>:";
-    std::cin.getline(argbuff_1, max_arg_length);
+    std::cin.getline(argbuff_1, kMaxArgLength);
 
     std::cout << "enter <port>:";
-    std::cin.getline(argbuff_2, max_arg_length);
+    std::cin.getline(argbuff_2, kMaxArgLength);
 
     arg_host = argbuff_1;
     arg_port = argbuff_2;
