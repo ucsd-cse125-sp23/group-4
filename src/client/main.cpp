@@ -51,6 +51,31 @@ void print_versions() {
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[]) {
+  char* arg_host;
+  char* arg_port;
+
+  if (argc != 3) {
+    std::cout << "usage: client <host> <port>" << std::endl;
+
+    const unsigned int max_arg_length = 64;
+    char argbuff_1[max_arg_length];
+    char argbuff_2[max_arg_length];
+
+    std::cout << "enter <host>:";
+    std::cin.getline(argbuff_1, max_arg_length);
+
+    std::cout << "enter <port>:";
+    std::cin.getline(argbuff_2, max_arg_length);
+
+    arg_host = argbuff_1;
+    arg_port = argbuff_2;
+  } else {
+    arg_host = argv[1];
+    arg_port = argv[2];
+  }
+
+  std::cout << "connecting to: " << arg_host << ":" << arg_port << std::endl;
+
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
   if (!window) exit(EXIT_FAILURE);
