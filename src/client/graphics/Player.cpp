@@ -1,6 +1,7 @@
 #include "Player.h"
 
-using namespace glm;
+using glm::mat4x4;
+using glm::vec3;
 
 void Player::update(float dt) {
   if (camera && camera->Fixed)

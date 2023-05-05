@@ -1,10 +1,12 @@
 #include "SkinnedMesh.h"
 
-using namespace glm;
+using glm::mat4;
+using glm::vec3;
+using glm::vec4;
 
 void SkinnedMesh::init(const char* filename) {
   // check filetype. for now just pass to LoadCustom()
-  // TODO: use ASSIMP here if .fbx extension detected
+  // TODO(matthew): use ASSIMP here if .fbx extension detected
   LoadCustom(filename);
 }
 

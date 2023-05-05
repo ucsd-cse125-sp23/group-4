@@ -68,8 +68,9 @@ bool Joint::Load(Tokenizer& t) {
     } else if (strcmp(temp, "}") == 0) {
       break;
     }
-    else
+    else {
       t.SkipLine();  // Unrecognized token
+    }
   }
 
   // box = new Cube(bmin, bmax);

@@ -53,8 +53,8 @@ void Camera::CamZoom(float y) {
   if (Fixed) return;
 
   const float rate = 0.05f;
-  float dist =
-      glm::clamp(GetDistance() * (1.0f - static_cast<float>(y) * rate), 0.01f, 1000.0f);
+  float dist = glm::clamp(GetDistance() * (1.0f - static_cast<float>(y) * rate),
+                          0.01f, 1000.0f);
   SetDistance(dist);
 }
 

@@ -41,7 +41,7 @@ void Scene::drawHUD(GLFWwindow* window) {
           reinterpret_cast<const unsigned char*>(name.c_str());
       glColor3f(1.0f, 1.0f, 1.0f);
       // glRasterPos2f(-0.1f, position[1] + 0.1);
-      // TODO: implement world to screen-space positions
+      // TODO(matthew): implement world to screen-space positions
       glRasterPos2f(-0.1f, 0.1f);
       glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, cname);
     }
@@ -105,7 +105,6 @@ void Scene::draw() {
       dfs_stack.push(cur->childnodes[i]);
       matrix_stack.push(cur_MMtx * (cur->transformMtx));
     }
-
   }  // End of DFS while loop.
 }
 
@@ -139,7 +138,7 @@ void Scene::gui() {
       ImGuiTreeNodeFlags node_flags =
           ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
       if (cur->childnodes.empty()) node_flags |= ImGuiTreeNodeFlags_Leaf;
-      bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)gui_id, node_flags,
+      bool node_open = ImGui::TreeNodeEx(reinterpret_cast<void*>((intptr_t)gui_id), node_flags,
                                          cur->name.c_str());
 
       if (node_open) {
@@ -151,9 +150,7 @@ void Scene::gui() {
       gui_id++;
 
       ImGui::PopStyleVar();
-
     }  // End of DFS while loop
-
     ImGui::TreePop();
   }
 
