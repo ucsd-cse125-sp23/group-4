@@ -149,6 +149,10 @@ void Scene::init(void) {
     thing_cube->name = "GT_cube";
     gamethings.push_back(thing_cube);
 
+    GameThing* thing_modeltest = new GameThing;
+    thing_modeltest->name = "GT_playerTest";
+    gamethings.push_back(thing_modeltest);
+
     Player* player = new Player();
     player->camera = camera;    // give a reference to the game camera
     player->pmodel = waspModel; // updating!
@@ -164,7 +168,7 @@ void Scene::init(void) {
     node["teapot2"] = new Node("teapotChild");
     node["bunny"] = new Node("bunny");
     node["cubeT"] = thing_cube;
-    node["player"] = player;
+    node["player"] = thing_modeltest;
     node["ground"] = new Node("ground");
     node["wasp"] = player;
 
@@ -180,8 +184,8 @@ void Scene::init(void) {
     thing_cube->transform.position = vec3(2.0f, 3.0f, -4.0f);
     node["cubeT"]->model = sceneResources->models["cubeTextured"];
 
-    player->transform.position = vec3(0.0f, 2.0f, 2.0f);
-    player->model = sceneResources->models["player"];
+    thing_modeltest->transform.position = vec3(0.0f, 2.0f, 2.0f);
+    thing_modeltest->model = sceneResources->models["player"];
 
     node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
     node["teapot2"]->model = sceneResources->models["teapot2"];
@@ -216,7 +220,7 @@ void Scene::init(void) {
     node["world"]->childnodes.push_back(node["cubeT"]);
     node["teapot1"]->childnodes.push_back(node["teapot2"]);
     node["world"]->childnodes.push_back(node["bunny"]);
-    node["world"]->childnodes.push_back(node["wasp"]);
+    node["world"]->childnodes.push_back(node["wasp"]);  // test player
 
     node["world"]->childnodes.push_back(node["ground"]);
     node["world"]->childnodes.push_back(node["collision"]);
