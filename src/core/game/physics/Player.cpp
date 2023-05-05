@@ -7,6 +7,7 @@ Player::Player() : PObject(PLAYER_BOUNDING_SHAPE, PLAYER_LAYER, 0, false), look(
 {
 	this->pid = Player::maxId++;
 	this->addModifierInstance(new ModifierInstance(GRAVITY_MODIFIER, new GravityModifierData(0.01f)));
+	this->addModifierInstance(new ModifierInstance(TAGGED_STATUS_MODIFIER, new TaggedStatusModifierData()));
 }
 
 Player::~Player()

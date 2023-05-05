@@ -61,6 +61,9 @@ public:
 	const std::map<Modifier*, std::vector<ModifierInstance*>> getModifiers() {
 		return modifiers;
 	}
+	const std::vector<ModifierInstance*> getModifiers(Modifier* modifier) {
+		return modifiers[modifier];
+	}
 	void tick() {
 		for (auto pair : this->getModifiers()) {
 			for (auto instance : pair.second)
