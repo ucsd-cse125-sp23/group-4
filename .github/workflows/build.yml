@@ -19,7 +19,7 @@ jobs:
       - run: sudo apt install -y cppcheck clang-format
       
       - name: cpplint
-        run: cpplint --recursive src
+        run: cpplint --recursive src --exclude="src/client/graphics/imported"
         
       - name: cppcheck
         run: cppcheck src

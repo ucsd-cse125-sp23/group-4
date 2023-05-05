@@ -10,6 +10,7 @@
 #include "client/graphics/imported/Tokenizer.h"
 
 using glm::mat4;
+using glm::vec4;
 using glm::vec3;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +40,7 @@ class Skin {
 
   bool Load(const char* file);
   void Update(Skeleton* skel);
-  void Draw(const glm::mat4& viewProjMtx, GLuint shader);
+  void Draw(glm::mat4& viewProjMtx, GLuint shader);
 
  private:
   GLuint VAO;

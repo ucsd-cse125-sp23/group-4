@@ -134,20 +134,20 @@ void Skin::Update(Skeleton* skel) {
       sum += skinweights[i][j].second * W * inverse(B);
     }
 
-    positions[i] = vec3(sum * vec4(initpositions[i], 1));
+    positions[i] = vec3(sum * glm::vec4(initpositions[i], 1));
   }
 }
 
-void Skin::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
+void Skin::Draw(glm::mat4& viewProjMtx, GLuint shader) {
   // actiavte the shader program
   glUseProgram(shader);
 
   // get the locations and send the uniforms to the shader
   glm::mat4 identity(1.0f);
   glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false,
-                     (float*)&viewProjMtx);
+                     reinterpret_cast<float*>(&viewProjMtx));
   glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE,
-                     (float*)&identity);
+                     reinterpret_cast<float*>(&identity));
   glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
 
   // Bind the VAO

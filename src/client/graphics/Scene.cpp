@@ -56,7 +56,7 @@ void Scene::drawHUD(GLFWwindow* window) {
     const unsigned char* string =
         reinterpret_cast<const unsigned char*>(str.c_str());
     glColor3f(1.0f, 1.0f, 1.0f);
-    glWindowPos2f(10.0f, float(height) - 25);
+    glWindowPos2f(10.0f, static_cast<float>(height) - 25);
     glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
   }
 }
@@ -138,8 +138,9 @@ void Scene::gui() {
       ImGuiTreeNodeFlags node_flags =
           ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
       if (cur->childnodes.empty()) node_flags |= ImGuiTreeNodeFlags_Leaf;
-      bool node_open = ImGui::TreeNodeEx(reinterpret_cast<void*>((intptr_t)gui_id), node_flags,
-                                         cur->name.c_str());
+      bool node_open =
+          ImGui::TreeNodeEx(reinterpret_cast<void*>((intptr_t)gui_id),
+                            node_flags, cur->name.c_str());
 
       if (node_open) {
         for (unsigned int i = 0; i < cur->childnodes.size(); i++) {

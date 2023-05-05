@@ -198,7 +198,8 @@ void Window::displayCallback(GLFWwindow* window) {
 // helper to reset the camera
 void Window::resetCamera() {
   Cam->Reset();
-  Cam->SetAspect(static_cast<float>(Window::width) / static_cast<float>(Window::height));
+  Cam->SetAspect(static_cast<float>(Window::width) /
+                 static_cast<float>(Window::height));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

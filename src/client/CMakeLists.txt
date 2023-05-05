@@ -54,8 +54,8 @@ set(SOURCES
   graphics/SkinnedMesh.cpp
   graphics/Texture.cpp
   graphics/Player.cpp
-  graphics/Tokenizer.cpp
   graphics/Window.cpp
+  graphics/imported/Tokenizer.cpp
 )
 
 add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES})

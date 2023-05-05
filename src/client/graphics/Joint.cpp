@@ -67,8 +67,7 @@ bool Joint::Load(Tokenizer& t) {
       AddChild(jnt);
     } else if (strcmp(temp, "}") == 0) {
       break;
-    }
-    else {
+    } else {
       t.SkipLine();  // Unrecognized token
     }
   }
