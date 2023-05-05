@@ -2,6 +2,7 @@
 #include "core/game/modifier/GravityModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TimedModifier.h"
+#include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 
 
@@ -40,4 +41,13 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data)
 			pObj->onGround = false;
 		}
 	}
+}
+
+void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data)
+{
+	TaggedStatusModifierData* cData = static_cast<TaggedStatusModifierData*>(data);
+	if (cData->isIt)
+		cData->ticksIt++;
+	else
+		cData->ticksIt = 0;
 }

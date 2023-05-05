@@ -93,6 +93,7 @@ void Level::tick() {
 				collisions[ind]->vel = tangent(collisions[ind]->vel, -norm);
 				collisions[ind]->vel -= collisions[ind]->vel * minMTV.w * self->getBounds()->friction * 0.5f;
 			}
+			this->eventManager->fireCollisionEvent(self, collisions[ind]);
 			collisions[ind]->onCollision(self);
 			self->onCollision(collisions[ind]);
 			collisions[ind] = collisions.back(); collisions.pop_back();
@@ -114,6 +115,7 @@ void Level::tick() {
 			case CollisionType::TRIGGER:
 				if (selfBounds->collides(obj->getBounds()))
 				{
+					this->eventManager->fireTriggerEvent(self, obj);
 					self->onTrigger(obj);
 					obj->onTrigger(self);
 				}
@@ -130,6 +132,7 @@ void Level::tick() {
 			case CollisionType::TRIGGER:
 				if (selfBounds->collides(obj->getBounds()))
 				{
+					this->eventManager->fireTriggerEvent(self, obj);
 					self->onTrigger(obj);
 					obj->onTrigger(self);
 				}
