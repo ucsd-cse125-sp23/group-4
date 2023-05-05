@@ -13,13 +13,21 @@ inline glm::vec4 aiQuaternionToVec4(const aiQuaternion& q) {
 // http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
 // https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/index.htm
 const float SLERP_THRESHOLD = 0.9995;
-/** tInvLerp is in (0,1) */
+/** tInvLerp is in (0,1)
+  * LinearLerp is recommended if q0 and q1 have small time difference.
+  */
 inline glm::vec4 quarternionInterpolateSpherical(const glm::vec4& q0, 
                                                  const glm::vec4& q1,
-                                                 float tInvLerp) {
+                                                 float tInvLerp,
+                                                 bool useLinear = true) {
+    if(useLinear) {
+        return glm::dot(q0,q1) >= 0 ? glm::normalize(q0 + tInvLerp*(q1-q0))
+                                    : glm::normalize(q0 + tInvLerp*(-q1-q0));
+    }
+
     float dot = glm::dot(q0,q1);
-    if(dot > SLERP_THRESHOLD) {
-        return glm::normalize(q0 + tInvLerp*(q1-q0));
+    if(glm::abs(dot) > SLERP_THRESHOLD) {
+        return quarternionInterpolateSpherical(q0,q1,tInvLerp,true);
     }
     float theta_0 = 
         glm::dot(q0,q1) < 0 ?
