@@ -15,10 +15,10 @@ using boost::asio::ip::tcp;
 template <typename T>
 class Connection : std::enable_shared_from_this<Connection<T>> {
  public:
-  typedef std::function<void(boost::system::error_code ec, const T& t)>
-      ReadHandler;
-  typedef std::function<void(boost::system::error_code ec, std::size_t length)>
-      WriteHandler;
+  using ReadHandler =
+      std::function<void(boost::system::error_code ec, const T& t)>;
+  using WriteHandler =
+      std::function<void(boost::system::error_code ec, std::size_t length)>;
 
   Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
       : socket_(std::move(s)),
@@ -106,13 +106,9 @@ void Connection<T>::write(const T& t) {
   archive << t;
   outbound_data_ = archive_stream.str();
 
-  std::cout << "Payload:\n" + t.to_string() << std::endl;
-  std::cout << "Payload is " + std::to_string(outbound_data_.size()) + " bytes"
-            << std::endl;
   std::ostringstream header_stream;
   header_stream << std::setw(header_length_) << std::hex
                 << outbound_data_.size();
-  std::cout << "Header: " << header_stream.str() << std::endl;
 
   if (!header_stream || header_stream.str().size() != header_length_) {
     boost::system::error_code ec(boost::asio::error::invalid_argument);

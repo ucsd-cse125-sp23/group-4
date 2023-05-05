@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <functional>
 #include <memory>
 #include <network/connection.hpp>
 #include <network/message.hpp>
@@ -15,11 +16,17 @@ struct Addr {
 
 class TCPClient {
  public:
-  TCPClient(boost::asio::io_context& io_context, Addr& addr);
-  void read();
+  using ConnectHandler = std::function<void(tcp::endpoint, TCPClient &)>;
+  using ReadHandler =
+      std::function<void(const message::Message &, TCPClient &)>;
+  using WriteHandler = std::function<void(std::size_t, TCPClient &)>;
+  TCPClient(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
+            WriteHandler);
   void write(message::Message);
 
  private:
+  void read();
+
   std::unique_ptr<Connection<message::Message>> connection;
   tcp::socket socket_;
   char data[1024];

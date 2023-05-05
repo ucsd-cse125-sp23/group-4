@@ -18,4 +18,5 @@ class TCPServer {
   std::vector<std::shared_ptr<Connection<message::Message>>> connections_;
 
   void do_accept();
+  void write(const message::Message&);
 };

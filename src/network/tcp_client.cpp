@@ -3,7 +3,8 @@
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 
-TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr)
+TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
+                     ConnectHandler ch, ReadHandler rh, WriteHandler wh)
     : socket_(io_context) {
   tcp::resolver resolver(io_context);
   boost::asio::async_connect(
@@ -13,34 +14,37 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr)
           std::cerr << "Error: " << ec.message() << std::endl;
           return;
         }
-        std::cout << "Connected to " << endpoint.address() << ":"
-                  << endpoint.port() << std::endl;
 
         auto read_handler = [&](boost::system::error_code ec,
                                 const message::Message& m) {
           if (ec) {
-            std::cerr << "Error while reading: " << ec.message() << std::endl;
-          }
-        };
-        auto write_handler = [&](boost::system::error_code ec,
-                                 std::size_t length) {
-          if (ec) {
-            std::cerr << "Error while writing: " << ec.message() << std::endl;
+            std::cerr << "Error: " << ec.message() << std::endl;
+            return;
           }
 
-          std::cout << "Wrote " << length << " bytes to server" << std::endl;
+          rh(m, *this);
+          read();
+        };
+        auto write_handler = [&](boost::system::error_code ec,
+                                 std::size_t bytes_transferred) {
+          if (ec) {
+            std::cerr << "Error: " << ec.message() << std::endl;
+            return;
+          }
+
+          wh(bytes_transferred, *this);
         };
 
         connection = std::make_unique<Connection<message::Message>>(
             socket_, read_handler, write_handler);
-
-        message::GreetingBody g = {"Hello!"};
-        message::Message m = {
-            message::Type::Greeting, {1, std::time(nullptr)}, g};
-        write(m);
+        ch(endpoint, *this);
+        read();
       });
 }
 
-void TCPClient::read() { connection->read(); }
+void TCPClient::read() {
+  std::cout << "Entering read state." << std::endl;
+  connection->read();
+}
 
 void TCPClient::write(message::Message message) { connection->write(message); }

@@ -79,7 +79,22 @@ int main(int argc, char* argv[]) {
   // NETWORK CODE
   boost::asio::io_context io_context;
   Addr server_addr{argv[1], argv[2]};
-  TCPClient client(io_context, server_addr);
+  auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
+    std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
+              << std::endl;
+    message::GreetingBody g = {"Hello!"};
+    message::Message m = {message::Type::Greeting, {1, std::time(nullptr)}, g};
+    client.write(m);
+  };
+  auto read_handler = [&](const message::Message& m, TCPClient& client) {
+    std::cout << "Recevied " << m << std::endl;
+  };
+  auto write_handler = [&](std::size_t bytes_transferred, TCPClient& client) {
+    std::cout << "Wrote " << bytes_transferred << " bytes to server"
+              << std::endl;
+  };
+  TCPClient client(io_context, server_addr, connect_handler, read_handler,
+                   write_handler);
   io_context.run();
 
   // Create the GLFW window.
