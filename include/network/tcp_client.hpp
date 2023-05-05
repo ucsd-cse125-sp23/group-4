@@ -8,10 +8,14 @@
 
 using boost::asio::ip::tcp;
 
+struct Addr {
+  std::string host;
+  std::string port;
+};
+
 class TCPClient {
  public:
-  TCPClient(boost::asio::io_context& io_context, std::string host,
-            std::string port);
+  TCPClient(boost::asio::io_context& io_context, Addr& addr);
   void read();
   void write(message::Message);
 

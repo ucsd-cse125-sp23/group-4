@@ -3,12 +3,11 @@
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 
-TCPClient::TCPClient(boost::asio::io_context& io_context, std::string host,
-                     std::string port)
+TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr)
     : socket_(io_context) {
   tcp::resolver resolver(io_context);
   boost::asio::async_connect(
-      socket_, resolver.resolve(host, port),
+      socket_, resolver.resolve(addr.host, addr.port),
       [&](boost::system::error_code ec, tcp::endpoint endpoint) {
         if (ec) {
           std::cerr << "Error: " << ec.message() << std::endl;

@@ -78,7 +78,8 @@ int main(int argc, char* argv[]) {
 
   // NETWORK CODE
   boost::asio::io_context io_context;
-  TCPClient client(io_context, argv[1], argv[2]);
+  Addr server_addr{argv[1], argv[2]};
+  TCPClient client(io_context, server_addr);
   io_context.run();
 
   // Create the GLFW window.
