@@ -6,7 +6,8 @@
 
 #include "Input.h"
 
-using namespace glm;
+using glm::mat4x4;
+using glm::vec3;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,7 @@ void Camera::UpdateView(GLFWwindow* window) {
 }
 
 void Camera::CamDrag(float a, float i) {
-  if (Fixed) return;  // TODO fix
+  if (Fixed) return;  // TODO(matthew) fix
 
   const float rate = 0.5f;  // mouse sensitivity TODO
   SetAzimuth(GetAzimuth() + a * rate);
@@ -53,7 +54,7 @@ void Camera::CamZoom(float y) {
 
   const float rate = 0.05f;
   float dist =
-      glm::clamp(GetDistance() * (1.0f - (float)y * rate), 0.01f, 1000.0f);
+      glm::clamp(GetDistance() * (1.0f - static_cast<float>(y) * rate), 0.01f, 1000.0f);
   SetDistance(dist);
 }
 

@@ -126,7 +126,7 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   // set up the camera
   Cam = new Camera();
-  Cam->SetAspect(float(width) / float(height));
+  Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
   // initialize the interaction variables
   LeftDown = RightDown = false;
@@ -148,7 +148,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
   // Set the viewport size.
   glViewport(0, 0, width, height);
 
-  Cam->SetAspect(float(width) / float(height));
+  Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
   // ImGui::WindowSize(w, h)?
 }
@@ -167,7 +167,7 @@ void Window::displayCallback(GLFWwindow* window) {
   // Gets events, including input such as keyboard and mouse or window resizing.
   glfwPollEvents();
 
-  // Clear the color and depth buffers.					******
+  // Clear the color and depth buffers.                     ******
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glLoadIdentity();
@@ -185,7 +185,7 @@ void Window::displayCallback(GLFWwindow* window) {
 
     gameScene->gui();
 
-    // imguiDraw(skeleton, animClip);	// simple helper method
+    // imguiDraw(skeleton, animClip);   // simple helper method
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -270,11 +270,11 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
 
 void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   int maxDelta = 100;
-  int dx = glm::clamp((int)currX - MouseX, -maxDelta, maxDelta);
-  int dy = glm::clamp(-((int)currY - MouseY), -maxDelta, maxDelta);
+  int dx = glm::clamp(static_cast<int>(currX) - MouseX, -maxDelta, maxDelta);
+  int dy = glm::clamp(-(static_cast<int>(currY) - MouseY), -maxDelta, maxDelta);
 
-  MouseX = (int)currX;
-  MouseY = (int)currY;
+  MouseX = static_cast<int>(currX);
+  MouseY = static_cast<int>(currY);
 
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) {
     LeftDown = RightDown = false;

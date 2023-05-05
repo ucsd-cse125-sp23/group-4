@@ -13,14 +13,14 @@ glm::mat4 Joint::ComputeLocal() {
 
 /////////////////////////
 // Format:
-// offset	    	x y z
-// boxmin	    	x y z
-// boxmax	    	x y z
-// rotxlimit	    min max
-// rotylimit	    min max
-// rotzlimit	    min max
-// pose	    		x y z
-// balljoint	    name { }
+// offset           x y z
+// boxmin           x y z
+// boxmax           x y z
+// rotxlimit        min max
+// rotylimit        min max
+// rotzlimit        min max
+// pose             x y z
+// balljoint        name { }
 //
 /////////////////////////
 bool Joint::Load(Tokenizer& t) {
@@ -65,8 +65,9 @@ bool Joint::Load(Tokenizer& t) {
       Joint* jnt = new Joint(&tempname[0]);
       jnt->Load(t);
       AddChild(jnt);
-    } else if (strcmp(temp, "}") == 0)
+    } else if (strcmp(temp, "}") == 0) {
       break;
+    }
     else
       t.SkipLine();  // Unrecognized token
   }

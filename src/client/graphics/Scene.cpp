@@ -8,7 +8,8 @@ adapted from CSE 167 - Matthew
 // The scene init definition
 #include "Scene.inl"
 
-using namespace glm;
+using glm::mat4x4;
+using glm::vec3;
 
 bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
