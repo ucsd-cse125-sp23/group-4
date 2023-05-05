@@ -40,6 +40,8 @@
 #include "client/graphics/SkinnedMesh.h"
 #include "client/graphics/shader.h"
 
+#include "core/lib.hpp"
+
 struct Character {
   unsigned int TextureID;  // ID handle of the glyph texture
   glm::ivec2 Size;         // Size of glyph

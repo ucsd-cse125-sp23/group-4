@@ -27,6 +27,8 @@
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/SkinnedMesh.h"
 
+namespace client {
+
 class Player : public GameThing, InputListener {
  private:
   float azimuth = 0;
@@ -58,3 +60,5 @@ class Player : public GameThing, InputListener {
   void setHeading(float rot);
   //                              --
 };
+
+}  // namespace client

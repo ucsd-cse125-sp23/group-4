@@ -184,7 +184,7 @@ void Scene::init(void) {
   thing_modeltest->name = "GT_playerTest";
   gamethings.push_back(thing_modeltest);
 
-  Player* player = new Player();
+  client::Player* player = new client::Player();
   player->camera = camera;               // give a reference to the game camera
   player->pmodel = waspModel;            // updating!
   player->model = waspModel;             // drawing!

@@ -32,8 +32,8 @@ void Scene::drawHUD(GLFWwindow* window) {
   std::map<std::string, float> player_times;
 
   for (GameThing* e : gamethings) {
-    if (dynamic_cast<Player*>(e) != nullptr) {
-      Player* player = dynamic_cast<Player*>(e);
+    if (dynamic_cast<client::Player*>(e) != nullptr) {
+      client::Player* player = dynamic_cast<client::Player*>(e);
       std::string name = player->name;
       glm::vec3 position = player->transform.position;
       player_times[name] = player->time;

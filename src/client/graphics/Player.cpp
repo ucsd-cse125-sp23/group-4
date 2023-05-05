@@ -3,7 +3,7 @@
 using glm::mat4x4;
 using glm::vec3;
 
-void Player::update(float dt) {
+void client::Player::update(float dt) {
   if (camera && camera->Fixed)
     return;  // don't move the player in no clip (for now)
 
@@ -35,7 +35,7 @@ void Player::update(float dt) {
   if (tagged) time += dt;
 }
 
-void Player::move(vec3 movement) {
+void client::Player::move(vec3 movement) {
   // use camera data here
   if (camera) {
     movement = vec3(camera->getCameraRotationMtx() * vec4(-movement, 1));
@@ -45,7 +45,7 @@ void Player::move(vec3 movement) {
   GameThing::move(movement);
 }
 
-void Player::faceDirection(vec3 direction) {
+void client::Player::faceDirection(vec3 direction) {
   direction = normalize(direction);
   azimuth = std::atan2(direction.x, direction.z) + (M_PI);  // aka azimuth
 
