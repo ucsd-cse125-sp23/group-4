@@ -1,16 +1,15 @@
 /**************************************************
-* Camera.h
-* Implementation of GameThing
-* handles rotation/movement of camera
-* and computing view projection matrices
-*****************************************************/
+ * Camera.h
+ * Implementation of GameThing
+ * handles rotation/movement of camera
+ * and computing view projection matrices
+ *****************************************************/
 
 #pragma once
 
-#include "glm/gtx/euler_angles.hpp"
-
-#include "client/graphics/core.h"
 #include "client/graphics/GameThing.h"
+#include "client/graphics/core.h"
+#include "glm/gtx/euler_angles.hpp"
 
 #ifdef __APPLE__
 #define GLFW_INCLUDE_GLCOREARB
@@ -61,7 +60,8 @@ class Camera : public GameThing {
   float Distance;  // Distance of the camera eye position to the origin (meters)
   float Azimuth;   // Rotation of the camera eye position around the Y axis
                    // (degrees)
-  float Incline;  // Angle of the camera eye position over the XZ plane (degrees)
+  float
+      Incline;  // Angle of the camera eye position over the XZ plane (degrees)
 
   // Computed data
   glm::mat4 ViewProjectMtx;

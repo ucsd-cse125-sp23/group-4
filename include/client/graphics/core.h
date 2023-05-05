@@ -7,24 +7,24 @@
 #include <GL/glew.h>
 #endif
 
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <vector>
-#include <string>
 #include <ctype.h>
 
-inline float modu(float x, float y) {
-	return x - y * floor(x / y);
-}
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <string>
+#include <vector>
 
-template<class T> struct optional {
-	T val;
-	bool exists;
-	optional() : exists(false) {}
-	optional(const T& t) : val(t), exists(true) {}
-	~optional() {
-		if (exists) val.~T();
-	}
+inline float modu(float x, float y) { return x - y * floor(x / y); }
+
+template <class T>
+struct optional {
+  T val;
+  bool exists;
+  optional() : exists(false) {}
+  optional(const T& t) : val(t), exists(true) {}
+  ~optional() {
+    if (exists) val.~T();
+  }
 };
 
 #endif

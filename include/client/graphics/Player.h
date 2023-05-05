@@ -1,9 +1,9 @@
 /**************************************************
-* Player.h
-* a single local player, controlled by the user
-* stores information about visuals in PlayerModel.h
-* currently needs Node::model reference set manually
-*****************************************************/
+ * Player.h
+ * a single local player, controlled by the user
+ * stores information about visuals in PlayerModel.h
+ * currently needs Node::model reference set manually
+ *****************************************************/
 
 #pragma once
 
@@ -15,44 +15,46 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include "client/graphics/GameThing.h"
-#include "client/graphics/PlayerModel.h"
-#include "client/graphics/Skeleton.h"
-#include "client/graphics/SkinnedMesh.h"
-#include "client/graphics/AnimationPlayer.h"
-#include "client/graphics/Camera.h"
-#include "client/graphics/Input.h"
-#include "client/graphics/InputListener.h"
-
 #include <map>
 #include <string>
 
+#include "client/graphics/AnimationPlayer.h"
+#include "client/graphics/Camera.h"
+#include "client/graphics/GameThing.h"
+#include "client/graphics/Input.h"
+#include "client/graphics/InputListener.h"
+#include "client/graphics/PlayerModel.h"
+#include "client/graphics/Skeleton.h"
+#include "client/graphics/SkinnedMesh.h"
+
 class Player : public GameThing, InputListener {
-  private:
-    float azimuth = 0;
-  public:
-    float speed = 10;
+ private:
+  float azimuth = 0;
 
-    Camera* camera = nullptr;   // a reference to the scene camera, so we know where we're going
+ public:
+  float speed = 10;
 
-    PlayerModel* pmodel;    // visual information
+  Camera* camera =
+      nullptr;  // a reference to the scene camera, so we know where we're going
 
-    float time; // how long we've been tagged
-    bool tagged;
+  PlayerModel* pmodel;  // visual information
 
-    Player() {
-        time = 0;
-        pmodel = nullptr;
-        tagged = true;
-    }
+  float time;  // how long we've been tagged
+  bool tagged;
 
-    void update(float dt);
-    void move(vec3 movement);
+  Player() {
+    time = 0;
+    pmodel = nullptr;
+    tagged = true;
+  }
 
-    void faceDirection(vec3 direction);
+  void update(float dt);
+  void move(vec3 movement);
 
-    // networking interface v00001  --
-    void setPosition(vec3 pos);
-    void setHeading(float rot);
-    //                              --
+  void faceDirection(vec3 direction);
+
+  // networking interface v00001  --
+  void setPosition(vec3 pos);
+  void setHeading(float rot);
+  //                              --
 };

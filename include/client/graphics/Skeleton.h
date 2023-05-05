@@ -15,12 +15,13 @@
 #endif
 #include <GLFW/glfw3.h>
 
+#include <map>
+#include <string>
+
 #include "client/graphics/Camera.h"
 #include "client/graphics/Joint.h"
 #include "client/graphics/Pose.h"
 #include "client/graphics/core.h"
-#include <map>
-#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 

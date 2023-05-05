@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 
 #include "Camera.h"
+
 #include "Input.h"
 
 using namespace glm;
@@ -12,7 +13,6 @@ using namespace glm;
 Camera::Camera() {
   Reset();
   Fixed = false;
-
 
   _renderGizmo = false;
 }
@@ -41,7 +41,7 @@ void Camera::UpdateView(GLFWwindow* window) {
 }
 
 void Camera::CamDrag(float a, float i) {
-  if (Fixed) return;    // TODO fix
+  if (Fixed) return;  // TODO fix
 
   const float rate = 0.5f;  // mouse sensitivity TODO
   SetAzimuth(GetAzimuth() + a * rate);
@@ -49,11 +49,11 @@ void Camera::CamDrag(float a, float i) {
 }
 
 void Camera::CamZoom(float y) {
-  if(Fixed) return;
+  if (Fixed) return;
 
   const float rate = 0.05f;
-  float dist = glm::clamp(GetDistance() * (1.0f - (float)y * rate),
-                          0.01f, 1000.0f);
+  float dist =
+      glm::clamp(GetDistance() * (1.0f - (float)y * rate), 0.01f, 1000.0f);
   SetDistance(dist);
 }
 
@@ -76,7 +76,7 @@ void Camera::update(float dt) {
     moveLocal += vec3(1, 0, 0);
   }
 
-  moveLocal = -moveLocal;   // invert directions
+  moveLocal = -moveLocal;  // invert directions
   moveLocal = normalize(moveLocal);
 
   moveLocal *= 12 * dt;
@@ -100,4 +100,3 @@ void Camera::Reset() {
 
   Fixed = false;
 }
-

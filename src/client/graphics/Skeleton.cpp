@@ -81,7 +81,6 @@ void Skeleton::Show() {
 }
 
 void Skeleton::SetPose(const Pose pose) {
-    
   glm::vec3 root_pos = root->GetPosition();
 
   for (int i = 0; i < pose.size(); i += 3) {
@@ -92,7 +91,7 @@ void Skeleton::SetPose(const Pose pose) {
     SetJointDOFs(j, p);
   }
 
-  if (!applyToRoot) {   // do we ignore moving the root bone?
+  if (!applyToRoot) {  // do we ignore moving the root bone?
     root->SetPosition(root_pos);
   }
 }
@@ -155,4 +154,3 @@ Joint* Skeleton::FindJointInTree(int j) {
 
   return nullptr;
 }
-

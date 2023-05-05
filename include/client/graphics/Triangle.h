@@ -12,18 +12,16 @@
 // The DOF struct, holds info for posing joints.
 
 struct Triangle {
-    Vertex* vert0;
-    Vertex* vert1;
-    Vertex* vert2;
+  Vertex* vert0;
+  Vertex* vert1;
+  Vertex* vert2;
 
-    Triangle() {
-
-    }
-    Triangle (Vertex* i, Vertex* j, Vertex* k) {
-        vert0 = i;
-        vert1 = j;
-        vert2 = k;
-    }
+  Triangle() {}
+  Triangle(Vertex* i, Vertex* j, Vertex* k) {
+    vert0 = i;
+    vert1 = j;
+    vert2 = k;
+  }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

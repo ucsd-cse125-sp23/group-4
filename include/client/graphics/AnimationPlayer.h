@@ -5,52 +5,41 @@
 
 #pragma once
 
-#include "core.h"
 #include "AnimationClip.h"
+#include "core.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // The AnimationPlayer class for playing animation clips.
 
-class AnimationPlayer
-{
-public:
-	float speed;
+class AnimationPlayer {
+ public:
+  float speed;
 
-	AnimationPlayer()
-	{
-		time = 0;
-		clip = nullptr;
-	}
-	~AnimationPlayer()
-	{
+  AnimationPlayer() {
+    time = 0;
+    clip = nullptr;
+  }
+  ~AnimationPlayer() {}
 
-	}
+  void SetClip(AnimationClip* c) { clip = c; }
 
-	void SetClip(AnimationClip* c)
-	{ clip = c; }
+  const Pose GetCurrentPose() { return pose; }
 
-	const Pose GetCurrentPose()
-	{ return pose; }
+  void Update(float deltaTime) {
+    if (clip) {
+      clip->Evaluate(time, pose);
+    }
 
-	void Update(float deltaTime)
-	{
-		if (clip) {
-			clip->Evaluate(time, pose);
-		}
+    time += deltaTime * speed;
+  }
 
-		time += deltaTime * speed;
-	}
+  void Play() { time = 0.0f; }
 
-	void Play()
-	{
-		time = 0.0f;
-	}
-
-private:
-	float time;
-	AnimationClip* clip;
-	Pose pose;
+ private:
+  float time;
+  AnimationClip* clip;
+  Pose pose;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

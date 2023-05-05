@@ -1,18 +1,19 @@
 /**************************************************
-* PlayerModel.h
-* implementation of Model
-* stores extra information for skeleton + skin + anims
-* and updating them
-*****************************************************/
+ * PlayerModel.h
+ * implementation of Model
+ * stores extra information for skeleton + skin + anims
+ * and updating them
+ *****************************************************/
 
 #pragma once
 
+#include <map>
+#include <string>
+
+#include "client/graphics/AnimationPlayer.h"
 #include "client/graphics/Model.h"
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/SkinnedMesh.h"
-#include "client/graphics/AnimationPlayer.h"
-#include <map>
-#include <string>
 
 class PlayerModel : public Model {
  public:
@@ -23,11 +24,11 @@ class PlayerModel : public Model {
   AnimationPlayer* currAnim = nullptr;
 
   void setAnimation(std::string animName) {
-      if (anims.find(animName) == anims.end()) {
-          return;   // anim not found!
-      }
+    if (anims.find(animName) == anims.end()) {
+      return;  // anim not found!
+    }
 
-      currAnim = anims[animName];
+    currAnim = anims[animName];
   }
 
   void update(float dt) {
