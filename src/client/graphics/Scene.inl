@@ -164,7 +164,7 @@ void Scene::init(void) {
   for (auto c : mapColliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
 
-    core_env->addConvex(c.core_vertices()); // core!
+    core_env->addConvex(c.core_vertices(), 2.21f);  // core!
   }
 
   ///////////////////////////////////////////////////////
@@ -185,6 +185,8 @@ void Scene::init(void) {
   gamethings.push_back(thing_modeltest);
 
   client::Player* player = new client::Player();
+  player->coreRef_object = core_playerpair.first;
+  player->coreRef_control = core_playerpair.second;
   player->camera = camera;               // give a reference to the game camera
   player->pmodel = waspModel;            // updating!
   player->model = waspModel;             // drawing!
@@ -193,6 +195,8 @@ void Scene::init(void) {
   player->transform.position = vec3(0, 2, 0);
   player->transform.updateMtx(&(player->transformMtx));
   gamethings.push_back(player);
+
+  Input::AddListener(player);
 
   // Build the scene graph
   node["teapot1"] = thing_example;

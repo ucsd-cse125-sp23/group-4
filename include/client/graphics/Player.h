@@ -26,14 +26,19 @@
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/SkinnedMesh.h"
+#include "core/game/modifier/ControlModifier.h"
+#include "core/math/vector.h"
 
 namespace client {
 
-class Player : public GameThing, InputListener {
+class Player : public GameThing, public InputListener {
  private:
   float azimuth = 0;
 
  public:
+  PObject* coreRef_object;  // this will be used to show position, for now
+  ControlModifierData* coreRef_control;  // this will be used to show physics, for now
+
   float speed = 10;
 
   Camera* camera =
@@ -50,13 +55,15 @@ class Player : public GameThing, InputListener {
     tagged = true;
   }
 
+  void OnEvent(const InputEvent evt);
+
   void update(float dt);
   void move(vec3 movement);
 
   void faceDirection(vec3 direction);
 
   // networking interface v00001  --
-  void setPosition(vec3 pos);
+  void setPosition(vec3f pos);
   void setHeading(float rot);
   //                              --
 };

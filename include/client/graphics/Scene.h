@@ -168,6 +168,7 @@ class Scene {
   void draw();
 
   void gui();
+  void gui_core();
 
   // destructor
   ~Scene() {

@@ -21,6 +21,8 @@ void Scene::update(float delta) {
   for (auto e : gamethings) {
     e->update(delta);
   }
+
+  level->tick();  // CORE
 }
 
 void Scene::drawHUD(GLFWwindow* window) {
@@ -153,6 +155,35 @@ void Scene::gui() {
       ImGui::PopStyleVar();
     }  // End of DFS while loop
     ImGui::TreePop();
+  }
+
+  ImGui::End();
+
+  gui_core();
+}
+
+void Scene::gui_core() {
+  ImGui::Begin("core debug +++");
+
+  ImGui::Separator();
+
+  client::Player* player = nullptr;
+  for (GameThing* e : gamethings) {
+    if (dynamic_cast<client::Player*>(e) != nullptr) {
+      player = dynamic_cast<client::Player*>(e);
+    }
+  }
+
+  if (player) {
+    std::ostringstream str;
+    str << player->coreRef_object->getPos();
+    ImGui::Text(("player pos: " + str.str()).c_str());
+
+    std::ostringstream str2;
+    str2 << player->coreRef_object->vel;
+    ImGui::Text(("player vel: " + str2.str()).c_str());
+
+    ImGui::Text(("player doJump: " + to_string(player->coreRef_control->doJump)).c_str());
   }
 
   ImGui::End();
