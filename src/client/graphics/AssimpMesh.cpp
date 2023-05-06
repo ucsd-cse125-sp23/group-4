@@ -10,7 +10,7 @@ glm::mat4 AssimpJoint::update() {
 }
 
 AssimpMesh::AssimpMesh() 
-        : node(nullptr), isLoaded(false), isDrawMesh(true) {
+        : node(nullptr), isLoaded(false) {
     matBindingInvs[0] = glm::mat4(1.0f);
 }
 

@@ -1,30 +1,44 @@
 #pragma once
 
-#include "core.h"
-#include "AssimpNode.h"
-#include "AssimpMesh.h"
-#include "AssimpAnimation.h"
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
 #include <vector>
 #include <string>
 #include <map>
 
+#include "client/graphics/core.h"
+#include "client/graphics/AssimpNode.h"
+#include "client/graphics/AssimpMesh.h"
+#include "client/graphics/AssimpAnimation.h"
+
+/** The AssimpModel class for loading and displaying an animated model file.
+  * 
+  * IMPORTANT:
+  * Due to defect in curent implementation, 
+  * every bone/joint must have a channel with at least two values;
+  * Fixed timestamp keyframing is preferred.
+  */
 class AssimpModel {
 public:
     AssimpModel();
+    // TODO
     // ~AssimpModel();
 
-    /** Load a model file using this node as root node.
+    /** Load a model file (displaying default pose).
       * Returns whether the model file is loaded properly.
       * If the node has already been initialized, returns false.
       */
     bool loadAssimp(const char* path);
 
+    /** Set model to use default pose */
     void useMesh();
-    void useAnimation(int animationInd);
+    /** Set model to use specified animation (-1 = use default pose)
+      * returns false if animationInd is invalid
+      */
+    bool useAnimation(int animationInd);
+
     void update(float deltaTimeInMs);
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
     void imGui();
@@ -37,22 +51,30 @@ private:
     std::vector<bool> meshVisibilities;
     std::vector<AssimpMesh*> meshes;
     bool isAnimated, isPaused;
-    /** -1  - use mesh
-      * 0+ - use animation (n in total)
-      */
     int currentAnimation;
     std::vector<AssimpAnimation> animations;
+    char** animModes;
 
-    /** Prepare a new AssimpNode
+    /** Prepare a new AssimpNode node
       * accTransform: accumulative transform from parent node
       * aiNode: aiNode from the importer corresponded to this node
       * scene: the scene created by the importer
       */
     void loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform, aiNode *aiNode, const aiScene *scene);
+    /** Prepare a new AssimpMesh mesh
+      * aiMesh: aiMesh from the importer corresponded to this mesh
+      * scene: the scene created by the importer
+      */
     void loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
+    /** Adds skeleton/joints to a new AssimpMesh mesh
+      * aiMesh: aiMesh from the importer corresponded to this mesh
+      * scene: the scene created by the importer
+      */
     void loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
+    /** Add animations to this model
+      * scene: the scene created by the importer
+      */
     void loadAssimpHelperAnim(const aiScene *scene);
+    /** Prepare ImGui information for this model */
     void loadAssimpHelperImgui();
-
-    char** animModes;
 };

@@ -1,12 +1,13 @@
 #pragma once
 
-#include "core.h"
-#include "AssimpNode.h"
-
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
+
 #include <vector>
 #include <string>
+
+#include "client/graphics/core.h"
+#include "client/graphics/AssimpNode.h"
 
 class AssimpNode;
 
@@ -33,15 +34,17 @@ struct Vertex {
     glm::vec4  boneWeights = glm::vec4(1,0,0,0);
 };
 
+/** The AssimpMesh class for storing a mesh with a binded skeleton. */
 class AssimpMesh {
 public:
+    static const int MAX_BONES = 200;
     AssimpMesh();
 
     AssimpNode* node;
     std::vector<Vertex>       vertices;
     std::vector<unsigned int> indices;
     std::vector<AssimpJoint*> joints;
-    glm::mat4 matBindingInvs[200];
+    glm::mat4 matBindingInvs[MAX_BONES];
 
     void update();
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
@@ -50,5 +53,5 @@ public:
     void imGui();
 private:
     unsigned int VAO, VBO, EBO;
-    bool isLoaded, isDrawMesh;
+    bool isLoaded;
 };

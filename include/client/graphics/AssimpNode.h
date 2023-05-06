@@ -1,16 +1,18 @@
 #pragma once
 
-#include "AssimpMesh.h"
-
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
+
 #include <vector>
 #include <string>
 #include <map>
 
+#include "client/graphics/AssimpMesh.h"
+
 class AssimpMesh;
 struct AssimpJoint;
 
+/** The AssimpNode class for a local representation of a scene node. */
 class AssimpNode {
 public:
     AssimpNode(unsigned int id);
@@ -19,13 +21,13 @@ public:
     const unsigned int id;
     std::string name;
     std::vector<AssimpMesh*> meshes;
-    /** This matrix is relative to parent's position */
+    /** transformation matrix relative to parent node (default pose) */
     glm::mat4 localTransform;
-    /** This matrix make node's meshes to go from node space to global space */
+    /** transformation matrix relative to world space (default pose) */
     glm::mat4 accTransform;
-    /** This matrix is calculated by the animation system */
+    /** transformation matrix relative to parent node (current pose) */
     glm::mat4 animationTransform;
-
+    /** transformation matrix relative to world space (current pose) */
     glm::mat4 matWorldTransform;
 
     AssimpNode* parent;

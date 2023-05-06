@@ -289,7 +289,7 @@ void AssimpModel::useMesh() {
     useAnimation(-1);
 }
 
-void AssimpModel::useAnimation(int animationInd) {
+bool AssimpModel::useAnimation(int animationInd) {
     printf("Using %d\n", animationInd);
 
     if(animationInd < 0) {
@@ -303,7 +303,10 @@ void AssimpModel::useAnimation(int animationInd) {
         for(int i = 0; i < meshes.size(); i++) {
             meshes[i]->update();
         }
-        return;
+        return true;
+    }
+    if(animationInd >= animations.size()) {
+        return false;
     }
 
     isAnimated = true;
@@ -313,6 +316,7 @@ void AssimpModel::useAnimation(int animationInd) {
     }
     currentAnimation = animationInd;
     animations[animationInd].restart();
+    return true;
 }
 
 void AssimpModel::update(float deltaTimeInMs) {

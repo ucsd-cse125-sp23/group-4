@@ -1,3 +1,6 @@
+/** Utility functions for Assimp related operations */
+#pragma once
+
 #include <glm/glm.hpp>
 #include <assimp/scene.h>
 

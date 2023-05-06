@@ -1,12 +1,12 @@
 #pragma once
 
-#include "core.h"
-#include "AssimpNode.h"
-
 #include <vector>
 #include <string>
 #include <map>
 #include <utility>      // pair
+
+#include "client/graphics/core.h"
+#include "client/graphics/AssimpNode.h"
 
 enum ASSIMP_EXTRAP_MODE {
     DEFAULT, CONSTANT, LINEAR, CYCLE
@@ -28,15 +28,22 @@ struct AssimpChannel {
     static std::string extraModeToString(ASSIMP_EXTRAP_MODE mode);
 };
 
+/** The AssimpAnimation class for storing and evaluating an animation. */
 class AssimpAnimation {
 public:
     AssimpAnimation();
 
+    /** duration of the animation (in ticks) */
     double duration;
+    /** ticks per second of the animation */
     double tps;
     std::vector<AssimpChannel> channels;
 
+    /** Update the state of the animation
+      * deltaTimeInMs: time elapsed since last rendering in miliseconds
+      */
     void update(double deltaTimeInMs);
+    /** Reset the animation */
     void restart();
     void imGui();
 private:
