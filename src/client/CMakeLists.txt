@@ -11,7 +11,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG 0.9.9.8)
+  GIT_TAG 0.9.8.5)
 FetchContent_Declare(
   freetype
   GIT_REPOSITORY https://github.com/freetype/freetype
@@ -20,13 +20,51 @@ FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/yesean/imgui
   GIT_TAG v1.1)
+#FetchContent_Declare(
+#  assimp
+#  GIT_REPOSITORY https://github.com/assimp/assimp
+#  GIT_TAG master)
+# FetchContent_GetProperties(assimp)
+# if(NOT assimp_POPULATED)
+#   FetchContent_Populate(assimp)
+#   add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
+# endif()
 FetchContent_Declare(
-  assimp
-  GIT_REPOSITORY https://github.com/assimp/assimp
+  freeglut
+  GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
   GIT_TAG master)
-FetchContent_MakeAvailable(glew glfw glm freetype imgui assimp)
+FetchContent_GetProperties(freeglut)
+if(NOT freeglut_POPULATED)
+    FetchContent_Populate(freeglut)
+    add_subdirectory(${freeglut_SOURCE_DIR} ${freeglut_BINARY_DIR})
+endif()
 
-add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp)
+FetchContent_MakeAvailable(glew glfw glm freeglut freetype imgui)# assimp)
+
+set(SOURCES
+  graphics/AnimationClip.cpp
+  graphics/Camera.cpp
+  graphics/Cube.cpp
+  graphics/Joint.cpp
+  graphics/Scene.cpp
+  graphics/shader.cpp
+  graphics/Input.cpp
+  graphics/Skeleton.cpp
+  graphics/Skin.cpp
+  graphics/SkinnedMesh.cpp
+  graphics/Texture.cpp
+  graphics/Player.cpp
+  graphics/Window.cpp
+  graphics/imported/Tokenizer.cpp
+)
+
+add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES})
+#add_executable(client main.cpp ${SOURCES})
+target_include_directories(client
+  PUBLIC
+    ${CMAKE_SOURCE_DIR}/include/client/graphics
+    ${freeglut_SOURCE_DIR}/include
+)
 target_link_libraries(
   client
   PRIVATE core
@@ -34,5 +72,25 @@ target_link_libraries(
           libglew_static
           glfw
           glm
-          imgui
-          assimp)
+          ImGui
+          #imgui # BROKEN!!!
+          #assimp
+          freeglut_static
+          freetype)
+target_compile_features(client PUBLIC cxx_std_11)
+if(APPLE)
+  target_compile_options(client
+    PUBLIC -Wno-deprecated-declarations
+  )
+endif()
+if(WIN32 OR MSVC OR MSYS OR MINGW)
+
+endif()
+
+# Copy assets folder to executable root directory
+add_custom_command(
+  TARGET client POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/assets" 
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets"
+)
