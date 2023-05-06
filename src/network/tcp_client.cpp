@@ -11,8 +11,8 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
 
   boost::asio::async_connect(
       socket_, resolver.resolve(addr.host, addr.port),
-      [&, read_handler, write_handler, connect_handler](boost::system::error_code ec,
-                           tcp::endpoint endpoint) {
+      [&, read_handler, write_handler, connect_handler](
+          boost::system::error_code ec, tcp::endpoint endpoint) {
         if (ec) {
           std::cerr << "Error: " << ec.message() << std::endl;
           return;

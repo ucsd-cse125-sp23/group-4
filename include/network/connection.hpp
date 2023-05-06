@@ -21,9 +21,7 @@ class Connection : std::enable_shared_from_this<Connection<T>> {
       std::function<void(boost::system::error_code ec, std::size_t length)>;
 
   Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
-      : socket_(std::move(s)),
-        read_handler(rh),
-        write_handler(wh) {}
+      : socket_(std::move(s)), read_handler(rh), write_handler(wh) {}
 
   void start();
   void read();
