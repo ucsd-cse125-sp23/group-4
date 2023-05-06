@@ -37,7 +37,8 @@ class Player : public GameThing, public InputListener {
 
  public:
   PObject* coreRef_object;  // this will be used to show position, for now
-  ControlModifierData* coreRef_control;  // this will be used to show physics, for now
+  ControlModifierData*
+      coreRef_control;  // this will be used to show physics, for now
 
   float speed = 10;
 
@@ -66,6 +67,20 @@ class Player : public GameThing, public InputListener {
   void setPosition(vec3f pos);
   void setHeading(float rot);
   //                              --
+
+  string debug_info() {
+    std::ostringstream str;
+    str << coreRef_object->getPos();
+    string out = "player" + to_string(coreRef_object->id) + "\n";
+    out += "player pos: " + str.str() + "\n";
+
+    std::ostringstream str2;
+    str2 << coreRef_object->vel;
+    out += ("player vel: " + str2.str()) + "\n";
+
+    out += "player doJump: " + to_string(coreRef_control->doJump);
+    return out;
+  }
 };
 
 }  // namespace client

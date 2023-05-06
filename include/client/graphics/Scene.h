@@ -39,7 +39,6 @@
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/SkinnedMesh.h"
 #include "client/graphics/shader.h"
-
 #include "core/lib.hpp"
 
 struct Character {
@@ -121,40 +120,42 @@ class Scene {
     sceneResources = new SceneResourceMap();
 
     // globals --
-    _globalSceneResources.meshes["_gz-cube"] = new Cube();
+    {
+      _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
-    _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-    _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+      _globalSceneResources.meshes["_gz-xyz"] =
+          new Obj();  // gizmo for debugging
+      _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
 
-    _globalSceneResources.shaderPrograms["unlit"] =
-        LoadShaders("assets/shaders/unlit.vert", "assets/shaders/unlit.frag");
+      _globalSceneResources.shaderPrograms["unlit"] =
+          LoadShaders("assets/shaders/unlit.vert", "assets/shaders/unlit.frag");
 
-    _globalSceneResources.materials["unlit"] = new Material;
-    _globalSceneResources.materials["unlit"]->shader =
-        _globalSceneResources.shaderPrograms["unlit"];
-    _globalSceneResources.materials["unlit"]->diffuse =
-        glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+      _globalSceneResources.materials["unlit"] = new Material;
+      _globalSceneResources.materials["unlit"]->shader =
+          _globalSceneResources.shaderPrograms["unlit"];
+      _globalSceneResources.materials["unlit"]->diffuse =
+          glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
 
-    _globalSceneResources.models["_gz-xyz"] = new Model;
-    _globalSceneResources.models["_gz-xyz"]->mesh =
-        _globalSceneResources.meshes["_gz-xyz"];
-    _globalSceneResources.models["_gz-xyz"]->material =
-        _globalSceneResources.materials["unlit"];
-    _globalSceneResources.models["_gz-xyz"]->modelMtx =
-        glm::scale(glm::vec3(1.0f));
+      _globalSceneResources.models["_gz-xyz"] = new Model;
+      _globalSceneResources.models["_gz-xyz"]->mesh =
+          _globalSceneResources.meshes["_gz-xyz"];
+      _globalSceneResources.models["_gz-xyz"]->material =
+          _globalSceneResources.materials["unlit"];
+      _globalSceneResources.models["_gz-xyz"]->modelMtx =
+          glm::scale(glm::vec3(1.0f));
 
-    _globalSceneResources.models["_gz-cube"] = new Model;
-    _globalSceneResources.models["_gz-cube"]->mesh =
-        _globalSceneResources.meshes["_gz-cube"];
-    _globalSceneResources.models["_gz-cube"]->material =
-        _globalSceneResources.materials["unlit"];
-    _globalSceneResources.models["_gz-cube"]->modelMtx =
-        glm::translate(glm::vec3(0.0f));
+      _globalSceneResources.models["_gz-cube"] = new Model;
+      _globalSceneResources.models["_gz-cube"]->mesh =
+          _globalSceneResources.meshes["_gz-cube"];
+      _globalSceneResources.models["_gz-cube"]->material =
+          _globalSceneResources.materials["unlit"];
+      _globalSceneResources.models["_gz-cube"]->modelMtx =
+          glm::translate(glm::vec3(0.0f));
+    }
     // --
 
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
-
 
     // core!!!
     core_env = new Environment;
@@ -164,6 +165,9 @@ class Scene {
 
   void init(void);
   void update(float delta);
+  void update_core(
+      void);  // TODO(matthew) let game state updates be passed in here
+
   void drawHUD(GLFWwindow* window);
   void draw();
 
@@ -179,8 +183,9 @@ class Scene {
 
     delete sceneResources;
   }
-private:
-    // core
-    Environment* core_env;
-    std::pair<Player*, ControlModifierData*> core_playerpair;
+
+ private:
+  // core
+  Environment* core_env;
+  std::pair<Player*, ControlModifierData*> core_playerpair;
 };

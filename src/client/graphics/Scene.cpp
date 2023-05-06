@@ -167,24 +167,18 @@ void Scene::gui_core() {
 
   ImGui::Separator();
 
-  client::Player* player = nullptr;
+  // loop through all players
   for (GameThing* e : gamethings) {
     if (dynamic_cast<client::Player*>(e) != nullptr) {
-      player = dynamic_cast<client::Player*>(e);
+      client::Player* player = dynamic_cast<client::Player*>(e);
+      if (player) {
+        ImGui::Text(player->debug_info().c_str());
+        ImGui::Text("---");
+      }
     }
   }
 
-  if (player) {
-    std::ostringstream str;
-    str << player->coreRef_object->getPos();
-    ImGui::Text(("player pos: " + str.str()).c_str());
-
-    std::ostringstream str2;
-    str2 << player->coreRef_object->vel;
-    ImGui::Text(("player vel: " + str2.str()).c_str());
-
-    ImGui::Text(("player doJump: " + to_string(player->coreRef_control->doJump)).c_str());
-  }
+  ImGui::Separator();
 
   ImGui::End();
 }
