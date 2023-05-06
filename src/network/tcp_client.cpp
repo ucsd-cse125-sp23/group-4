@@ -26,7 +26,6 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
           }
 
           read_handler(m, *this);
-          read();
         };
 
         auto conn_write_handler = [&, write_handler](
