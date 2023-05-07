@@ -16,23 +16,14 @@ bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
 
-
-Scene::Scene() {
-  camera = new Camera;
-  sceneResources = new SceneResourceMap();
-  time.time = 300.0f;
-  time.countdown = true;
-
-  // the default scene graph already has one node named "world."
-  node["world"] = new Node("world");
-}
-
-void Scene::update(GLFWwindow* window, Camera* camera, float delta, float step) {
+void Scene::update(float delta) {
     //if (player) player->update(deltaTime);
 
   for (auto e : gamethings) {
     e->update(delta);
   }
+
+  time.Update(delta);
 
   level->tick();  // CORE
 }
@@ -47,7 +38,7 @@ void Scene::drawHUD(GLFWwindow* window) {
 
     for (GameThing* e : gamethings) {
       if (dynamic_cast<client::Player*>(e) != nullptr) {
-        Player* player = dynamic_cast<Player*>(e);
+        client::Player* player = dynamic_cast<client::Player*>(e);
         std::string name = player->name;
         player_times[name] = player->time;
         const unsigned char* cname =
@@ -80,12 +71,12 @@ void Scene::drawHUD(GLFWwindow* window) {
 
     for (GameThing* e : gamethings) {
       if (dynamic_cast<client::Player*>(e) != nullptr) {
-        Player* player = dynamic_cast<Player*>(e);
+        client::Player* player = dynamic_cast<client::Player*>(e);
         glm::vec3 position = player->transform.position;
         glColor3f(0.0f, 0.0f, 1.0f);
         glPointSize(10);
         glBegin(GL_POINTS);
-        glVertex3f(position[0] / map_size, -position[2] / map_size, 0.0f);
+        glVertex3f(position[0] / map_size, -position[2] / map_size, 0.0f); // TODO: get minimap coordinates based off player position
         glEnd();
       }
     }
@@ -97,8 +88,8 @@ void Scene::drawHUD(GLFWwindow* window) {
     glDisable(GL_BLEND);
  }
 void Scene::draw() {
-    // Pre-draw sequence:
-    //camera->computeMatrices();
+  // Pre-draw sequence:
+  glm::mat4 viewProjMtx = camera->GetViewProjectMtx();  
 
   // Define stacks for depth-first search (DFS)
   std::stack<Node*> dfs_stack;

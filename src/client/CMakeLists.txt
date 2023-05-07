@@ -21,7 +21,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glew glfw glm freetype)
 
 
-FetchContent_MakeAvailable(glew glfw glm freeglut freetype imgui)# assimp)
+FetchContent_MakeAvailable(glew glfw glm freetype)# assimp)
 
 set(SOURCES
   graphics/AnimationClip.cpp

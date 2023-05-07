@@ -47,7 +47,7 @@ void client::Player::update(float dt) {
     }
   }
 
-  if (tagged) time += dt;
+  if (tagged) time.Update(dt);
 }
 
 void client::Player::OnEvent(const InputEvent evt) {

@@ -106,15 +106,17 @@ class Scene {
 
   std::vector<GameThing*> gamethings;
 
-    Timer time;
+  Timer time;
 
-    FontRenderer fr;
+  FontRenderer fr;
 
   Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
     gamethings.push_back(camera);
+    time.time = 300.f; //5 minutes
+    time.countdown = true;
 
     sceneResources = new SceneResourceMap();
 
@@ -188,3 +190,5 @@ class Scene {
   Environment* core_env;
   std::pair<Player*, ControlModifierData*> core_playerpair;
 };
+
+#endif
