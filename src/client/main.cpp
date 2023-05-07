@@ -1,9 +1,11 @@
 #include "client/graphics/main.h"
 
-////////////////////////////////////////////////////////////////////////////////
+#include <boost/asio.hpp>
+#include <iostream>
+#include <network/message.hpp>
+#include <network/tcp_client.hpp>
 
 void error_callback(int error, const char* description) {
-  // Print error.
   std::cerr << description << std::endl;
 }
 
@@ -48,8 +50,6 @@ void print_versions() {
 #endif
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 int main(int argc, char* argv[]) {
   char* arg_host;
   char* arg_port;
@@ -76,9 +76,27 @@ int main(int argc, char* argv[]) {
 
   std::cout << "connecting to: " << arg_host << ":" << arg_port << std::endl;
 
-  //
-  // network code here
-  //
+  // NETWORK CODE
+  boost::asio::io_context io_context;
+  Addr server_addr{argv[1], argv[2]};
+  auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
+    std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
+              << std::endl;
+    message::GreetingBody g = {"Hello!"};
+    message::Message m = {message::Type::Greeting, {1, std::time(nullptr)}, g};
+    std::cout << "Sending to server: " << m << std::endl;
+    client.write(m);
+  };
+  auto read_handler = [&](const message::Message& m, TCPClient& client) {
+    std::cout << "Recevied " << m << std::endl;
+  };
+  auto write_handler = [&](std::size_t bytes_transferred, TCPClient& client) {
+    std::cout << "Wrote " << bytes_transferred << " bytes to server"
+              << std::endl;
+  };
+  TCPClient client(io_context, server_addr, connect_handler, read_handler,
+                   write_handler);
+  io_context.run();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
@@ -133,5 +151,3 @@ int main(int argc, char* argv[]) {
 
   exit(EXIT_SUCCESS);
 }
-
-////////////////////////////////////////////////////////////////////////////////

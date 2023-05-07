@@ -9,6 +9,7 @@ that loads an obj file.
 
 #include <stdio.h>
 
+#include <cstring>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <string>
