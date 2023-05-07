@@ -3,19 +3,15 @@ project(client DESCRIPTION "tagguys client executable")
 FetchContent_Declare(
   glew
   GIT_REPOSITORY https://github.com/Perlmint/glew-cmake
-  GIT_TAG master
-)
+  GIT_TAG glew-cmake-2.2.0)
 FetchContent_Declare(
   glfw
   GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG 3.3.8
-)
+  GIT_TAG 3.3.8)
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG 0.9.8.5
-)
-
+  GIT_TAG 0.9.8.5)
 FetchContent_Declare(
     freetype
     GIT_REPOSITORY https://github.com/freetype/freetype.git
@@ -25,15 +21,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glew glfw glm freetype)
 
 
-# FetchContent_Declare(
-#   assimp
-#   GIT_REPOSITORY https://github.com/assimp/assimp.git
-# )
-# FetchContent_GetProperties(assimp)
-# if(NOT assimp_POPULATED)
-#   FetchContent_Populate(assimp)
-#   add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
-# endif()
+FetchContent_MakeAvailable(glew glfw glm freeglut freetype imgui)# assimp)
 
 set(SOURCES
   graphics/AnimationClip.cpp
@@ -42,22 +30,34 @@ set(SOURCES
   graphics/Joint.cpp
   graphics/Scene.cpp
   graphics/shader.cpp
+  graphics/Input.cpp
   graphics/Skeleton.cpp
   graphics/Skin.cpp
   graphics/SkinnedMesh.cpp
-  graphics/Tokenizer.cpp
+  graphics/Texture.cpp
+  graphics/Player.cpp
   graphics/Window.cpp
+  graphics/imported/Tokenizer.cpp
 )
 
-add_executable(client main.cpp ${SOURCES})
+add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES})
+#add_executable(client main.cpp ${SOURCES})
 target_include_directories(client
   PUBLIC
     ${CMAKE_SOURCE_DIR}/include/client/graphics
     ${freeglut_SOURCE_DIR}/include
 )
-
-
-target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui freetype)
+target_link_libraries(
+  client
+  PRIVATE core
+          network
+          libglew_static
+          glfw
+          glm
+          ImGui
+          #imgui # BROKEN!!!
+          #assimp
+          freetype)
 target_compile_features(client PUBLIC cxx_std_11)
 if(APPLE)
   target_compile_options(client
@@ -73,6 +73,5 @@ add_custom_command(
   TARGET client POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_SOURCE_DIR}/assets" 
-    "${PROJECT_BINARY_DIR}/assets"
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets"
 )
-

@@ -1,10 +1,16 @@
-////////////////////////////////////////
-// Camera.h
-////////////////////////////////////////
+/**************************************************
+ * Camera.h
+ * Implementation of GameThing
+ * handles rotation/movement of camera
+ * and computing view projection matrices
+ *****************************************************/
 
 #pragma once
 
-#include "core.h"
+#include "client/graphics/GameThing.h"
+#include "client/graphics/core.h"
+#include "glm/gtx/euler_angles.hpp"
+
 #ifdef __APPLE__
 #define GLFW_INCLUDE_GLCOREARB
 #include <OpenGL/gl3.h>
@@ -14,31 +20,33 @@
 #include <GLFW/glfw3.h>
 ////////////////////////////////////////////////////////////////////////////////
 
-// The Camera class provides a simple means to controlling the 3D camera. It
-// could be extended to support more interactive controls. Ultimately. the
-// camera sets the GL projection and viewing matrices.
-
-class Camera {
+class Camera : public GameThing {
  public:
+  bool Fixed;
+
   Camera();
 
-  void Update(GLFWwindow* window);
+  void update(float dt);
+
+  void UpdateView(GLFWwindow* window);
   void Reset();
-  void ToggleFixedCamera();
-  void Move(GLFWwindow* window, float delta = 0.25);
-  void KeyInput(GLFWwindow* window, float delta = 0.5);
 
   // Access functions
   void SetAspect(float a) { Aspect = a; }
   void SetDistance(float d) { Distance = d; }
   void SetAzimuth(float a) { Azimuth = a; }
   void SetIncline(float i) { Incline = i; }
-  void UpdateWorld();
+
+  void CamZoom(float y);
+  void CamDrag(float a, float i);
 
   float GetDistance() { return Distance; }
   float GetAzimuth() { return Azimuth; }
   float GetIncline() { return Incline; }
-  bool GetFixed() { return Fixed; }
+
+  glm::mat4 getCameraRotationMtx() {
+    return glm::eulerAngleY(glm::radians(-Azimuth));
+  }
   const glm::mat4& GetViewProjectMtx() { return ViewProjectMtx; }
 
  private:
@@ -54,11 +62,6 @@ class Camera {
                    // (degrees)
   float
       Incline;  // Angle of the camera eye position over the XZ plane (degrees)
-  float XTranslation;  // Left/Right Translation of Camera
-  float ZTranslation;  // Forward/Back Translation of Camera
-  glm::vec3 Translations;
-  bool Fixed;
-  glm::mat4 World;
 
   // Computed data
   glm::mat4 ViewProjectMtx;

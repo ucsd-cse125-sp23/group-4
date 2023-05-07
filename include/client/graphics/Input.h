@@ -1,119 +1,127 @@
+/**************************************************
+ * Input.h
+ * static class for input management
+ * make sure to call handle() in a draw/update function
+ * usage:
+ *	- Input::GetInputState(InputAction::MoveForward)
+ *	- or see InputListener
+ *****************************************************/
+
 #pragma once
 
-#include "InputListener.h"
-
-#include <imgui/imgui.h>
-
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+
 #include <map>
 #include <string>
 #include <vector>
 
-class Input
-{
-private:
-	// default bindings
-	static std::map <int, InputAction> inputmap;
+#include "client/graphics/InputListener.h"
 
-	// raw state machine
-	static std::pair<bool, bool> pressed[400];
+class Input {
+ private:
+  static const int num_actions = 11;
 
-	static std::map <InputAction, InputState> inputStates;
+  // default bindings
+  static std::map<int, InputAction> inputmap;
 
-	static void setInputState(InputAction e, InputState s) {
-		Input::inputStates[e] = s;	//bad
+  // raw state machine
+  static std::pair<bool, bool> pressed[400];
 
-		// do listener function on press/release
-		if (s == InputState::Press || s == InputState::Release) {
-			InputEvent r = InputEvent(e, s);
-			Broadcast(r);
-		}
-	}
+  // one true map, and one cache that is updated mid frame
+  static std::map<InputAction, InputState> inputStates;
+  static std::map<InputAction, InputState> inputStateCache;
 
+  static void setInputState(InputAction e, InputState s) {
+    if (s > Input::inputStateCache[e]) Input::inputStateCache[e] = s;
 
-	// observer/listener pattern
-	static std::vector<InputListener*> listeners;
+    // do listener function on press/release
+    if (s == InputState::Press || s == InputState::Release) {
+      InputEvent r = InputEvent(e, s);
+      Broadcast(r);
+    }
+  }
 
-	static void Broadcast(const InputEvent msg) {
-		for (InputListener* li : Input::listeners) {
-			li->OnEvent(msg);
-		}
-	}
+  // observer/listener pattern
+  static std::vector<InputListener*> listeners;
 
-public:
-	static void init() {
-		// populate states map
-		for (int i = 0; i <= 11; i++)
-		{
-			InputAction e = static_cast<InputAction>(i);
+  static void Broadcast(const InputEvent msg) {
+    for (InputListener* li : Input::listeners) {
+      li->OnEvent(msg);
+    }
+  }
 
-			Input::inputStates.insert(std::pair<InputAction, InputState>(e, InputState::None));
-		}
-	}
+ public:
+  static void init() {
+    // populate states maps
+    for (int i = 0; i <= num_actions; i++) {
+      InputAction e = static_cast<InputAction>(i);
 
-	static InputState GetInputState(InputAction e) {
-		return Input::inputStates[e];
-	}
+      Input::inputStates.insert(
+          std::pair<InputAction, InputState>(e, InputState::None));
+      Input::inputStateCache.insert(
+          std::pair<InputAction, InputState>(e, InputState::None));
+    }
+  }
 
-	static void AddListener(InputListener* p) {
+  static InputState GetInputState(InputAction e) {
+    return Input::inputStates[e];
+  }
 
-		Input::listeners.push_back(p);
-	}
-	static void Clear() {
-		Input::listeners.clear();
-	}
+  static void AddListener(InputListener* p) { Input::listeners.push_back(p); }
+  static void Clear() { Input::listeners.clear(); }
 
+  static void handle(bool gui) {
+    if (gui) ImGui::Begin("input");
 
+    // reset state cache...
+    for (auto& state : inputStateCache) {
+      state.second = InputState::None;
+    }
 
-	static void handle(bool gui) {
-		if(gui) ImGui::Begin("input");
-		
-		for (const auto &e : inputmap) {
-			std::string v = "nothing";
-			const std::pair<bool, bool>* istate = &Input::pressed[e.first];
+    // key loop
+    for (const auto& e : inputmap) {
+      std::string v = "nothing";
+      const std::pair<bool, bool>* istate = &Input::pressed[e.first];
 
-			if (istate->first && istate->second) {	// held
-				setInputState(e.second, InputState::Hold);
-				v = "held";
-			}
-			else if (istate->first) {				// press
-				setInputState(e.second, InputState::Press);
-				v = "press";
-			}
-			else if (istate->second) {				// release
-				setInputState(e.second, InputState::Release);
-				v = "released";
-			}
-			else {
-				setInputState(e.second, InputState::None);
-				continue;
-			}
+      if (istate->first && istate->second) {  // held
+        setInputState(e.second, InputState::Hold);
+        v = "held";
+      } else if (istate->first) {  // press
+        setInputState(e.second, InputState::Press);
+        v = "press";
+      } else if (istate->second) {  // release
+        setInputState(e.second, InputState::Release);
+        v = "released";
+      } else {
+        setInputState(e.second, InputState::None);
+        continue;
+      }
 
-			if (gui) ImGui::Text((std::string("") + std::to_string(e.first) + v).c_str());
+      if (gui)
+        ImGui::Text((std::string("") + std::to_string(e.first) + v).c_str());
 
-			// progress state:
-			Input::pressed[e.first].second = Input::pressed[e.first].first;
-		}
+      // progress state:
+      Input::pressed[e.first].second = Input::pressed[e.first].first;
+    }
 
-		if (gui) ImGui::End();
-	}
+    if (gui) ImGui::End();
 
-	static void keyListener(GLFWwindow* win, int key, int scancode, int action, int mods) {
+    inputStates = inputStateCache;  // end of frame: apply
+  }
 
-		if (action == GLFW_PRESS) {
-			Input::pressed[key].first = true;
-		}
-		else if (action == GLFW_RELEASE) {
-			Input::pressed[key].first = false;
-		}
+  static void keyListener(GLFWwindow* win, int key, int scancode, int action,
+                          int mods) {
+    if (action == GLFW_PRESS) {
+      Input::pressed[key].first = true;
+    } else if (action == GLFW_RELEASE) {
+      Input::pressed[key].first = false;
+    }
 
-
-		// edge cases
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		{
-			// Close the window. This causes the program to also terminate.
-			glfwSetWindowShouldClose(win, GL_TRUE);
-		}
-	}
-
+    // edge cases
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+      // Close the window. This causes the program to also terminate.
+      glfwSetWindowShouldClose(win, GL_TRUE);
+    }
+  }
 };

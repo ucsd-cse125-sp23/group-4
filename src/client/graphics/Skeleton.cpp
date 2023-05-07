@@ -66,10 +66,9 @@ bool Skeleton::Load(const char* file) {
   return true;
 }
 
-void Skeleton::Update(GLFWwindow* window, Camera* camera, float deltaTime, std::map<std::string, AnimationPlayer*> anims, float step) {
+void Skeleton::Update(float deltaTime) {
   if (root) {
     root->Update(glm::mat4(1.0));
-    Move(window, camera, deltaTime, anims, step);
   }
 }
 
@@ -82,12 +81,18 @@ void Skeleton::Show() {
 }
 
 void Skeleton::SetPose(const Pose pose) {
+  glm::vec3 root_pos = root->GetPosition();
+
   for (int i = 0; i < pose.size(); i += 3) {
     int j = (i / 3) - 1;  // account for root index!
 
     glm::vec3 p = glm::vec3(pose[i], pose[i + 1], pose[i + 2]);
 
     SetJointDOFs(j, p);
+  }
+
+  if (!applyToRoot) {  // do we ignore moving the root bone?
+    root->SetPosition(root_pos);
   }
 }
 
@@ -149,179 +154,3 @@ Joint* Skeleton::FindJointInTree(int j) {
 
   return nullptr;
 }
-
-void Skeleton::MoveForward(Camera* camera, float delta) {
-  // orient skeleton to face forward
-  root->SetDOF(1, glm::radians(-1.0 * camera->GetAzimuth()));
-
-  glm::vec3 root_pos = root->GetPosition();
-
-  // rotate axis (0, 0, 1) to get the current forward axis
-  glm::vec3 forward_axis = GetForward(camera);
-  float forwardX = forward_axis[0];
-  float forwardZ = forward_axis[2];
-
-  float dx;
-  float dz;
-  if (abs(int(forwardZ)) == 1) {
-    dx = 0;
-    dz = forwardZ * delta;
-  } else if (abs(int(forwardX)) == 1) {
-    dz = 0;
-    dx = forwardX * delta;
-  } else {
-    float m = forwardZ / forwardX;
-    dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
-         (2 * (1 + pow(m, 2)));
-    if (forwardX < 0) {
-      dx *= -1;
-    }
-    dz = dx * m;
-  }
-  root_pos[0] += dx;
-  root_pos[2] -= dz;
-  root->SetPosition(root_pos);
-}
-
-void Skeleton::MoveBackward(Camera* camera, float delta) {
-  root->SetDOF(1, glm::radians((-1.0 * camera->GetAzimuth()) + 180.0f));
-  glm::vec3 root_pos = root->GetPosition();
-
-  // rotate axis (0, 0, 1) to get the current forward axis
-  glm::vec3 forward_axis = GetForward(camera);
-  float forwardX = forward_axis[0];
-  float forwardZ = forward_axis[2];
-
-  float dx;
-  float dz;
-  if (abs(int(forwardZ)) == 1) {
-    dx = 0;
-    dz = forwardZ * delta;
-  } else if (abs(int(forwardX)) == 1) {
-    dz = 0;
-    dx = forwardX * delta;
-  } else {
-    float m = forwardZ / forwardX;
-    dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
-         (2 * (1 + pow(m, 2)));
-    if (forwardX < 0) {
-      dx *= -1;
-    }
-    dz = dx * m;
-  }
-  root_pos[0] -= dx;
-  root_pos[2] += dz;
-  root->SetPosition(root_pos);
-}
-
-void Skeleton::MoveRight(Camera* camera, float delta) {
-  root->SetDOF(1, glm::radians((-1.0 * camera->GetAzimuth()) - 90.0f));
-  glm::vec3 root_pos = root->GetPosition();
-
-  // rotate (1, 0, 0) to get the new left/right axis
-  glm::vec3 side_axis = GetSide(camera);
-  float sideX = side_axis[0];  // x component of left/right axis
-  float sideZ = side_axis[2];
-  float dx, dz;
-
-  if (abs(int(sideX)) == 1) {
-    dz = 0;
-    dx = sideX * delta;
-  } else if (abs(int(sideZ)) == 1) {
-    dx = 0;
-    dz = -1 * sideZ * delta;
-  } else {
-    float m = sideZ / sideX;
-    dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
-         (2 * (1 + pow(m, 2)));
-    if (sideX < 0) {
-      dx *= -1;
-    }
-    dz = -1 * dx * m;
-  }
-  root_pos[0] += dx;
-  root_pos[2] += dz;
-  root->SetPosition(root_pos);
-}
-
-void Skeleton::MoveLeft(Camera* camera, float delta) {
-  root->SetDOF(1, glm::radians((-1.0 * camera->GetAzimuth()) + 90.0f));
-  glm::vec3 root_pos = root->GetPosition();
-
-  glm::vec3 side_axis = GetSide(camera);
-  float sideX = side_axis[0];  // x component of left/right axis
-  float sideZ = side_axis[2];
-  float dx, dz;
-
-  if (abs(int(sideX)) == 1) {
-    dz = 0;
-    dx = sideX * delta;
-  } else if (abs(int(sideZ)) == 1) {
-    dx = 0;
-    dz = -1 * sideZ * delta;
-  } else {
-    float m = sideZ / sideX;
-    dx = sqrt(-4 * (1 + pow(m, 2)) * (-1 * pow(delta, 2))) /
-         (2 * (1 + pow(m, 2)));
-    if (sideX < 0) {
-      dx *= -1;
-    }
-    dz = -1 * dx * m;
-  }
-  root_pos[0] -= dx;
-  root_pos[2] -= dz;
-  root->SetPosition(root_pos);
-}
-
-void Skeleton::Move(GLFWwindow* window, Camera* camera, float deltaTime,
-                    std::map<std::string,AnimationPlayer*> anims, float delta) {
-  AnimationPlayer* anim = anims["walk"];
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    MoveForward(camera, delta);
-    glm::vec3 root_pos = root->GetPosition();
-    std::vector<DOF> root_rot = root->GetDOFS();
-    anim->Update(deltaTime);
-    SetPose(anim->GetCurrentPose());
-    root->SetPosition(root_pos);
-    root->SetDOF(0, root_rot[0].GetValue());
-    root->SetDOF(1, root_rot[1].GetValue());
-    root->SetDOF(2, root_rot[2].GetValue());
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    MoveBackward(camera, delta);
-    glm::vec3 root_pos = root->GetPosition();
-    std::vector<DOF> root_rot = root->GetDOFS();
-    anim->Update(deltaTime);
-    SetPose(anim->GetCurrentPose());
-    root->SetPosition(root_pos);
-    root->SetDOF(0, root_rot[0].GetValue());
-    root->SetDOF(1, root_rot[1].GetValue());
-    root->SetDOF(2, root_rot[2].GetValue());
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    MoveRight(camera, delta);
-    glm::vec3 root_pos = root->GetPosition();
-    std::vector<DOF> root_rot = root->GetDOFS();
-    anim->Update(deltaTime);
-    SetPose(anim->GetCurrentPose());
-    root->SetPosition(root_pos);
-    root->SetDOF(0, root_rot[0].GetValue());
-    root->SetDOF(1, root_rot[1].GetValue());
-    root->SetDOF(2, root_rot[2].GetValue());
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    MoveLeft(camera, delta);
-    glm::vec3 root_pos = root->GetPosition();
-    std::vector<DOF> root_rot = root->GetDOFS();
-    anim->Update(deltaTime);
-    SetPose(anim->GetCurrentPose());
-    root->SetPosition(root_pos);
-    root->SetDOF(0, root_rot[0].GetValue());
-    root->SetDOF(1, root_rot[1].GetValue());
-    root->SetDOF(2, root_rot[2].GetValue());
-  }
-
-  camera->Move(window, delta);
-}
-
-glm::vec3 Skeleton::getPos() { return root->GetPosition(); }

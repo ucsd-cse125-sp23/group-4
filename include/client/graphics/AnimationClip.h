@@ -5,42 +5,39 @@
 
 #pragma once
 
-#include <imgui/imgui.h>
-#include "core.h"
+#include <imgui.h>
+
 #include "Channel.h"
 #include "Pose.h"
-#include "Tokenizer.h"
-using namespace::glm;
+#include "client/graphics/imported/Tokenizer.h"
+#include "core.h"
+using namespace ::glm;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// The AnimationClip class for storing a single animation's channel data and coordinating them.
+// The AnimationClip class for storing a single animation's channel data and
+// coordinating them.
 
-class AnimationClip 
-{
-public:
-	AnimationClip()
-	{
-		timeStart = 0, timeEnd = 0;
+class AnimationClip {
+ public:
+  AnimationClip() {
+    timeStart = 0, timeEnd = 0;
 
-		currTime = 0;
-	}
-	~AnimationClip()
-	{
+    currTime = 0;
+  }
+  ~AnimationClip() {}
 
-	}
+  bool Load(const char* file);
+  void Show();  // GUI
 
-	bool Load(const char* file);
-	void Show();	// GUI
+  void Evaluate(float time, Pose& pose);
 
-	void Evaluate(float time, Pose &pose);
+ private:
+  float timeStart, timeEnd;
+  bool cycleTime = true;
+  float currTime;  // Can be locked to start/end range
 
-private:
-	float timeStart, timeEnd;
-	bool cycleTime = true;
-	float currTime;	// Can be locked to start/end range
-
-	std::vector<Channel> channels;
+  std::vector<Channel> channels;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,40 +1,39 @@
 /**************************************************
-A model is a mesh with material (and more?? animation skeleton???)
-*****************************************************/
-#include "Mesh.h"
-#include "Material.h"
+ * Model.h
+ * basic data container for a Mesh + Material pair
+ *****************************************************/
+#include "client/graphics/Material.h"
+#include "client/graphics/Mesh.h"
 
 #ifndef __MODEL_H__
 #define __MODEL_H__
 
 struct Model {
-    glm::mat4 transformMtx; // applied first!
+  glm::mat4 modelMtx;  // applied first!
 
-    Mesh* mesh;
-    Material* material;
-    // TODO, consider adding skin stuff here
+  Mesh* mesh;
+  Material* material;
 
-    void draw(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx, const bool ignoreDepth = false)
-    {
-        if (!material || !mesh)
-            return;
+  void draw(const glm::mat4& viewProjMtx, const glm::mat4& transformMtx,
+            const bool ignoreDepth = false) {
+    if (!material || !mesh) return;
 
-        GLuint shader = material->shader;
+    GLuint shader = material->shader;
 
-        // actiavte the shader program      ---
-        glUseProgram(shader);
+    // actiavte the shader program      ---
+    glUseProgram(shader);
 
-        material->setUniforms(viewProjMtx, modelMtx * transformMtx);
+    material->setUniforms(viewProjMtx, transformMtx * modelMtx);
 
-        if (ignoreDepth) glDisable(GL_DEPTH_TEST);
+    if (ignoreDepth) glDisable(GL_DEPTH_TEST);
 
-        mesh->draw();
+    mesh->draw();
 
-        if (ignoreDepth) glEnable(GL_DEPTH_TEST);
+    if (ignoreDepth) glEnable(GL_DEPTH_TEST);
 
-        // deactivate the shader program    ---
-        glUseProgram(0);
-    }
+    // deactivate the shader program    ---
+    glUseProgram(0);
+  }
 };
 
-#endif 
+#endif
