@@ -23,7 +23,7 @@ void Scene::init(void) {
 
   sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
   sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
-  sceneResources->meshes["player"]->init("assets/models/player_v1.obj");
+  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
 
   sceneResources->meshes["cubeUV"] = new Obj();
   sceneResources->meshes["cubeUV"]->init(
