@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 
   // NETWORK CODE
   boost::asio::io_context io_context;
-  Addr server_addr{argv[1], argv[2]};
+  Addr server_addr{arg_host, arg_port};
   auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
     std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
               << std::endl;
