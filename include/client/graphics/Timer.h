@@ -10,11 +10,15 @@ class Timer {
     countdown = false;
   }
 
-  void Update(float deltaTime) { 
+  void Update(float deltaTime) {
     if (!countdown)
       time += deltaTime;
-    else
+    else {
       time -= deltaTime;
+      if (time < 0) {
+        time = 0.0f;
+      }
+    }
   }
 
   std::string ToString() { 

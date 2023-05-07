@@ -22,17 +22,7 @@ FetchContent_Declare(
     GIT_TAG master
 )
 
-FetchContent_Declare(
-    freeglut
-    GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
-    GIT_TAG master
-)
-FetchContent_GetProperties(freeglut)
-if(NOT freeglut_POPULATED)
-    FetchContent_Populate(freeglut)
-    add_subdirectory(${freeglut_SOURCE_DIR} ${freeglut_BINARY_DIR})
-endif()
-FetchContent_MakeAvailable(glew glfw glm freeglut freetype)
+FetchContent_MakeAvailable(glew glfw glm freetype)
 
 
 # FetchContent_Declare(
@@ -67,7 +57,7 @@ target_include_directories(client
 )
 
 
-target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui freeglut_static freetype)
+target_link_libraries(client PRIVATE core network libglew_static glfw glm ImGui freetype)
 target_compile_features(client PUBLIC cxx_std_11)
 if(APPLE)
   target_compile_options(client

@@ -12,7 +12,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
-#include <GL/freeglut.h>
 #include <math.h>
 #include <stdlib.h>
 #include <vector>
@@ -35,16 +34,10 @@
 #include "Obj.h"
 #include "Cube.h"
 #include "Timer.h"
+#include "FontRenderer.h"
 
 #ifndef __SCENE_H__
 #define __SCENE_H__
-
-struct Character {
-  unsigned int TextureID;  // ID handle of the glyph texture
-  glm::ivec2 Size;         // Size of glyph
-  glm::ivec2 Bearing;      // Offset from baseline to left/top of glyph
-  unsigned int Advance;    // Offset to advance to next glyph
-};
 
 class SceneResourceMap {
 public:
@@ -112,19 +105,20 @@ public:
 
     std::vector< GameThing* > gamethings;
 
-    std::map<char, Character> Characters;
-
     Timer time;
 
-    Scene() {
-        camera = new Camera;
-        sceneResources = new SceneResourceMap();
-        time.time = 300.0f;
-        time.countdown = true;
+    FontRenderer fr;
 
-        // the default scene graph already has one node named "world."
-        node["world"] = new Node("world");
-    }
+    //Scene() {
+    //    camera = new Camera;
+    //    sceneResources = new SceneResourceMap();
+    //    time.time = 300.0f;
+    //    time.countdown = true;
+
+    //    // the default scene graph already has one node named "world."
+    //    node["world"] = new Node("world");
+    //}
+    Scene();
 
     void init(void);
     void update(GLFWwindow* window, Camera* camera, float delta, float step = 0.25);

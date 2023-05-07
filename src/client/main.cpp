@@ -1,4 +1,4 @@
-#include "main.h"
+#include "client/graphics/main.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,8 +62,6 @@ int main(int argc, char* argv[])
 	// Create the GLFW window.
 	GLFWwindow* window = Window::createWindow(800, 600);
 	if (!window) exit(EXIT_FAILURE);
-
-	glutInit(&argc, argv);
 
 	// Print OpenGL and GLSL versions.
 	print_versions();

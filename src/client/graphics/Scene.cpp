@@ -10,6 +10,43 @@ adapted from CSE 167 - Matthew
 
 
 using namespace glm;
+/*
+GLuint textureID;
+
+void LoadTexture() {
+  glGenTextures(1, &textureID);
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  // set the texture wrapping/filtering options (on the currently bound
+  // texture object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  // load and generate the texture
+  int width, height, nrChannels;
+  unsigned char* data = stbi_load("assets/image/test_uv.png", &width, &height, &nrChannels, 0);
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, data);
+    // glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    std::cerr << "Cannot open file: " << filename << std::endl;
+  }
+
+  stbi_image_free(data);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}*/
+
+Scene::Scene() {
+  camera = new Camera;
+  sceneResources = new SceneResourceMap();
+  time.time = 300.0f;
+  time.countdown = true;
+
+  // the default scene graph already has one node named "world."
+  node["world"] = new Node("world");
+}
 
 void Scene::update(GLFWwindow* window, Camera* camera, float delta, float step) {
     //if (player) player->update(deltaTime);
@@ -22,6 +59,8 @@ void Scene::update(GLFWwindow* window, Camera* camera, float delta, float step) 
 }
 
 void Scene::drawHUD(GLFWwindow* window) { 
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
     int width, height;
     glfwGetWindowSize(window, &width, &height);
   
@@ -37,29 +76,22 @@ void Scene::drawHUD(GLFWwindow* window) {
         player_times[name] = player->time;
         const unsigned char* cname =
             reinterpret_cast<const unsigned char*>(name.c_str());
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRasterPos2f(-0.1f, position[1] + 0.1);
-        glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, cname);
+        fr.RenderText(name, (width / 2.0f) - 30.0f, (height / 2.0f) + 25.0f, 0.5f,
+                   glm::vec3(0.0f, 0.0f, 0.0f)); //TODO: get screen coordinates based off player position
       }
     }
-
+    
     for (auto times : player_times) {
       std::string str = times.first;
       Timer time = times.second;
       str += " " + time.ToString();
-      const unsigned char* string =
-          reinterpret_cast<const unsigned char*>(str.c_str());
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glWindowPos2f(10.0f, float(height) - 25);
-      glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
+      fr.RenderText(str, 10.0f, float(height) - 25, 0.5f,
+                     glm::vec3(1.0f, 1.0f, 1.0f));
     }
 
     std::string game_time = time.ToString();
-    const unsigned char* gtime =
-        reinterpret_cast<const unsigned char*>(game_time.c_str());
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glWindowPos2f((float(width) / 2.0f) - 25, float(height) - 25);
-    glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, gtime);
+    fr.RenderText(game_time, (width / 2.0f) - 75.0f, height - 35.0f, 1.0f,
+                   glm::vec3(1.0f, 0.0f, 0.0f));
 
     // minimap stuff
     int map_size = width / 4;
@@ -77,6 +109,7 @@ void Scene::drawHUD(GLFWwindow* window) {
         PlayerModel* mod = player->mod;
         Skeleton* skel = mod->skel;
         glm::vec3 position = skel->getPos();
+        glColor3f(0.0f, 0.0f, 1.0f);
         glPointSize(10);
         glBegin(GL_POINTS);
         glVertex3f(position[0] / map_size, -position[2] / map_size, 0.0f);
@@ -87,6 +120,8 @@ void Scene::drawHUD(GLFWwindow* window) {
 
     glViewport(0, 0, width, height);
 
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
  }
 void Scene::draw(GLFWwindow* window, const glm::mat4& viewProjMtx) {
     // Pre-draw sequence:
