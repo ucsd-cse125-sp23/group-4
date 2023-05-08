@@ -72,6 +72,7 @@ bool isAt(PObject* obj, vec3f pos, float epsilon = 0.01f)
 }
 
 TEST_CASE("Initialize", "[game]") {
+	REQUIRE_NOTHROW(initializeLib(true));
 	Environment* environment = new Environment();
 	REQUIRE_NOTHROW(initializeLevel(environment));
 	REQUIRE_NOTHROW(initializePlayer());
@@ -79,6 +80,7 @@ TEST_CASE("Initialize", "[game]") {
 }
 
 TEST_CASE("Collision", "[game]") {
+	REQUIRE_NOTHROW(initializeLib(true));
 	Environment* environment = new Environment();
 	environment->addBox(vec3f(-2.0, -3.0, -2.0), vec3f(2.0, -2.0, 2.0));
 	REQUIRE_NOTHROW(initializeLevel(environment));
@@ -107,6 +109,7 @@ TEST_CASE("Collision", "[game]") {
 }
 
 TEST_CASE("Gravity Modifier", "[modifier]") {
+	REQUIRE_NOTHROW(initializeLib(true));
 	Environment* environment = new Environment();
 	REQUIRE_NOTHROW(initializeLevel(environment));
 	std::pair<Player*,ControlModifierData*> pair;
@@ -217,6 +220,7 @@ void playerArrivesAt(std::initializer_list<vec3f> poss, std::initializer_list<ve
 }
 
 TEST_CASE("Control, Collision, Slopes", "[game]") {
+	REQUIRE_NOTHROW(initializeLib(true));
 	REQUIRE_NOTHROW(initializeLevel(testEnvironment()));
 	std::pair<Player*, ControlModifierData*> pair;
 	REQUIRE_NOTHROW(pair = initializePlayer());
@@ -253,6 +257,7 @@ TEST_CASE("Control, Collision, Slopes", "[game]") {
 }
 
 TEST_CASE("Jump", "[game]") {
+	REQUIRE_NOTHROW(initializeLib(true));
 	REQUIRE_NOTHROW(initializeLevel(jumpEnvironment()));
 	std::pair<Player*, ControlModifierData*> pair;
 	REQUIRE_NOTHROW(pair = initializePlayer());

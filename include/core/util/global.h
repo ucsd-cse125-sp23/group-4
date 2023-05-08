@@ -11,14 +11,20 @@
 #include "core/game/modifier/SpeedBoostModifier.h"
 
 #include "core/game/physics/PObjectType.h"
+#include "core/game/packet/PacketHandler.h"
 
 
 extern bool IS_SERVER;
 extern bool isServer();
 
-extern int PLAYER_LAYER;// = 0;
-extern int ENVIRONMENT_LAYER;// = 1;
-extern int POWER_LAYER;// = 2;
+extern PacketHandler* PACKET_HANDLER;
+extern int CLIENT_ADD_POBJECT_PACKET_ID;// = 0
+extern int CLIENT_UPDATE_POBJECT_PACKET_ID;// = 1
+extern int CLIENT_REMOVE_POBJECT_PACKET_ID;// = 2
+
+extern int PLAYER_LAYER;// = 0
+extern int ENVIRONMENT_LAYER;// = 1
+extern int POWER_LAYER;// = 2
 
 extern CylinderShape* PLAYER_BASE_SHAPE;
 extern OffsetShape* PLAYER_BOUNDING_SHAPE;

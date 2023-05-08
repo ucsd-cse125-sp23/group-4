@@ -21,6 +21,10 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/game/Serializable.h
 	${tagguys_SOURCE_DIR}/include/core/game/Registry.h
 
+	${tagguys_SOURCE_DIR}/include/core/game/packet/Packet.h
+	${tagguys_SOURCE_DIR}/include/core/game/packet/PacketHandler.h
+	${tagguys_SOURCE_DIR}/include/core/game/packet/CRemovePObjectPacket.h
+
 	${tagguys_SOURCE_DIR}/include/core/game/physics/CollisionBounds.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/PObject.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/PObjectType.h
@@ -49,6 +53,9 @@ set( SOURCES
 	${PROJECT_SOURCE_DIR}/game/level/PObjectCollection.cpp
 
 	${PROJECT_SOURCE_DIR}/math/ConvexShape.cpp
+
+	${PROJECT_SOURCE_DIR}/game/packet/PacketHandler.cpp
+	${PROJECT_SOURCE_DIR}/game/packet/CRemovePObjectPacket.cpp
 	
 	${PROJECT_SOURCE_DIR}/game/physics/CollisionBounds.cpp
 	${PROJECT_SOURCE_DIR}/game/physics/PObject.cpp

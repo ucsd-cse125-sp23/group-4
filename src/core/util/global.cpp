@@ -5,6 +5,11 @@ bool isServer() {
 	return IS_SERVER;
 }
 
+PacketHandler* PACKET_HANDLER = nullptr;
+int CLIENT_ADD_POBJECT_PACKET_ID = 0;
+int CLIENT_UPDATE_POBJECT_PACKET_ID = 1;
+int CLIENT_REMOVE_POBJECT_PACKET_ID = 2;
+
 int PLAYER_LAYER = 0;
 int ENVIRONMENT_LAYER = 1;
 int POWER_LAYER = 2;

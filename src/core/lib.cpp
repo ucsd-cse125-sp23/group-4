@@ -3,6 +3,8 @@
 #include "core/util/global.h"
 #include "core/game/physics/PObjectType.h"
 
+#include "core/game/packet/CRemovePObjectPacket.h"
+
 
 void initializeLib(bool isServer) {
 	IS_SERVER = isServer;
@@ -14,6 +16,14 @@ void initializeLib(bool isServer) {
 	GAME_REGISTRY->MODIFIER_REGISTRY.registerType("speedboost", SPEEDBOOST_MODIFIER = new SpeedBoostModifier());
 
 	GAME_REGISTRY->POBJECT_REGISTRY.registerType("player", PLAYER_TYPE = new PObjectType("player", []()-> PObject* {return new Player(); }));
+
+	PACKET_HANDLER = new PacketHandler();
+	PACKET_HANDLER->registerPacket(CLIENT_ADD_POBJECT_PACKET_ID, NetworkDirection::CLIENT_BOUND, {
+			CRemovePObjectPacket::handle,
+			CRemovePObjectPacket::fromBytes,
+			CRemovePObjectPacket::toBytes
+		}
+	);
 }
 
 void initializeLevel(Environment* environment) {
@@ -31,4 +41,9 @@ std::pair<Player*, ControlModifierData*> initializePlayer() {
 
 void terminateLevel() {
 	delete level;
+}
+
+void terminateLib() {
+	//delete GAME_REGISTRY;
+	delete PACKET_HANDLER;
 }
