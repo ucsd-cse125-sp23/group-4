@@ -23,11 +23,10 @@ class TCPClient {
   using WriteHandler = std::function<void(std::size_t, TCPClient &)>;
   TCPClient(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
             WriteHandler);
+  void read();
   void write(message::Message);
 
  private:
-  void read();
-
   std::unique_ptr<Connection<message::Message>> connection;
   tcp::socket socket_;
 };

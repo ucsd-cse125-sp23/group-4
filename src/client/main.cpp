@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 
+#include <unistd.h>
+
 #include <boost/asio.hpp>
 #include <config/lib.hpp>
 #include <cstdio>
@@ -72,19 +74,19 @@ int main(int argc, char* argv[]) {
               << std::endl;
     message::GreetingBody g = {"Hello!"};
     message::Message m = {message::Type::Greeting, {1, std::time(nullptr)}, g};
-    std::cout << "Sending to server: " << m << std::endl;
     client.write(m);
   };
   auto read_handler = [&](const message::Message& m, TCPClient& client) {
-    std::cout << "Recevied " << m << std::endl;
+    std::cout << "Received " << m << std::endl;
   };
   auto write_handler = [&](std::size_t bytes_transferred, TCPClient& client) {
-    std::cout << "Wrote " << bytes_transferred << " bytes to server"
-              << std::endl;
+    std::cout << "Successfully wrote " << bytes_transferred
+              << " bytes to server" << std::endl;
   };
   TCPClient client(io_context, server_addr, connect_handler, read_handler,
                    write_handler);
   io_context.run();
+  client.read();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
