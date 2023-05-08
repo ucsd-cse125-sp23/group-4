@@ -9,9 +9,9 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
                      WriteHandler write_handler)
     : socket_(io_context) {
   tcp::resolver resolver(io_context);
-
+  auto endpoints = resolver.resolve(addr.host, std::to_string(addr.port));
   boost::asio::async_connect(
-      socket_, resolver.resolve(addr.host, std::to_string(addr.port)),
+      socket_, endpoints,
       [&, read_handler, write_handler, connect_handler](
           boost::system::error_code ec, tcp::endpoint endpoint) {
         if (ec) {
@@ -22,18 +22,19 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
         auto conn_read_handler = [&, read_handler](boost::system::error_code ec,
                                                    const message::Message& m) {
           if (ec) {
-            std::cerr << "Error: " << ec.message() << std::endl;
+            std::cerr << "(read) Error: " << ec.message() << std::endl;
             return;
           }
 
           read_handler(m, *this);
+          read();
         };
 
         auto conn_write_handler = [&, write_handler](
                                       boost::system::error_code ec,
                                       std::size_t bytes_transferred) {
           if (ec) {
-            std::cerr << "Error: " << ec.message() << std::endl;
+            std::cerr << "(write) Error: " << ec.message() << std::endl;
             return;
           }
 
@@ -43,13 +44,15 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
         connection = std::make_unique<Connection<message::Message>>(
             socket_, conn_read_handler, conn_write_handler);
         connect_handler(endpoint, *this);
-        read();
       });
 }
 
 void TCPClient::read() {
-  std::cout << "Entering read state." << std::endl;
+  std::cout << "Queueing read handler" << std::endl;
   connection->read();
 }
 
-void TCPClient::write(message::Message message) { connection->write(message); }
+void TCPClient::write(message::Message message) {
+  std::cout << "Queueing write to server: " << message << std::endl;
+  connection->write(message);
+}

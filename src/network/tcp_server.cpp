@@ -10,17 +10,16 @@ TCPServer::TCPServer(boost::asio::io_context& io_context, int port)
 }
 
 void TCPServer::do_accept() {
-  acceptor_.async_accept([this](boost::system::error_code ec,
-                                tcp::socket socket) {
+  acceptor_.async_accept([&](boost::system::error_code ec, tcp::socket socket) {
     if (ec) {
-      std::cerr << "Error: " << ec.message() << std::endl;
+      std::cerr << "(accept) Error: " << ec.message() << std::endl;
       return;
     }
 
     auto read_handler = [&](boost::system::error_code ec,
                             const message::Message& m) {
       if (ec) {
-        std::cerr << "Error: " << ec.message() << std::endl;
+        std::cerr << "(read) Error: " << ec.message() << std::endl;
         return;
       }
 
@@ -36,7 +35,7 @@ void TCPServer::do_accept() {
 
     auto write_handler = [&](boost::system::error_code ec, std::size_t length) {
       if (ec) {
-        std::cerr << "Error: " << ec.message() << std::endl;
+        std::cerr << "(write) Error: " << ec.message() << std::endl;
         return;
       }
 
@@ -53,4 +52,6 @@ void TCPServer::do_accept() {
   });
 }
 
-void TCPServer::write(const message::Message& m) { connections_[0]->write(m); }
+void TCPServer::write(const message::Message& m) {
+  connections_.back()->write(m);
+}
