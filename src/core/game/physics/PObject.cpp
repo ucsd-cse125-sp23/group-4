@@ -1,10 +1,12 @@
 #include "core/game/physics/PObject.h"
 
+#include "core/util/global.h"
+
 
 uint32_t PObject::maxId = 1;
 
-PObject::PObject(PObjectType* type, BoundingShape* shape, unsigned int layer, float friction, bool static_)
-	: type(type), bounds(new CollisionBounds(shape, layer, friction)), static_(static_), pos(vec3f(0.0f, 0.0f, 0.0f)), vel(vec3f(0.0f, 0.0f, 0.0f)),
+PObject::PObject(/*PObjectType* type, */BoundingShape* shape, unsigned int layer, float friction, bool static_)
+	: /*type(type),*/ bounds(new CollisionBounds(shape, layer, friction)), static_(static_), pos(vec3f(0.0f, 0.0f, 0.0f)), vel(vec3f(0.0f, 0.0f, 0.0f)),
 	onGround(false) {
 	if(isServer())
 		this->id = PObject::maxId++;
@@ -46,16 +48,16 @@ const CollisionBounds* PObject::getBounds()
 
 
 void PObject::pack(ByteBufferBuilder& builder)
-{
+{/*
 	builder.writeULL(this->type->key.size());
 	builder.writeString(this->type->key);
 	builder.writeUInt(this->id);
 	builder.writeVec3f(this->pos);
 	builder.writeInt((toRemove ? 0b10 : 0) | (onGround ? 0b01 : 0));
-	Modifiable::pack(builder);
+	Modifiable::pack(builder);*/
 }
 void PObject::unpack(ByteBuffer buf)
-{
+{/*
 	size_t keyLen = buf.nextULL();
 	if (buf.nextString(keyLen).compare(this->type->key) == 0)
 	{
@@ -69,5 +71,5 @@ void PObject::unpack(ByteBuffer buf)
 			onGround = (flags & 0b01) != 0;
 			Modifiable::unpack(buf);
 		}
-	}
+	}*/
 }

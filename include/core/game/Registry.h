@@ -4,7 +4,7 @@
 #include <string>
 
 #include "core/game/modifier/Modifier.h"
-#include "core/game/physics/PObjectType.h"
+//#include "core/game/physics/PObjectType.h"
 
 template <typename T>
 class Registry {
@@ -29,5 +29,5 @@ public:
 class GameRegistry {
 public:
 	Registry<Modifier> MODIFIER_REGISTRY = Registry<Modifier>("modifier");
-	Registry<PObjectType> POBJECT_REGISTRY = Registry<PObjectType>("pobject");
+	//Registry<PObjectType> POBJECT_REGISTRY = Registry<PObjectType>("pobject");
 };

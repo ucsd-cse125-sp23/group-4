@@ -1,7 +1,7 @@
 #include "core/lib.hpp"
 
 #include "core/util/global.h"
-#include "core/game/physics/PObjectType.h"
+//#include "core/game/physics/PObjectType.h"
 
 
 void initializeLib(bool isServer) {
@@ -13,7 +13,7 @@ void initializeLib(bool isServer) {
 	GAME_REGISTRY->MODIFIER_REGISTRY.registerType("gravity", GRAVITY_MODIFIER = new GravityModifier());
 	GAME_REGISTRY->MODIFIER_REGISTRY.registerType("speedboost", SPEEDBOOST_MODIFIER = new SpeedBoostModifier());
 
-	GAME_REGISTRY->POBJECT_REGISTRY.registerType("player", PLAYER_TYPE = new PObjectType("player", []()-> PObject* {return new Player(); }));
+	//GAME_REGISTRY->POBJECT_REGISTRY.registerType("player", PLAYER_TYPE = new PObjectType("player", []()-> PObject* {return new Player(); }));
 }
 
 void initializeLevel(Environment* environment) {

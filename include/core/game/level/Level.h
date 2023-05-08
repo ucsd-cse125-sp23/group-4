@@ -36,7 +36,8 @@ public:
 	unsigned long long getAge() { return age; }
 
 	void tick();
-
+	/*
 	void pack(ByteBufferBuilder& builder);
 	void unpack(ByteBuffer buf);
+	*/
 };

@@ -8,5 +8,5 @@ class PObjectType {
 public:
 	const std::string key;
 	const std::function<PObject*()> instansiate;
-	PObjectType(std::string key, std::function<PObject*()> func) : key(key), instansiate(func) {}
+	PObjectType(std::string key, std::function<PObject*()> func);
 };
