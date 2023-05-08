@@ -13,6 +13,7 @@ public:
 	PObject* getById(size_t id);
 	bool removeById(size_t id);
 	std::vector<size_t> getAllIds();
+	void clear();
 
 	PObject* operator[](size_t id);
 };

@@ -28,6 +28,10 @@ std::vector<size_t> PObjectCollection::getAllIds()
 		keys.push_back(pair.first);
 	return keys;
 }
+void PObjectCollection::clear()
+{
+	this->objs.clear();
+}
 
 PObject* PObjectCollection::operator[](size_t id)
 {

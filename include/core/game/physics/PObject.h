@@ -35,4 +35,6 @@ public:
 
 	virtual void pack(ByteBufferBuilder& builder);
 	virtual void unpack(ByteBuffer buf);
+
+	static PObject* fromBytes(ByteBuffer buf);
 };

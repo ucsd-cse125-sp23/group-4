@@ -75,3 +75,13 @@ void PObject::unpack(ByteBuffer buf)
 		}
 	}
 }
+
+static PObject* fromBytes(ByteBuffer buf)
+{
+	size_t keyLen = buf.nextULL();
+	const PObjectType* type = GAME_REGISTRY->POBJECT_REGISTRY.getType(buf.nextString(keyLen));
+	PObject* ret = type->instansiate();
+	buf.reset();
+	ret->unpack(buf);
+	return ret;
+}

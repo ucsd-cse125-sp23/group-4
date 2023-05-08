@@ -141,3 +141,31 @@ void Level::tick() {
 
 	this->age++;
 }
+
+
+void Level::pack(ByteBufferBuilder& builder)
+{
+	builder.writeULL(age);
+	std::vector<size_t> ids = this->objects.getAllIds();
+	builder.writeULL(ids.size());
+	ByteBufferBuilder objBuilder;
+	for (size_t id : ids)
+	{
+		this->objects[id]->pack(objBuilder);
+		ByteBuffer objBuffer = objBuilder.build(); objBuilder.clear();
+		builder.writeULL(objBuffer.getLength());
+		builder.writeBuffer(objBuffer);
+	}
+}
+void Level::unpack(ByteBuffer buf)
+{
+	this->age = buf.nextULL();
+	this->objects.clear();
+	size_t objCount = buf.nextULL();
+	for (size_t i = 0; i < objCount; i++)
+	{
+		size_t objBufferSize = buf.nextULL();
+		ByteBuffer objBuffer = buf.nextBuffer(objBufferSize);
+		this->objects.addPObject(PObject::fromBytes(objBuffer));
+	}
+}

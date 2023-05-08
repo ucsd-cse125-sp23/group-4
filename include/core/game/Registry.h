@@ -21,7 +21,7 @@ public:
 	std::string getKey(T* t) {
 		return reverseMap[t];
 	}
-	T* getType(std::string key) {
+	const T* getType(std::string key) {
 		return forwardMap[key];
 	}
 };
