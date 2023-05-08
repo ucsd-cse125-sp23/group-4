@@ -19,3 +19,5 @@ GameRegistry* GAME_REGISTRY = nullptr;
 ControlModifier* CONTROL_MODIFIER = nullptr;
 GravityModifier* GRAVITY_MODIFIER = nullptr;
 SpeedBoostModifier* SPEEDBOOST_MODIFIER = nullptr;
+
+PObjectType* PLAYER_TYPE = nullptr;

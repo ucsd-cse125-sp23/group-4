@@ -23,7 +23,7 @@ set( HEADERS
 
 	${tagguys_SOURCE_DIR}/include/core/game/physics/CollisionBounds.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/PObject.h
-	#${tagguys_SOURCE_DIR}/include/core/game/physics/PObjectType.h
+	${tagguys_SOURCE_DIR}/include/core/game/physics/PObjectType.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/Player.h
 
 	${tagguys_SOURCE_DIR}/include/core/game/level/Level.h
@@ -50,7 +50,7 @@ set( SOURCES
 	
 	${PROJECT_SOURCE_DIR}/game/physics/CollisionBounds.cpp
 	${PROJECT_SOURCE_DIR}/game/physics/PObject.cpp
-	#${PROJECT_SOURCE_DIR}/game/physics/PObjectType.cpp
+	${PROJECT_SOURCE_DIR}/game/physics/PObjectType.cpp
 	${PROJECT_SOURCE_DIR}/game/physics/Player.cpp
 	
 	${PROJECT_SOURCE_DIR}/game/modifier/Modifiers.cpp

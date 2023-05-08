@@ -3,7 +3,7 @@
 
 uint32_t Player::maxId = 1;
 
-Player::Player() : PObject(/*PLAYER_TYPE,*/ PLAYER_BOUNDING_SHAPE, PLAYER_LAYER, 0, false), look(vec3f(1.0f, 0.0f, 0.0f))
+Player::Player() : PObject(PLAYER_TYPE, PLAYER_BOUNDING_SHAPE, PLAYER_LAYER, 0, false), look(vec3f(1.0f, 0.0f, 0.0f))
 {
 	if (isServer())
 		this->pid = Player::maxId++;

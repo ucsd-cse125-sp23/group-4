@@ -5,8 +5,8 @@
 
 uint32_t PObject::maxId = 1;
 
-PObject::PObject(/*PObjectType* type, */BoundingShape* shape, unsigned int layer, float friction, bool static_)
-	: /*type(type),*/ bounds(new CollisionBounds(shape, layer, friction)), static_(static_), pos(vec3f(0.0f, 0.0f, 0.0f)), vel(vec3f(0.0f, 0.0f, 0.0f)),
+PObject::PObject(PObjectType* type, BoundingShape* shape, unsigned int layer, float friction, bool static_)
+	: type(type), bounds(new CollisionBounds(shape, layer, friction)), static_(static_), pos(vec3f(0.0f, 0.0f, 0.0f)), vel(vec3f(0.0f, 0.0f, 0.0f)),
 	onGround(false) {
 	if(isServer())
 		this->id = PObject::maxId++;

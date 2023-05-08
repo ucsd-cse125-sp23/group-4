@@ -10,6 +10,8 @@
 #include "core/game/modifier/GravityModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 
+#include "core/game/physics/PObjectType.h"
+
 
 extern bool IS_SERVER;
 extern bool isServer();
@@ -29,4 +31,4 @@ extern ControlModifier* CONTROL_MODIFIER;
 extern GravityModifier* GRAVITY_MODIFIER;
 extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 
-//extern PObjectType* PLAYER_TYPE;
+extern PObjectType* PLAYER_TYPE;
