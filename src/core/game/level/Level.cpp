@@ -1,4 +1,9 @@
 #include "core/game/level/Level.h"
+#include "core/util/global.h"
+
+#include "core/game/packet/CRemovePObjectPacket.h"
+#include "core/game/packet/CUpdatePObjectPacket.h"
+#include "core/game/packet/CLevelStatusPacket.h"
 
 void Level::tick() {
 	std::vector<size_t> allIds = this->objects.getAllIds();
@@ -7,7 +12,10 @@ void Level::tick() {
 		PObject* obj = this->objects[id];
 		obj->tick();
 		if (obj->markedRemove())
+		{
 			this->objects.removeById(id);
+			PACKET_HANDLER->sendPacketToAllClients(CRemovePObjectPacket(id));
+		}
 	}
 
 	allIds = this->objects.getAllIds();
@@ -139,7 +147,14 @@ void Level::tick() {
 		}
 	}
 
+	for (size_t id : allIds)
+	{
+		PObject* obj = this->objects[id];
+		PACKET_HANDLER->sendPacketToAllClients(CUpdatePObjectPacket(obj));
+	}
+
 	this->age++;
+	PACKET_HANDLER->sendPacketToAllClients(CLevelStatusPacket(this));
 }
 
 

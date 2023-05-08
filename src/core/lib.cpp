@@ -6,6 +6,7 @@
 #include "core/game/packet/CAddPObjectPacket.h"
 #include "core/game/packet/CRemovePObjectPacket.h"
 #include "core/game/packet/CUpdatePObjectPacket.h"
+#include "core/game/packet/CLevelStatusPacket.h"
 
 
 void initializeLib(bool isServer) {
@@ -36,6 +37,12 @@ void initializeLib(bool isServer) {
 			CUpdatePObjectPacket::handle,
 			CUpdatePObjectPacket::fromBytes,
 			CUpdatePObjectPacket::toBytes
+		}
+	);
+	PACKET_HANDLER->registerPacket(CLIENT_LEVEL_STATUS_PACKET_ID, NetworkDirection::CLIENT_BOUND, {
+			CLevelStatusPacket::handle,
+			CLevelStatusPacket::fromBytes,
+			CLevelStatusPacket::toBytes
 		}
 	);
 }

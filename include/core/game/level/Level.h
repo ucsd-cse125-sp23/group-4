@@ -5,6 +5,7 @@
 #include "core/game/physics/PObject.h"
 #include "core/game/level/Environment.h"
 #include "core/game/level/PObjectCollection.h"
+#include "core/game/packet/CAddPObjectPacket.h"
 
 enum class CollisionType {
 	NONE, COLLISION, TRIGGER
@@ -33,6 +34,8 @@ public:
 	}
 	void addPObject(PObject* obj) {
 		objects.addPObject(obj);
+		if(isServer())
+			PACKET_HANDLER->sendPacketToAllClients(CAddPObjectPacket(obj));
 	}
 	void removePObject(size_t id) {
 		objects.removeById(id);
@@ -41,6 +44,7 @@ public:
 		return objects[id];
 	}
 	unsigned long long getAge() { return age; }
+	void setAge(size_t age) { this->age = age; }
 
 	void tick();
 

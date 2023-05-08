@@ -26,6 +26,7 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/game/packet/CAddPObjectPacket.h
 	${tagguys_SOURCE_DIR}/include/core/game/packet/CRemovePObjectPacket.h
 	${tagguys_SOURCE_DIR}/include/core/game/packet/CUpdatePObjectPacket.h
+	${tagguys_SOURCE_DIR}/include/core/game/packet/CLevelStatusPacket.h
 
 	${tagguys_SOURCE_DIR}/include/core/game/physics/CollisionBounds.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/PObject.h
@@ -60,6 +61,7 @@ set( SOURCES
 	${PROJECT_SOURCE_DIR}/game/packet/CAddPObjectPacket.cpp
 	${PROJECT_SOURCE_DIR}/game/packet/CRemovePObjectPacket.cpp
 	${PROJECT_SOURCE_DIR}/game/packet/CUpdatePObjectPacket.cpp
+	${PROJECT_SOURCE_DIR}/game/packet/CLevelStatusPacket.cpp
 	
 	${PROJECT_SOURCE_DIR}/game/physics/CollisionBounds.cpp
 	${PROJECT_SOURCE_DIR}/game/physics/PObject.cpp

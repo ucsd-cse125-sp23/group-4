@@ -21,6 +21,7 @@ extern PacketHandler* PACKET_HANDLER;
 extern int CLIENT_ADD_POBJECT_PACKET_ID;// = 0
 extern int CLIENT_UPDATE_POBJECT_PACKET_ID;// = 1
 extern int CLIENT_REMOVE_POBJECT_PACKET_ID;// = 2
+extern int CLIENT_LEVEL_STATUS_PACKET_ID;// = 3
 
 extern int PLAYER_LAYER;// = 0
 extern int ENVIRONMENT_LAYER;// = 1
