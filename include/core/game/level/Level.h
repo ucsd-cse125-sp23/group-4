@@ -37,6 +37,9 @@ public:
 	void removePObject(size_t id) {
 		objects.removeById(id);
 	}
+	PObject* getPObject(size_t id) {
+		return objects[id];
+	}
 	unsigned long long getAge() { return age; }
 
 	void tick();

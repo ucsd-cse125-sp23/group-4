@@ -6,10 +6,11 @@
 
 struct ByteBuffer {
 private:
-	const size_t size;
+	size_t size;
 	size_t index;
 	uint8_t* data;
 public:
+	ByteBuffer();
 	ByteBuffer(std::vector<uint8_t> data);
 	ByteBuffer(const uint8_t* data, size_t size);
 	~ByteBuffer();

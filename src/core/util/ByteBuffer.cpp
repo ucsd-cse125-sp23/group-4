@@ -76,7 +76,8 @@ void ByteBufferBuilder::writeBuffer(ByteBuffer buf)
 		this->data.push_back(data[i]);
 }
 
-
+ByteBuffer::ByteBuffer() : size(0), index(0), data(nullptr)
+{}
 ByteBuffer::ByteBuffer(std::vector<uint8_t> data) : size(data.size()), index(0)
 {
 	this->data = (uint8_t*)malloc(sizeof(char) * data.size());

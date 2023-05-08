@@ -23,6 +23,4 @@ public:
 	void sendPacketToServer(Packet packet);
 	void sendPacketToClient(size_t pid, Packet packet);
 	void sendPacketToAllClients(Packet packet);
-
-
 };

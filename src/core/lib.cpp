@@ -3,7 +3,9 @@
 #include "core/util/global.h"
 #include "core/game/physics/PObjectType.h"
 
+#include "core/game/packet/CAddPObjectPacket.h"
 #include "core/game/packet/CRemovePObjectPacket.h"
+#include "core/game/packet/CUpdatePObjectPacket.h"
 
 
 void initializeLib(bool isServer) {
@@ -19,9 +21,21 @@ void initializeLib(bool isServer) {
 
 	PACKET_HANDLER = new PacketHandler();
 	PACKET_HANDLER->registerPacket(CLIENT_ADD_POBJECT_PACKET_ID, NetworkDirection::CLIENT_BOUND, {
+			CAddPObjectPacket::handle,
+			CAddPObjectPacket::fromBytes,
+			CAddPObjectPacket::toBytes
+		}
+	);
+	PACKET_HANDLER->registerPacket(CLIENT_REMOVE_POBJECT_PACKET_ID, NetworkDirection::CLIENT_BOUND, {
 			CRemovePObjectPacket::handle,
 			CRemovePObjectPacket::fromBytes,
 			CRemovePObjectPacket::toBytes
+		}
+	);
+	PACKET_HANDLER->registerPacket(CLIENT_UPDATE_POBJECT_PACKET_ID, NetworkDirection::CLIENT_BOUND, {
+			CUpdatePObjectPacket::handle,
+			CUpdatePObjectPacket::fromBytes,
+			CUpdatePObjectPacket::toBytes
 		}
 	);
 }
