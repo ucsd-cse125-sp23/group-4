@@ -52,7 +52,7 @@ void TCPClient::read() {
   connection->read();
 }
 
-void TCPClient::write(message::Message message) {
-  std::cout << "Queueing write to server: " << message << std::endl;
-  connection->write(message);
+void TCPClient::write(message::Message m) {
+  std::cout << "Queueing write to server: " << m << std::endl;
+  connection->write(m);
 }
