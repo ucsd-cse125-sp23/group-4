@@ -23,13 +23,12 @@ void TCPServer::do_accept() {
         return;
       }
 
-      std::cout << "Received:\n" << m << std::endl;
+      std::cout << "Received " << m << std::endl;
 
       message::GreetingBody g = {"Hello player " +
                                  std::to_string(m.metadata.player_id) + "!"};
       message::Message new_message = {
           message::Type::Greeting, {1, std::time(nullptr)}, g};
-      std::cout << "Sending to client: " << new_message << std::endl;
       write(new_message);
     };
 
@@ -39,7 +38,8 @@ void TCPServer::do_accept() {
         return;
       }
 
-      std::cout << "Wrote " << length << " bytes to client" << std::endl;
+      std::cout << "Successfully wrote " << length << " bytes to client"
+                << std::endl;
     };
 
     std::cout << "Connection established with client" << std::endl;
@@ -53,5 +53,6 @@ void TCPServer::do_accept() {
 }
 
 void TCPServer::write(const message::Message& m) {
+  std::cout << "Queueing write to client: " << m << std::endl;
   connections_.back()->write(m);
 }
