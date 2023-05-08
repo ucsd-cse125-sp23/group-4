@@ -76,7 +76,7 @@ void PObject::unpack(ByteBuffer buf)
 	}
 }
 
-static PObject* fromBytes(ByteBuffer buf)
+PObject* PObject::fromBytes(ByteBuffer buf)
 {
 	size_t keyLen = buf.nextULL();
 	PObjectType* type = GAME_REGISTRY->POBJECT_REGISTRY.getType(buf.nextString(keyLen));
