@@ -21,19 +21,19 @@ const std::vector<PObject*>& Environment::getCollisions()
 void Environment::addBox(vec3f min, vec3f max, float friction)
 {
 	BoundingShape* shape = new AABShape(min, max);
-	//PObject* obj = new PObject(shape, ENVIRONMENT_LAYER, friction, true);
-	//this->addPObject(obj);
+	PObject* obj = new PObject(nullptr, shape, ENVIRONMENT_LAYER, friction, true);
+	this->addPObject(obj);
 }
 
 void Environment::addConvex(std::vector<vec3f> vertices, float friction)
 {
 	BoundingShape* shape = new ConvexMeshShape(vertices);
-	//PObject* obj = new PObject(shape, ENVIRONMENT_LAYER, friction, true);
-	//this->addPObject(obj);
+	PObject* obj = new PObject(nullptr, shape, ENVIRONMENT_LAYER, friction, true);
+	this->addPObject(obj);
 }
 void Environment::addConvex(std::initializer_list<vec3f> vertices, float friction)
 {
 	BoundingShape* shape = new ConvexMeshShape(vertices);
-	//PObject* obj = new PObject(shape, ENVIRONMENT_LAYER, friction, true);
-	//this->addPObject(obj);
+	PObject* obj = new PObject(nullptr, shape, ENVIRONMENT_LAYER, friction, true);
+	this->addPObject(obj);
 }

@@ -48,16 +48,16 @@ const CollisionBounds* PObject::getBounds()
 
 
 void PObject::pack(ByteBufferBuilder& builder)
-{/*
+{
 	builder.writeULL(this->type->key.size());
 	builder.writeString(this->type->key);
 	builder.writeUInt(this->id);
 	builder.writeVec3f(this->pos);
 	builder.writeInt((toRemove ? 0b10 : 0) | (onGround ? 0b01 : 0));
-	Modifiable::pack(builder);*/
+	Modifiable::pack(builder);
 }
 void PObject::unpack(ByteBuffer buf)
-{/*
+{
 	size_t keyLen = buf.nextULL();
 	if (buf.nextString(keyLen).compare(this->type->key) == 0)
 	{
@@ -71,5 +71,5 @@ void PObject::unpack(ByteBuffer buf)
 			onGround = (flags & 0b01) != 0;
 			Modifiable::unpack(buf);
 		}
-	}*/
+	}
 }
