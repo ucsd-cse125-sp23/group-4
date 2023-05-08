@@ -18,8 +18,12 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/math/shape/ConvexMeshShape.h
 	${tagguys_SOURCE_DIR}/include/core/math/shape/ConcaveMeshShape.h
 
+	${tagguys_SOURCE_DIR}/include/core/game/Serializable.h
+	${tagguys_SOURCE_DIR}/include/core/game/Registry.h
+
 	${tagguys_SOURCE_DIR}/include/core/game/physics/CollisionBounds.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/PObject.h
+	${tagguys_SOURCE_DIR}/include/core/game/physics/PObjectType.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/Player.h
 
 	${tagguys_SOURCE_DIR}/include/core/game/level/Level.h

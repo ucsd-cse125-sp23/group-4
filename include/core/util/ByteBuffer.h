@@ -16,7 +16,7 @@ public:
 	void writeChar(char c);
 	void writeInt(int i);
 	void writeUInt(uint32_t u);
-	void writeUnsignedLongLong(unsigned long long ull);
+	void writeULL(unsigned long long ull);
 	void writeFloat(float f);
 	void writeDouble(double d);
 	void writeVec3f(vec3f v);
@@ -39,7 +39,7 @@ public:
 	char nextChar();
 	int nextInt();
 	uint32_t nextUInt();
-	unsigned long long nextUnsignedLongLong();
+	unsigned long long nextULL();
 	float nextFloat();
 	double nextDouble();
 	vec3f nextVec3f();

@@ -5,6 +5,8 @@
 #include <algorithm>
 
 #include "core/game/modifier/ModifierInstance.h"
+#include "core/util/ByteBuffer.h"
+#include "core/util/global.h"
 
 class Modifiable : public Serializable {
 private:
@@ -77,10 +79,10 @@ public:
 			if (!pair.first->isServerOnly())
 			{
 				count++;
-				std::string key = Modifier::getKey(pair.first);
+				std::string key = GAME_REGISTRY->MODIFIER_REGISTRY.getKey(pair.first);
 				modBuilder.writeUInt(key.length());
 				modBuilder.writeString(key);
-				modBuilder.writeUnsignedLongLong(pair.second.size());
+				modBuilder.writeULL(pair.second.size());
 				for (ModifierInstance* inst : pair.second)
 				{
 					ByteBuffer buf = ByteBuffer((uint8_t*)inst->get(), pair.first->size());
@@ -88,22 +90,22 @@ public:
 				}
 			}
 		}
-		builder.writeUnsignedLongLong(count);
+		builder.writeULL(count);
 		builder.writeBuffer(modBuilder.build());
 	}
 	virtual void unpack(ByteBuffer buf) {
-		size_t modCount = buf.nextUnsignedLongLong();
+		size_t modCount = buf.nextULL();
 		for (size_t i = 0; i < modCount; i++)
 		{
 			uint32_t strLen = buf.nextUInt();
 			std::string key = buf.nextString(strLen);
-			Modifier* modifier = Modifier::getModifier(key);
+			Modifier* modifier = GAME_REGISTRY->MODIFIER_REGISTRY.getType(key);
 
 			for (auto inst : modifiers[modifier])
 				delete inst;
 			modifiers[modifier].clear();
 
-			size_t instCount = buf.nextUnsignedLongLong();
+			size_t instCount = buf.nextULL();
 			for (size_t j = 0; j < instCount; j++)
 			{
 				ByteBuffer inst = buf.nextBuffer(modifier->size());

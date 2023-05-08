@@ -8,7 +8,7 @@
 enum class CollisionType {
 	NONE, COLLISION, TRIGGER
 };
-class Level {
+class Level/* : public Serializable*/ {
 private:
 	unsigned long long age;
 	CollisionType collisionTypeLUT[10][10];
@@ -36,4 +36,7 @@ public:
 	unsigned long long getAge() { return age; }
 
 	void tick();
+
+	void pack(ByteBufferBuilder& builder);
+	void unpack(ByteBuffer buf);
 };

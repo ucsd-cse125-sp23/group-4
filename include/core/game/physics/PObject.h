@@ -4,6 +4,7 @@
 
 #include "core/game/Serializable.h"
 #include "core/math/vector.h"
+#include "core/game/physics/PObjectType.h"
 #include "core/game/modifier/Modifiable.h"
 #include "core/game/modifier/ModifierInstance.h"
 #include "core/game/physics/CollisionBounds.h"
@@ -16,11 +17,12 @@ private:
 	vec3f pos;
 
 	CollisionBounds* bounds;
+	PObjectType* type;
 public:
 	uint32_t id;
 	vec3f vel;
 	bool onGround, static_;
-	PObject(BoundingShape* shape, unsigned int layer = 0, float friction = 0.0f, bool static_ = false);
+	PObject(PObjectType* type, BoundingShape* shape, unsigned int layer = 0, float friction = 0.0f, bool static_ = false);
 	~PObject();
 	vec3f getPos();
 	void setPos(vec3f pos);

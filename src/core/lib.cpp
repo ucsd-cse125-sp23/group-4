@@ -1,16 +1,19 @@
 #include "core/lib.hpp"
 
 #include "core/util/global.h"
+#include "core/game/physics/PObjectType.h"
 
 
-void initializeLib() {
-	CONTROL_MODIFIER = new ControlModifier();
-	GRAVITY_MODIFIER = new GravityModifier();
-	SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
+void initializeLib(bool isServer) {
+	IS_SERVER = isServer;
 
-	Modifier::registerModifier("control", CONTROL_MODIFIER);
-	Modifier::registerModifier("gravity", GRAVITY_MODIFIER);
-	Modifier::registerModifier("speedboost", SPEEDBOOST_MODIFIER);
+	GAME_REGISTRY = new GameRegistry();
+
+	GAME_REGISTRY->MODIFIER_REGISTRY.registerType("control", CONTROL_MODIFIER = new ControlModifier());
+	GAME_REGISTRY->MODIFIER_REGISTRY.registerType("gravity", GRAVITY_MODIFIER = new GravityModifier());
+	GAME_REGISTRY->MODIFIER_REGISTRY.registerType("speedboost", SPEEDBOOST_MODIFIER = new SpeedBoostModifier());
+
+	GAME_REGISTRY->POBJECT_REGISTRY.registerType("player", PLAYER_TYPE = new PObjectType("player", []()-> PObject* {return new Player(); }));
 }
 
 void initializeLevel(Environment* environment) {

@@ -26,7 +26,7 @@ void ByteBufferBuilder::writeUInt(uint32_t u)
 	data.push_back(buf[2]);
 	data.push_back(buf[3]);
 }
-void ByteBufferBuilder::writeUnsignedLongLong(unsigned long long ull)
+void ByteBufferBuilder::writeULL(unsigned long long ull)
 {
 	memcpy(buf, &ull, 8);
 	data.push_back(buf[0]);
@@ -107,7 +107,7 @@ uint32_t ByteBuffer::nextUInt()
 	uint32_t u; memcpy(&u, this->data + index, 4); index += 4;
 	return u;
 }
-unsigned long long ByteBuffer::nextUnsignedLongLong()
+unsigned long long ByteBuffer::nextULL()
 {
 	int ull; memcpy(&ull, this->data + index, 8); index += 8;
 	return ull;
