@@ -28,6 +28,7 @@ set( HEADERS
 
 	${tagguys_SOURCE_DIR}/include/core/game/level/Level.h
 	${tagguys_SOURCE_DIR}/include/core/game/level/Environment.h
+	${tagguys_SOURCE_DIR}/include/core/game/level/PObjectCollection.h
 	
 	${tagguys_SOURCE_DIR}/include/core/game/modifier/Modifiable.h
 	${tagguys_SOURCE_DIR}/include/core/game/modifier/Modifier.h
@@ -45,6 +46,7 @@ set( SOURCES
 
 	${PROJECT_SOURCE_DIR}/game/level/Level.cpp
 	${PROJECT_SOURCE_DIR}/game/level/Environment.cpp
+	${PROJECT_SOURCE_DIR}/game/level/PObjectCollection.cpp
 
 	${PROJECT_SOURCE_DIR}/math/ConvexShape.cpp
 	

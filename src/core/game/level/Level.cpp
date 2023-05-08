@@ -1,27 +1,26 @@
 #include "core/game/level/Level.h"
 
 void Level::tick() {
-	for (int i = 0; i < this->objects.size(); i++)
+	std::vector<size_t> allIds = this->objects.getAllIds();
+	for (size_t id : allIds)
 	{
-		PObject* obj = this->objects[i];
+		PObject* obj = this->objects[id];
 		obj->tick();
 		if (obj->markedRemove())
-		{
-			delete this->objects[i];
-			this->objects[i] = this->objects.back();
-			this->objects.pop_back();
-			i--;
-		}
+			this->objects.removeById(id);
 	}
 
+	allIds = this->objects.getAllIds();
 	std::vector<PObject*> collisions;
-	for (int i = 0; i < objects.size(); i++)
+	for (size_t id : allIds)
 	{
-		PObject* self = objects[i];
+		PObject* self = objects[id];
 		const CollisionBounds* selfBounds = self->getBounds();
-		for (int j = i + 1; j < objects.size(); j++)
+		for (size_t id_other : allIds)
 		{
-			PObject* obj = objects[j];
+			if (id == id_other)
+				continue;
+			PObject* obj = objects[id_other];
 			switch (collisionTypeLUT[selfBounds->layer][obj->getBounds()->layer])
 			{
 			case CollisionType::NONE:
@@ -99,13 +98,15 @@ void Level::tick() {
 		}
 	}
 
-	for (int i = 0; i < objects.size(); i++)
+	for (size_t id : allIds)
 	{
-		PObject* self = objects[i];
+		PObject* self = objects[id];
 		const CollisionBounds* selfBounds = self->getBounds();
-		for (int j = i + 1; j < objects.size(); j++)
+		for (size_t id_other : allIds)
 		{
-			PObject* obj = objects[j];
+			if (id == id_other)
+				continue;
+			PObject* obj = objects[id_other];
 			switch (collisionTypeLUT[selfBounds->layer][obj->getBounds()->layer])
 			{
 			case CollisionType::NONE:

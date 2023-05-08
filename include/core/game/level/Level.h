@@ -4,6 +4,7 @@
 
 #include "core/game/physics/PObject.h"
 #include "core/game/level/Environment.h"
+#include "core/game/level/PObjectCollection.h"
 
 enum class CollisionType {
 	NONE, COLLISION, TRIGGER
@@ -12,7 +13,7 @@ class Level/* : public Serializable*/ {
 private:
 	unsigned long long age;
 	CollisionType collisionTypeLUT[10][10];
-	std::vector<PObject*> objects;
+	PObjectCollection objects;
 	Environment* environment;
 public:
 	/**
@@ -31,7 +32,7 @@ public:
 		collisionTypeLUT[layer1][layer0] = type;
 	}
 	void addPObject(PObject* obj) {
-		objects.push_back(obj);
+		objects.addPObject(obj);
 	}
 	unsigned long long getAge() { return age; }
 
