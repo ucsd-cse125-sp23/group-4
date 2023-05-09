@@ -46,18 +46,20 @@ void HUD::draw(GLFWwindow* window) {
                 glm::vec3(1.0f, 0.0f, 0.0f));
 
   // minimap stuff
-  int map_size = (width / 4 > 250) ? 250 : width / 4;
+  int map_size = (width / 4 > 350) ? 350 : width / 4;
   glViewport(10, 10, map_size, map_size);
   glScissor(10, 10, map_size, map_size);
   glEnable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDisable(GL_SCISSOR_TEST);
 
+  drawMinimap();
+
   for (GameThing* e : scene->gamethings) {
     if (dynamic_cast<client::Player*>(e) != nullptr) {
       client::Player* player = dynamic_cast<client::Player*>(e);
       glm::vec3 position = player->transform.position;
-      glColor3f(0.0f, 0.0f, 1.0f);
+      glColor3f(1.0f, 1.0f, 1.0f);
       glPointSize(10);
       glBegin(GL_POINTS);
       glVertex3f(
@@ -71,4 +73,27 @@ void HUD::draw(GLFWwindow* window) {
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_BLEND);
+}
+
+void HUD::drawMinimap() {
+  map.bindgl();
+  glEnable(GL_TEXTURE_2D);
+
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex2f(1, -1);
+
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex2f(1, 1);
+
+  glTexCoord2f(1, 0);
+  glVertex2f(-1, 1);
+
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex2f(-1, -1);
+
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
 }
