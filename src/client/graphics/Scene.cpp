@@ -43,25 +43,34 @@ void Scene::drawHUD(GLFWwindow* window) {
         player_times[name] = player->time;
         const unsigned char* cname =
             reinterpret_cast<const unsigned char*>(name.c_str());
-        fr.RenderText(name, (width / 2.0f) - 30.0f, (height / 2.0f) + 25.0f, 0.5f,
-                   glm::vec3(0.0f, 0.0f, 0.0f)); //TODO: get screen coordinates based off player position
+        glm::vec4 position = glm::vec4(player->transform.position, 1.0f);
+        glm::vec4 postProjectivePosition =
+            camera->GetViewProjectMtx() * position;
+        glm::vec3 normalizedSpace =
+            glm::vec3(postProjectivePosition) / postProjectivePosition[3];
+        glm::vec2 windowSpace =
+            ((glm::vec2(normalizedSpace) + 1.0f) / 2.0f) * glm::vec2(width, height) +
+            glm::vec2(0.0f, 0.0f);
+        fr.RenderText(
+            window, name, windowSpace[0], windowSpace[1], 0.5f,
+                   glm::vec3(0.0f, 0.0f, 1.0f));
       }
     }
-    
+
     for (auto times : player_times) {
       std::string str = times.first;
       Timer time = times.second;
       str += " " + time.ToString();
-      fr.RenderText(str, 10.0f, float(height) - 25, 0.5f,
+      fr.RenderText(window, str, 10.0f, float(height) - 25, 0.5f,
                      glm::vec3(1.0f, 1.0f, 1.0f));
     }
 
     std::string game_time = time.ToString();
-    fr.RenderText(game_time, (width / 2.0f) - 75.0f, height - 35.0f, 1.0f,
+    fr.RenderText(window, game_time, (width / 2.0f) - 75.0f, height - 40.0f, 1.0f,
                    glm::vec3(1.0f, 0.0f, 0.0f));
 
     // minimap stuff
-    int map_size = width / 4;
+    int map_size = (width / 4 > 250) ? 250 : width / 4;
     glViewport(10, 10, map_size, map_size);
     glScissor(10, 10, map_size, map_size);
     glEnable(GL_SCISSOR_TEST);

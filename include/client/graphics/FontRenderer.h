@@ -22,17 +22,14 @@ class FontRenderer {
   unsigned int VAO, VBO;
 
   FontRenderer() {
+
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     shader =
         LoadShaders("assets/shaders/text.vert", "assets/shaders/text.frag");
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(800), 0.0f,
-                                      static_cast<float>(600));
-    glUseProgram(shader);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE,
-                       (float*)&projection);
+    
 
     if (FT_Init_FreeType(&ft)) {
       std::cout << "ERROR::FREETYPE: Could not init FreeType Library"
@@ -100,8 +97,17 @@ class FontRenderer {
   }
 
   
-void RenderText(std::string text, float x, float y,
+void RenderText(GLFWwindow* window, std::string text, float x, float y,
                   float scale, glm::vec3 color) {
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(width), 0.0f,
+                                      static_cast<float>(height));
+    glUseProgram(shader);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE,
+                       (float*)&projection);
+
     // activate corresponding render state
     glUseProgram(shader);
     glUniform3f(glGetUniformLocation(shader, "textColor"), color.x, color.y,
