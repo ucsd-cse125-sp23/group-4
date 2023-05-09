@@ -1,15 +1,32 @@
+#include <boost/variant.hpp>
+#include <magic_enum.hpp>
 #include <network/message.hpp>
 
-std::string message::Message::to_string() const {
+namespace message {
+
+std::string Message::toString() const {
+  std::string body_str =
+      boost::apply_visitor([](auto b) { return b.toString(); }, body);
+
   std::string str =
-      std::string("Message {\n") + "  type: " + std::to_string(type) + ",\n" +
-      "  metadata: {,\n" +
-      "    player_id: " + std::to_string(metadata.player_id) + ",\n" +
-      "    time: " + std::to_string(metadata.time) + ",\n" + "  }, \n" +
-      "  body: {\n" + "    greeting: " + body.greeting + "\n" + "  }\n" + "}";
+      // clang-format off
+      std::string("") +
+      "Message {" +                                                   "\n"
+      "  type: " + std::string(magic_enum::enum_name(type)) + "," +   "\n"
+      "  metadata: {," +                                              "\n"
+      "    player_id: " + std::to_string(metadata.player_id) + "," +  "\n"
+      "    time: " + std::to_string(metadata.time) + "," +            "\n"
+      "  }," +                                                        "\n"
+      "  body: {" +                                                   "\n"
+      "    " + body_str +                                             "\n"
+      "  }" +                                                         "\n"
+      "}";
+  // clang-format on
   return str;
 }
 
-std::ostream& message::operator<<(std::ostream& os, const message::Message& m) {
-  return os << m.to_string();
+std::ostream& operator<<(std::ostream& os, const message::Message& m) {
+  return os << m.toString();
 }
+
+}  // namespace message

@@ -10,8 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "boost/system/detail/error_code.hpp"
-
 using boost::asio::ip::tcp;
 
 template <typename T>

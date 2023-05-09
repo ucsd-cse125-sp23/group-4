@@ -1,20 +1,16 @@
 #pragma once
 
+#include <boost/serialization/variant.hpp>
+#include <boost/variant.hpp>
 #include <ctime>
 #include <ostream>
 #include <string>
-#include <variant>
 
 namespace message {
-enum Type {
+
+enum class Type {
+  Connect,
   Greeting,
-  Join,
-  Customize,
-  Ready,
-  Movement,
-  Item,
-  GameState,
-  Animation
 };
 
 struct Metadata {
@@ -22,45 +18,40 @@ struct Metadata {
   std::time_t time;
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& player_id;
-    ar& time;
+  void serialize(Archive& ar, unsigned int) {
+    ar& player_id& time;
   }
 };
 
-struct GreetingBody {
+struct Connect {
+  std::string toString() { return "connect request"; }
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {}
+};
+
+struct Greeting {
   std::string greeting;
+  std::string toString() { return greeting; }
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
+  void serialize(Archive& ar, unsigned int) {
     ar& greeting;
-  }
-};
-
-struct Movement {
-  std::string direction;
-
-  template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& direction;
   }
 };
 
 struct Message {
   Type type;
   Metadata metadata;
-  GreetingBody body;
-  // std::variant<struct Greeting, struct Movement> body;
+  boost::variant<Connect, Greeting> body;
+
+  std::string toString() const;
+  friend std::ostream& operator<<(std::ostream&, const Message&);
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& type;
-    ar& metadata;
-    ar& body;
+  void serialize(Archive& ar, unsigned int) {
+    ar& type& metadata& body;
   }
-
-  std::string to_string() const;
-  friend std::ostream& operator<<(std::ostream&, const Message&);
 };
 
 }  // namespace message

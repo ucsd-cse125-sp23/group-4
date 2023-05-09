@@ -72,8 +72,8 @@ int main(int argc, char* argv[]) {
   auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
     std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
               << std::endl;
-    message::GreetingBody g = {"Hello!"};
-    message::Message m = {message::Type::Greeting, {1, std::time(nullptr)}, g};
+    message::Message m = {
+        message::Type::Connect, {-1, std::time(nullptr)}, message::Connect{}};
     client.write(m);
   };
   auto read_handler = [&](const message::Message& m, TCPClient& client) {
@@ -87,6 +87,7 @@ int main(int argc, char* argv[]) {
                    write_handler);
   io_context.run();
   client.read();
+  return 0;
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);

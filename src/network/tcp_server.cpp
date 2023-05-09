@@ -25,8 +25,8 @@ void TCPServer::do_accept() {
 
       std::cout << "Received " << m << std::endl;
 
-      message::GreetingBody g = {"Hello player " +
-                                 std::to_string(m.metadata.player_id) + "!"};
+      message::Greeting g = {"Hello player " +
+                             std::to_string(m.metadata.player_id) + "!"};
       message::Message new_message = {
           message::Type::Greeting, {1, std::time(nullptr)}, g};
       write(new_message);
