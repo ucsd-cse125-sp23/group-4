@@ -18,11 +18,10 @@ struct Addr {
 class Client {
  public:
   using ConnectHandler = std::function<void(tcp::endpoint, Client &)>;
-  using ReadHandler =
-      std::function<void(const message::Message &, Client &)>;
+  using ReadHandler = std::function<void(const message::Message &, Client &)>;
   using WriteHandler = std::function<void(std::size_t, Client &)>;
   Client(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
-            WriteHandler);
+         WriteHandler);
   void read();
   void write(message::Message);
 
