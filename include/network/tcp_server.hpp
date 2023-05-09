@@ -8,9 +8,9 @@
 
 using boost::asio::ip::tcp;
 
-class TCPServer {
+class Server {
  public:
-  TCPServer(boost::asio::io_context& io_context, int port);
+  Server(boost::asio::io_context& io_context, int port);
 
  private:
   tcp::acceptor acceptor_;

@@ -4,9 +4,9 @@
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 
-TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
-                     ConnectHandler connect_handler, ReadHandler read_handler,
-                     WriteHandler write_handler)
+Client::Client(boost::asio::io_context& io_context, Addr& addr,
+               ConnectHandler connect_handler, ReadHandler read_handler,
+               WriteHandler write_handler)
     : socket_(io_context) {
   tcp::resolver resolver(io_context);
   auto endpoints = resolver.resolve(addr.host, std::to_string(addr.port));
@@ -48,12 +48,12 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
       });
 }
 
-void TCPClient::read() {
+void Client::read() {
   // std::cout << "Queueing read handler" << std::endl;
   connection->read();
 }
 
-void TCPClient::write(message::Message m) {
+void Client::write(message::Message m) {
   // std::cout << "Queueing write to server: " << m << std::endl;
   connection->write(m);
 }

@@ -8,13 +8,13 @@
 #include <network/tcp_server.hpp>
 #include <string>
 
-TCPServer::TCPServer(boost::asio::io_context& io_context, int port)
+Server::Server(boost::asio::io_context& io_context, int port)
     : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
   std::cout << "Server running on port " << port << std::endl;
   do_accept();
 }
 
-void TCPServer::do_accept() {
+void Server::do_accept() {
   acceptor_.async_accept([&](boost::system::error_code ec, tcp::socket socket) {
     if (ec) {
       std::cerr << "(accept) Error: " << ec.message() << std::endl;
@@ -85,14 +85,14 @@ void TCPServer::do_accept() {
   });
 }
 
-void TCPServer::read(int idx) { connections_[idx]->read(); }
+void Server::read(int idx) { connections_[idx]->read(); }
 
-void TCPServer::write(const message::Message& m, int idx) {
+void Server::write(const message::Message& m, int idx) {
   // std::cout << "Queueing write to client: " << m << std::endl;
   connections_[idx]->write(m);
 }
 
-void TCPServer::write_all(const message::Message& m) {
+void Server::write_all(const message::Message& m) {
   // std::cout << "Queueing write to all clients: " << m << std::endl;
   for (auto& c : connections_) c->write(m);
 }

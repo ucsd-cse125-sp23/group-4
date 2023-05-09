@@ -71,11 +71,11 @@ void network_init() {
 
   boost::asio::io_context io_context;
   std::string player_id;
-  auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
+  auto connect_handler = [&](tcp::endpoint endpoint, Client& client) {
     std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
               << std::endl;
   };
-  auto read_handler = [&](const message::Message& m, TCPClient& client) {
+  auto read_handler = [&](const message::Message& m, Client& client) {
     std::cout << "Received " << m << std::endl;
     auto assign_handler = [&](const message::Assign& body) {
       player_id = m.metadata.player_id;
@@ -92,12 +92,12 @@ void network_init() {
 
     boost::apply_visitor(message_handler, m.body);
   };
-  auto write_handler = [&](std::size_t bytes_transferred, TCPClient& client) {
+  auto write_handler = [&](std::size_t bytes_transferred, Client& client) {
     std::cout << "Successfully wrote " << bytes_transferred
               << " bytes to server" << std::endl;
   };
-  TCPClient client(io_context, server_addr, connect_handler, read_handler,
-                   write_handler);
+  Client client(io_context, server_addr, connect_handler, read_handler,
+                write_handler);
   io_context.run();
 }
 
