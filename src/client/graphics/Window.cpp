@@ -14,6 +14,7 @@ const char* Window::windowTitle = "CSE 125 graphics engine :)";
 
 // Game stuff to render
 Scene* Window::gameScene;
+HUD* Window::hud;
 
 Camera* Cam;
 
@@ -52,6 +53,7 @@ bool Window::initializeObjects() {
   gameScene = new Scene(Cam);
   gameScene->init();
 
+  hud = new HUD(gameScene);
   return true;
 }
 
@@ -171,7 +173,7 @@ void Window::displayCallback(GLFWwindow* window) {
 
   // Render the objects.
   gameScene->draw();
-  gameScene->drawHUD(window);
+  hud->draw(window);
 
   Input::handle(false);
   if (_debugmode) {

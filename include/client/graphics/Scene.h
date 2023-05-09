@@ -39,7 +39,6 @@
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/SkinnedMesh.h"
 #include "client/graphics/shader.h"
-#include "client/graphics/FontRenderer.h"
 #include "core/lib.hpp"
 
 #ifndef __SCENE_H__
@@ -108,8 +107,6 @@ class Scene {
 
   Timer time;
 
-  FontRenderer fr;
-
   Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
@@ -169,7 +166,7 @@ class Scene {
   void update_core(
       void);  // TODO(matthew) let game state updates be passed in here
 
-  void drawHUD(GLFWwindow* window);
+  //void drawHUD(GLFWwindow* window);
   void draw();
 
   void gui();

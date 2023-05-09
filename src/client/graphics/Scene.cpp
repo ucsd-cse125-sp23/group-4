@@ -27,7 +27,7 @@ void Scene::update(float delta) {
 
   level->tick();  // CORE
 }
-
+/*
 void Scene::drawHUD(GLFWwindow* window) { 
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
@@ -95,7 +95,7 @@ void Scene::drawHUD(GLFWwindow* window) {
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
- }
+ }*/
 void Scene::draw() {
   // Pre-draw sequence:
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();  

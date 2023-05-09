@@ -38,6 +38,7 @@ set(SOURCES
   graphics/Player.cpp
   graphics/Window.cpp
   graphics/imported/Tokenizer.cpp
+  graphics/HUD.cpp
 )
 
 add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES})
@@ -45,7 +46,6 @@ add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES})
 target_include_directories(client
   PUBLIC
     ${CMAKE_SOURCE_DIR}/include/client/graphics
-    ${freeglut_SOURCE_DIR}/include
 )
 target_link_libraries(
   client

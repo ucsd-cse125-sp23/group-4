@@ -1,4 +1,24 @@
 #pragma once
+#define GLM_FORCE_RADIANS
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/rotate_normalized_axis.hpp>
+#include <math.h>
+#include <stdlib.h>
+#include <vector>
+#include <string>
+#include <map>
+#include <stack>
+#include <string>
+#include <vector>
+#include "client/graphics/shader.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -37,15 +57,11 @@ class FontRenderer {
       return;
     }
 
-    std::cout << "Successfully initialized FreeType Library" << std::endl;
-
     FT_Face face;
     if (FT_New_Face(ft, "assets/fonts/Violety Crumble.ttf", 0, &face)) {
       std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
       return;
     }
-
-    std::cout << "Successfully loaded font" << std::endl;
 
     FT_Set_Pixel_Sizes(face, 0, 48);
 
@@ -96,8 +112,18 @@ class FontRenderer {
 
   }
 
-  
-void RenderText(GLFWwindow* window, std::string text, float x, float y,
+ // return width of text 
+ float TextWidth(std::string text, float scale) {
+    std::string::const_iterator c;
+    float width = 0;
+    for (c = text.begin(); c != text.end(); c++) {
+      Character ch = Characters[*c];
+      float w = ch.Size.x * scale;
+      width += w;
+    }
+    return width;
+ }
+ void RenderText(GLFWwindow* window, std::string text, float x, float y,
                   float scale, glm::vec3 color) {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
