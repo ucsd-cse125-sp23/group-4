@@ -3,9 +3,8 @@
 #include <boost/asio.hpp>
 #include <memory>
 #include <network/connection.hpp>
+#include <network/message.hpp>
 #include <vector>
-
-#include "network/message.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -18,5 +17,7 @@ class TCPServer {
   std::vector<std::shared_ptr<Connection<message::Message>>> connections_;
 
   void do_accept();
-  void write(const message::Message&);
+  void read(int);
+  void write(const message::Message&, int);
+  void write_all(const message::Message&);
 };

@@ -9,12 +9,12 @@
 namespace message {
 
 enum class Type {
-  Connect,
+  Assign,
   Greeting,
 };
 
 struct Metadata {
-  int player_id;
+  std::string player_id;
   std::time_t time;
 
   template <typename Archive>
@@ -23,8 +23,8 @@ struct Metadata {
   }
 };
 
-struct Connect {
-  std::string toString() { return "connect request"; }
+struct Assign {
+  std::string toString() { return "assign response"; }
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {}
@@ -43,7 +43,7 @@ struct Greeting {
 struct Message {
   Type type;
   Metadata metadata;
-  boost::variant<Connect, Greeting> body;
+  boost::variant<Assign, Greeting> body;
 
   std::string toString() const;
   friend std::ostream& operator<<(std::ostream&, const Message&);

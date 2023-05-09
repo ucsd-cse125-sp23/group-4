@@ -8,6 +8,8 @@
 #include <unistd.h>
 
 #include <boost/asio.hpp>
+#include <boost/bind/bind.hpp>
+#include <boost/functional/overloaded_function.hpp>
 #include <config/lib.hpp>
 #include <cstdio>
 #include <ctime>
@@ -63,21 +65,32 @@ void print_versions() {
 #endif
 }
 
-int main(int argc, char* argv[]) {
+void network_init() {
   auto config = get_config();
-
-  // NETWORK CODE
-  boost::asio::io_context io_context;
   Addr server_addr{config["server_address"], config["server_port"]};
+
+  boost::asio::io_context io_context;
+  std::string player_id;
   auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
     std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
               << std::endl;
-    message::Message m = {
-        message::Type::Connect, {-1, std::time(nullptr)}, message::Connect{}};
-    client.write(m);
   };
   auto read_handler = [&](const message::Message& m, TCPClient& client) {
     std::cout << "Received " << m << std::endl;
+    auto assign_handler = [&](const message::Assign& body) {
+      player_id = m.metadata.player_id;
+      message::Message new_m{message::Type::Greeting,
+                             {player_id, std::time(nullptr)},
+                             message::Greeting{"Hello, server!"}};
+      client.write(new_m);
+    };
+    auto greeting_handler = [&](const message::Greeting& body) {};
+
+    auto message_handler = boost::bind<void>(
+        boost::make_overloaded_function(assign_handler, greeting_handler),
+        boost::placeholders::_1);
+
+    boost::apply_visitor(message_handler, m.body);
   };
   auto write_handler = [&](std::size_t bytes_transferred, TCPClient& client) {
     std::cout << "Successfully wrote " << bytes_transferred
@@ -86,7 +99,10 @@ int main(int argc, char* argv[]) {
   TCPClient client(io_context, server_addr, connect_handler, read_handler,
                    write_handler);
   io_context.run();
-  client.read();
+}
+
+int main(int argc, char* argv[]) {
+  network_init();
   return 0;
 
   // Create the GLFW window.

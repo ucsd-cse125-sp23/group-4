@@ -14,7 +14,7 @@ std::string Message::toString() const {
       "Message {" +                                                   "\n"
       "  type: " + std::string(magic_enum::enum_name(type)) + "," +   "\n"
       "  metadata: {," +                                              "\n"
-      "    player_id: " + std::to_string(metadata.player_id) + "," +  "\n"
+      "    player_id: " + metadata.player_id + "," +                  "\n"
       "    time: " + std::to_string(metadata.time) + "," +            "\n"
       "  }," +                                                        "\n"
       "  body: {" +                                                   "\n"

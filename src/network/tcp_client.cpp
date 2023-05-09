@@ -44,15 +44,16 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
         connection = std::make_unique<Connection<message::Message>>(
             socket_, conn_read_handler, conn_write_handler);
         connect_handler(endpoint, *this);
+        read();
       });
 }
 
 void TCPClient::read() {
-  std::cout << "Queueing read handler" << std::endl;
+  // std::cout << "Queueing read handler" << std::endl;
   connection->read();
 }
 
 void TCPClient::write(message::Message m) {
-  std::cout << "Queueing write to server: " << m << std::endl;
+  // std::cout << "Queueing write to server: " << m << std::endl;
   connection->write(m);
 }
