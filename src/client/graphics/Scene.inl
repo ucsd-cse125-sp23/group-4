@@ -40,11 +40,9 @@ void Scene::init(void) {
 
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =
-      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-  sceneResources->shaderPrograms["basicTex"] =
-      LoadShaders("assets/shaders/shaderx.vert", "assets/shaders/shaderx.frag");
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
   sceneResources->shaderPrograms["toon"] =
-      LoadShaders("assets/shaders/toon.vert", "assets/shaders/toon.frag");
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 
   // Create a material palette
   sceneResources->materials["wood"] = new Material;
@@ -86,7 +84,7 @@ void Scene::init(void) {
 
   sceneResources->materials["grid"] = new Material;
   sceneResources->materials["grid"]->shader =
-      sceneResources->shaderPrograms["basicTex"];
+      sceneResources->shaderPrograms["basic"];
   sceneResources->materials["grid"]->texture = sceneResources->textures["grid"];
   sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   sceneResources->materials["grid"]->diffuse = vec4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -94,9 +92,12 @@ void Scene::init(void) {
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
       sceneResources->shaderPrograms["toon"];
-  sceneResources->materials["toon.blue"]->texture = sceneResources->textures["grid"];
-  sceneResources->materials["toon.blue"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  sceneResources->materials["toon.blue"]->diffuse = vec4(0.6f, 0.6f, 0.97f, 1.0f);
+  sceneResources->materials["toon.blue"]->texture =
+      sceneResources->textures["grid"];
+  sceneResources->materials["toon.blue"]->ambient =
+      vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["toon.blue"]->diffuse =
+      vec4(0.6f, 0.6f, 0.97f, 1.0f);
 
   // Create a model palette
   sceneResources->models["teapot1"] = new Model;

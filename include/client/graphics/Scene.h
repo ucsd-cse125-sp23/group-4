@@ -125,7 +125,7 @@ class Scene {
     _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
 
     _globalSceneResources.shaderPrograms["unlit"] =
-        LoadShaders("assets/shaders/unlit.vert", "assets/shaders/unlit.frag");
+        LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
 
     _globalSceneResources.materials["unlit"] = new Material;
     _globalSceneResources.materials["unlit"]->shader =

@@ -47,6 +47,7 @@ class Camera : public GameThing {
   glm::mat4 getCameraRotationMtx() {
     return glm::eulerAngleY(glm::radians(-Azimuth));
   }
+  const glm::mat4& GetViewMtx() { return ViewMtx; }
   const glm::mat4& GetViewProjectMtx() { return ViewProjectMtx; }
 
  private:
@@ -64,6 +65,7 @@ class Camera : public GameThing {
       Incline;  // Angle of the camera eye position over the XZ plane (degrees)
 
   // Computed data
+  glm::mat4 ViewMtx;
   glm::mat4 ViewProjectMtx;
 };
 
