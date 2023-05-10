@@ -27,7 +27,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/yesean/imgui
-  GIT_TAG v1.0
+  GIT_TAG v1.1
   GIT_PROGRESS TRUE)
 FetchContent_Declare(
   assimp
@@ -69,7 +69,6 @@ add_executable(client ${SOURCES})
 target_include_directories(
   client PRIVATE ${CMAKE_SOURCE_DIR}/include/client/graphics
                  ${freeglut_SOURCE_DIR}/include)
-
 target_link_libraries(
   client
   PRIVATE core
