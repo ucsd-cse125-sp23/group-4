@@ -1,35 +1,44 @@
 project(client DESCRIPTION "tagguys client executable")
 
+set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+set(IMGUI_ENABLE_STDLIB_SUPPORT ON)
+set(IMGUI_EXAMPLES OFF)
+
 FetchContent_Declare(
   glew
   GIT_REPOSITORY https://github.com/Perlmint/glew-cmake
-  GIT_TAG glew-cmake-2.2.0)
+  GIT_TAG glew-cmake-2.2.0
+  GIT_PROGRESS TRUE)
 FetchContent_Declare(
   glfw
   GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG 3.3.8)
+  GIT_TAG 3.3.8
+  GIT_PROGRESS TRUE)
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG 0.9.8.5)
+  GIT_TAG 0.9.8.5
+  GIT_PROGRESS TRUE)
 FetchContent_Declare(
   freetype
   GIT_REPOSITORY https://github.com/freetype/freetype
-  GIT_TAG VER-2-13-0)
+  GIT_TAG VER-2-13-0
+  GIT_PROGRESS TRUE)
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/yesean/imgui
-  GIT_TAG v1.1)
+  GIT_TAG v1.0
+  GIT_PROGRESS TRUE)
 FetchContent_Declare(
   assimp
   GIT_REPOSITORY https://github.com/assimp/assimp
-  GIT_TAG v5.2.5)
+  GIT_TAG v5.2.5
+  GIT_PROGRESS TRUE)
 FetchContent_Declare(
   freeglut
   GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
-  GIT_TAG v3.4.0)
-
-set(ASSIMP_WARNINGS_AS_ERRORS off)
+  GIT_TAG v3.4.0
+  GIT_PROGRESS TRUE)
 FetchContent_MakeAvailable(
   glew
   glfw
@@ -69,7 +78,9 @@ target_link_libraries(
           libglew_static
           glfw
           glm
-          ImGui # TODO: fix imgui
+          imgui
+          imgui-glfw
+          imgui-opengl3
           assimp
           freeglut_static
           freetype)
