@@ -21,10 +21,13 @@ struct Material {
   glm::vec4 emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   float shininess = 10.0f;
 
-  void setUniforms(const glm::mat4& viewProjMtx, const glm::mat4& model) {
+  void setUniforms(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+                   const glm::mat4& model) {
     // TODO: optimize this glGetLocation call out to an init func?
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, GL_FALSE,
                        (float*)&viewProjMtx);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE,
+                       (float*)&viewMtx);
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE,
                        (float*)&model);
 

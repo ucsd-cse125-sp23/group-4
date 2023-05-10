@@ -4,6 +4,8 @@ in vec3 fragPosition;
 in vec3 fragNormal;
 in vec2 texCoord0;	// UV coordinates
 
+uniform mat4 view;      // from world coord to eye coord
+
 uniform int renderMode;	// 0 = no texture, 1 = texture
 uniform sampler2D gSampler;
 
@@ -30,7 +32,7 @@ vec3 unitDir (vec4 p, vec4 q){
 void main()
 {
 
-	vec4 posC = vec4(fragPosition, 1);
+	vec4 posC = view * vec4(fragPosition, 1);
     vec3 viewdir = unitDir(posC, vec4(0.0, 0.0, 0.0, 1.0));  // unit direction towards viewer
 
 	vec3 lightsum = vec3(0.0);

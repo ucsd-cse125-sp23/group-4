@@ -42,7 +42,8 @@ class PlayerModel : public Model {
     skin->updateSkin(skel);
   }
 
-  void draw(const glm::mat4& viewProjMtx, const glm::mat4& transformMtx) {
+  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+            const glm::mat4& transformMtx) {
     if (!material || !mesh) return;
 
     GLuint shader = material->shader;
@@ -50,7 +51,7 @@ class PlayerModel : public Model {
     // actiavte the shader program      ---
     glUseProgram(shader);
 
-    material->setUniforms(viewProjMtx, transformMtx * modelMtx);
+    material->setUniforms(viewProjMtx, viewMtx, transformMtx * modelMtx);
 
     skin->draw();
 
