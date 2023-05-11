@@ -22,7 +22,7 @@ class Server {
       connections_;
 
   void do_accept();
-  void read(PlayerID&);
-  void write(const message::Message&, PlayerID&);
+  void read(const PlayerID&);
+  void write(const message::Message&, const PlayerID&);
   void write_all(const message::Message&);
 };

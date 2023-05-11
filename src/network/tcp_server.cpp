@@ -93,9 +93,9 @@ void Server::do_accept() {
   });
 }
 
-void Server::read(PlayerID& id) { connections_[id]->read(); }
+void Server::read(const PlayerID& id) { connections_[id]->read(); }
 
-void Server::write(const message::Message& m, PlayerID& id) {
+void Server::write(const message::Message& m, const PlayerID& id) {
   std::cout << "Queueing write to client: " << m << std::endl;
   connections_[id]->write(m);
 }
