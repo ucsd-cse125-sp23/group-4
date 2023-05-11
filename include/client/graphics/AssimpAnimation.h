@@ -33,6 +33,8 @@ class AssimpAnimation {
 public:
     AssimpAnimation();
 
+    /** name of the animation */
+    std::string name;
     /** duration of the animation (in ticks) */
     double duration;
     /** ticks per second of the animation */

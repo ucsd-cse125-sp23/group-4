@@ -148,6 +148,7 @@ void AssimpModel::loadAssimpHelperAnim(const aiScene *scene) {
     for(int i = 0; i < scene->mNumAnimations; i++) {
         aiAnimation* aiAnimation = scene->mAnimations[i];
         AssimpAnimation animation;
+        animation.name = aiAnimation->mName.C_Str();
         animation.duration = aiAnimation->mDuration;
         animation.tps = aiAnimation->mTicksPerSecond;
         for(int j = 0; j < aiAnimation->mNumChannels; j++) {

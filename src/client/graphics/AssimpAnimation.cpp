@@ -139,6 +139,7 @@ void AssimpAnimation::update(double deltaTimeInMs) {
 }
 
 void AssimpAnimation::imGui() {
+    ImGui::Text("name    : %s", name.c_str());
     ImGui::Text("duration: %f ticks; %f secs", duration, duration/tps);
     ImGui::Text("tps     : %f t/s", tps);
     if (ImGui::TreeNode((void*)(intptr_t)0, "Channels (%lu)", channels.size())) {
