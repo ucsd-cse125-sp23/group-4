@@ -50,7 +50,7 @@ void main()
 	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
 
 	// Add in specular
-	reflectance += specularColor * pow(max(dot(fragNormal, halfwayv), 0.0), shininess);
+	reflectance += specularColor * pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
 
 	// sampled texture color
 	vec4 texturedColor = texture2D(gSampler, texCoord0.st);

@@ -64,6 +64,10 @@ struct Material {
     glUniform4fv( lightcolors_loc, GLsizei(nlights), &lightcolors[0][0] );
     */
   }
+
+  void show() {
+    // TODO(matthew)
+  }
 };
 
 #endif

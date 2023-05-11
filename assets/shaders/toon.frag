@@ -42,27 +42,21 @@ void main()
 
 	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
 
-	lightsum += pow(max(dot(fragNormal, halfwayv), 0.0), shininess);
+	lightsum += pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
 
 	vec3 color;
 
 	lightsum = sqrt(lightsum);
 
 	// Stepped lighting ramp
-	if(length(lightsum) > 1.75) {
+	if(length(lightsum) > 1.85) {
 		color = diffuseColor * 1.2;
 	}
 	else if(length(lightsum) > 0.70) {
 		color = diffuseColor * 1.0;
 	}
-	/*else if(length(lightsum) > 0.25) {
-		color = diffuseColor * 0.8;
-	}*/
-	else if(length(lightsum) > 0.22) {
-		color = diffuseColor * 0.6;
-	}
 	else {
-		color = diffuseColor * 0.5;
+		color = diffuseColor * 0.9;
 	}
 
 
@@ -70,12 +64,12 @@ void main()
 	vec3 irradiance = ambientColor + lightsum;
 
 	// Diffuse reflectance
-	vec3 reflectance = irradiance * diffuseColor;
+	vec3 reflectance = irradiance * color;
 
 	// sampled texture color
 	vec4 texturedColor = texture2D(gSampler, texCoord0.st);
 
 	// Gamma correction
-	//fragColor = vec4(sqrt(reflectance)/* * vec3(texturedColor)*/, 1);
-	fragColor = vec4(color, 1);
+	fragColor = vec4(sqrt(reflectance)/* * vec3(texturedColor)*/, 1);
+	//fragColor = vec4(color, 1);
 }

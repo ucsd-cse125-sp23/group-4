@@ -42,7 +42,7 @@ void main()
 
 	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
 
-	lightsum += pow(max(dot(fragNormal, halfwayv), 0.0), shininess);
+	lightsum += pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
 
 	vec3 color;
 
