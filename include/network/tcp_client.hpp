@@ -11,7 +11,7 @@ using boost::asio::ip::tcp;
 
 struct Addr {
   std::string host;
-  std::string port;
+  int port;
 };
 
 class TCPClient {
