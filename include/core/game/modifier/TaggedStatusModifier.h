@@ -12,5 +12,6 @@ struct TaggedStatusModifierData : ModifierData {
 	TaggedStatusModifierData() : TaggedStatusModifierData(false) {}
 };
 class TaggedStatusModifier : public Modifier {
+	TaggedStatusModifier();
 	void modify(Modifiable* obj, ModifierData* data) override;
 };
