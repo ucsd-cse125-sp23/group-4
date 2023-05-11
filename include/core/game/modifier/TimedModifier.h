@@ -8,6 +8,9 @@ struct TimedModifierData : public ModifierData {
 	TimedModifierData(unsigned long long expire) : expire(expire) {}
 };
 class TimedModifier : public Modifier {
+public:
+	TimedModifier();
+	TimedModifier(bool serverOnly);
 	void modify(Modifiable* obj, ModifierData* data) override;
 	virtual void timedModify(Modifiable* obj, ModifierData* data) = 0;
 };

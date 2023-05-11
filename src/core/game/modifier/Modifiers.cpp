@@ -5,7 +5,11 @@
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 
+Modifier::Modifier() : Modifier(true) {}
+Modifier::Modifier(bool serverOnly) : serverOnly(serverOnly) {}
 
+TimedModifier::TimedModifier() : Modifier() {}
+TimedModifier::TimedModifier(bool serverOnly) : Modifier(serverOnly) {}
 void TimedModifier::modify(Modifiable* obj, ModifierData* data)
 {
 	TimedModifierData* cData = static_cast<TimedModifierData*>(data);
@@ -13,6 +17,7 @@ void TimedModifier::modify(Modifiable* obj, ModifierData* data)
 		cData->markedRemove = true;
 }
 
+SpeedBoostModifier::SpeedBoostModifier() : TimedModifier(false) {}
 void SpeedBoostModifier::timedModify(Modifiable* obj, ModifierData* data)
 {
 	if (PObject* pObj = dynamic_cast<PObject*>(obj))
@@ -43,6 +48,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data)
 	}
 }
 
+TaggedStatusModifier::TaggedStatusModifier() : Modifier(false) {}
 void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data)
 {
 	TaggedStatusModifierData* cData = static_cast<TaggedStatusModifierData*>(data);

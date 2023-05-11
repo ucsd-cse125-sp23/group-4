@@ -9,5 +9,6 @@ struct SpeedBoostModifierData : TimedModifierData {
 	SpeedBoostModifierData(unsigned long long expire, float factorIncrease) : TimedModifierData(expire), factorIncrease(factorIncrease) {}
 };
 class SpeedBoostModifier : public TimedModifier {
+	SpeedBoostModifier();
 	void timedModify(Modifiable* obj, ModifierData* data) override;
 };
