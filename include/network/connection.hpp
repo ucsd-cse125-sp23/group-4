@@ -24,6 +24,11 @@ class Connection : std::enable_shared_from_this<Connection<T>> {
   Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
       : socket_(std::move(s)), read_handler(rh), write_handler(wh) {}
 
+  ~Connection() {
+    std::cout << "Closing connection and its socket" << std::endl;
+    socket_.close();
+  }
+
   void start();
   void read();
   void write(const T&);
