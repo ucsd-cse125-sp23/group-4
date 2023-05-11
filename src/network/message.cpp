@@ -2,24 +2,26 @@
 #include <magic_enum.hpp>
 #include <network/message.hpp>
 
+#include "boost/uuid/uuid_io.hpp"
+
 namespace message {
 
 std::string Message::toString() const {
   std::string body_str =
       boost::apply_visitor([](auto b) { return b.toString(); }, body);
 
+  // clang-format off
   std::string str =
-      // clang-format off
       std::string("") +
-      "Message {" +                                                   "\n"
-      "  type: " + std::string(magic_enum::enum_name(type)) + "," +   "\n"
-      "  metadata: {," +                                              "\n"
-      "    player_id: " + metadata.player_id + "," +                  "\n"
-      "    time: " + std::to_string(metadata.time) + "," +            "\n"
-      "  }," +                                                        "\n"
-      "  body: {" +                                                   "\n"
-      "    " + body_str +                                             "\n"
-      "  }" +                                                         "\n"
+      "Message {" +                                                             "\n" // NOLINT
+      "  type: " + std::string(magic_enum::enum_name(type)) + "," +             "\n" // NOLINT
+      "  metadata: {," +                                                        "\n" // NOLINT
+      "    player_id: " + boost::uuids::to_string(metadata.player_id) + "," +   "\n" // NOLINT
+      "    time: " + std::to_string(metadata.time) + "," +                      "\n" // NOLINT
+      "  }," +                                                                  "\n" // NOLINT
+      "  body: {" +                                                             "\n" // NOLINT
+      "    " + body_str +                                                       "\n" // NOLINT
+      "  }" +                                                                   "\n" // NOLINT
       "}";
   // clang-format on
   return str;

@@ -20,6 +20,8 @@
 
 #include "Window.h"
 
+using message::PlayerID;
+
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
 }
@@ -70,7 +72,7 @@ void network_init() {
   Addr server_addr{config["server_address"], config["server_port"]};
 
   boost::asio::io_context io_context;
-  std::string player_id;
+  PlayerID player_id;
   auto connect_handler = [&](tcp::endpoint endpoint, Client& client) {
     std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
               << std::endl;
@@ -98,7 +100,7 @@ void network_init() {
   };
   Client client(io_context, server_addr, connect_handler, read_handler,
                 write_handler);
-  io_context.run();
+  io_context.run_for(std::chrono::seconds(3));
 }
 
 int main(int argc, char* argv[]) {

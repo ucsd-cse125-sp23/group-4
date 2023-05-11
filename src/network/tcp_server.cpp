@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <boost/bind/bind.hpp>
 #include <boost/functional/overloaded_function.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <boost/variant.hpp>
 #include <ctime>
 #include <iostream>
@@ -21,8 +22,7 @@ void Server::do_accept() {
       return;
     }
 
-    int connection_idx = connections_.size();
-    std::string player_id = std::to_string(connection_idx);
+    PlayerID player_id = boost::uuids::random_generator()();
 
     std::cout << "Accepted new client, assigning player_id " << player_id
               << std::endl;
@@ -31,18 +31,23 @@ void Server::do_accept() {
                             const message::Message& m) {
       if (ec) {
         std::cerr << "(read) Error: " << ec.message() << std::endl;
+        if (ec == boost::asio::error::eof) {
+          connections_.erase(player_id);
+        }
         return;
       }
 
       std::cout << "Received " << m << std::endl;
 
-      std::string player_id = m.metadata.player_id;
+      PlayerID player_id = m.metadata.player_id;
       auto assign_handler = [&](const message::Assign& body) {};
       auto greeting_handler = [&](const message::Greeting& body) {
-        message::Message new_m{message::Type::Greeting,
-                               {player_id, std::time(nullptr)},
-                               message::Greeting{"Hello, player " + player_id}};
-        write(new_m, connection_idx);
+        message::Message new_m{
+            message::Type::Greeting,
+            {player_id, std::time(nullptr)},
+            message::Greeting{"Hello, player " +
+                              boost::uuids::to_string(player_id)}};
+        write(new_m, player_id);
       };
 
       auto message_handler = boost::bind<void>(
@@ -51,7 +56,7 @@ void Server::do_accept() {
 
       boost::apply_visitor(message_handler, m.body);
 
-      read(connection_idx);
+      read(player_id);
     };
 
     auto write_handler = [=](boost::system::error_code ec, std::size_t length) {
@@ -66,6 +71,8 @@ void Server::do_accept() {
 
     auto connection = std::make_shared<Connection<message::Message>>(
         socket, read_handler, write_handler);
+
+    // assign client player_id
     message::Message new_m{message::Type::Assign,
                            {player_id, std::time(nullptr)},
                            message::Assign{}};
@@ -75,24 +82,25 @@ void Server::do_accept() {
     message::Message join_notification{
         message::Type::Greeting,
         {player_id, std::time(nullptr)},
-        message::Greeting{"Player " + player_id + " has joined"}};
+        message::Greeting{"Player " + boost::uuids::to_string(player_id) +
+                          " has joined"}};
     write_all(join_notification);
 
-    connections_.push_back(connection);
+    connections_[player_id] = connection;
     connection->start();
 
     do_accept();
   });
 }
 
-void Server::read(int idx) { connections_[idx]->read(); }
+void Server::read(PlayerID& id) { connections_[id]->read(); }
 
-void Server::write(const message::Message& m, int idx) {
-  // std::cout << "Queueing write to client: " << m << std::endl;
-  connections_[idx]->write(m);
+void Server::write(const message::Message& m, PlayerID& id) {
+  std::cout << "Queueing write to client: " << m << std::endl;
+  connections_[id]->write(m);
 }
 
 void Server::write_all(const message::Message& m) {
   // std::cout << "Queueing write to all clients: " << m << std::endl;
-  for (auto& c : connections_) c->write(m);
+  for (auto& kv : connections_) kv.second->write(m);
 }

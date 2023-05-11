@@ -1,6 +1,9 @@
 #pragma once
 
 #include <boost/serialization/variant.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_serialize.hpp>
 #include <boost/variant.hpp>
 #include <ctime>
 #include <ostream>
@@ -8,13 +11,15 @@
 
 namespace message {
 
+using PlayerID = boost::uuids::uuid;
+
 enum class Type {
   Assign,
   Greeting,
 };
 
 struct Metadata {
-  std::string player_id;
+  PlayerID player_id;
   std::time_t time;
 
   template <typename Archive>
