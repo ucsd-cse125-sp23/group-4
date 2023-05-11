@@ -73,6 +73,7 @@ target_link_libraries(
   client
   PRIVATE core
           network
+          config
           Boost::asio
           libglew_static
           glfw

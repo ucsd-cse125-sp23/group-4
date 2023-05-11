@@ -1,6 +1,7 @@
 #include "client/graphics/main.h"
 
 #include <boost/asio.hpp>
+#include <config/lib.hpp>
 #include <iostream>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
@@ -51,34 +52,11 @@ void print_versions() {
 }
 
 int main(int argc, char* argv[]) {
-  char* arg_host;
-  char* arg_port;
-
-  if (argc != 3) {
-    std::cout << "usage: client <host> <port>" << std::endl;
-
-    const unsigned int kMaxArgLength = 64;
-    char argbuff_1[kMaxArgLength];
-    char argbuff_2[kMaxArgLength];
-
-    std::cout << "enter <host>:";
-    std::cin.getline(argbuff_1, kMaxArgLength);
-
-    std::cout << "enter <port>:";
-    std::cin.getline(argbuff_2, kMaxArgLength);
-
-    arg_host = argbuff_1;
-    arg_port = argbuff_2;
-  } else {
-    arg_host = argv[1];
-    arg_port = argv[2];
-  }
-
-  std::cout << "connecting to: " << arg_host << ":" << arg_port << std::endl;
+  auto config = get_config();
 
   // NETWORK CODE
   boost::asio::io_context io_context;
-  Addr server_addr{arg_host, arg_port};
+  Addr server_addr{config["server_address"], config["server_port"]};
   auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
     std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
               << std::endl;
