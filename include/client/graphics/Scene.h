@@ -28,7 +28,7 @@
 #include "client/graphics/Camera.h"
 #include "client/graphics/GameThing.h"
 #include "client/graphics/Node.h"
-//#include "Light.h"
+// #include "Light.h"
 #include "client/graphics/Collider.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/Material.h"

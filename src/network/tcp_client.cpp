@@ -10,7 +10,7 @@ TCPClient::TCPClient(boost::asio::io_context& io_context, Addr& addr,
   tcp::resolver resolver(io_context);
 
   boost::asio::async_connect(
-      socket_, resolver.resolve(addr.host, addr.port),
+      socket_, resolver.resolve(addr.host, std::to_string(addr.port)),
       [&, read_handler, write_handler, connect_handler](
           boost::system::error_code ec, tcp::endpoint endpoint) {
         if (ec) {
