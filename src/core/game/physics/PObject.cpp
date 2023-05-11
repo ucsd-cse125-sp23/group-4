@@ -4,7 +4,7 @@
 uint32_t PObject::maxId = 0;
 
 PObject::PObject(BoundingShape* shape, unsigned int layer, float friction, bool static_)
-	: bounds(new CollisionBounds(shape, layer, friction)), static_(static_), pos(vec3f(0.0f, 0.0f, 0.0f)), vel(vec3f(0.0f, 0.0f, 0.0f)),
+	: bounds(new CollisionBounds(shape, layer, friction)), static_(static_), pos(vec3f(0.0f, 0.0f, 0.0f)), oPos(vec3f(0.0f, 0.0f, 0.0f)), vel(vec3f(0.0f, 0.0f, 0.0f)),
 	onGround(false) {
 	this->id = PObject::maxId++;
 }
@@ -14,6 +14,7 @@ PObject::~PObject() {
 void PObject::tick() {
 	Modifiable::tick();
 
+	oPos = pos;
 	pos += vel;
 	this->bounds->setPos(pos);
 }
