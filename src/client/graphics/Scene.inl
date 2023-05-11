@@ -60,7 +60,7 @@ void Scene::init(void) {
       vec4(0.02f, 0.07f, 0.2f, 1.0f);
   sceneResources->materials["ceramic"]->diffuse = vec4(0.1f, 0.25f, 0.7f, 1.0f);
   sceneResources->materials["ceramic"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
-  sceneResources->materials["ceramic"]->shininess = 150.0f;
+  sceneResources->materials["ceramic"]->shininess = 50.0f;
 
   sceneResources->materials["silver"] = new Material;
   sceneResources->materials["silver"]->shader =
@@ -98,6 +98,10 @@ void Scene::init(void) {
       vec4(0.1f, 0.1f, 0.1f, 1.0f);
   sceneResources->materials["toon.blue"]->diffuse =
       vec4(0.6f, 0.6f, 0.97f, 1.0f);
+  sceneResources->materials["toon.blue"]->specular =
+      vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["toon.blue"]->shininess = 50.0f;
+
 
   // Create a model palette
   sceneResources->models["teapot1"] = new Model;

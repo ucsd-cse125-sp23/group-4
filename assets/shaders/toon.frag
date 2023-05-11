@@ -1,7 +1,10 @@
 #version 330 core
 
+in vec3 fragPosition;
 in vec3 fragNormal;
 in vec2 texCoord0;	// UV coordinates
+
+uniform mat4 view;      // from world coord to eye coord
 
 uniform sampler2D gSampler;
 
@@ -12,14 +15,24 @@ uniform vec3 LightDirections[] = {
 								 };
 uniform vec3 LightColors[] = { vec3(1), vec3(0.6, 0.7, 1) * 0.4 };
 
-uniform vec3 ambientColor = vec3(0.1);
+uniform vec3 ambientColor;
 uniform vec3 diffuseColor;
+uniform vec3 specularColor;
+uniform vec3 emissionColor;
+uniform float shininess;
 
 // You can output many things. The first vec4 type output determines the color of the fragment
 out vec4 fragColor;
 
+vec3 unitDir (vec4 p, vec4 q){
+    return normalize(p.w * q.xyz - q.w * p.xyz);
+}
+
 void main()
 {
+
+	vec4 posC = view * vec4(fragPosition, 1);
+    vec3 viewdir = unitDir(posC, vec4(0.0, 0.0, 0.0, 1.0));  // unit direction towards viewer
 
 	vec3 lightsum = vec3(0.0);
 
@@ -27,20 +40,29 @@ void main()
         lightsum += LightColors[i] * max(0, dot(LightDirections[i], fragNormal));
     }
 
+	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
+
+	lightsum += pow(max(dot(fragNormal, halfwayv), 0.0), shininess);
+
 	vec3 color;
 
+	lightsum = sqrt(lightsum);
+
 	// Stepped lighting ramp
-	if(length(lightsum) > 0.95) {
+	if(length(lightsum) > 1.75) {
+		color = diffuseColor * 1.2;
+	}
+	else if(length(lightsum) > 0.70) {
 		color = diffuseColor * 1.0;
 	}
-	else if(length(lightsum) > 0.5) {
+	/*else if(length(lightsum) > 0.25) {
+		color = diffuseColor * 0.8;
+	}*/
+	else if(length(lightsum) > 0.22) {
 		color = diffuseColor * 0.6;
 	}
-	else if(length(lightsum) > 0.25) {
-		color = diffuseColor * 0.4;
-	}
 	else {
-		color = diffuseColor * 0.2;
+		color = diffuseColor * 0.5;
 	}
 
 
