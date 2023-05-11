@@ -43,8 +43,7 @@ public:
 	void addPObject(PObject* obj) {
 		objects.addPObject(obj);
 	}
-	template <typename T>
-	void addStatistic(StatisticDefinition<T>* def) {
+	void addStatistic(StatisticDefinition* def) {
 		statisticManager->addDefinition(def);
 	}
 	unsigned long long getAge() { return age; }

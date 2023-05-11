@@ -7,10 +7,10 @@ void initializeLevel(Environment* environment) {
 	level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER, ENVIRONMENT_LAYER);
 	level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER, PLAYER_LAYER);
 
-	/*level->addStatistic(new LambdaStatisticDefinition("itCount", 0, [](EventManager* eventManager) {
-			eventManager->registerTriggerEventHandler()
+	level->addStatistic(new LambdaStatisticDefinition("itCount", 0, [](EventManager* eventManager) {
+			//eventManager->registerTriggerEventHandler()
 		}
-	));*/
+	));
 }
 
 std::pair<Player*, ControlModifierData*> initializePlayer() {
