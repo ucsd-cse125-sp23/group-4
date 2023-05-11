@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/asio.hpp>
@@ -35,7 +36,7 @@ class Connection : std::enable_shared_from_this<Connection<T>> {
 
   tcp::socket socket_;
   const int header_length_ = 8;
-  char inbound_header_[8];
+  std::array<char, 8> inbound_header_;
   std::vector<char> inbound_data_;
   std::string outbound_header_;
   std::string outbound_data_;
@@ -50,7 +51,8 @@ void Connection<T>::start() {
 
 template <typename T>
 std::size_t Connection<T>::parse_header() {
-  std::istringstream is(std::string(inbound_header_, header_length_));
+  std::istringstream is(
+      std::string(inbound_header_.begin(), inbound_header_.end()));
   std::size_t inbound_data_size = 0;
   if (!(is >> std::hex >> inbound_data_size)) {
     throw boost::system::error_code(boost::asio::error::invalid_argument);
