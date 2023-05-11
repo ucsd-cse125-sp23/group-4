@@ -2,11 +2,11 @@
  * Model.h
  * basic data container for a Mesh + Material pair
  *****************************************************/
+
+#pragma once
+
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
-
-#ifndef __MODEL_H__
-#define __MODEL_H__
 
 struct Model {
   glm::mat4 modelMtx;  // applied first!
@@ -35,5 +35,3 @@ struct Model {
     glUseProgram(0);
   }
 };
-
-#endif

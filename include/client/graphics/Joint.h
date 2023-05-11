@@ -5,10 +5,15 @@
 
 #pragma once
 
+#include <GL/glew.h>
+
+#include <glm/glm.hpp>
+#include <string>
+#include <vector>
+
 #include "Cube.h"
 #include "DOF.h"
-#include "client/graphics/imported/Tokenizer.h"
-#include "core.h"
+#include "imported/Tokenizer.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +22,7 @@
 class Joint {
  public:
   Joint() { box = nullptr; }
-  Joint(const char* n) : Joint() { name = n; }
+  explicit Joint(const char* n) : Joint() { name = n; }
   ~Joint() {
     if (box) delete box;
 

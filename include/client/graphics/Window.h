@@ -4,12 +4,9 @@
  * game scene, and setting up input handling
  *****************************************************/
 
-#ifndef _WINDOW_H_
-#define _WINDOW_H_
+#pragma once
 
-#include "client/graphics/Camera.h"
-#include "client/graphics/Scene.h"
-#include "client/graphics/main.h"
+#include "Scene.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -53,5 +50,3 @@ class Window {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-
-#endif

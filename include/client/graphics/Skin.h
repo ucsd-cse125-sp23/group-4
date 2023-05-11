@@ -5,9 +5,13 @@
 
 #pragma once
 
-#include "client/graphics/Skeleton.h"
-#include "client/graphics/core.h"
-#include "client/graphics/imported/Tokenizer.h"
+#include <GL/glew.h>
+
+#include <glm/glm.hpp>
+#include <utility>
+#include <vector>
+
+#include "Skeleton.h"
 
 using glm::mat4;
 using glm::vec3;

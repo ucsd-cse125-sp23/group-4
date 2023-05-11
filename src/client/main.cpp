@@ -1,10 +1,20 @@
-#include "client/graphics/main.h"
+// clang-format off
+#include <GL/glew.h>
+// clang-format on
+#include <GL/freeglut_std.h>
+#include <GLFW/glfw3.h>
+#include <stdlib.h>
 
 #include <boost/asio.hpp>
 #include <config/lib.hpp>
+#include <cstdio>
+#include <ctime>
 #include <iostream>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
+#include <string>
+
+#include "Window.h"
 
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
@@ -105,13 +115,12 @@ int main(int argc, char* argv[]) {
   // Delta time logic (see
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
   double lastTime = glfwGetTime();
-  double deltaTime = 0, nowTime = 0;
 
   // Loop while GLFW window should stay open.
   while (!glfwWindowShouldClose(window)) {
     // - Measure time
-    nowTime = glfwGetTime();
-    deltaTime = nowTime - lastTime;
+    double nowTime = glfwGetTime();
+    double deltaTime = nowTime - lastTime;
     lastTime = nowTime;
 
     // Idle callback. Updating objects, etc. can be done here.

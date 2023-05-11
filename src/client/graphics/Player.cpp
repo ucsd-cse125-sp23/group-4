@@ -1,7 +1,13 @@
 #include "Player.h"
 
+#include <cmath>
+#include <glm/glm.hpp>
+
+#include "Input.h"
+
 using glm::mat4x4;
 using glm::vec3;
+using glm::vec4;
 
 void Player::update(float dt) {
   if (camera && camera->Fixed)

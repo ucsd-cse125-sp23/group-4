@@ -1,8 +1,5 @@
-#ifndef CORE_TEST_H
-#define CORE_TEST_H
+#pragma once
 
 #include <string>
 
 void test_core(const std::string &source);
-
-#endif

@@ -5,10 +5,12 @@
 
 #pragma once
 
-#include "client/graphics/Mesh.h"
-#include "client/graphics/Skeleton.h"
-#include "client/graphics/core.h"
-#include "client/graphics/imported/Tokenizer.h"
+#include <glm/glm.hpp>
+#include <utility>
+#include <vector>
+
+#include "Mesh.h"
+#include "Skeleton.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
