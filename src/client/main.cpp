@@ -5,8 +5,6 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 
-#include <unistd.h>
-
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/functional/overloaded_function.hpp>
