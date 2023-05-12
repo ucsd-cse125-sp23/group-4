@@ -1,19 +1,29 @@
 #pragma once
 
-#include "Event.h"
-
+#include <functional>
 #include <vector>
 
-class EventManager {
-private:
-	std::vector<CollisionEventHandler*> collisionEventHandlers;
-	std::vector<TriggerEventHandler*> triggerEventHandlers;
-	void onCollisionEvent(CollisionEvent event);
-	void onTriggerEvent(TriggerEvent event);
-public:
-	void registerCollisionEventHandler(CollisionEventHandler* handler);
-	void registerTriggerEventHandler(TriggerEventHandler* handler);
+#include "Event.h"
 
-	void fireCollisionEvent(PObject* self, PObject* other);
-	void fireTriggerEvent(PObject* self, PObject* other);
+class EventManager {
+ private:
+  Level* level;
+
+  std::vector<std::function<void(CollisionEvent)>> collisionEventHandlers;
+  std::vector<std::function<void(TriggerEvent)>> triggerEventHandlers;
+  std::vector<std::function<void(TaggingEvent)>> taggingEventHandlers;
+  void onCollisionEvent(CollisionEvent event);
+  void onTriggerEvent(TriggerEvent event);
+  void onTaggingEvent(TaggingEvent event);
+
+ public:
+  explicit EventManager(Level* level);
+  void registerCollisionEventHandler(
+      std::function<void(CollisionEvent)> handler);
+  void registerTriggerEventHandler(std::function<void(TriggerEvent)> handler);
+  void registerTaggingEventHandler(std::function<void(TaggingEvent)> handler);
+
+  void fireCollisionEvent(PObject* self, PObject* other);
+  void fireTriggerEvent(PObject* self, PObject* other);
+  void fireTaggingEvent(PObject* tagger, PObject* tagee, int ticksIt);
 };
