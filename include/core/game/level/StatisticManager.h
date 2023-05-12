@@ -1,39 +1,26 @@
 #pragma once
 
-#include <variant>
 #include <map>
+#include <set>
 #include <string>
-#include "core/game/event/EventManager.h";
+#include <variant>
 
-using Stat = std::variant<int, float>;
+#include "core/game/event/EventManager.h"
 
-struct StatisticDefinition {
-	std::string key;
-	Stat defaultValue;
-	StatisticDefinition(std::string key, std::variant<int,float> defaultValue) : key(key), defaultValue(defaultValue) {}
-	virtual void registerListeners(const EventManager* eventManager) = 0;
-};
-template<typename U>
-struct LambdaStatisticDefinition : StatisticDefinition, private U {
-	LambdaStatisticDefinition(std::string key, Stat defaultValue, U l) noexcept : StatisticDefinition(key, defaultValue), U{ l } {}
+using Stat = std::variant<std::monostate, int, float>;
 
-	void registerListeners(const EventManager* eventManager) {
-		U::operator()();
-	}
-};
 class StatisticManager {
-private:
-	const EventManager* eventManager;
+ private:
+  std::set<std::string> keys;
+  std::map<std::string, Stat> defaultValues;
+  std::map<uint32_t, std::map<std::string, Stat>> playerStatistics;
 
-	std::map<std::string, StatisticDefinition*> definitions;
-	std::map<uint32_t, std::map<std::string, Stat>> playerStatistics;
+ public:
+  StatisticManager();
 
-	Stat getValue(uint32_t pid, StatisticDefinition* def);
-public:
-	StatisticManager(const EventManager* eventManager);
+  bool registerStat(std::string key, Stat defaultValue);
 
-	void addDefinition(StatisticDefinition* def);
-
-	template <typename T>
-	Stat getValue(uint32_t pid, std::string key);
+  const std::set<std::string> getKeys();
+  Stat getValue(uint32_t pid, std::string key);
+  bool setValue(uint32_t pid, std::string key, Stat stat);
 };

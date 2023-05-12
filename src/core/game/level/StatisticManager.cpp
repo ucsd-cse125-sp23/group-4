@@ -1,27 +1,25 @@
 #include "core/game/level/StatisticManager.h"
 
+StatisticManager::StatisticManager() {}
 
-Stat StatisticManager::getValue(uint32_t pid, StatisticDefinition* def)
-{
-	if (this->playerStatistics[pid].find(def->key) == this->playerStatistics[pid].end())
-	{
-		this->playerStatistics[pid][def->key] = def->defaultValue;
-		return def->defaultValue;
-	}
-	return this->playerStatistics[pid][def->key];
+bool StatisticManager::registerStat(std::string key, Stat defaultValue) {
+  if (defaultValues.find(key) == defaultValues.end()) {
+    defaultValues[key] = defaultValue;
+    keys.insert(key);
+    return true;
+  }
+  return false;
 }
 
-StatisticManager::StatisticManager(const EventManager* eventManager) : eventManager(eventManager)
-{}
+const std::set<std::string> StatisticManager::getKeys() { return keys; }
 
-void StatisticManager::addDefinition(StatisticDefinition* def)
-{
-	this->definitions[def->key] = def;
-	def->registerListeners(eventManager);
+Stat StatisticManager::getValue(uint32_t pid, std::string key) {
+  if (defaultValues.find(key) == defaultValues.end()) return std::monostate();
+  if (playerStatistics[pid].find(key) == playerStatistics[pid].end())
+    playerStatistics[pid][key] = defaultValues[key];
+  return playerStatistics[pid][key];
 }
-
-template <typename T>
-T getValue(uint32_t pid, std::string key)
-{
-	return getValue(pid, this->definitions[key])
+bool StatisticManager::setValue(uint32_t pid, std::string key, Stat stat) {
+  if (defaultValues.find(key) == defaultValues.end()) return false;
+  playerStatistics[pid][key] = stat;
 }
