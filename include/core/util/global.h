@@ -10,6 +10,8 @@
 #include "core/math/shape/OffsetShape.h"
 
 extern int TAG_COOLDOWN;
+extern float JUMP_VELOCITY;
+extern float GRAVITY_STRENGTH;
 
 extern int PLAYER_LAYER;       // = 0;
 extern int ENVIRONMENT_LAYER;  // = 1;
