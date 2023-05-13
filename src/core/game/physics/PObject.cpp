@@ -3,9 +3,9 @@
 uint32_t PObject::maxId = 0;
 
 PObject::PObject(BoundingShape* shape, unsigned int layer, float friction,
-                 bool static_)
+                 bool s)
     : bounds(new CollisionBounds(shape, layer, friction)),
-      static_(static_),
+      static_(s),
       pos(vec3f(0.0f, 0.0f, 0.0f)),
       oPos(vec3f(0.0f, 0.0f, 0.0f)),
       vel(vec3f(0.0f, 0.0f, 0.0f)),
