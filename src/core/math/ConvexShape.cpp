@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/math/shape/ConvexShape.h"
+#include "core/math/shape/PointShape.h"
 
 #include <limits>
 #include <vector>
@@ -318,3 +319,11 @@ vec4f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx,
   }
   return vec4f(-min.x, -min.y, -min.z, min.w);
 }
+
+
+bool ConvexShape::contains(const vec3f& point, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const {
+    return this->collides(new PointShape(point), thisMtx, otherMtx);
+}
+float ConvexShape::intersects(const Ray& ray, const mat4f& thisMtx = mat4f::identity(), const mat4f& otherMtx = mat4f::identity()) const {
+}
+
