@@ -37,8 +37,9 @@ set(SOURCES
   graphics/Texture.cpp
   graphics/Player.cpp
   graphics/Window.cpp
-  graphics/imported/Tokenizer.cpp
+  graphics/Lobby.cpp
   graphics/HUD.cpp
+  graphics/imported/Tokenizer.cpp
 )
 
 add_executable(client ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES})

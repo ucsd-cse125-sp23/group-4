@@ -11,9 +11,11 @@
 int Window::width;
 int Window::height;
 const char* Window::windowTitle = "CSE 125 graphics engine :)";
+bool Window::inGame;
 
 // Game stuff to render
 Scene* Window::gameScene;
+Lobby* Window::lobby;
 HUD* Window::hud;
 
 Camera* Cam;
@@ -50,10 +52,14 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  gameScene = new Scene(Cam);
-  gameScene->init();
-
-  hud = new HUD(gameScene);
+  if (inGame) {
+    gameScene = new Scene(Cam);
+    gameScene->init();
+    hud = new HUD(gameScene);
+  } else {
+    gameScene = new Lobby(Cam);
+    gameScene->init();
+  }
   return true;
 }
 
@@ -75,6 +81,7 @@ void Window::cleanUp() {
 // for the Window
 GLFWwindow* Window::createWindow(int width, int height) {
   // Initialize GLFW.
+  inGame = false;
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return NULL;
@@ -160,6 +167,17 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
   Cam->UpdateView(window);
 
   gameScene->update(deltaTime);
+
+  if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
+    Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
+    inGame = lobby->ready;
+    if (inGame) {
+      //initializeObjects(inGame);
+      gameScene = new Scene(Cam);
+      gameScene->init(lobby->selectedModel);
+      hud = new HUD(gameScene);
+    }
+  }
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -173,7 +191,7 @@ void Window::displayCallback(GLFWwindow* window) {
 
   // Render the objects.
   gameScene->draw();
-  hud->draw(window);
+  if (inGame) hud->draw(window);
 
   Input::handle(false);
   if (_debugmode) {

@@ -111,6 +111,7 @@ class Scene {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
+    camera->Fixed = false;
     gamethings.push_back(camera);
     time.time = 300.f; //5 minutes
     time.countdown = true;
@@ -161,13 +162,13 @@ class Scene {
     core_playerpair = initializePlayer();
   }
 
-  void init(void);
-  void update(float delta);
+  virtual void init(void);
+  void init(PlayerModel* player);
+  virtual void update(float delta);
   void update_core(
       void);  // TODO(matthew) let game state updates be passed in here
 
-  //void drawHUD(GLFWwindow* window);
-  void draw();
+  virtual void draw();
 
   void gui();
   void gui_core();

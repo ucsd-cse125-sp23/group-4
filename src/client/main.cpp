@@ -94,6 +94,7 @@ int main(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
   // Initialize objects/pointers for rendering; exit if initialization fails.
+  bool inGame = false;
   if (!Window::initializeObjects()) {
     std::cout << "Press enter...";
     char i = std::getchar();

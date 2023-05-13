@@ -9,6 +9,7 @@
 
 #include "client/graphics/Camera.h"
 #include "client/graphics/Scene.h"
+#include "client/graphics/Lobby.h"
 #include "client/graphics/HUD.h"
 #include "client/graphics/main.h"
 
@@ -20,9 +21,11 @@ class Window {
   static int width;
   static int height;
   static const char* windowTitle;
+  static bool inGame;
 
   // Objects to render
   static Scene* gameScene;
+  static Lobby* lobby;
   static HUD* hud;
   // Act as Constructors and desctructors
   static bool initializeProgram(GLFWwindow* window);
@@ -37,7 +40,7 @@ class Window {
 
   // update and draw functions
   static void idleCallback(GLFWwindow* window, float deltaTime);
-  static void displayCallback(GLFWwindow*);
+  static void displayCallback(GLFWwindow* window);
 
   // helper to reset the camera
   static void resetCamera();
