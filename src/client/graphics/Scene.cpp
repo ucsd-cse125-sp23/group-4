@@ -3,10 +3,17 @@ Scene.cpp contains the implementation of the draw command
 Renders all objects with DFS tree traversal
 adapted from CSE 167 - Matthew
 *****************************************************/
-#include "client/graphics/Scene.h"
+#include "Scene.h"
 
-// The scene init definition
-#include "Scene.inl"
+#include <GL/freeglut.h>
+#include <Player.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+#include <iostream>
+#include <stack>
+
+#include "Scene.inl"  // The scene init definition
 
 using glm::mat4x4;
 using glm::vec3;

@@ -1,14 +1,20 @@
 #include "Joint.h"
 
+#include <string.h>
+
+#include <ostream>
+
+#include "glm/gtx/transform.hpp"
+
 void Joint::AddChild(Joint* child) { children.push_back(child); }
 
 // Ljoint(phi)
 glm::mat4 Joint::ComputeLocal() {
   // right terms first, left term last
-  return translate(offset) *
-         rotate(phi[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f)) *
-         rotate(phi[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f)) *
-         rotate(phi[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
+  return glm::translate(offset) *
+         glm::rotate(phi[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f)) *
+         glm::rotate(phi[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f)) *
+         glm::rotate(phi[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 /////////////////////////

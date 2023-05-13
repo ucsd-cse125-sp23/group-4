@@ -23,6 +23,7 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
+#include <utility>
 #include <vector>
 
 #include "client/graphics/Node.h"

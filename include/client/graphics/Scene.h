@@ -12,33 +12,28 @@
 #else
 #include <GL/glew.h>
 #endif
-#include <GL/freeglut.h>
 #include <GLFW/glfw3.h>
-#include <math.h>
-#include <stdlib.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
 #include <map>
-#include <stack>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "./shader.h"
 #include "client/graphics/Camera.h"
-#include "client/graphics/GameThing.h"
-#include "client/graphics/Node.h"
-// #include "Light.h"
-#include "client/graphics/Collider.h"
 #include "client/graphics/Cube.h"
+#include "client/graphics/GameThing.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
+#include "client/graphics/Node.h"
 #include "client/graphics/Obj.h"
-#include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
-#include "client/graphics/SkinnedMesh.h"
-#include "client/graphics/shader.h"
+#include "client/graphics/Skeleton.h"
+#include "client/graphics/Texture.h"
 #include "client/graphics/SceneState.h"
 
 struct Character {
@@ -113,7 +108,7 @@ class Scene {
 
   std::map<char, Character> Characters;
 
-  Scene(Camera* camFromWindow) {
+  explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";

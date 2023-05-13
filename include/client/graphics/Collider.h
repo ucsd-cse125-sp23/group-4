@@ -22,7 +22,7 @@ class Collider : public Node {
  public:
   std::vector<glm::vec3> vertices;  // passed in as world space
 
-  Collider(std::vector<glm::vec3> v) { vertices = v; }
+  explicit Collider(std::vector<glm::vec3> v) { vertices = v; }
 
   Collider(std::vector<glm::vec3> v, Mesh* displayMesh) : Collider(v) {
     vertices = v;
