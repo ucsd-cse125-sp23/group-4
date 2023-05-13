@@ -7,7 +7,7 @@
 #include "core/math/shape/OffsetShape.h"
 #include "core/util/global.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {/*
   std::cout << "Hello world!" << std::endl;
 
   PObject* player = new Player();
@@ -21,5 +21,5 @@ int main(int argc, char* argv[]) {
     player->tick();
   }
 
-  std::cout << "End" << std::endl;
+  std::cout << "End" << std::endl;*/
 }
