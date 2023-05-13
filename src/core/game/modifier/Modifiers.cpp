@@ -29,6 +29,10 @@ void GravityModifier::modify(Modifiable* obj, ModifierData* data) {
         vec3f(0.0f, -static_cast<GravityModifierData*>(data)->gravity, 0.0f);
 }
 
+ControlModifierData::ControlModifierData()
+    : ControlModifierData(JUMP_VELOCITY) {}
+ControlModifierData::ControlModifierData(float jumpVel)
+    : jumpVel(jumpVel), horizontalVel(vec3f(0, 0, 0)), doJump(false) {}
 void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     ControlModifierData* cData = static_cast<ControlModifierData*>(data);
