@@ -4,10 +4,6 @@
 
 #pragma once
 
-#include <string>
-
-#include "core.h"
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // The Tokenizer class for reading simple ascii data files. The GetToken

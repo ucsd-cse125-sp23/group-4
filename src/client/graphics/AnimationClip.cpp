@@ -1,5 +1,10 @@
 #include "AnimationClip.h"
 
+#include <imgui.h>
+
+#include "./core.h"
+#include "imported/Tokenizer.h"
+
 bool AnimationClip::Load(const char* file) {
   Tokenizer t;
   bool success = t.Open(file);

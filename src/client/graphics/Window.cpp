@@ -3,7 +3,20 @@
 // please refrain from modifying this a lot
 ////////////////////////////////////////
 
-#include "client/graphics/Window.h"
+#include "Window.h"
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <stddef.h>
+
+#include <glm/glm.hpp>
+#include <iostream>
+#include <string>
+
+#include "Camera.h"
+#include "Input.h"
+#include "Scene.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

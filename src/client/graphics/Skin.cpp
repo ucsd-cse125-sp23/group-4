@@ -1,5 +1,7 @@
 #include "Skin.h"
 
+#include "imported/Tokenizer.h"
+
 bool Skin::Load(const char* file) {
   Tokenizer t;
   bool success = t.Open(file);
