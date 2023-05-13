@@ -26,7 +26,7 @@ struct Simplex {
 
   void push(vec3f pt) {
     pts = {pt, pts[0], pts[1], pts[2]};
-    _size = std::min(_size + 1, 4ul);
+    _size = std::min(_size + 1, static_cast<std::size_t>(4));
   }
 
   vec3f& operator[](unsigned int i) { return this->pts[i]; }
