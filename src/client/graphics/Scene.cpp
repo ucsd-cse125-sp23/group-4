@@ -15,11 +15,22 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-void Scene::update(float delta) {
+void Scene::update(float delta) {  // deprecated. use updateState now
   // if (player) player->update(deltaTime);
 
   for (auto e : gamethings) {
     e->update(delta);
+  }
+}
+
+void Scene::updateState(SceneState newState) {
+  // loop through GameThings, send newest state data
+  for (auto e : gamethings) {
+    int currId = e->netId;
+
+    SceneGameThingState currState = newState.objectStates[currId];
+    // please check for non-null too!
+    e->updateFromState(currState);
   }
 }
 

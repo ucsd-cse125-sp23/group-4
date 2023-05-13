@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "client/graphics/Node.h"
+#include "client/graphics/SceneState.h"
 //#include "Input.h"
 
 struct Transform {
@@ -50,6 +51,8 @@ struct Transform {
 // a GameThing (tm)
 class GameThing : public Node {
  public:
+  int netId;  // used to connect with network/core data
+
   Transform transform;
 
   virtual void update(float dt) {
@@ -58,7 +61,32 @@ class GameThing : public Node {
     transform.updateMtx(&transformMtx);  // needed to update node matrix
   }
 
+  void updateFromState(SceneGameThingState state) {
+    // update self
+    setPosition(state.position);
+    setHeading(state.heading);
+  }
+
   // transform helpers
+
+  void setPosition(glm::vec3 pos) {
+    this->transform.position = pos;
+    transform.updateMtx(&transformMtx);
+  }
+
+  void setHeading(glm::vec3 direction) {
+    direction = normalize(direction);
+    // aka azimuth:
+    float heading = std::atan2(direction.x, direction.z) + (M_PI);
+
+    setHeading(heading);
+  }
+  void setHeading(float heading) {
+    // purely visual, for now (rotation not applied to transform itself)
+    if (!model) return;
+
+    model->modelMtx = glm::eulerAngleY(heading);
+  }
 
   void move(glm::vec3 movement) {
     // movement is in world space

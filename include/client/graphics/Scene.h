@@ -39,6 +39,7 @@
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/SkinnedMesh.h"
 #include "client/graphics/shader.h"
+#include "client/graphics/SceneState.h"
 
 struct Character {
   unsigned int TextureID;  // ID handle of the glyph texture
@@ -102,6 +103,8 @@ class Scene {
 
   Camera* camera;
 
+  SceneState gameState;
+
   // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
   std::map<std::string, Node*> node;
@@ -156,6 +159,8 @@ class Scene {
 
   void init(void);
   void update(float delta);
+  void updateState(SceneState newState);  // SEND NETWORK MESSAGE HERE
+
   void drawHUD(GLFWwindow* window);
   void draw();
 
