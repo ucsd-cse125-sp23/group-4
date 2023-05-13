@@ -22,7 +22,6 @@
 #include <utility>
 #include <vector>
 
-#include "client/graphics/shader.h"
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
@@ -35,6 +34,7 @@
 #include "client/graphics/SceneState.h"
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/Texture.h"
+#include "client/graphics/shader.h"
 
 struct Character {
   unsigned int TextureID;  // ID handle of the glyph texture
