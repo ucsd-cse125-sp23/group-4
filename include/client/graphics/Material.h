@@ -3,12 +3,15 @@
  * Contains info about how to render the surface of a
  * given mesh
  *****************************************************/
+
+#pragma once
+
 #define GLM_FORCE_RADIANS
+
+#include <glm/glm.hpp>
+
 #include "client/graphics/Texture.h"
 #include "client/graphics/core.h"
-
-#ifndef __MATERIAL_H__
-#define __MATERIAL_H__
 
 struct Material {
   GLuint shader;  // points to the shader program we want to use
@@ -24,9 +27,9 @@ struct Material {
   void setUniforms(const glm::mat4& viewProjMtx, const glm::mat4& model) {
     // TODO: optimize this glGetLocation call out to an init func?
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false,
-                       (float*)&viewProjMtx);
+                       reinterpret_cast<const float*>(&viewProjMtx));
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE,
-                       (float*)&model);
+                       reinterpret_cast<const float*>(&model));
 
     glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &diffuse[0]);
 
@@ -53,5 +56,3 @@ struct Material {
     */
   }
 };
-
-#endif

@@ -1,6 +1,5 @@
 #include <boost/asio.hpp>
 #include <config/lib.hpp>
-#include <iostream>
 #include <network/tcp_server.hpp>
 
 int main(int argc, char *argv[]) {

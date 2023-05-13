@@ -8,6 +8,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 #include <vector>
 
 #include "client/graphics/Model.h"
@@ -18,7 +19,7 @@ class Node {
  public:
   std::string name = "node";
   Node() {}
-  Node(std::string name) { this->name = name; }
+  explicit Node(std::string name) { this->name = name; }
 
   glm::mat4 transformMtx;  // local space
   glm::mat4

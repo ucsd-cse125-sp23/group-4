@@ -1,5 +1,13 @@
 #include "Skeleton.h"
 
+#include <cmath>
+
+#include "Camera.h"
+#include "GL/glew.h"
+#include "Joint.h"
+#include "Pose.h"
+#include "imported/Tokenizer.h"
+
 // get the camera forward direction
 glm::vec3 GetForward(Camera* camera) {
   float azimuth = camera->GetAzimuth();
