@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 /* PROTOTYPE SCENE GAME STATE CODE (clean it up later) */
 
 struct SceneGameThingState {

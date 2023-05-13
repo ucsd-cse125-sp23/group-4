@@ -28,7 +28,6 @@
 
 #include "client/graphics/Node.h"
 #include "client/graphics/SceneState.h"
-//#include "Input.h"
 
 struct Transform {
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
