@@ -29,6 +29,6 @@ public:
 	bool isStatic();
 	const CollisionBounds* getBounds();
 	virtual void tick();
-	virtual void onCollision(const PObject* other) {}
-	virtual void onTrigger(const PObject* other) {}
+	virtual void onCollision(PObject* other) {}
+	virtual void onTrigger(PObject* other) {}
 };
