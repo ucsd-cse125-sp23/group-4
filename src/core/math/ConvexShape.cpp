@@ -52,24 +52,16 @@ bool triangle(Simplex& pts, vec3f& dir) {
     if (sameDir(ac, ao)) {
       pts = {a, c};
       dir = cross(cross(ac, ao), ac);
-    }
-
-    else {
+    } else {
       return line(pts = {a, b}, dir);
     }
-  }
-
-  else {
+  } else {
     if (sameDir(cross(ab, abc), ao)) {
       return line(pts = {a, b}, dir);
-    }
-
-    else {
+    } else {
       if (sameDir(abc, ao)) {
         dir = abc;
-      }
-
-      else {
+      } else {
         pts = {a, c, b};
         dir = -abc;
       }

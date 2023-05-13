@@ -5,7 +5,7 @@
 
 struct GravityModifierData : ModifierData {
   float gravity;
-  GravityModifierData(float gravity) : gravity(gravity) {}
+  explicit GravityModifierData(float gravity) : gravity(gravity) {}
 };
 class GravityModifier : public Modifier {
  public:

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
 #include "core/game/event/EventManager.h"
@@ -11,7 +12,7 @@
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {
  private:
-  unsigned long long age;
+  uint64_t age;
   CollisionType collisionTypeLUT[10][10];
   Environment* environment;
 
@@ -29,6 +30,6 @@ class Level {
   ~Level();
   void setCollisionType(CollisionType type, int layer0, int layer1);
   void addPObject(PObject* obj);
-  unsigned long long getAge();
+  uint64_t getAge();
   void tick();
 };
