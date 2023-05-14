@@ -38,13 +38,14 @@ void Camera::UpdateView(GLFWwindow* window) {
       glm::perspective(glm::radians(FOV), Aspect, NearClip, FarClip);
 
   // Compute final view-projection matrix
+  ViewMtx = view;
   ViewProjectMtx = project * view;
 }
 
 void Camera::CamDrag(float a, float i) {
   if (Fixed) return;  // TODO(matthew) fix
 
-  const float rate = 0.5f;  // mouse sensitivity TODO
+  const float rate = 0.5f;  // mouse sensitivity
   SetAzimuth(GetAzimuth() + a * rate);
   SetIncline(glm::clamp(GetIncline() - i * rate, -90.0f, 90.0f));
 }

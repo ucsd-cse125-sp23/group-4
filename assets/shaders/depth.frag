@@ -1,3 +1,4 @@
+// ((((not used)))) just a reference
 #version 330 core
 
 in vec4 position; // raw position in the model coord
