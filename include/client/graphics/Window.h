@@ -20,7 +20,9 @@ public:
 	// Objects to render
 	static Scene* gameScene;
 	static GLuint shaderAssimp;
+	static GLuint shaderBasic;
 	static AssimpModel* assimpModel;
+	static Cube* testCube;
 
 	// Act as Constructors and desctructors 
 	static bool initializeProgram(GLFWwindow* window);

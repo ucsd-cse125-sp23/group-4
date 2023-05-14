@@ -34,6 +34,7 @@ bool AssimpModel::loadAssimp(const char* path) {
     loadAssimpHelperNode(rootNode, glm::mat4(1.0f), scene->mRootNode, scene);
     loadAssimpHelperAnim(scene);
     loadAssimpHelperImgui();
+    useMesh();
     return true;
 }
 
@@ -60,7 +61,12 @@ void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < aiNode->mNumChildren; i++) {
-        AssimpNode* childNode = new AssimpNode(numNode++);
+        AssimpNode* childNode;
+        if(nodeMap.find(aiNode->mChildren[i]->mName.C_Str()) != nodeMap.end()) {
+            childNode = nodeMap.find(aiNode->mChildren[i]->mName.C_Str())->second;
+        } else {
+            childNode = new AssimpNode(numNode++);
+        }
         childNode->parent = node;
         loadAssimpHelperNode(childNode, node->accTransform, aiNode->mChildren[i], scene);
         node->children.push_back(childNode);
@@ -69,6 +75,7 @@ void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
 
 void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene) {
     // Is it possible to use vector.resize() & index?
+    mesh->name = aiMesh->mName.C_Str();
 
     for(unsigned int i = 0; i < aiMesh->mNumVertices; i++) {
         Vertex vertex;
@@ -108,17 +115,24 @@ void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const a
             vw.weight    = bone->mWeights[i].mWeight;
             joint->weights.push_back(vw);
         }
+        if(nodeMap.find(joint->name) == nodeMap.end()) {
+            nodeMap[joint->name] = new AssimpNode(numNode++);
+        }
         joint->node = nodeMap[joint->name];
 
         mesh->joints.push_back(joint);
         nodeMap[joint->name]->joints.push_back(joint);
     }
 
+    int maxBoneAffected = 0;
     std::vector<int> vertexBindedBones(mesh->vertices.size(), 0);
     for(int i = 0; i < mesh->joints.size(); i++) {
         AssimpJoint* joint = mesh->joints[i];
         for(int j = 0; j < joint->weights.size(); j++) {
             VertexWeight& vw = joint->weights[j];
+            if(maxBoneAffected < vertexBindedBones[vw.vertexInd]) {
+                maxBoneAffected = vertexBindedBones[vw.vertexInd];
+            }
             switch (vertexBindedBones[vw.vertexInd]) {
             case 0:
                 mesh->vertices[vw.vertexInd].boneInds.x = i;
@@ -137,11 +151,20 @@ void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const a
                 mesh->vertices[vw.vertexInd].boneWeights.w = vw.weight;
                 break;
             default:
+                for(int n = 0; n < 3; n++) {
+                    if(mesh->vertices[vw.vertexInd].boneWeights[n] < vw.weight) {
+                        mesh->vertices[vw.vertexInd].boneInds[n] = i;
+                        mesh->vertices[vw.vertexInd].boneWeights[n] = vw.weight;
+                        break;
+                    }
+                }
                 break;
             }
             vertexBindedBones[vw.vertexInd]++;
         }
     }
+    printf("%s MAX_BONE: %d\n", mesh->name.c_str(), maxBoneAffected);
+    // printf("MAX_BONE_VERT: %u %u %u %u\n", mesh->vertices[vw.vertexInd].boneInds.x, mesh->vertices[vw.vertexInd].boneInds.y, mesh->vertices[vw.vertexInd].boneInds.z. mesh->vertices[vw.vertexInd].boneInds.w);
 }
 
 void AssimpModel::loadAssimpHelperAnim(const aiScene *scene) {
@@ -195,6 +218,7 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, GLuint shader) {
         return;
     }
 
+    glUseProgram(shader);
     // TODO: remove this matrix when done with integration
     glm::mat4 betterViewMat = glm::scale(
         glm::translate(
@@ -207,6 +231,12 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, GLuint shader) {
             meshes[i]->draw(viewProjMtx, shader);
         }
     }
+
+    if(drawNode) {
+        glDepthFunc(GL_ALWAYS);
+        rootNode->draw(viewProjMtx);
+        glDepthFunc(GL_LEQUAL);
+    }
 }
 
 void AssimpModel::loadAssimpHelperImgui() {
@@ -218,6 +248,10 @@ void AssimpModel::loadAssimpHelperImgui() {
     for(int i = 0; i < animations.size(); i++) {
         strcpy(animModes[1+i],std::string("Animation ").append(std::to_string(i+1)).c_str());
     }
+
+    for(auto& n : nodeMap) {
+        nodeControlMap[n.first] = ControlInfo();
+    }
 }
 
 void AssimpModel::imGui() {
@@ -228,6 +262,14 @@ void AssimpModel::imGui() {
 
     // Node Tree
     ImGui::SeparatorText("Node Tree");
+    ImGui::Checkbox("draw node", &drawNode);
+    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Node Highlight (%lu)", nodeMap.size())) {
+        for(auto it = nodeMap.begin(); it != nodeMap.end(); it++) {
+            std::string name = it->first;
+            ImGui::Checkbox(name.c_str(), &it->second->isMarked);
+        }
+        ImGui::TreePop();
+    }
     if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Node Tree (%lu)", nodeMap.size())) {
         rootNode->imGui();
         ImGui::TreePop();
@@ -283,6 +325,10 @@ void AssimpModel::imGui() {
         ImGui::EndListBox();
     }
 
+    // Joint control
+    ImGui::SeparatorText("Joint Control");
+    imGuiJointMenu();
+
     ImGui::End();
 }
 
@@ -329,5 +375,43 @@ void AssimpModel::update(float deltaTimeInMs) {
     rootNode->update(glm::mat4(1.0f));
     for(int i = 0; i < meshes.size(); i++) {
         meshes[i]->update();
+    }
+}
+
+void AssimpModel::imGuiJointMenu() {
+    for(auto& x : nodeMap) {
+        AssimpNode* node = x.second;
+        const std::string name = node->name;
+        if(ImGui::TreeNode(name.c_str())) {
+            bool& isControlled = nodeControlMap[x.first].useControl;
+            glm::vec3& pose = nodeControlMap[x.first].pose;
+            glm::vec3& scale = nodeControlMap[x.first].scale;
+            glm::vec3& offset = nodeControlMap[x.first].offset;
+            ImGui::Checkbox("Control", &isControlled);
+            ImGui::SliderFloat("Pos X", &offset.x, -5.0f, 5.0f, "%.2f");
+            ImGui::SliderFloat("Pos Y", &offset.y, -5.0f, 5.0f, "%.2f");
+            ImGui::SliderFloat("Pos Z", &offset.z, -5.0f, 5.0f, "%.2f");
+            ImGui::SliderFloat("Rot X", &pose.x, -360.0f, 360.0f, "%.2f");
+            ImGui::SliderFloat("Rot Y", &pose.y, -360.0f, 360.0f, "%.2f");
+            ImGui::SliderFloat("Rot Z", &pose.z, -360.0f, 360.0f, "%.2f");
+            ImGui::SliderFloat("Sca X", &scale.x, 0.1f, 2.0f, "%.2f");
+            ImGui::SliderFloat("Sca Y", &scale.y, 0.1f, 2.0f, "%.2f");
+            ImGui::SliderFloat("Sca Z", &scale.z, 0.1f, 2.0f, "%.2f");
+            ImGui::TreePop();
+            if(isControlled) {
+                glm::vec3 poseR = glm::radians(pose);
+                glm::mat4 result(1.0f);
+                result = glm::translate(result, offset);
+                result = glm::rotate(result, poseR.x, glm::vec3(1.0f, 0.0f, 0.0f));
+                result = glm::rotate(result, poseR.y, glm::vec3(0.0f, 1.0f, 0.0f));
+                result = glm::rotate(result, poseR.z, glm::vec3(0.0f, 0.0f, 1.0f));
+                result = glm::scale(result, scale);
+                node->animationTransform = result;
+                rootNode->update(glm::mat4(1.0f));
+                for(int i = 0; i < meshes.size(); i++) {
+                    meshes[i]->update();
+                }
+            }
+        }
     }
 }

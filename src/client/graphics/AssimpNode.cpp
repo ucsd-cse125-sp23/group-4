@@ -1,6 +1,7 @@
 #include "AssimpNode.h"
 
 #include "AssimpMath.h"
+#include "shader.h"
 #include <glm/gtx/string_cast.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -18,6 +19,29 @@ void AssimpNode::update(const glm::mat4& parentWorldTransform) {
     }
     for(int i = 0; i < children.size(); i++) {
         children[i]->update(matWorldTransform);
+    }
+}
+
+GLuint* AssimpNode::shader;
+void AssimpNode::draw(const glm::mat4& viewProjMtx) {
+    if(!shader) {
+        GLuint shaderTemp = LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
+        shader = new GLuint(shaderTemp);
+    }
+
+    glUseProgram(*shader);
+    glm::vec3 color;
+    if(!isMarked) {
+        color = glm::vec3(1.0f, 1.0f, 1.0f);
+    } else {
+        color = glm::vec3(1.0f, 1.0f, 0.0f);
+    }
+    glUniformMatrix4fv(glGetUniformLocation(*shader, "viewProj"), 1, false, (float*)&viewProjMtx);
+    glUniformMatrix4fv(glGetUniformLocation(*shader, "model"), 1, GL_FALSE, (float*)&matWorldTransform);
+    glUniform3fv(glGetUniformLocation(*shader, "DiffuseColor"), 1, &color[0]);
+    geometry.draw();
+    for(auto c : children) {
+        c->draw(viewProjMtx);
     }
 }
 

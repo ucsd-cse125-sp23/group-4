@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 
+#include "client/graphics/Cube.h"
 #include "client/graphics/AssimpMesh.h"
 
 class AssimpMesh;
@@ -34,6 +35,12 @@ public:
     std::vector<AssimpNode*> children;
     std::vector<AssimpJoint*> joints;
 
+    bool isMarked = false;
+
     void update(const glm::mat4& parentWorldTransform);
+    void draw(const glm::mat4& viewProjMtx);
     void imGui();
+private:
+    static GLuint *shader;
+    Cube geometry = Cube(glm::vec3(-0.1,-0.1,-0.1), glm::vec3(0.1,0.1,0.1));
 };

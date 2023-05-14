@@ -54,6 +54,16 @@ private:
     int currentAnimation;
     std::vector<AssimpAnimation> animations;
     char** animModes;
+    bool drawNode = false;
+
+    struct ControlInfo {
+        bool useControl = false;
+        glm::vec3 pose = glm::vec3(1);
+        glm::vec3 scale = glm::vec3(1);
+        glm::vec3 offset = glm::vec3(1);
+    };
+
+    std::map<std::string, ControlInfo> nodeControlMap;
 
     /** Prepare a new AssimpNode node
       * accTransform: accumulative transform from parent node
@@ -77,4 +87,5 @@ private:
     void loadAssimpHelperAnim(const aiScene *scene);
     /** Prepare ImGui information for this model */
     void loadAssimpHelperImgui();
+    void imGuiJointMenu();
 };

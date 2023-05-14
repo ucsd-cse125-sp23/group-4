@@ -40,6 +40,7 @@ public:
     static const int MAX_BONES = 200;
     AssimpMesh();
 
+    std::string name;
     AssimpNode* node;
     std::vector<Vertex>       vertices;
     std::vector<unsigned int> indices;

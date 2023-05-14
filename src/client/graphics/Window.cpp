@@ -13,6 +13,7 @@ const char* Window::windowTitle = "CSE 125 graphics engine :)";
 
 // Game stuff to render
 Scene* Window::gameScene;
+GLuint Window::shaderBasic;
 GLuint Window::shaderAssimp;
 AssimpModel* Window::assimpModel;
 
@@ -265,7 +266,6 @@ void Window::displayCallback(GLFWwindow* window)
 		glUseProgram(shaderAssimp);
 		assimpModel->draw(Cam->GetViewProjectMtx(), shaderAssimp);
 	}
-
 
 	// imgui new frame
 	ImGui_ImplOpenGL3_NewFrame();

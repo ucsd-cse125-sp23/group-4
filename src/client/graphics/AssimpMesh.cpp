@@ -11,7 +11,9 @@ glm::mat4 AssimpJoint::update() {
 
 AssimpMesh::AssimpMesh() 
         : node(nullptr), isLoaded(false) {
-    matBindingInvs[0] = glm::mat4(1.0f);
+    for(int i = 0; i < MAX_BONES; i++) {
+        matBindingInvs[i] = glm::mat4(1.0f);
+    }
 }
 
 void AssimpMesh::update() {
