@@ -1,3 +1,4 @@
+// ((((not used)))) just a reference
 # version 330 core
 
 layout (location = 0) in vec3 vertex_position;  // raw position in the model coord

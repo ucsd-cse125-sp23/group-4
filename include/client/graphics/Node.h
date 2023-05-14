@@ -31,10 +31,11 @@ class Node {
 
   std::vector<Node*> childnodes;
 
-  virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& parentMtx) {
+  virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+                    const glm::mat4& parentMtx) {
     parentMtxCache = parentMtx;
     if (model) {
-      model->draw(viewProjMtx, parentMtx * transformMtx);
+      model->draw(viewProjMtx, viewMtx, parentMtx * transformMtx);
     }
   }
 
@@ -42,7 +43,8 @@ class Node {
                           const glm::mat4& parentMtx, bool gizmos,
                           Model* gizmo_mdl, Model* gizmoCube_mdl) {
     if (gizmos && _renderGizmo) {
-      gizmo_mdl->draw(viewProjMtx, parentMtx * transformMtx, true);
+      gizmo_mdl->draw(viewProjMtx, glm::mat4(1), parentMtx * transformMtx,
+                      true);
     }
   }
 
