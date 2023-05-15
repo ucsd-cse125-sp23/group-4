@@ -5,43 +5,47 @@
 
 #pragma once
 
-#include "core.h"
-#include "Pose.h"
+#define _USE_MATH_DEFINES
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+
+#include <vector>
+
 #include "Joint.h"
+#include "Pose.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // The Skeleton class for holding joints of a skeleton tree structure.
 
-class Skeleton 
-{
-public:
-	Skeleton()
-	{
-		root = nullptr;
-	}
-	~Skeleton()
-	{
-		delete root;
-	}
+class Skeleton {
+ public:
+  Skeleton() { root = nullptr; }
+  ~Skeleton() { delete root; }
 
-	bool Load(const char* file);
-	void Update();
-	void Draw(const glm::mat4& viewProjMtx, GLuint shader);
-	void Show();	// GUI
+  bool Load(const char* file);
+  void Update(float deltaTime);
+  void Draw(const glm::mat4& viewProjMtx, GLuint shader);
+  void Show();  // GUI
 
-	glm::mat4 GetWorldMatrix(int joint);
+  glm::mat4 GetWorldMatrix(int joint);
 
-	void SetPose(const Pose pose);
+  void SetPose(const Pose pose);
 
-private:
-	std::vector<Joint*> joints;	// random access
+ private:
+  std::vector<Joint*> joints;  // random access
 
-	Joint* root;	// tree structure
+  Joint* root;  // tree structure
 
-	void SetJointDOFs(int joint, glm::vec3 dof);
-	Joint* GetJoint(int j);
-	Joint* FindJointInTree(int j);
+  bool applyToRoot = false;
+
+  void SetJointDOFs(int joint, glm::vec3 dof);
+  Joint* GetJoint(int j);
+  Joint* FindJointInTree(int j);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

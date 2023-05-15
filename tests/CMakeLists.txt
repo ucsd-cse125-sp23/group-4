@@ -6,4 +6,4 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(tests example.cpp)
 target_link_libraries(tests Catch2::Catch2WithMain)
-add_test(test_all tests)
+add_test(NAME test_all COMMAND tests)
