@@ -13,7 +13,7 @@ std::string Message::toString() const {
   // clang-format off
   std::string str =
       std::string("") +
-      "Message {" +                                                             "\n" // NOLINT
+      "{" +                                                             "\n" // NOLINT
       "  type: " + std::string(magic_enum::enum_name(type)) + "," +             "\n" // NOLINT
       "  metadata: {," +                                                        "\n" // NOLINT
       "    player_id: " + boost::uuids::to_string(metadata.player_id) + "," +   "\n" // NOLINT

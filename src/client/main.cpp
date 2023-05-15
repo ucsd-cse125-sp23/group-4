@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <ctime>
 #include <iostream>
+#include <magic_enum.hpp>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 #include <string>
@@ -72,11 +73,11 @@ void network_init() {
   boost::asio::io_context io_context;
   PlayerID player_id;
   auto connect_handler = [&](tcp::endpoint endpoint, Client& client) {
-    std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
-              << std::endl;
+    std::cout << "(Client::connect) Connected to " << endpoint.address() << ":"
+              << endpoint.port() << std::endl;
   };
   auto read_handler = [&](const message::Message& m, Client& client) {
-    std::cout << "Received " << m << std::endl;
+    std::cout << "(Connection::read) Received\n" << m << std::endl;
     auto assign_handler = [&](const message::Assign& body) {
       player_id = m.metadata.player_id;
       message::Message new_m{message::Type::Greeting,
@@ -85,15 +86,16 @@ void network_init() {
       client.write(new_m);
     };
     auto greeting_handler = [&](const message::Greeting& body) {};
+    auto notify_handler = [&](const message::Notify& body) {};
 
-    auto message_handler = boost::bind<void>(
-        boost::make_overloaded_function(assign_handler, greeting_handler),
-        boost::placeholders::_1);
-
+    auto message_handler = boost::make_overloaded_function(
+        assign_handler, greeting_handler, notify_handler);
     boost::apply_visitor(message_handler, m.body);
   };
-  auto write_handler = [&](std::size_t bytes_transferred, Client& client) {
-    std::cout << "Successfully wrote " << bytes_transferred
+  auto write_handler = [&](std::size_t bytes_transferred,
+                           const message::Message& m, Client& client) {
+    std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
+              << ") Successfully wrote " << bytes_transferred
               << " bytes to server" << std::endl;
   };
   Client client(io_context, server_addr, connect_handler, read_handler,

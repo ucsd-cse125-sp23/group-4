@@ -21,7 +21,8 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
         auto conn_read_handler = [=](boost::system::error_code ec,
                                      const message::Message& m) {
           if (ec) {
-            std::cerr << "(read) Error: " << ec.message() << std::endl;
+            std::cerr << "(Connection::read) Error: " << ec.message()
+                      << std::endl;
             return;
           }
 
@@ -30,13 +31,15 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
         };
 
         auto conn_write_handler = [=](boost::system::error_code ec,
-                                      std::size_t bytes_transferred) {
+                                      std::size_t bytes_transferred,
+                                      const message::Message& m) {
           if (ec) {
-            std::cerr << "(write) Error: " << ec.message() << std::endl;
+            std::cerr << "(Connection::write) Error: " << ec.message()
+                      << std::endl;
             return;
           }
 
-          write_handler(bytes_transferred, *this);
+          write_handler(bytes_transferred, m, *this);
         };
 
         connection = std::make_unique<Connection<message::Message>>(

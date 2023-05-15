@@ -16,6 +16,7 @@ using PlayerID = boost::uuids::uuid;
 enum class Type {
   Assign,
   Greeting,
+  Notify,
 };
 
 struct Metadata {
@@ -45,10 +46,20 @@ struct Greeting {
   }
 };
 
+struct Notify {
+  std::string message;
+  std::string toString() { return message; }
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& message;
+  }
+};
+
 struct Message {
   Type type;
   Metadata metadata;
-  boost::variant<Assign, Greeting> body;
+  boost::variant<Assign, Greeting, Notify> body;
 
   std::string toString() const;
   friend std::ostream& operator<<(std::ostream&, const Message&);

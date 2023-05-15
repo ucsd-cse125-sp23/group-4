@@ -16,8 +16,10 @@ class Server {
   Server(boost::asio::io_context& io_context, int port);
 
  private:
+  friend std::ostream& operator<<(std::ostream&, Server*);
+
   tcp::acceptor acceptor_;
-  std::unordered_map<PlayerID, std::shared_ptr<Connection<message::Message>>,
+  std::unordered_map<PlayerID, std::unique_ptr<Connection<message::Message>>,
                      boost::hash<PlayerID>>
       connections_;
 

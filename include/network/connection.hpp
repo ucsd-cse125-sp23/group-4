@@ -6,7 +6,6 @@
 #include <boost/asio.hpp>
 #include <functional>
 #include <iostream>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,18 +13,18 @@
 using boost::asio::ip::tcp;
 
 template <typename T>
-class Connection : std::enable_shared_from_this<Connection<T>> {
+class Connection {
  public:
   using ReadHandler =
       std::function<void(boost::system::error_code ec, const T& t)>;
-  using WriteHandler =
-      std::function<void(boost::system::error_code ec, std::size_t length)>;
+  using WriteHandler = std::function<void(boost::system::error_code ec,
+                                          std::size_t length, const T& t)>;
 
   Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
       : socket_(std::move(s)), read_handler(rh), write_handler(wh) {}
 
   ~Connection() {
-    std::cout << "Closing connection and its socket" << std::endl;
+    std::cout << "(~Connection) Closing connection and its socket" << std::endl;
     socket_.close();
   }
 
@@ -136,11 +135,13 @@ void Connection<T>::write(const T& data) {
     outbound_data_ = serialize_data(data);
     outbound_header_ = build_header();
   } catch (const boost::system::error_code& ec) {
-    return write_handler(ec, 0);
+    return write_handler(ec, 0, data);
   }
 
   std::vector<boost::asio::const_buffer> buffers;
   buffers.push_back(boost::asio::buffer(outbound_header_));
   buffers.push_back(boost::asio::buffer(outbound_data_));
-  boost::asio::async_write(socket_, buffers, write_handler);
+  boost::asio::async_write(socket_, buffers,
+                           std::bind(write_handler, std::placeholders::_1,
+                                     std::placeholders::_2, data));
 }
