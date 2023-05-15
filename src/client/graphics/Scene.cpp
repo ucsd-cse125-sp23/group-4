@@ -35,6 +35,8 @@ void Scene::updateState(SceneState newState) {
   for (auto e : gamethings) {
     int currId = e->netId;
 
+    if (currId == -1) continue;  // skip thing
+
     SceneGameThingState currState = newState.objectStates[currId];
     // please check for non-null too!
     e->updateFromState(currState);

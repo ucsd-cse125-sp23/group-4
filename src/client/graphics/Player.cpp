@@ -35,7 +35,7 @@ void Player::update(float dt) {
 
   if (moving) {
     move(moveLocal);
-    pmodel->update(dt);
+    if (pmodel) pmodel->update(dt);
   }
 
   if (tagged) time += dt;
@@ -56,7 +56,7 @@ void Player::faceDirection(vec3 direction) {
   azimuth = std::atan2(direction.x, direction.z) + (M_PI);  // aka azimuth
 
   // purely visual, for now (rotation never applied to player node itself)
-  if (!pmodel) return;
+  if (!model) return;
 
-  pmodel->modelMtx = glm::eulerAngleY(azimuth);
+  model->modelMtx = glm::eulerAngleY(azimuth);
 }

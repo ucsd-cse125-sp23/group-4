@@ -30,6 +30,7 @@
 #include "client/graphics/Model.h"
 #include "client/graphics/Node.h"
 #include "client/graphics/Obj.h"
+#include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/SceneState.h"
 #include "client/graphics/Skeleton.h"
@@ -152,6 +153,7 @@ class Scene {
     node["world"] = new Node("world");
   }
 
+  Player* createPlayer(int id, bool isUser);
   void init(void);
   void update(float delta);
   void updateState(SceneState newState);  // SEND NETWORK MESSAGE HERE

@@ -51,7 +51,7 @@ struct Transform {
 // a GameThing (tm)
 class GameThing : public Node {
  public:
-  int netId;  // used to connect with network/core data
+  int netId = -1;  // used to connect with network/core data (-1 means unset)
 
   Transform transform;
 
