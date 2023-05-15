@@ -21,5 +21,3 @@ struct optional {
     if (exists) val.~T();
   }
 };
-
-#endif

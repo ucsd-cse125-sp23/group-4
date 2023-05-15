@@ -81,5 +81,3 @@ class GameThing : public Node {
     return glm::vec3(transform.getRotationMtx() * glm::vec4(1, 0, 0, 1));
   }
 };
-
-};

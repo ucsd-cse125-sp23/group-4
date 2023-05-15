@@ -98,5 +98,3 @@ class Mesh {
     glDeleteBuffers(1, &buffers[3]);
   }
 };
-
-#endif 
