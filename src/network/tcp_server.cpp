@@ -20,19 +20,23 @@ Server::Server(boost::asio::io_context& io_context, int port)
 }
 
 void Server::do_accept() {
-  acceptor_.async_accept([=](boost::system::error_code ec, tcp::socket socket) {
+  // handler on new client connections
+  auto accept_handler = [=](boost::system::error_code ec, tcp::socket socket) {
     if (ec) {
       std::cerr << "(TCPServer::accept) Error: " << ec.message() << std::endl;
       return;
     }
 
+    do_accept();  // start accepting new connections
+
+    // generate new player_id
     PlayerID player_id = boost::uuids::random_generator()();
     std::cout
         << "(TCPServer::accept) Accepted new client, assigning player_id: "
         << player_id << std::endl;
 
-    auto read_handler = [=](boost::system::error_code ec,
-                            const message::Message& m) {
+    auto conn_read_handler = [=](boost::system::error_code ec,
+                                 const message::Message& m) {
       if (ec) {
         std::cerr << "(Connection::read) Error: " << ec.message() << std::endl;
         if (ec == boost::asio::error::eof) {
@@ -68,8 +72,9 @@ void Server::do_accept() {
       read(player_id);
     };
 
-    auto write_handler = [=](boost::system::error_code ec, std::size_t length,
-                             const message::Message& m) {
+    auto conn_write_handler = [=](boost::system::error_code ec,
+                                  std::size_t length,
+                                  const message::Message& m) {
       if (ec) {
         std::cerr << "(Connection::write, " << magic_enum::enum_name(m.type)
                   << ") Error: " << ec.message() << std::endl;
@@ -81,32 +86,32 @@ void Server::do_accept() {
                 << player_id << std::endl;
     };
 
+    // store new connection
     connections_.insert(
         {player_id, std::make_unique<Connection<message::Message>>(
-                        socket, read_handler, write_handler)});
+                        socket, conn_read_handler, conn_write_handler)});
     auto& connection = connections_[player_id];
+    std::cout << this << std::endl;
 
-    // assign client player_id
+    // assign client their player_id
     message::Message new_m{message::Type::Assign,
                            {player_id, std::time(nullptr)},
                            message::Assign{}};
     connection->write(new_m);
 
     // notify everyone a new player has joined
+    // TODO: don't notify newly joined client
     message::Message join_notification{
         message::Type::Notify,
         {player_id, std::time(nullptr)},
         message::Notify{"Player " + boost::uuids::to_string(player_id) +
                         " has joined"}};
-    // TODO: don't notify newly joined client
     write_all(join_notification);
 
-    connection->start();
+    connection->start();  // start reading from client
+  };
 
-    std::cout << this << std::endl;
-
-    do_accept();
-  });
+  acceptor_.async_accept(accept_handler);
 }
 
 void Server::read(const PlayerID& id) { connections_[id]->read(); }
