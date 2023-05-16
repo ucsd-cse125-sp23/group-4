@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <network/message.hpp>
 
 #include "glm/glm.hpp"
 
@@ -20,6 +21,12 @@ struct SceneState {
   std::map<int, SceneGameThingState> objectStates;
 
   SceneGameThingState GetUpdateFor(int id) { return objectStates[id]; }
+
+  SceneState() {}
+
+  SceneState(message::Message state) {
+    // TODO(matthew) convert message to SceneState
+  }
 };
 
 /* *** */
