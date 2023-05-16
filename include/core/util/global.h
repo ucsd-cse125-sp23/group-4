@@ -11,7 +11,9 @@
 #include "core/math/shape/SphereShape.h"
 #include "core/math/shape/CylinderShape.h"
 #include "core/math/shape/OffsetShape.h"
-#include "core/game/effect/GlobalEffect.h"
+
+#include "core/game/effect/StaticGlobalEffect.h"
+#include "core/game/effect/ContextAwareGlobalEffect.h"
 
 extern int TAG_COOLDOWN;
 extern float JUMP_VELOCITY;
@@ -35,8 +37,18 @@ extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern AttractModifier* ATTRACT_MODIFIER;
 extern FreezeModifier* FREEZE_MODIFIER;
 
+
+extern StaticGlobalEffect* SPEEDBOOST_EFFECT;
+extern StaticGlobalEffect* SLOWDOWN_EFFECT;
+extern StaticGlobalEffect* FREEZE_EFFECT;
+extern StaticGlobalEffect* REVERSE_EFFECT;
+extern StaticGlobalEffect* LAUNCH_EFFECT;
+extern StaticGlobalEffect* SLOW_FALL_EFFECT;
+extern StaticGlobalEffect* FAST_FALL_EFFECT;
+extern StaticGlobalEffect* SWAP_POSITIONS_EFFECT;
+
+extern StaticGlobalEffect* ATTRACT_EFFECT;
 /*
-extern GlobalEffect* SPEEDBOOST_SELF_EFFECT;
 extern GlobalEffect* SLOWDOWN_OTHER_EFFECT;
 extern GlobalEffect* FREEZE_OTHER_EFFECT;
 extern GlobalEffect* FLIP_CONTROL_OTHER_EFFECT;
@@ -46,7 +58,4 @@ extern GlobalEffect* SWAP_POSITIONS_OTHER_EFFECT;
 extern GlobalEffect* SWAP_POSITIONS_ALL_EFFECT;
 extern GlobalEffect* SLOW_FALL_OTHER_EFFECT;
 extern GlobalEffect* FAST_FALL_OTHER_EFFECT;
-extern GlobalEffect* SPEEDBOOST_EFFECT;
-extern GlobalEffect* SPEEDBOOST_EFFECT;
-extern GlobalEffect* SPEEDBOOST_EFFECT;
 */

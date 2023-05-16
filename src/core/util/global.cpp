@@ -23,9 +23,30 @@ SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
 AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
 FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
 
-/*
-GlobalEffect* SPEEDBOOST_EFFECT = new GlobalEffect([](Level* level, std::vector<PObject*> targets) {
+
+StaticGlobalEffect* SPEEDBOOST_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, 0.2f)));
 	});
-*/
+StaticGlobalEffect* SLOWDOWN_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+	for (auto target : targets)
+		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, -0.2f)));
+	});
+StaticGlobalEffect* FREEZE_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+	for (auto target : targets)
+		target->addModifierInstance(new ModifierInstance(FREEZE_MODIFIER, new FreezeModifierData(40)));
+	});
+StaticGlobalEffect* REVERSE_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+	for (auto target : targets)
+		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, -2.0f)));
+	});
+StaticGlobalEffect* LAUNCH_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+	for (auto target : targets)
+		target->vel += vec3f(0.0f, 2.0f, 0.0f);
+	});
+
+StaticGlobalEffect* SLOW_FALL_EFFECT;
+StaticGlobalEffect* FAST_FALL_EFFECT;
+StaticGlobalEffect* SWAP_POSITIONS_EFFECT;
+
+StaticGlobalEffect* ATTRACT_EFFECT = nullptr;
