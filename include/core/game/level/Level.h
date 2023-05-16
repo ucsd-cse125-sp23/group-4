@@ -8,6 +8,7 @@
 #include "core/game/level/PObjectCollection.h"
 #include "core/game/level/StatisticManager.h"
 #include "core/game/physics/PObject.h"
+#include "core/game/physics/Player.h"
 
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {

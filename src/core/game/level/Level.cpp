@@ -1,5 +1,4 @@
 #include "core/game/level/Level.h"
-#include "core/game/physics/Player.h"
 
 #include "core/util/global.h"
 
