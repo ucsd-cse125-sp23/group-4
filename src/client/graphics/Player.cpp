@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "Input.h"
+#include "UserState.h"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -15,7 +16,7 @@ void Player::update(float dt) {
   if (camera && camera->Fixed)
     return;  // don't move the player in no clip (for now)
 
-  vec3 moveLocal = vec3(0);
+  vec3 moveLocal = vec3(0);  // relative to... keyboard
 
   // read inputs
   if (Input::GetInputState(InputAction::MoveForward) != InputState::None) {
@@ -35,15 +36,25 @@ void Player::update(float dt) {
   moveLocal *= speed * dt;
   bool moving = length(moveLocal) > 0;
 
+  vec3 moveWorld = vec3(0);
   if (moving) {
-    move(moveLocal);
+    moveWorld = move(moveLocal);
     if (pmodel) pmodel->update(dt);
   }
 
-  if (tagged) time += dt;
+  if (tagged) time += dt;  // move this to server TODO
+
+  // Get ready to send a message to the server: ***
+  UserState myInputState;
+  myInputState.id = netId;
+  myInputState.movement = moveWorld;
+  myInputState.heading = azimuth;
+  myInputState.jump = false;
+  myInputState.toMessage();
+  // TODO(matthew) send to server
 }
 
-void Player::move(vec3 movement) {
+vec3 Player::move(vec3 movement) {
   // use camera data here
   if (camera) {
     movement = vec3(camera->getCameraRotationMtx() * vec4(-movement, 1));
@@ -51,6 +62,7 @@ void Player::move(vec3 movement) {
 
   faceDirection(movement);
   GameThing::move(movement);
+  return movement;  // send back the "world space" movement vector
 }
 
 void Player::faceDirection(vec3 direction) {

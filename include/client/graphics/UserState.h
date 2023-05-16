@@ -15,6 +15,7 @@ struct UserState {
 
   message::Message toMessage() {
     // TODO(matthew) convert state to message to be sent
+    return message::Message();
   }
 };
 

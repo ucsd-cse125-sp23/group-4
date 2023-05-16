@@ -12,8 +12,6 @@
 #include "InputListener.h"
 #include "PlayerModel.h"
 
-using glm::vec3;
-
 class Player : public GameThing, InputListener {
  private:
   float azimuth = 0;
@@ -36,7 +34,7 @@ class Player : public GameThing, InputListener {
   }
 
   void update(float dt);
-  void move(vec3 movement);  // NOLINT
+  glm::vec3 move(glm::vec3 movement);
 
-  void faceDirection(vec3 direction);
+  void faceDirection(glm::vec3 direction);
 };
