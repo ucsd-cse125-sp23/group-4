@@ -158,7 +158,6 @@ void Scene::init(void) {
   SoundEffect* sfx = new SoundEffect();
   sceneResources->sounds["test"] = sfx;
   sfx->load("assets/sounds/sound_test.wav");
-  sfx->play();
 
   ///// maps:
 
