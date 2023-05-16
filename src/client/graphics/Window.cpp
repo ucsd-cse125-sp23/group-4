@@ -15,7 +15,6 @@ bool Window::inGame;
 
 // Game stuff to render
 Scene* Window::gameScene;
-Lobby* Window::lobby;
 HUD* Window::hud;
 
 Camera* Cam;
@@ -52,20 +51,13 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  if (inGame) {
-    gameScene = new Scene(Cam);
-    gameScene->init();
-    hud = new HUD(gameScene);
-  } else {
-    gameScene = new Lobby(Cam);
-    gameScene->init();
-  }
+  gameScene = new Start(Cam);
   return true;
 }
 
 void Window::cleanObjects() {
   // Deallcoate the objects.
-  // delete gameScene;
+  delete gameScene;
 }
 
 void Window::cleanUp() {
@@ -168,11 +160,17 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
 
   gameScene->update(deltaTime);
 
-  if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
+  if (dynamic_cast<Start*>(gameScene) != nullptr) {
+    Start* startScreen = dynamic_cast<Start*>(gameScene);
+    if (startScreen->gameStart) {
+      gameScene = new Lobby(Cam);
+      gameScene->init();
+    }
+  }
+  else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
     Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
     inGame = lobby->ready;
     if (inGame) {
-      //initializeObjects(inGame);
       gameScene = new Scene(Cam);
       gameScene->init(lobby->selectedModel);
       hud = new HUD(gameScene);

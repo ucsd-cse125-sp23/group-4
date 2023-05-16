@@ -2,16 +2,18 @@
 #include "Lobby.inl"
 
 void Lobby::update(float delta) {
-  if (Input::GetInputState(InputAction::Enter) != InputState::None) {
+  GameThing* display = gamethings[index];
+  display->update(delta);
+  if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
     ready = true;
     selectedModel = player_models[index];
   }
-  if (Input::GetInputState(InputAction::MoveRight) != InputState::Press) {
+  if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
     index++;
     if (index >= gamethings.size()) index = 0;
     buildSceneTree();
   }
-  if (Input::GetInputState(InputAction::MoveLeft) != InputState::Press) {
+  if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
     index--;
     if (index < 0) index = gamethings.size() - 1;
     buildSceneTree();

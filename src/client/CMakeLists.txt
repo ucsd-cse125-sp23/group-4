@@ -39,6 +39,7 @@ set(SOURCES
   graphics/Window.cpp
   graphics/Lobby.cpp
   graphics/HUD.cpp
+  graphics/Start.cpp
   graphics/imported/Tokenizer.cpp
 )
 

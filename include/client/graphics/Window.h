@@ -8,6 +8,7 @@
 #define _WINDOW_H_
 
 #include "client/graphics/Camera.h"
+#include "client/graphics/Start.h"
 #include "client/graphics/Scene.h"
 #include "client/graphics/Lobby.h"
 #include "client/graphics/HUD.h"
@@ -25,7 +26,6 @@ class Window {
 
   // Objects to render
   static Scene* gameScene;
-  static Lobby* lobby;
   static HUD* hud;
   // Act as Constructors and desctructors
   static bool initializeProgram(GLFWwindow* window);
