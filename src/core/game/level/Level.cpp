@@ -146,3 +146,4 @@ void Level::setCollisionType(CollisionType type, int layer0, int layer1) {
 }
 void Level::addPObject(PObject* obj) { objects.addPObject(obj); }
 unsigned long long Level::getAge() { return age; }
+Environment* Level::getEnvironment() { return environment; }

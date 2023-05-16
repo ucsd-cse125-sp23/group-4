@@ -7,3 +7,4 @@
 void initializeLevel(Environment* environment);
 void terminateLevel();
 std::pair<Player*, ControlModifierData*> initializePlayer();
+void spawnPowerUp(vec3f min, vec3f max, const std::vector<GlobalEffect*>& effects);

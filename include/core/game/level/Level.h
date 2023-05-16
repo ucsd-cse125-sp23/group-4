@@ -30,5 +30,6 @@ class Level {
   void setCollisionType(CollisionType type, int layer0, int layer1);
   void addPObject(PObject* obj);
   unsigned long long getAge();
+  Environment* getEnvironment();
   void tick();
 };
