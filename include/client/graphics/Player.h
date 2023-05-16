@@ -34,7 +34,7 @@ class Player : public GameThing, InputListener {
   }
 
   void update(float dt);
-  glm::vec3 move(glm::vec3 movement);
+  glm::vec3 move(glm::vec3 movement);  // NOLINT
 
   void faceDirection(glm::vec3 direction);
 };
