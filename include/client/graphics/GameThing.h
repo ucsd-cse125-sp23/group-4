@@ -52,6 +52,7 @@ struct Transform {
 class GameThing : public Node {
  public:
   int netId = -1;  // used to connect with network/core data (-1 means unset)
+  bool isUser = false;  // controls whether we want to read input and send it
 
   Transform transform;
 

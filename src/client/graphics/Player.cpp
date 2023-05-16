@@ -10,6 +10,8 @@ using glm::vec3;
 using glm::vec4;
 
 void Player::update(float dt) {
+  if (!isUser) return;
+
   if (camera && camera->Fixed)
     return;  // don't move the player in no clip (for now)
 

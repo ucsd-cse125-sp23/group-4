@@ -17,6 +17,7 @@ Player* Scene::createPlayer(int id, bool isUser = false) {
   Player* player = new Player();
   player->netId = id;
   if (isUser) {
+    player->isUser = true;
     player->camera = camera;  // give a reference to the game camera
     player->childnodes.push_back(camera);
   }
