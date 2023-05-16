@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "core/game/event/EventManager.h"
 #include "core/game/level/Environment.h"
@@ -15,6 +16,7 @@ class Level {
   CollisionType collisionTypeLUT[10][10];
   Environment* environment;
 
+  std::map<uint32_t, Player*> players;
   PObjectCollection objects;
 
  public:
