@@ -3,6 +3,12 @@ project(client DESCRIPTION "tagguys client executable")
 set(ASSIMP_WARNINGS_AS_ERRORS OFF)
 set(IMGUI_ENABLE_STDLIB_SUPPORT ON)
 set(IMGUI_EXAMPLES OFF)
+set(SFML_USE_STATIC_STD_LIBS TRUE)
+set(SFML_BUILD_AUDIO ON)
+set(SFML_BUILD_EXAMPLES OFF)
+set(SFML_BUILD_GRAPHICS OFF)
+set(SFML_BUILD_WINDOW OFF)
+set(SFML_BUILD_NETWORK OFF)
 
 FetchContent_Declare(
   glew
@@ -39,6 +45,11 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
   GIT_TAG v3.4.0
   GIT_PROGRESS TRUE)
+FetchContent_Declare(
+  SFML
+  GIT_REPOSITORY https://github.com/SFML/SFML
+  GIT_TAG 2.5.1
+  GIT_PROGRESS TRUE)
 FetchContent_MakeAvailable(
   glew
   glfw
@@ -46,7 +57,8 @@ FetchContent_MakeAvailable(
   freeglut
   freetype
   imgui
-  assimp)
+  assimp
+  SFML)
 
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/main.cpp
@@ -83,13 +95,18 @@ target_link_libraries(
           imgui-opengl3
           assimp
           freeglut_static
-          freetype)
+          freetype
+          sfml-audio)
 
 if(APPLE)
   target_compile_options(client PRIVATE -Wno-deprecated-declarations)
   add_compile_definitions(FREEGLUT_BUILD_DEMOS=OFF
                           OPENGL_gl_LIBRARY=/usr/local/lib/libGL.dylib)
 endif()
+
+set_target_properties(
+  sfml-audio
+  PROPERTIES CXX_STANDARD 98 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO)
 
 # Copy assets folder to executable root directory
 add_custom_command(

@@ -184,12 +184,19 @@ void Scene::init(void) {
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
   sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
+
   // THE player !!!
   sceneResources->models["playerRef"] = new Model;
   sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
   // TODO(matthew) copy over mesh too?
   sceneResources->models["playerRef"]->material =
       sceneResources->materials["toon.blue"];
+
+  // Sound palette
+  SoundEffect* sfx = new SoundEffect();
+  sceneResources->sounds["test"] = sfx;
+  sfx->load("assets/sounds/sound_test.wav");
+
 
   ///// maps:
 
