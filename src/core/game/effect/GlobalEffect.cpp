@@ -12,8 +12,3 @@ void GlobalEffect::apply(Level* level, std::vector<PObject*> targets)
 {
 	applyTo(level, targets);
 }
-
-GlobalEffect* SPEEDBOOST_EFFECT = new GlobalEffect([](Level* level, std::vector<PObject*> targets) {
-	for (auto target : targets)
-		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, 0.2f)));
-});

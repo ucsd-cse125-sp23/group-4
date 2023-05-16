@@ -20,5 +20,13 @@ GravityModifier* GRAVITY_MODIFIER = new GravityModifier();
 TaggedStatusModifier* TAGGED_STATUS_MODIFIER = new TaggedStatusModifier();
 
 SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
-extern AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
-extern FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
+AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
+FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
+
+
+
+
+GlobalEffect* SPEEDBOOST_EFFECT = new GlobalEffect([](Level* level, std::vector<PObject*> targets) {
+	for (auto target : targets)
+		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, 0.2f)));
+	});
