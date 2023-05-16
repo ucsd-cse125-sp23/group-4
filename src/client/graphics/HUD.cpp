@@ -1,4 +1,4 @@
-#include "client/graphics/HUD.h"
+#include "HUD.h"
 
 void HUD::draw(GLFWwindow* window) {
   glEnable(GL_CULL_FACE);
@@ -11,8 +11,8 @@ void HUD::draw(GLFWwindow* window) {
   float scale = float(width) / float(800);
 
   for (GameThing* e : scene->gamethings) {
-    if (dynamic_cast<client::Player*>(e) != nullptr) {
-      client::Player* player = dynamic_cast<client::Player*>(e);
+    if (dynamic_cast<Player*>(e) != nullptr) {
+      Player* player = dynamic_cast<Player*>(e);
       std::string name = player->name;
       player_times[name] = player->time;
       const unsigned char* cname =
@@ -56,8 +56,8 @@ void HUD::draw(GLFWwindow* window) {
   drawMinimap();
 
   for (GameThing* e : scene->gamethings) {
-    if (dynamic_cast<client::Player*>(e) != nullptr) {
-      client::Player* player = dynamic_cast<client::Player*>(e);
+    if (dynamic_cast<Player*>(e) != nullptr) {
+      Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
       glColor3f(1.0f, 1.0f, 1.0f);
       glPointSize(10);

@@ -2,8 +2,9 @@
  * Scene.inl
  * contains the definition of the scene graph
  *****************************************************/
-#include "client/graphics/ColliderImporter.h"
-#include "client/graphics/Scene.h"
+
+#include "ColliderImporter.h"
+#include "Scene.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -23,7 +24,7 @@ void Scene::init(void) {
 
   sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
   sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
-  sceneResources->meshes["player"]->init("assets/models/player_v1.obj");
+  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
 
   sceneResources->meshes["cubeUV"] = new Obj();
   sceneResources->meshes["cubeUV"]->init(
@@ -40,9 +41,9 @@ void Scene::init(void) {
 
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =
-      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-  sceneResources->shaderPrograms["basicTex"] =
-      LoadShaders("assets/shaders/shaderx.vert", "assets/shaders/shaderx.frag");
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["toon"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 
   // Create a material palette
   sceneResources->materials["wood"] = new Material;
@@ -60,7 +61,7 @@ void Scene::init(void) {
       vec4(0.02f, 0.07f, 0.2f, 1.0f);
   sceneResources->materials["ceramic"]->diffuse = vec4(0.1f, 0.25f, 0.7f, 1.0f);
   sceneResources->materials["ceramic"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
-  sceneResources->materials["ceramic"]->shininess = 150.0f;
+  sceneResources->materials["ceramic"]->shininess = 50.0f;
 
   sceneResources->materials["silver"] = new Material;
   sceneResources->materials["silver"]->shader =
@@ -84,15 +85,29 @@ void Scene::init(void) {
 
   sceneResources->materials["grid"] = new Material;
   sceneResources->materials["grid"]->shader =
-      sceneResources->shaderPrograms["basicTex"];
+      sceneResources->shaderPrograms["basic"];
   sceneResources->materials["grid"]->texture = sceneResources->textures["grid"];
-  sceneResources->materials["grid"]->diffuse = vec4(0.7f, 0.7f, 0.7f, 1.0f);
+  sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["grid"]->diffuse = vec4(0.3f, 0.3f, 0.3f, 1.0f);
+
+  sceneResources->materials["toon.blue"] = new Material;
+  sceneResources->materials["toon.blue"]->shader =
+      sceneResources->shaderPrograms["toon"];
+  sceneResources->materials["toon.blue"]->texture =
+      sceneResources->textures["grid"];
+  sceneResources->materials["toon.blue"]->ambient =
+      vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["toon.blue"]->diffuse =
+      vec4(0.6f, 0.6f, 0.97f, 1.0f);
+  sceneResources->materials["toon.blue"]->specular =
+      vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
   // Create a model palette
   sceneResources->models["teapot1"] = new Model;
   sceneResources->models["teapot1"]->mesh = sceneResources->meshes["teapot"];
   sceneResources->models["teapot1"]->material =
-      sceneResources->materials["silver"];
+      sceneResources->materials["toon.blue"];
   sceneResources->models["teapot1"]->modelMtx = scale(vec3(1.5f));
   sceneResources->models["teapot2"] = new Model;
   sceneResources->models["teapot2"]->mesh = sceneResources->meshes["teapot"];
@@ -110,6 +125,10 @@ void Scene::init(void) {
   sceneResources->models["player"] = new Model;
   sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
   sceneResources->models["player"]->material =
+      sceneResources->materials["toon.blue"];
+  sceneResources->models["player2"] = new Model;
+  sceneResources->models["player2"]->mesh = sceneResources->meshes["player"];
+  sceneResources->models["player2"]->material =
       sceneResources->materials["ceramic"];
   sceneResources->models["cube1"] = new Model;
   sceneResources->models["cube1"]->mesh = sceneResources->meshes["cube"];
@@ -134,7 +153,7 @@ void Scene::init(void) {
 
   sceneResources->models["wasp"] = waspModel;
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
+  sceneResources->models["wasp"]->material = sceneResources->materials["marble"];
 
   ///// maps:
 
@@ -163,9 +182,9 @@ void Scene::init(void) {
   node["collision"] = new Node("_colliders");
   for (auto c : mapColliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
-
-    core_env->addConvex(c.core_vertices(), 2.21f);  // core!
   }
+  // node["collision"]->transformMtx =
+  // sceneResources->models["mapColsTesting"]->transformMtx;
 
   ///////////////////////////////////////////////////////
   printf("\nScene: done loading resources!\n");
@@ -184,9 +203,11 @@ void Scene::init(void) {
   thing_modeltest->name = "GT_playerTest";
   gamethings.push_back(thing_modeltest);
 
-  client::Player* player = new client::Player();
-  player->coreRef_object = core_playerpair.first;
-  player->coreRef_control = core_playerpair.second;
+  GameThing* thing_modeltestB = new GameThing;
+  thing_modeltestB->name = "GT_playerTestB";
+  gamethings.push_back(thing_modeltestB);
+
+  Player* player = new Player();
   player->camera = camera;               // give a reference to the game camera
   player->pmodel = waspModel;            // updating!
   player->model = waspModel;             // drawing!
@@ -196,14 +217,13 @@ void Scene::init(void) {
   player->transform.updateMtx(&(player->transformMtx));
   gamethings.push_back(player);
 
-  Input::AddListener(player);
-
   // Build the scene graph
   node["teapot1"] = thing_example;
   node["teapot2"] = new Node("teapotChild");
   node["bunny"] = new Node("bunny");
   node["cubeT"] = thing_cube;
-  node["player"] = thing_modeltest;
+  node["playerA"] = thing_modeltest;
+  node["playerB"] = thing_modeltestB;
   node["ground"] = new Node("ground");
   node["wasp"] = player;
 
@@ -219,8 +239,10 @@ void Scene::init(void) {
   thing_cube->transform.position = vec3(2.0f, 3.0f, -4.0f);
   node["cubeT"]->model = sceneResources->models["cubeTextured"];
 
-  thing_modeltest->transform.position = vec3(0.0f, 2.0f, 2.0f);
+  thing_modeltest->transform.position = vec3(5.0f, 2.0f, 2.0f);
   thing_modeltest->model = sceneResources->models["player"];
+  thing_modeltestB->transform.position = vec3(9.0f, 2.0f, 2.0f);
+  thing_modeltestB->model = sceneResources->models["player2"];
 
   node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
   node["teapot2"]->model = sceneResources->models["teapot2"];
@@ -251,7 +273,8 @@ void Scene::init(void) {
   player->childnodes.push_back(camera);
 
   // "world" node already exists
-  node["world"]->childnodes.push_back(node["player"]);
+  node["world"]->childnodes.push_back(node["playerA"]);
+  node["world"]->childnodes.push_back(node["playerB"]);
   node["world"]->childnodes.push_back(node["teapot1"]);
   node["world"]->childnodes.push_back(node["cubeT"]);
   node["teapot1"]->childnodes.push_back(node["teapot2"]);
@@ -278,7 +301,7 @@ void Scene::init(PlayerModel* player_model) {
 
   sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
   sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
-  sceneResources->meshes["player"]->init("assets/models/player_v1.obj");
+  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
 
   sceneResources->meshes["cubeUV"] = new Obj();
   sceneResources->meshes["cubeUV"]->init(
@@ -295,9 +318,9 @@ void Scene::init(PlayerModel* player_model) {
 
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =
-      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-  sceneResources->shaderPrograms["basicTex"] =
-      LoadShaders("assets/shaders/shaderx.vert", "assets/shaders/shaderx.frag");
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["toon"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 
   // Create a material palette
   sceneResources->materials["wood"] = new Material;
@@ -315,7 +338,7 @@ void Scene::init(PlayerModel* player_model) {
       vec4(0.02f, 0.07f, 0.2f, 1.0f);
   sceneResources->materials["ceramic"]->diffuse = vec4(0.1f, 0.25f, 0.7f, 1.0f);
   sceneResources->materials["ceramic"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
-  sceneResources->materials["ceramic"]->shininess = 150.0f;
+  sceneResources->materials["ceramic"]->shininess = 50.0f;
 
   sceneResources->materials["silver"] = new Material;
   sceneResources->materials["silver"]->shader =
@@ -339,15 +362,29 @@ void Scene::init(PlayerModel* player_model) {
 
   sceneResources->materials["grid"] = new Material;
   sceneResources->materials["grid"]->shader =
-      sceneResources->shaderPrograms["basicTex"];
+      sceneResources->shaderPrograms["basic"];
   sceneResources->materials["grid"]->texture = sceneResources->textures["grid"];
-  sceneResources->materials["grid"]->diffuse = vec4(0.7f, 0.7f, 0.7f, 1.0f);
+  sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["grid"]->diffuse = vec4(0.3f, 0.3f, 0.3f, 1.0f);
+
+  sceneResources->materials["toon.blue"] = new Material;
+  sceneResources->materials["toon.blue"]->shader =
+      sceneResources->shaderPrograms["toon"];
+  sceneResources->materials["toon.blue"]->texture =
+      sceneResources->textures["grid"];
+  sceneResources->materials["toon.blue"]->ambient =
+      vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["toon.blue"]->diffuse =
+      vec4(0.6f, 0.6f, 0.97f, 1.0f);
+  sceneResources->materials["toon.blue"]->specular =
+      vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
   // Create a model palette
   sceneResources->models["teapot1"] = new Model;
   sceneResources->models["teapot1"]->mesh = sceneResources->meshes["teapot"];
   sceneResources->models["teapot1"]->material =
-      sceneResources->materials["silver"];
+      sceneResources->materials["toon.blue"];
   sceneResources->models["teapot1"]->modelMtx = scale(vec3(1.5f));
   sceneResources->models["teapot2"] = new Model;
   sceneResources->models["teapot2"]->mesh = sceneResources->meshes["teapot"];
@@ -365,6 +402,10 @@ void Scene::init(PlayerModel* player_model) {
   sceneResources->models["player"] = new Model;
   sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
   sceneResources->models["player"]->material =
+      sceneResources->materials["toon.blue"];
+  sceneResources->models["player2"] = new Model;
+  sceneResources->models["player2"]->mesh = sceneResources->meshes["player"];
+  sceneResources->models["player2"]->material =
       sceneResources->materials["ceramic"];
   sceneResources->models["cube1"] = new Model;
   sceneResources->models["cube1"]->mesh = sceneResources->meshes["cube"];
@@ -382,14 +423,7 @@ void Scene::init(PlayerModel* player_model) {
   sceneResources->models["cubeTextured"]->material =
       sceneResources->materials["grid"];
 
-  PlayerModel* waspModel = new PlayerModel;
-  waspModel->skel = sceneResources->skeletons["wasp"];
-  waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel->anims = sceneResources->animations["wasp"];
-
-  sceneResources->models["wasp"] = waspModel;
-  sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
+  sceneResources->models["wasp"] = player_model;
 
   ///// maps:
 
@@ -418,9 +452,9 @@ void Scene::init(PlayerModel* player_model) {
   node["collision"] = new Node("_colliders");
   for (auto c : mapColliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
-
-    core_env->addConvex(c.core_vertices(), 2.21f);  // core!
   }
+  // node["collision"]->transformMtx =
+  // sceneResources->models["mapColsTesting"]->transformMtx;
 
   ///////////////////////////////////////////////////////
   printf("\nScene: done loading resources!\n");
@@ -439,9 +473,11 @@ void Scene::init(PlayerModel* player_model) {
   thing_modeltest->name = "GT_playerTest";
   gamethings.push_back(thing_modeltest);
 
-  client::Player* player = new client::Player();
-  player->coreRef_object = core_playerpair.first;
-  player->coreRef_control = core_playerpair.second;
+  GameThing* thing_modeltestB = new GameThing;
+  thing_modeltestB->name = "GT_playerTestB";
+  gamethings.push_back(thing_modeltestB);
+
+  Player* player = new Player();
   player->camera = camera;               // give a reference to the game camera
   player->pmodel = player_model;            // updating!
   player->model = player_model;             // drawing!
@@ -451,14 +487,13 @@ void Scene::init(PlayerModel* player_model) {
   player->transform.updateMtx(&(player->transformMtx));
   gamethings.push_back(player);
 
-  Input::AddListener(player);
-
   // Build the scene graph
   node["teapot1"] = thing_example;
   node["teapot2"] = new Node("teapotChild");
   node["bunny"] = new Node("bunny");
   node["cubeT"] = thing_cube;
-  node["player"] = thing_modeltest;
+  node["playerA"] = thing_modeltest;
+  node["playerB"] = thing_modeltestB;
   node["ground"] = new Node("ground");
   node["wasp"] = player;
 
@@ -474,8 +509,10 @@ void Scene::init(PlayerModel* player_model) {
   thing_cube->transform.position = vec3(2.0f, 3.0f, -4.0f);
   node["cubeT"]->model = sceneResources->models["cubeTextured"];
 
-  thing_modeltest->transform.position = vec3(0.0f, 2.0f, 2.0f);
+  thing_modeltest->transform.position = vec3(5.0f, 2.0f, 2.0f);
   thing_modeltest->model = sceneResources->models["player"];
+  thing_modeltestB->transform.position = vec3(9.0f, 2.0f, 2.0f);
+  thing_modeltestB->model = sceneResources->models["player2"];
 
   node["teapot2"]->transformMtx = translate(vec3(0.0f, 1.0f, 0.0f));
   node["teapot2"]->model = sceneResources->models["teapot2"];
@@ -483,7 +520,7 @@ void Scene::init(PlayerModel* player_model) {
   node["bunny"]->transformMtx = translate(vec3(-4.0f, 2.0f, 0.0f));
   node["bunny"]->model = sceneResources->models["bunny1"];
 
-  //node["wasp"]->model = sceneResources->models["wasp"];
+  node["wasp"]->model = sceneResources->models["wasp"];
 
   node["ground"]->transformMtx = translate(vec3(-10, 1.0f, -10));
   int checkers = 16;
@@ -506,7 +543,8 @@ void Scene::init(PlayerModel* player_model) {
   player->childnodes.push_back(camera);
 
   // "world" node already exists
-  node["world"]->childnodes.push_back(node["player"]);
+  node["world"]->childnodes.push_back(node["playerA"]);
+  node["world"]->childnodes.push_back(node["playerB"]);
   node["world"]->childnodes.push_back(node["teapot1"]);
   node["world"]->childnodes.push_back(node["cubeT"]);
   node["teapot1"]->childnodes.push_back(node["teapot2"]);

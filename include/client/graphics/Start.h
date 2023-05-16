@@ -1,5 +1,7 @@
 #pragma once
 #include "client/graphics/Scene.h"
+#include "client/graphics/InputListener.h"
+#include "client/graphics/Input.h"
 #include "client/graphics/FontRenderer.h"
 
 class Start : public Scene, public InputListener {

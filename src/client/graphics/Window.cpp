@@ -3,7 +3,20 @@
 // please refrain from modifying this a lot
 ////////////////////////////////////////
 
-#include "client/graphics/Window.h"
+#include "Window.h"
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <stddef.h>
+
+#include <glm/glm.hpp>
+#include <iostream>
+#include <string>
+
+#include "Camera.h"
+#include "Input.h"
+#include "Scene.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -166,8 +179,7 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
       gameScene = new Lobby(Cam);
       gameScene->init();
     }
-  }
-  else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
+  } else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
     Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
     inGame = lobby->ready;
     if (inGame) {

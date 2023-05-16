@@ -3,10 +3,17 @@ Scene.cpp contains the implementation of the draw command
 Renders all objects with DFS tree traversal
 adapted from CSE 167 - Matthew
 *****************************************************/
-#include "client/graphics/Scene.h"
+#include "Scene.h"
 
 // The scene init definition
 #include "Scene.inl"
+#include <Player.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+#include <iostream>
+#include <stack>
+
 
 using glm::mat4x4;
 using glm::vec3;
@@ -24,13 +31,12 @@ void Scene::update(float delta) {
   }
 
   time.Update(delta);
-
-  level->tick();  // CORE
 }
 
 void Scene::draw() {
   // Pre-draw sequence:
-  glm::mat4 viewProjMtx = camera->GetViewProjectMtx();  
+  glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
+  glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
 
   // Define stacks for depth-first search (DFS)
   std::stack<Node*> dfs_stack;
@@ -61,7 +67,7 @@ void Scene::draw() {
     matrix_stack.pop();
 
     // draw the visuals of our current node
-    cur->draw(viewProjMtx, cur_MMtx);
+    cur->draw(viewProjMtx, viewMtx, cur_MMtx);
 
     cur->draw_debug(viewProjMtx, cur_MMtx, Scene::_gizmos,
                     _globalSceneResources.models["_gz-xyz"],
@@ -125,26 +131,4 @@ void Scene::gui() {
 
   ImGui::End();
 
-  gui_core();
-}
-
-void Scene::gui_core() {
-  ImGui::Begin("core debug +++");
-
-  ImGui::Separator();
-
-  // loop through all players
-  for (GameThing* e : gamethings) {
-    if (dynamic_cast<client::Player*>(e) != nullptr) {
-      client::Player* player = dynamic_cast<client::Player*>(e);
-      if (player) {
-        ImGui::Text(player->debug_info().c_str());
-        ImGui::Text("---");
-      }
-    }
-  }
-
-  ImGui::Separator();
-
-  ImGui::End();
 }

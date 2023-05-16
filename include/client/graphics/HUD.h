@@ -1,7 +1,8 @@
 #pragma once
 
-#include "client/graphics/FontRenderer.h"
-#include "client/graphics/Scene.h"
+#include "FontRenderer.h"
+#include "Scene.h"
+#include "Player.h"
 
 class HUD {
  public:

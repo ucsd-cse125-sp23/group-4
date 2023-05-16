@@ -5,8 +5,12 @@
 
 #pragma once
 
+#include <cstring>
+#include <utility>
+#include <vector>
+
 #include "Keyframe.h"
-#include "client/graphics/imported/Tokenizer.h"
+#include "imported/Tokenizer.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -68,8 +72,10 @@ struct Channel {
       int p = i - 1;
       int n = i + 1;
 
-      optional<Keyframe> prev = (p >= 0) ? keys[p] : optional<Keyframe>();
-      optional<Keyframe> next = (n < max) ? keys[n] : optional<Keyframe>();
+      optional<Keyframe> prev =
+          (p >= 0) ? optional<Keyframe>(keys[p]) : optional<Keyframe>();
+      optional<Keyframe> next =
+          (n < max) ? optional<Keyframe>(keys[n]) : optional<Keyframe>();
 
       keys[i].ComputeTangents(prev, next);
     }
@@ -227,7 +233,7 @@ struct Channel {
     }
 
     // Handle fixed float case
-    return std::make_pair(TangentRule::fixed, float(atof(temp)));
+    return std::make_pair(TangentRule::fixed, static_cast<float>(atof(temp)));
   }
 };
 

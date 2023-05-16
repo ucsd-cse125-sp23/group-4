@@ -1,9 +1,21 @@
-#include "client/graphics/main.h"
+// clang-format off
+#include <GL/glew.h>
+// clang-format on
+#include <GLFW/glfw3.h>
+#include <stdlib.h>
 
-////////////////////////////////////////////////////////////////////////////////
+#include <boost/asio.hpp>
+#include <config/lib.hpp>
+#include <cstdio>
+#include <ctime>
+#include <iostream>
+#include <network/message.hpp>
+#include <network/tcp_client.hpp>
+#include <string>
+
+#include "Window.h"
 
 void error_callback(int error, const char* description) {
-  // Print error.
   std::cerr << description << std::endl;
 }
 
@@ -48,44 +60,41 @@ void print_versions() {
 #endif
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 int main(int argc, char* argv[]) {
-  char* arg_host;
-  char* arg_port;
+  auto config = get_config();
 
-  if (argc != 3) {
-    std::cout << "usage: client <host> <port>" << std::endl;
-
-    const unsigned int kMaxArgLength = 64;
-    char argbuff_1[kMaxArgLength];
-    char argbuff_2[kMaxArgLength];
-
-    std::cout << "enter <host>:";
-    std::cin.getline(argbuff_1, kMaxArgLength);
-
-    std::cout << "enter <port>:";
-    std::cin.getline(argbuff_2, kMaxArgLength);
-
-    arg_host = argbuff_1;
-    arg_port = argbuff_2;
-  } else {
-    arg_host = argv[1];
-    arg_port = argv[2];
-  }
-
-  std::cout << "connecting to: " << arg_host << ":" << arg_port << std::endl;
+  // NETWORK CODE
+  boost::asio::io_context io_context;
+  Addr server_addr{config["server_address"], config["server_port"]};
+  auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
+    std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
+              << std::endl;
+    message::GreetingBody g = {"Hello!"};
+    message::Message m = {message::Type::Greeting, {1, std::time(nullptr)}, g};
+    std::cout << "Sending to server: " << m << std::endl;
+    client.write(m);
+  };
+  auto read_handler = [&](const message::Message& m, TCPClient& client) {
+    std::cout << "Recevied " << m << std::endl;
+  };
+  auto write_handler = [&](std::size_t bytes_transferred, TCPClient& client) {
+    std::cout << "Wrote " << bytes_transferred << " bytes to server"
+              << std::endl;
+  };
+  TCPClient client(io_context, server_addr, connect_handler, read_handler,
+                   write_handler);
+  io_context.run();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
   if (!window) exit(EXIT_FAILURE);
 
-	// Print OpenGL and GLSL versions.
-	print_versions();
-	// Setup callbacks.
-	setup_callbacks(window);
-	// Setup OpenGL settings.
-	setup_opengl_settings();
+  // Print OpenGL and GLSL versions.
+  print_versions();
+  // Setup callbacks.
+  setup_callbacks(window);
+  // Setup OpenGL settings.
+  setup_opengl_settings();
 
   // Initialize the shader program; exit if initialization fails.
   if (!Window::initializeProgram(window)) {
@@ -94,7 +103,6 @@ int main(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
   // Initialize objects/pointers for rendering; exit if initialization fails.
-  bool inGame = false;
   if (!Window::initializeObjects()) {
     std::cout << "Press enter...";
     char i = std::getchar();
@@ -104,13 +112,12 @@ int main(int argc, char* argv[]) {
   // Delta time logic (see
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
   double lastTime = glfwGetTime();
-  double deltaTime = 0, nowTime = 0;
 
   // Loop while GLFW window should stay open.
   while (!glfwWindowShouldClose(window)) {
     // - Measure time
-    nowTime = glfwGetTime();
-    deltaTime = nowTime - lastTime;
+    double nowTime = glfwGetTime();
+    double deltaTime = nowTime - lastTime;
     lastTime = nowTime;
 
     // Idle callback. Updating objects, etc. can be done here.

@@ -5,8 +5,12 @@
 
 #pragma once
 
-#include "core.h"
-using namespace ::glm;
+#include <utility>
+#include <vector>
+
+#include "./core.h"
+
+using glm::vec3;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +24,7 @@ struct Vertex {
   std::vector<std::pair<int, float>> skinweights;
 
   Vertex() {}
-  Vertex(vec3 p) { position = p; }
+  explicit Vertex(vec3 p) { position = p; }
 
   void SetPosition(vec3 p) { position = p; }
 

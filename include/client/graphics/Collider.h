@@ -23,7 +23,7 @@ class Collider : public Node {
  public:
   std::vector<glm::vec3> vertices;  // passed in as world space
 
-  Collider(std::vector<glm::vec3> v) { vertices = v; }
+  explicit Collider(std::vector<glm::vec3> v) { vertices = v; }
 
   Collider(std::vector<glm::vec3> v, Mesh* displayMesh) : Collider(v) {
     vertices = v;
@@ -35,7 +35,7 @@ class Collider : public Node {
     if (gizmos && _renderGizmo) {
       for (glm::vec3 v : vertices) {
         gizmoCube_mdl->draw(
-            viewProjMtx,
+            viewProjMtx, glm::mat4(1),
             modelMtx * glm::translate(v) * glm::scale(glm::vec3(0.15f)), true);
       }
     }

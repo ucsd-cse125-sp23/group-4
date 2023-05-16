@@ -1,21 +1,11 @@
 #include "client/graphics/Lobby.h"
 
 void Lobby::init(void) {
-  sceneResources->meshes["cube"] = new Cube();
-  sceneResources->meshes["teapot"] = new Obj();
-  sceneResources->meshes["player"] = new Obj();
-
+  // Create a mesh palette
   sceneResources->meshes["wasp"] =
       new SkinnedMesh();  // can only be tied to one object? (not a static
                           // resource)
   sceneResources->meshes["wasp"]->init("assets/models/wasp.skin");
-
-  sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
-  sceneResources->meshes["player"]->init("assets/models/player_v1.obj");
-
-  sceneResources->meshes["cubeUV"] = new Obj();
-  sceneResources->meshes["cubeUV"]->init(
-      "assets/models/bevel_cube.obj");  // includes UV data
 
   sceneResources->skeletons["wasp"] = new Skeleton();
   sceneResources->skeletons["wasp"]->Load("assets/models/wasp.skel");
@@ -28,9 +18,9 @@ void Lobby::init(void) {
 
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =
-      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-  sceneResources->shaderPrograms["basicTex"] =
-      LoadShaders("assets/shaders/shaderx.vert", "assets/shaders/shaderx.frag");
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["toon"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 
   // Create a material palette
   sceneResources->materials["wood"] = new Material;
@@ -48,7 +38,7 @@ void Lobby::init(void) {
       vec4(0.02f, 0.07f, 0.2f, 1.0f);
   sceneResources->materials["ceramic"]->diffuse = vec4(0.1f, 0.25f, 0.7f, 1.0f);
   sceneResources->materials["ceramic"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
-  sceneResources->materials["ceramic"]->shininess = 150.0f;
+  sceneResources->materials["ceramic"]->shininess = 50.0f;
 
   sceneResources->materials["silver"] = new Material;
   sceneResources->materials["silver"]->shader =
@@ -72,28 +62,25 @@ void Lobby::init(void) {
 
   sceneResources->materials["grid"] = new Material;
   sceneResources->materials["grid"]->shader =
-      sceneResources->shaderPrograms["basicTex"];
+      sceneResources->shaderPrograms["basic"];
   sceneResources->materials["grid"]->texture = sceneResources->textures["grid"];
-  sceneResources->materials["grid"]->diffuse = vec4(0.7f, 0.7f, 0.7f, 1.0f);
+  sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["grid"]->diffuse = vec4(0.3f, 0.3f, 0.3f, 1.0f);
+
+  sceneResources->materials["toon.blue"] = new Material;
+  sceneResources->materials["toon.blue"]->shader =
+      sceneResources->shaderPrograms["toon"];
+  sceneResources->materials["toon.blue"]->texture =
+      sceneResources->textures["grid"];
+  sceneResources->materials["toon.blue"]->ambient =
+      vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["toon.blue"]->diffuse =
+      vec4(0.6f, 0.6f, 0.97f, 1.0f);
+  sceneResources->materials["toon.blue"]->specular =
+      vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
   // Create a model palette
-  sceneResources->models["teapot1"] = new Model;
-  sceneResources->models["teapot1"]->mesh = sceneResources->meshes["teapot"];
-  sceneResources->models["teapot1"]->material =
-      sceneResources->materials["silver"];
-  sceneResources->models["teapot1"]->modelMtx = scale(vec3(1.5f));
- 
-  
-  sceneResources->models["player"] = new Model;
-  sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
-  sceneResources->models["player"]->material =
-      sceneResources->materials["ceramic"];
-  sceneResources->models["cubeTextured"] = new Model;
-  sceneResources->models["cubeTextured"]->mesh =
-      sceneResources->meshes["cubeUV"];
-  sceneResources->models["cubeTextured"]->material =
-      sceneResources->materials["grid"];
-
   PlayerModel* waspModel = new PlayerModel;
   waspModel->skel = sceneResources->skeletons["wasp"];
   waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
@@ -135,13 +122,12 @@ void Lobby::init(void) {
   sceneResources->models["wasp4"]->mesh = sceneResources->meshes["wasp"];
   sceneResources->models["wasp4"]->material =
       sceneResources->materials["silver"];
-    player_models.push_back(waspModel4);
+  player_models.push_back(waspModel4);
 
   ///////////////////////////////////////////////////////
   printf("\nScene: done loading resources!\n");
   ///////////////////////////////////////////////////////
 
-  // Add stuff to game updateables
   GameThing* thing_wasp = new GameThing;
   thing_wasp->name = "wasp1";
   gamethings.push_back(thing_wasp);

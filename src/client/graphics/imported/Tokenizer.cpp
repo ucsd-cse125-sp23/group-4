@@ -2,9 +2,14 @@
 // Tokenizer.cpp
 ////////////////////////////////////////
 
-#define _CRT_SECURE_NO_WARNINGS
+#include "imported/Tokenizer.h"
 
-#include "client/graphics/imported/Tokenizer.h"
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#define _CRT_SECURE_NO_WARNINGS
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <imgui.h>
+#include <vector>
 
 #include "Channel.h"
 #include "Pose.h"

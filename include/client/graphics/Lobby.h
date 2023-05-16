@@ -1,6 +1,8 @@
 #pragma once
 
 #include "client/graphics/Scene.h"
+#include "client/graphics/InputListener.h"
+#include "client/graphics/Input.h"
 
 class Lobby : public Scene, public InputListener {
  public:

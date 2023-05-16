@@ -13,7 +13,9 @@
 #include <GL/glew.h>
 #endif
 #include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
+#include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <math.h>
@@ -23,26 +25,24 @@
 #include <map>
 #include <stack>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "client/graphics/Camera.h"
-#include "client/graphics/GameThing.h"
-#include "client/graphics/Node.h"
-//#include "Light.h"
-#include "client/graphics/Collider.h"
-#include "client/graphics/Cube.h"
-#include "client/graphics/Material.h"
-#include "client/graphics/Mesh.h"
-#include "client/graphics/Model.h"
-#include "client/graphics/Obj.h"
-#include "client/graphics/Player.h"
-#include "client/graphics/PlayerModel.h"
-#include "client/graphics/SkinnedMesh.h"
-#include "client/graphics/shader.h"
-#include "core/lib.hpp"
+#include "./shader.h"
+#include "Camera.h"
+#include "Cube.h"
+#include "GameThing.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "Model.h"
+#include "Node.h"
+#include "Obj.h"
+#include "Player.h"
+#include "PlayerModel.h"
+#include "Skeleton.h"
+#include "Texture.h"
+#include "Timer.h"
 
-#ifndef __SCENE_H__
-#define __SCENE_H__
 
 class SceneResourceMap {
  public:
@@ -107,7 +107,7 @@ class Scene {
 
   Timer time;
 
-  Scene(Camera* camFromWindow) {
+  explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
@@ -120,58 +120,47 @@ class Scene {
 
     // globals --
     {
-      _globalSceneResources.meshes["_gz-cube"] = new Cube();
+    _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
-      _globalSceneResources.meshes["_gz-xyz"] =
-          new Obj();  // gizmo for debugging
-      _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+    _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
+    _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
 
-      _globalSceneResources.shaderPrograms["unlit"] =
-          LoadShaders("assets/shaders/unlit.vert", "assets/shaders/unlit.frag");
+    _globalSceneResources.shaderPrograms["unlit"] =
+        LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
 
-      _globalSceneResources.materials["unlit"] = new Material;
-      _globalSceneResources.materials["unlit"]->shader =
-          _globalSceneResources.shaderPrograms["unlit"];
-      _globalSceneResources.materials["unlit"]->diffuse =
-          glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+    _globalSceneResources.materials["unlit"] = new Material;
+    _globalSceneResources.materials["unlit"]->shader =
+        _globalSceneResources.shaderPrograms["unlit"];
+    _globalSceneResources.materials["unlit"]->diffuse =
+        glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
 
-      _globalSceneResources.models["_gz-xyz"] = new Model;
-      _globalSceneResources.models["_gz-xyz"]->mesh =
-          _globalSceneResources.meshes["_gz-xyz"];
-      _globalSceneResources.models["_gz-xyz"]->material =
-          _globalSceneResources.materials["unlit"];
-      _globalSceneResources.models["_gz-xyz"]->modelMtx =
-          glm::scale(glm::vec3(1.0f));
+    _globalSceneResources.models["_gz-xyz"] = new Model;
+    _globalSceneResources.models["_gz-xyz"]->mesh =
+        _globalSceneResources.meshes["_gz-xyz"];
+    _globalSceneResources.models["_gz-xyz"]->material =
+        _globalSceneResources.materials["unlit"];
+    _globalSceneResources.models["_gz-xyz"]->modelMtx =
+        glm::scale(glm::vec3(1.0f));
 
-      _globalSceneResources.models["_gz-cube"] = new Model;
-      _globalSceneResources.models["_gz-cube"]->mesh =
-          _globalSceneResources.meshes["_gz-cube"];
-      _globalSceneResources.models["_gz-cube"]->material =
-          _globalSceneResources.materials["unlit"];
-      _globalSceneResources.models["_gz-cube"]->modelMtx =
-          glm::translate(glm::vec3(0.0f));
+    _globalSceneResources.models["_gz-cube"] = new Model;
+    _globalSceneResources.models["_gz-cube"]->mesh =
+        _globalSceneResources.meshes["_gz-cube"];
+    _globalSceneResources.models["_gz-cube"]->material =
+        _globalSceneResources.materials["unlit"];
+    _globalSceneResources.models["_gz-cube"]->modelMtx =
+        glm::translate(glm::vec3(0.0f));
     }
     // --
 
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
-
-    // core!!!
-    core_env = new Environment;
-    initializeLevel(core_env);
-    core_playerpair = initializePlayer();
   }
-
   virtual void init(void);
   void init(PlayerModel* player);
   virtual void update(float delta);
-  void update_core(
-      void);  // TODO(matthew) let game state updates be passed in here
-
   virtual void draw();
 
   void gui();
-  void gui_core();
 
   // destructor
   ~Scene() {
@@ -182,11 +171,4 @@ class Scene {
 
     delete sceneResources;
   }
-
- private:
-  // core
-  Environment* core_env;
-  std::pair<Player*, ControlModifierData*> core_playerpair;
 };
-
-#endif

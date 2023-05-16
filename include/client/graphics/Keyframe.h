@@ -5,8 +5,12 @@
 
 #pragma once
 
-#include "core.h"
-using namespace ::glm;
+#include <glm/glm.hpp>
+
+#include "./core.h"
+
+using glm::mat4;
+using glm::vec4;
 
 ////////////////////////////////////////////////////////////////////////////////
 

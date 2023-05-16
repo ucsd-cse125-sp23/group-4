@@ -1,20 +1,15 @@
 #include "Player.h"
 
+#include <cmath>
+#include <glm/glm.hpp>
+
+#include "Input.h"
+
 using glm::mat4x4;
 using glm::vec3;
+using glm::vec4;
 
-void client::Player::setPosition(vec3f pos) {
-  GameThing::setPosition(vec3(pos.x, pos.y, pos.z));
-  // GameThing::setPosition(static_cast<vec3>(pos));
-}
-
-void client::Player::update(float dt) {
-  // core:
-  if (coreRef_object) {
-    setPosition(coreRef_object->getPos());
-  }
-  // --
-
+void Player::update(float dt) {
   if (camera && camera->Fixed)
     return;  // don't move the player in no clip (for now)
 
@@ -35,54 +30,28 @@ void client::Player::update(float dt) {
   }
 
   moveLocal = normalize(moveLocal);
-  moveLocal *= speed * 0.015f;  // *dt;
+  moveLocal *= speed * dt;
   bool moving = length(moveLocal) > 0;
 
   if (moving) {
     move(moveLocal);
     pmodel->update(dt);
-  } else {
-    if (coreRef_control) {
-      coreRef_control->horizontalVel = vec3f(0, 0, 0);
-    }
   }
 
   if (tagged) time.Update(dt);
 }
 
-void client::Player::OnEvent(const InputEvent evt) {
-  // see InputListener
-
-  if (evt.action == InputAction::MoveJump) {
-    if (coreRef_control) {
-      coreRef_control->doJump = false;  // always start false
-    }
-  }
-
-  if (evt.state == InputState::Press) {
-    if (evt.action == InputAction::MoveJump) {
-      if (coreRef_control) {
-        coreRef_control->doJump = true;
-      }
-    }
-  }
-}
-
-void client::Player::move(vec3 movement) {
+void Player::move(vec3 movement) {
   // use camera data here
   if (camera) {
     movement = vec3(camera->getCameraRotationMtx() * vec4(-movement, 1));
   }
 
   faceDirection(movement);
-  // GameThing::move(movement); // sp only!
-
-  if (coreRef_control) {
-    coreRef_control->horizontalVel = vec3f(movement.x, movement.y, movement.z);
-  }
+  GameThing::move(movement);
 }
 
-void client::Player::faceDirection(vec3 direction) {
+void Player::faceDirection(vec3 direction) {
   direction = normalize(direction);
   azimuth = std::atan2(direction.x, direction.z) + (M_PI);  // aka azimuth
 
