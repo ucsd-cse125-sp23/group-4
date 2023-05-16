@@ -6,6 +6,7 @@
 #include "core/game/modifier/GravityModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
+#include "core/math/shape/SphereShape.h"
 #include "core/math/shape/CylinderShape.h"
 #include "core/math/shape/OffsetShape.h"
 
@@ -17,6 +18,7 @@ extern int PLAYER_LAYER;       // = 0;
 extern int ENVIRONMENT_LAYER;  // = 1;
 extern int POWER_LAYER;        // = 2;
 
+extern SphereShape* POWERUP_BASE_SHAPE;
 extern CylinderShape* PLAYER_BASE_SHAPE;
 extern OffsetShape* PLAYER_BOUNDING_SHAPE;
 

@@ -4,9 +4,9 @@
 
 void initializeLevel(Environment* environment) {
   level = new Level(environment);
-  level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER,
-                          ENVIRONMENT_LAYER);
+  level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER, ENVIRONMENT_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER, PLAYER_LAYER);
+  level->setCollisionType(CollisionType::TRIGGER, POWER_LAYER, PLAYER_LAYER);
 
   level->statisticManager->registerStat("ticks_it", 0);
   level->statisticManager->registerStat("it_count", 0);
