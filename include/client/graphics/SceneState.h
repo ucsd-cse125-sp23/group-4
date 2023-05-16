@@ -1,7 +1,8 @@
 #pragma once
 
-#include "glm/glm.hpp"
 #include <map>
+
+#include "glm/glm.hpp"
 
 /* PROTOTYPE SCENE GAME STATE CODE (clean it up later) */
 
