@@ -4,7 +4,7 @@
 
 struct TimedModifierData : public ModifierData {
   unsigned long long expire = -1;
-  TimedModifierData(unsigned long long expire) : expire(expire) {}
+  TimedModifierData(unsigned long long duration);
 };
 class TimedModifier : public Modifier {
  public:

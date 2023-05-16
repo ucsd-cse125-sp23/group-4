@@ -6,8 +6,8 @@
 
 struct SpeedBoostModifierData : TimedModifierData {
   float factorIncrease;
-  SpeedBoostModifierData(unsigned long long expire, float factorIncrease)
-      : TimedModifierData(expire), factorIncrease(factorIncrease) {}
+  SpeedBoostModifierData(unsigned long long duration, float factorIncrease)
+      : TimedModifierData(duration), factorIncrease(factorIncrease) {}
 };
 class SpeedBoostModifier : public TimedModifier {
  public:

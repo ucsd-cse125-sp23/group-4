@@ -10,6 +10,7 @@
 Modifier::Modifier() : Modifier(true) {}
 Modifier::Modifier(bool serverOnly) : serverOnly(serverOnly) {}
 
+TimedModifierData::TimedModifierData(unsigned long long duration) : expire(level->getAge() + duration) {}
 TimedModifier::TimedModifier() : Modifier() {}
 TimedModifier::TimedModifier(bool serverOnly) : Modifier(serverOnly) {}
 void TimedModifier::modify(Modifiable* obj, ModifierData* data) {

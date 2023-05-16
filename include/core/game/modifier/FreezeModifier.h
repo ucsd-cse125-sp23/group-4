@@ -5,8 +5,8 @@
 #include "core/math/vector.h"
 
 struct FreezeModifierData : TimedModifierData {
-    FreezeModifierData(unsigned long long expire)
-        : TimedModifierData(expire) {}
+    FreezeModifierData(unsigned long long duration)
+        : TimedModifierData(duration) {}
 };
 class FreezeModifier : public TimedModifier {
 public:

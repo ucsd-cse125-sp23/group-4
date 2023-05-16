@@ -7,8 +7,8 @@
 struct AttractModifierData : TimedModifierData {
     PObject* sink;
     float factor;
-    AttractModifierData(unsigned long long expire, PObject* sink, float factor)
-        : TimedModifierData(expire), sink(sink), factor(factor) {}
+    AttractModifierData(unsigned long long duration, PObject* sink, float factor)
+        : TimedModifierData(duration), sink(sink), factor(factor) {}
 };
 class AttractModifier : public TimedModifier {
 public:
