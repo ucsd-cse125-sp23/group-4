@@ -38,6 +38,7 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/game/event/Event.h
 	${tagguys_SOURCE_DIR}/include/core/game/event/EventManager.h
 	
+	${tagguys_SOURCE_DIR}/include/core/game/effect/GlobalEffect.h
 )
 
 set( SOURCES
@@ -57,6 +58,7 @@ set( SOURCES
 	${PROJECT_SOURCE_DIR}/game/modifier/Modifiers.cpp
 	
 	${PROJECT_SOURCE_DIR}/game/event/EventManager.cpp
+	${PROJECT_SOURCE_DIR}/game/effect/GlobalEffect.cpp
 )
 
 include_directories(
