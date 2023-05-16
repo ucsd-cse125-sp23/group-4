@@ -9,6 +9,7 @@
 #include "core/math/shape/SphereShape.h"
 #include "core/math/shape/CylinderShape.h"
 #include "core/math/shape/OffsetShape.h"
+#include "core/game/effect/GlobalEffect.h"
 
 extern int TAG_COOLDOWN;
 extern float JUMP_VELOCITY;
@@ -28,3 +29,5 @@ extern ControlModifier* CONTROL_MODIFIER;
 extern GravityModifier* GRAVITY_MODIFIER;
 extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern TaggedStatusModifier* TAGGED_STATUS_MODIFIER;
+
+extern GlobalEffect* SPEEDBOOST_EFFECT;

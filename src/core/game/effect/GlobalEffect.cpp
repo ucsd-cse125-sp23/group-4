@@ -1,19 +1,19 @@
-#include "core/game/effect/Effect.h"
+#include "core/game/effect/GlobalEffect.h"
 
 #include "core/util/global.h"
 
-
-Effect:Effect(U u) : applyTo(u) {}
-void Effect::apply(Level* level, PObject* target)
+GlobalEffect::GlobalEffect(std::function<void(Level*, std::vector<PObject*>)> f) : applyTo(f)
+{}
+void GlobalEffect::apply(Level* level, PObject* target)
 {
 	applyTo(level, { target });
 }
-void Effect::apply(Level* level, std::vector<PObject*> targets)
+void GlobalEffect::apply(Level* level, std::vector<PObject*> targets)
 {
 	applyTo(level, targets);
 }
 
-Effect* SPEEDBOOST_EFFECT = new Effect([](Level* level, std::vector<PObject*> targets) {
+GlobalEffect* SPEEDBOOST_EFFECT = new GlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, 0.2f)));
 });

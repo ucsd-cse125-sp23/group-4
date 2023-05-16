@@ -4,13 +4,11 @@
 #include <vector>
 #include "core/game/physics/PObject.h"
 
-template <typename U>
-struct Effect : private U {
+struct GlobalEffect {
+private:
 	std::function<void(Level*, std::vector<PObject*>)> applyTo;
-	Effect(U u);
+public:
+	GlobalEffect(std::function<void(Level*, std::vector<PObject*>)> f);
 	void apply(Level* level, PObject* target);
 	void apply(Level* level, std::vector<PObject*> targets);
 };
-
-
-extern Effect* SPEEDBOOST_EFFECT;

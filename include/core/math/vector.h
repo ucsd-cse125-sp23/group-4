@@ -410,7 +410,6 @@ inline TVector3<T> proj(const TVector3<T>& vec, const TVector3<T>& dir) {
     return dot(vec, dir) * dir / length_squared(dir);
 }
 
-
 template <typename T>
 inline TVector3<T> sameSign(const TVector3<T>& v0, const TVector3<T>& v1) {
   return TVector3<T>((v0.x > 0) ^ (v1.x <= 0), (v0.y > 0) ^ (v1.y <= 0),
