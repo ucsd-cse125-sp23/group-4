@@ -6,11 +6,13 @@
 #pragma once
 
 #include <SFML/Audio.hpp>
+#include <string>
 
 class SoundEffect {
  public:
   void load(std::string filename) {
     sound = loadSound(filename);
+    sound.setVolume(100);
   }
 
   void play() { sound.play(); }
