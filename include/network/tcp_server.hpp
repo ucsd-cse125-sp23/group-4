@@ -26,5 +26,5 @@ class Server {
   void do_accept();
   void read(const PlayerID&);
   void write(const message::Message&, const PlayerID&);
-  void write_all(const message::Message&);
+  void write_all(message::Message&);
 };

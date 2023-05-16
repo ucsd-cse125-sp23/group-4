@@ -121,9 +121,12 @@ void Server::write(const message::Message& m, const PlayerID& id) {
   connections_[id]->write(m);
 }
 
-void Server::write_all(const message::Message& m) {
+void Server::write_all(message::Message& m) {
   // std::cout << "Queueing write to all clients: " << m << std::endl;
-  for (auto& kv : connections_) kv.second->write(m);
+  for (auto& kv : connections_) {
+    m.metadata.player_id = kv.first;
+    kv.second->write(m);
+  }
 }
 
 std::ostream& operator<<(std::ostream& os, Server* s) {
