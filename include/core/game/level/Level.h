@@ -34,8 +34,6 @@ class Level {
   ~Level();
   void setCollisionType(CollisionType type, int layer0, int layer1);
   void addPObject(PObject* obj);
-  const std::map<uint32_t, Player*>* getPlayers();
-  const PObjectCollection* getPObjects();
   unsigned long long getAge();
   void tick();
 };
