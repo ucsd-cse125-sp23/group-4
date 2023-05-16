@@ -87,9 +87,13 @@ void network_init() {
     };
     auto greeting_handler = [&](const message::Greeting& body) {};
     auto notify_handler = [&](const message::Notify& body) {};
+    auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
+    };
 
     auto message_handler = boost::make_overloaded_function(
-        assign_handler, greeting_handler, notify_handler);
+        assign_handler, greeting_handler, notify_handler,
+        game_state_update_handler);
+
     boost::apply_visitor(message_handler, m.body);
   };
   auto write_handler = [&](std::size_t bytes_transferred,

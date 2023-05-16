@@ -64,9 +64,12 @@ void Server::do_accept() {
         write(new_m, player_id);
       };
       auto notify_handler = [&](const message::Notify& body) {};
+      auto game_state_update_handler =
+          [&](const message::GameStateUpdate& body) {};
 
       auto message_handler = boost::make_overloaded_function(
-          assign_handler, greeting_handler, notify_handler);
+          assign_handler, greeting_handler, notify_handler,
+          game_state_update_handler);
       boost::apply_visitor(message_handler, m.body);
 
       read(player_id);
