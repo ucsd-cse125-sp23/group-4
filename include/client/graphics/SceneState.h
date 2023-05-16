@@ -1,6 +1,7 @@
 #pragma once
 
-#include <vector>
+#include "glm/glm.hpp"
+#include <map>
 
 /* PROTOTYPE SCENE GAME STATE CODE (clean it up later) */
 
@@ -15,7 +16,7 @@ struct SceneGameThingState {
 struct SceneState {
   // want to be able to map an id to a GameThingState
   // try a different data structure?
-  std::vector<SceneGameThingState> objectStates;
+  std::map<int, SceneGameThingState> objectStates;
 
   SceneGameThingState GetUpdateFor(int id) { return objectStates[id]; }
 };

@@ -37,7 +37,7 @@ void Scene::updateState(SceneState newState) {
 
     if (currId == -1) continue;  // skip thing
 
-    SceneGameThingState currState = newState.objectStates[currId];
+    SceneGameThingState currState = newState.GetUpdateFor(currId);
     // please check for non-null too!
     e->updateFromState(currState);
   }
