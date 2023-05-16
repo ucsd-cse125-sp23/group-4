@@ -8,5 +8,5 @@ private:
 	const GlobalEffect* effect;
 public:
 	PowerUp(vec3f pos, GlobalEffect* effect);
-	void onTrigger(PObject* other) override;
+	void onTrigger(const PObject* other) override;
 };

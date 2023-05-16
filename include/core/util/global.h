@@ -35,5 +35,18 @@ extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern AttractModifier* ATTRACT_MODIFIER;
 extern FreezeModifier* FREEZE_MODIFIER;
 
-
+/*
+extern GlobalEffect* SPEEDBOOST_SELF_EFFECT;
+extern GlobalEffect* SLOWDOWN_OTHER_EFFECT;
+extern GlobalEffect* FREEZE_OTHER_EFFECT;
+extern GlobalEffect* FLIP_CONTROL_OTHER_EFFECT;
+extern GlobalEffect* ATTRACT_OTHER_EFFECT;
+extern GlobalEffect* LAUNCH_OTHER_EFFECT;
+extern GlobalEffect* SWAP_POSITIONS_OTHER_EFFECT;
+extern GlobalEffect* SWAP_POSITIONS_ALL_EFFECT;
+extern GlobalEffect* SLOW_FALL_OTHER_EFFECT;
+extern GlobalEffect* FAST_FALL_OTHER_EFFECT;
 extern GlobalEffect* SPEEDBOOST_EFFECT;
+extern GlobalEffect* SPEEDBOOST_EFFECT;
+extern GlobalEffect* SPEEDBOOST_EFFECT;
+*/

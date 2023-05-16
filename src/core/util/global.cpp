@@ -23,10 +23,9 @@ SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
 AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
 FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
 
-
-
-
+/*
 GlobalEffect* SPEEDBOOST_EFFECT = new GlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, 0.2f)));
 	});
+*/
