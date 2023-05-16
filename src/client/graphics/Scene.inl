@@ -102,7 +102,6 @@ void Scene::init(void) {
       vec4(0.9f, 0.9f, 0.9f, 1.0f);
   sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
-
   // Create a model palette
   sceneResources->models["teapot1"] = new Model;
   sceneResources->models["teapot1"]->mesh = sceneResources->meshes["teapot"];
@@ -154,6 +153,11 @@ void Scene::init(void) {
   sceneResources->models["wasp"] = waspModel;
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
   sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
+
+  // Sound palette
+  SoundEffect* sfx = new SoundEffect();
+  sceneResources->sounds["test"] = sfx;
+  sfx->load("assets/sounds/sound_test.wav");
 
   ///// maps:
 
