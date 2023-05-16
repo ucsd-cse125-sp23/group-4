@@ -146,6 +146,7 @@ void Level::setCollisionType(CollisionType type, int layer0, int layer1) {
 }
 void Level::addPObject(PObject* obj) {
     objects.addPObject(obj);
+    obj->level = this;
     if (auto player = dynamic_cast<Player*>(obj))
         players[player->pid] = player;
 }
