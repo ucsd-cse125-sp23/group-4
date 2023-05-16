@@ -1,5 +1,4 @@
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#pragma once
 
 #ifdef __APPLE__
 #include <OpenGL/gl3.h>
@@ -17,5 +16,3 @@
 
 extern GLuint LoadShaders(const char* vertex_file_path,
                           const char* fragment_file_path);
-
-#endif

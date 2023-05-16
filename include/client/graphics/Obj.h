@@ -2,10 +2,10 @@
 Obj is subclass class of Mesh
 that loads an obj file.
 *****************************************************/
-#define GLM_FORCE_RADIANS
 
-#ifndef __OBJ_H__
-#define __OBJ_H__
+#pragma once
+
+#define GLM_FORCE_RADIANS
 
 #include <stdio.h>
 
@@ -72,10 +72,12 @@ class Obj : public Mesh {
                  &textureIndex[0], &normalIndex[0], &vertexIndex[1],
                  &textureIndex[1], &normalIndex[1], &vertexIndex[2],
                  &textureIndex[2], &normalIndex[2]);
-        } else
+        } else {
           fscanf(file, "%d//%d %d//%d %d//%d\n", &vertexIndex[0],
                  &normalIndex[0], &vertexIndex[1], &normalIndex[1],
                  &vertexIndex[2], &normalIndex[2]);
+        }
+
         temp_vertexIndices.push_back(vertexIndex[0]);
         temp_vertexIndices.push_back(vertexIndex[1]);
         temp_vertexIndices.push_back(vertexIndex[2]);
@@ -117,5 +119,3 @@ class Obj : public Mesh {
     std::cout << "Obj " << filename << " loaded successfully." << std::endl;
   }
 };
-
-#endif

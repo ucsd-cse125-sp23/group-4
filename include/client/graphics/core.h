@@ -1,5 +1,4 @@
-#ifndef _CORE_H_
-#define _CORE_H_
+#pragma once
 
 #ifdef __APPLE__
 #include <OpenGL/gl3.h>
@@ -8,11 +7,7 @@
 #endif
 
 #include <ctype.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <string>
-#include <vector>
+#include <math.h>
 
 inline float modu(float x, float y) { return x - y * floor(x / y); }
 
@@ -21,10 +16,8 @@ struct optional {
   T val;
   bool exists;
   optional() : exists(false) {}
-  optional(const T& t) : val(t), exists(true) {}
+  explicit optional(const T& t) : val(t), exists(true) {}
   ~optional() {
     if (exists) val.~T();
   }
 };
-
-#endif

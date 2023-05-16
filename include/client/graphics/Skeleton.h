@@ -6,22 +6,17 @@
 #pragma once
 
 #define _USE_MATH_DEFINES
-#include <cmath>
 #ifdef __APPLE__
 #define GLFW_INCLUDE_GLCOREARB
 #include <OpenGL/gl3.h>
 #else
 #include <GL/glew.h>
 #endif
-#include <GLFW/glfw3.h>
 
-#include <map>
-#include <string>
+#include <vector>
 
-#include "client/graphics/Camera.h"
-#include "client/graphics/Joint.h"
-#include "client/graphics/Pose.h"
-#include "client/graphics/core.h"
+#include "Joint.h"
+#include "Pose.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

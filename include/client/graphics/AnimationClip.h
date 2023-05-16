@@ -5,13 +5,10 @@
 
 #pragma once
 
-#include <imgui.h>
+#include <vector>
 
 #include "Channel.h"
 #include "Pose.h"
-#include "client/graphics/imported/Tokenizer.h"
-#include "core.h"
-using namespace ::glm;
 
 ////////////////////////////////////////////////////////////////////////////////
 
