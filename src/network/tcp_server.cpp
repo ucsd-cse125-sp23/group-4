@@ -4,6 +4,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/variant.hpp>
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <magic_enum.hpp>
@@ -14,9 +15,37 @@
 #include <string>
 
 Server::Server(boost::asio::io_context& io_context, int port)
-    : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
+    : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
+      timer_(boost::asio::steady_timer(io_context)) {
   std::cout << "(TCPServer) Server running on port " << port << std::endl;
   do_accept();
+  tick();
+}
+
+void Server::tick() {
+  auto prev_time = std::chrono::steady_clock::now();
+  timer_.expires_from_now(tick_rate_);
+  timer_.async_wait([=](const boost::system::error_code& ec) {
+    if (ec) {
+      std::cerr << "(TCPServer::tick) Error: " << ec.message() << std::endl;
+      return;
+    }
+    auto curr_time = std::chrono::steady_clock::now();
+    auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        curr_time - prev_time);
+    std::cout
+        << "(TCPServer::tick) Updating game, time elapsed since last tick: "
+        << time_elapsed.count() << "ms" << std::endl;
+
+    message::Message game_state_update{
+        message::Type::GameStateUpdate,
+        {boost::uuids::random_generator()(), std::time(nullptr)},
+        message::Greeting{"Game state update: " +
+                          std::to_string(update_num_++)}};
+    write_all(game_state_update);
+
+    tick();
+  });
 }
 
 void Server::do_accept() {

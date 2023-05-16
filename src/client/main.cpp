@@ -66,11 +66,10 @@ void print_versions() {
 #endif
 }
 
-void network_init() {
+std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
   auto config = get_config();
   Addr server_addr{config["server_address"], config["server_port"]};
 
-  boost::asio::io_context io_context;
   PlayerID player_id;
   auto connect_handler = [&](tcp::endpoint endpoint, Client& client) {
     std::cout << "(Client::connect) Connected to " << endpoint.address() << ":"
@@ -102,14 +101,14 @@ void network_init() {
               << ") Successfully wrote " << bytes_transferred
               << " bytes to server" << std::endl;
   };
-  Client client(io_context, server_addr, connect_handler, read_handler,
-                write_handler);
-  io_context.run_for(std::chrono::seconds(3));
+  auto client = std::make_unique<Client>(
+      io_context, server_addr, connect_handler, read_handler, write_handler);
+  return client;
 }
 
 int main(int argc, char* argv[]) {
-  network_init();
-  return 0;
+  boost::asio::io_context io_context;
+  auto client = network_init(io_context);
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
@@ -148,6 +147,7 @@ int main(int argc, char* argv[]) {
     double deltaTime = nowTime - lastTime;
     lastTime = nowTime;
 
+    io_context.poll();
     // Idle callback. Updating objects, etc. can be done here.
     Window::idleCallback(window, deltaTime);
 
