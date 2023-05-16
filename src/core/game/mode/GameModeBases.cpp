@@ -8,8 +8,6 @@
 CountGameMode::CountGameMode() { }
 void CountGameMode::registerTrackers(Level* level)
 {
-    GameMode::registerTrackers(level);
-
     level->statisticManager->registerStat("it_count", 0);
     level->eventManager->registerTaggingEventHandler([](TaggingEvent event) {
         if (Player* p = dynamic_cast<Player*>(event.tagee))
@@ -29,8 +27,6 @@ TimeGameMode::TimeGameMode()
 }
 void TimeGameMode::registerTrackers(Level* level)
 {
-    GameMode::registerTrackers(level);
-
     level->statisticManager->registerStat("ticks_it", 0);
     level->eventManager->registerTaggingEventHandler([](TaggingEvent event) {
         if (Player* p = dynamic_cast<Player*>(event.tagger))
@@ -82,9 +78,12 @@ void TeamedTaggerGameMode::initPlayers(std::map<uint32_t, Player*> players)
 
     for (int i = 0; i < players.size() / 2; i++)
     {
+        teams[0].push_back(pPerm[i]->pid);
         TaggedStatusModifierData* data =
             static_cast<TaggedStatusModifierData*>(pPerm[i]->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get());
         data->isIt = true;
         data->taggedTime = 0;
     }
+    for (int i = players.size() / 2; i < players.size(); i++)
+        teams[1].push_back(pPerm[i]->pid);
 }
