@@ -34,6 +34,8 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/game/modifier/ControlModifier.h
 	${tagguys_SOURCE_DIR}/include/core/game/modifier/SpeedBoostModifier.h
 	${tagguys_SOURCE_DIR}/include/core/game/modifier/TaggedStatusModifier.h
+	${tagguys_SOURCE_DIR}/include/core/game/modifier/AttractModifier.h
+	${tagguys_SOURCE_DIR}/include/core/game/modifier/FreezeModifier.h
 
 	${tagguys_SOURCE_DIR}/include/core/game/event/Event.h
 	${tagguys_SOURCE_DIR}/include/core/game/event/EventManager.h
