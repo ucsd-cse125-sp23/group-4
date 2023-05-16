@@ -24,7 +24,7 @@ struct SceneState {
 
   SceneState() {}
 
-  SceneState(message::Message state) {
+  explicit SceneState(message::Message state) {
     // TODO(matthew) convert message to SceneState
   }
 };
