@@ -16,5 +16,8 @@ Level* level = nullptr;
 
 ControlModifier* CONTROL_MODIFIER = new ControlModifier();
 GravityModifier* GRAVITY_MODIFIER = new GravityModifier();
-SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
 TaggedStatusModifier* TAGGED_STATUS_MODIFIER = new TaggedStatusModifier();
+
+SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
+extern AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
+extern FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();

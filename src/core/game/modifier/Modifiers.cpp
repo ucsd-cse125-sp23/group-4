@@ -3,6 +3,8 @@
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/game/modifier/TimedModifier.h"
+#include "core/game/modifier/AttractModifier.h"
+#include "core/game/modifier/FreezeModifier.h"
 #include "core/util/global.h"
 
 Modifier::Modifier() : Modifier(true) {}
@@ -39,6 +41,8 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
     vec3f dv =
         clampBySign(cData->horizontalVel, cData->horizontalVel - pObj->vel) *
         0.6f;
+    if (!pObj->onGround)
+        dv *= 0.5f;
     pObj->vel += vec3f(dv.x, 0.0f, dv.z);
     if (pObj->onGround && cData->doJump) {
       pObj->vel.y = cData->jumpVel;
@@ -49,3 +53,19 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
 
 TaggedStatusModifier::TaggedStatusModifier() : Modifier(false) {}
 void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {}
+
+
+AttractModifier::AttractModifier() : TimedModifier(false) {}
+void AttractModifier::timedModify(Modifiable* obj, ModifierData* data) {
+    if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
+        AttractModifierData* cData = static_cast<AttractModifierData*>(data);
+        pObj->addPos(cData->factor * normalize(cData->sink->getPos() - pObj->getPos()));
+    }
+}
+
+FreezeModifier::FreezeModifier() : TimedModifier(false) {}
+void FreezeModifier::timedModify(Modifiable* obj, ModifierData* data) {
+    if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
+        pObj->vel = vec3f(0, 0, 0);
+    }
+}

@@ -5,7 +5,9 @@
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/modifier/GravityModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
+#include "core/game/modifier/AttractModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
+#include "core/game/modifier/FreezeModifier.h"
 #include "core/math/shape/CylinderShape.h"
 #include "core/math/shape/OffsetShape.h"
 
@@ -24,5 +26,8 @@ extern Level* level;
 
 extern ControlModifier* CONTROL_MODIFIER;
 extern GravityModifier* GRAVITY_MODIFIER;
-extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern TaggedStatusModifier* TAGGED_STATUS_MODIFIER;
+
+extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
+extern AttractModifier* ATTRACT_MODIFIER;
+extern FreezeModifier* FREEZE_MODIFIER;
