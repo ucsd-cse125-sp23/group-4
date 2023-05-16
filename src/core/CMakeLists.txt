@@ -15,7 +15,6 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/math/shape/SphereShape.h
 	${tagguys_SOURCE_DIR}/include/core/math/shape/AABShape.h
 	${tagguys_SOURCE_DIR}/include/core/math/shape/ConvexMeshShape.h
-	${tagguys_SOURCE_DIR}/include/core/math/shape/ConcaveMeshShape.h
 
 	${tagguys_SOURCE_DIR}/include/core/game/physics/CollisionBounds.h
 	${tagguys_SOURCE_DIR}/include/core/game/physics/PObject.h

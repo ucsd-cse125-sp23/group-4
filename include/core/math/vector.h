@@ -402,6 +402,11 @@ inline TVector3<T> tangent(const TVector3<T>& vec, const TVector3<T>& norm) {
     return vec - dot(vec, norm) * norm;
 }
 
+template <typename T>
+inline TVector3<T> proj(const TVector3<T>& vec, const TVector3<T>& dir) {
+    return dot(vec, dir) * dir / length_squared(dir);
+}
+
 
 template <typename T>
 inline TVector3<T> sameSign(const TVector3<T>& v0, const TVector3<T>& v1) {

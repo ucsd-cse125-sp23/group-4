@@ -147,3 +147,40 @@ TEST_CASE("Mixed Offset Collision MTV", "[mtv]") {
 	delete offset;
 	delete aab;
 }
+
+TEST_CASE("Simple Point Test", "[pointtest]") {
+	SphereShape* sphere = new SphereShape(1);
+	CHECK(sphere->contains(vec3f(0, 0, 0)));
+	CHECK(sphere->contains(vec3f(0.0, 0.5, 0.0)));
+	CHECK(sphere->contains(vec3f(0.0, 0.5, 0.5)));
+	CHECK(sphere->contains(vec3f(0.5, 0.5, 0.5)));
+
+	CHECK_FALSE(sphere->contains(vec3f(0, 0, 0), translate(vec3f(1, 1, 1))));
+	CHECK(sphere->contains(vec3f(1, 1, 1), translate(vec3f(1, 1, 1))));
+	delete sphere;
+
+	AABShape* aab = new AABShape(vec3f(-1, -1, -1), vec3f(1, 1, 1));
+	CHECK(aab->contains(vec3f(0.9, 0.9, -0.9)));
+	CHECK(aab->contains(vec3f(0.9, 0.9, 0.9)));
+	CHECK(aab->contains(vec3f(0.9, -0.9, -0.9)));
+	CHECK(aab->contains(vec3f(0.9, -0.9, 0.9)));
+	CHECK(aab->contains(vec3f(-0.9, 0.9, -0.9)));
+	CHECK(aab->contains(vec3f(-0.9, 0.9, 0.9)));
+	CHECK(aab->contains(vec3f(-0.9, -0.9, -0.9)));
+	CHECK(aab->contains(vec3f(-0.9, -0.9, 0.9)));
+	delete aab;
+}
+
+TEST_CASE("Simple Raycast", "[raycast]") {
+	SphereShape* sphere = new SphereShape(1);
+	CHECK_THAT(sphere->intersects({ vec3f(0,0,0), vec3f(1,0,0) }, translate(vec3f(5, 0, 0))), WithinAbs(4, 0.01f));
+	CHECK_THAT(sphere->intersects({ vec3f(0,0,0), vec3f(-1,0,0) }, translate(vec3f(5, 0, 0))), WithinAbs(-1, 0.01f));
+	CHECK_THAT(sphere->intersects({ vec3f(0,0,0), vec3f(1,0,0) }, translate(vec3f(5.0, 0.9, 0.0))), WithinAbs(4.56, 0.01f));
+	delete sphere;
+
+	AABShape* aab = new AABShape(vec3f(-1, -1, -1), vec3f(1, 1, 1));
+	CHECK_THAT(aab->intersects({ vec3f(0,0,0), vec3f(1,0,0) }, translate(vec3f(5, 0, 0))), WithinAbs(4, 0.01f));
+	CHECK_THAT(aab->intersects({ vec3f(0.0,0.5,0.5), vec3f(1,0,0) }, translate(vec3f(5, 0, 0))), WithinAbs(4, 0.01f));
+	CHECK_THAT(aab->intersects({ vec3f(0,0,0), vec3f(1.0,0.2,0.2) }, translate(vec3f(5, 0, 0))), WithinAbs(4, 0.01f));
+	delete aab;
+}
