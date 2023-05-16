@@ -43,6 +43,10 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/game/effect/GlobalEffect.h
 	${tagguys_SOURCE_DIR}/include/core/game/effect/StaticGlobalEffect.h
 	${tagguys_SOURCE_DIR}/include/core/game/effect/ContextAwareGlobalEffect.h
+	
+	${tagguys_SOURCE_DIR}/include/core/game/mode/GameMode.h
+	${tagguys_SOURCE_DIR}/include/core/game/mode/GameModeBases.h
+	${tagguys_SOURCE_DIR}/include/core/game/mode/GameModes.h
 )
 
 set( SOURCES
@@ -62,9 +66,14 @@ set( SOURCES
 	${PROJECT_SOURCE_DIR}/game/modifier/Modifiers.cpp
 	
 	${PROJECT_SOURCE_DIR}/game/event/EventManager.cpp
+	
 	${PROJECT_SOURCE_DIR}/game/effect/GlobalEffect.cpp
 	${PROJECT_SOURCE_DIR}/game/effect/StaticGlobalEffect.cpp
 	${PROJECT_SOURCE_DIR}/game/effect/ContextAwareGlobalEffect.cpp
+	
+	${PROJECT_SOURCE_DIR}/game/mode/GameMode.cpp
+	${PROJECT_SOURCE_DIR}/game/mode/GameModeBases.cpp
+	${PROJECT_SOURCE_DIR}/game/mode/GameModes.cpp
 )
 
 include_directories(

@@ -1,13 +1,16 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "core/game/event/EventManager.h"
 #include "core/game/level/Environment.h"
 #include "core/game/level/PObjectCollection.h"
 #include "core/game/level/StatisticManager.h"
 #include "core/game/physics/PObject.h"
+#include "core/game/physics/Player.h"
 
+class GameMode;
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {
  private:
@@ -15,11 +18,13 @@ class Level {
   CollisionType collisionTypeLUT[10][10];
   Environment* environment;
 
+ public:
+  std::map<uint32_t, Player*> players;
   PObjectCollection objects;
 
- public:
   EventManager* eventManager;
   StatisticManager* statisticManager;
+  GameMode* gameMode;
 
   /**
    * @param environment defines the environement of the level. Will be deleted
