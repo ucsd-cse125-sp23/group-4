@@ -145,7 +145,8 @@ void Connection<T>::write(const T& data) {
   buffers.push_back(boost::asio::buffer(outbound_payloads_.back().first));
   buffers.push_back(boost::asio::buffer(outbound_payloads_.back().second));
   boost::asio::async_write(
-      socket_, buffers, [&](boost::system::error_code ec, std::size_t length) {
+      socket_, buffers,
+      [&, data](boost::system::error_code ec, std::size_t length) {
         outbound_payloads_.pop_front();
         write_handler(ec, length, data);
       });
