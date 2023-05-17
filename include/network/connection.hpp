@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <functional>
 #include <iostream>
+#include <list>
 #include <string>
 #include <utility>
 #include <vector>
@@ -33,17 +34,18 @@ class Connection {
   void write(const T&);
 
  private:
+  using Payload = std::pair<std::string, std::string>;
+
   std::size_t parse_header();
   T parse_data();
-  std::string build_header();
+  std::string build_header(const std::string&);
   std::string serialize_data(const T&);
 
   tcp::socket socket_;
   const int header_length_ = 8;
   std::array<char, 8> inbound_header_;
   std::vector<char> inbound_data_;
-  std::string outbound_header_;
-  std::string outbound_data_;
+  std::list<Payload> outbound_payloads_;
   ReadHandler read_handler;
   WriteHandler write_handler;
 };
@@ -87,10 +89,10 @@ std::string Connection<T>::serialize_data(const T& data) {
 }
 
 template <typename T>
-std::string Connection<T>::build_header() {
+std::string Connection<T>::build_header(const std::string& outbound_data) {
   std::ostringstream header_stream;
   header_stream << std::setw(header_length_) << std::hex
-                << outbound_data_.size();
+                << outbound_data.size();
 
   if (!header_stream || header_stream.str().size() != header_length_) {
     throw boost::system::error_code(boost::asio::error::invalid_argument);
@@ -132,16 +134,19 @@ void Connection<T>::read() {
 template <typename T>
 void Connection<T>::write(const T& data) {
   try {
-    outbound_data_ = serialize_data(data);
-    outbound_header_ = build_header();
+    std::string outbound_data = serialize_data(data);
+    std::string outbound_header = build_header(outbound_data);
+    outbound_payloads_.push_back({outbound_header, outbound_data});
   } catch (const boost::system::error_code& ec) {
     return write_handler(ec, 0, data);
   }
 
   std::vector<boost::asio::const_buffer> buffers;
-  buffers.push_back(boost::asio::buffer(outbound_header_));
-  buffers.push_back(boost::asio::buffer(outbound_data_));
-  boost::asio::async_write(socket_, buffers,
-                           std::bind(write_handler, std::placeholders::_1,
-                                     std::placeholders::_2, data));
+  buffers.push_back(boost::asio::buffer(outbound_payloads_.back().first));
+  buffers.push_back(boost::asio::buffer(outbound_payloads_.back().second));
+  boost::asio::async_write(
+      socket_, buffers, [&](boost::system::error_code ec, std::size_t length) {
+        outbound_payloads_.pop_front();
+        write_handler(ec, length, data);
+      });
 }
