@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 void AssimpChannel::eval(double currentTick) {
     // IMPORTANT: assuming that pos,rot,sca has the same ticks

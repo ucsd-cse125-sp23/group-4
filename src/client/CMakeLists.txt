@@ -63,7 +63,11 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/Texture.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Player.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Window.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/imported/Tokenizer.cpp)
+    ${PROJECT_SOURCE_DIR}/graphics/imported/Tokenizer.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpAnimation.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpMesh.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpModel.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpNode.cpp)
 
 add_executable(client ${SOURCES})
 target_include_directories(
