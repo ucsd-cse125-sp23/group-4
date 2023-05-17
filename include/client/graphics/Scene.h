@@ -34,6 +34,7 @@
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/SceneState.h"
 #include "client/graphics/Skeleton.h"
+#include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
 #include "client/graphics/shader.h"
 
