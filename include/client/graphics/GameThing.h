@@ -28,6 +28,7 @@
 
 #include "client/graphics/Node.h"
 #include "client/graphics/SceneState.h"
+#include "client/graphics/UserState.h"
 
 struct Transform {
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -56,14 +57,16 @@ class GameThing : public Node {
 
   Transform transform;
 
-  virtual void update(float dt) {
-    // --- example ---
+  virtual UserState update(float dt) {
+    // --- example (spin spin) ---
     transform.rotation += glm::vec3(0, 30 * dt, 0);  // spin on y axis
     transform.updateMtx(&transformMtx);  // needed to update node matrix
+
+    return UserState();
   }
 
   void updateFromState(SceneGameThingState state) {
-    // update self
+    // update self from server input
     setPosition(state.position);
     setHeading(state.heading);
   }

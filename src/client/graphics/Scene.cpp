@@ -22,12 +22,16 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-void Scene::update(float delta) {  // deprecated. use updateState now
-  // if (player) player->update(deltaTime);
+UserState Scene::update(float delta) {
+  UserState ourPlayerUpdates;
 
   for (auto e : gamethings) {
-    e->update(delta);
+    UserState currUpdate = e->update(delta);
+
+    if (e->isUser) ourPlayerUpdates = currUpdate;
   }
+
+  return ourPlayerUpdates;
 }
 
 void Scene::updateState(SceneState newState) {

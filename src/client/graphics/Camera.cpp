@@ -59,8 +59,8 @@ void Camera::CamZoom(float y) {
   SetDistance(dist);
 }
 
-void Camera::update(float dt) {
-  if (!Fixed) return;
+UserState Camera::update(float dt) {
+  if (!Fixed) return UserState();
 
   vec3 moveLocal = vec3(0);
 
@@ -84,6 +84,8 @@ void Camera::update(float dt) {
   moveLocal *= 12 * dt;
 
   if (length(moveLocal) > 0) move_local(moveLocal);
+
+  return UserState();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

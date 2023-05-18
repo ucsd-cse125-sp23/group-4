@@ -34,8 +34,8 @@ class Window {
   static void resizeCallback(GLFWwindow* window, int width, int height);
 
   // update and draw functions
-  static void idleCallback(GLFWwindow* window, float deltaTime,
-                           message::Message gamestate);
+  static message::Message idleCallback(GLFWwindow* window, float deltaTime,
+                                       message::Message gamestate);
   static void displayCallback(GLFWwindow*);
 
   // helper to reset the camera

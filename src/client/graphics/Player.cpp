@@ -10,11 +10,11 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
-void Player::update(float dt) {
-  if (!isUser) return;
+UserState Player::update(float dt) {
+  if (!isUser) return UserState();
 
   if (camera && camera->Fixed)
-    return;  // don't move the player in no clip (for now)
+    return UserState();  // don't move the player in no clip (for now)
 
   vec3 moveLocal = vec3(0);  // relative to... keyboard
 
@@ -50,8 +50,8 @@ void Player::update(float dt) {
   myInputState.movement = moveWorld;
   myInputState.heading = azimuth;
   myInputState.jump = false;
-  myInputState.toMessage();
-  // TODO(matthew) send to server
+
+  return myInputState;
 }
 
 vec3 Player::move(vec3 movement) {

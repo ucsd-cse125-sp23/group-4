@@ -36,6 +36,7 @@
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
+#include "client/graphics/UserState.h"
 #include "client/graphics/shader.h"
 
 struct Character {
@@ -161,8 +162,8 @@ class Scene {
 
   Player* createPlayer(int id, bool isUser);
   void init(void);
-  void update(float delta);
-  void updateState(SceneState newState);  // SEND NETWORK MESSAGE HERE
+  UserState update(float delta);          // broadcast to net
+  void updateState(SceneState newState);  // receive from net
 
   void drawHUD(GLFWwindow* window);
   void draw();
