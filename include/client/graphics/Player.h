@@ -9,10 +9,9 @@
 
 #include "Camera.h"
 #include "GameThing.h"
+#include "Input.h"
 #include "InputListener.h"
 #include "PlayerModel.h"
-#include "InputListener.h"
-#include "Input.h"
 #include "Timer.h"
 
 using glm::vec3;

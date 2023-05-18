@@ -62,8 +62,8 @@ class GameThing : public Node {
   // transform helpers
 
   void setPosition(glm::vec3 pos) {
-      this->transform.position = pos;
-      transform.updateMtx(&transformMtx);
+    this->transform.position = pos;
+    transform.updateMtx(&transformMtx);
   }
 
   void move(glm::vec3 movement) {

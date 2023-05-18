@@ -1,8 +1,8 @@
 #pragma once
-#include "client/graphics/Scene.h"
-#include "client/graphics/InputListener.h"
-#include "client/graphics/Input.h"
 #include "client/graphics/FontRenderer.h"
+#include "client/graphics/Input.h"
+#include "client/graphics/InputListener.h"
+#include "client/graphics/Scene.h"
 
 class Start : public Scene, public InputListener {
  public:
@@ -14,12 +14,12 @@ class Start : public Scene, public InputListener {
   bool renderText;
 
   Start(Camera* camFromWindow) : Scene(camFromWindow) {
-	gamethings.clear();
+    gamethings.clear();
     timeElapsed = 0.0f;
-	offset = 0.0f;
-	background.init("assets/image/clouds.png");
+    offset = 0.0f;
+    background.init("assets/image/clouds.png");
     gameStart = false;
-	renderText = true;
+    renderText = true;
   }
 
   void draw();

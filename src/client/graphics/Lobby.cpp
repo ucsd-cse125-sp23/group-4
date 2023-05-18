@@ -1,4 +1,5 @@
 #include "client/graphics/Lobby.h"
+
 #include "Lobby.inl"
 
 void Lobby::update(float delta) {
@@ -17,16 +18,16 @@ void Lobby::update(float delta) {
     index--;
     if (index < 0) index = gamethings.size() - 1;
     buildSceneTree();
-  } 
+  }
 }
 
-void Lobby::buildSceneTree() { 
+void Lobby::buildSceneTree() {
   GameThing* display = gamethings[index];
   node["world"]->childnodes.clear();
   node["world"]->childnodes.push_back(node[display->name]);
 }
 
-void Lobby::draw() { 
+void Lobby::draw() {
   glDisable(GL_DEPTH_TEST);
   drawBackground();
   glEnable(GL_DEPTH_TEST);

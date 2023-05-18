@@ -18,7 +18,8 @@ void HUD::draw(GLFWwindow* window) {
       const unsigned char* cname =
           reinterpret_cast<const unsigned char*>(name.c_str());
       glm::vec4 position = glm::vec4(player->transform.position, 1.0f);
-      glm::vec4 postProjectivePosition = scene->camera->GetViewProjectMtx() * position;
+      glm::vec4 postProjectivePosition =
+          scene->camera->GetViewProjectMtx() * position;
       glm::vec3 normalizedSpace =
           glm::vec3(postProjectivePosition) / postProjectivePosition[3];
       glm::vec2 windowSpace = ((glm::vec2(normalizedSpace) + 1.0f) / 2.0f) *
@@ -41,8 +42,8 @@ void HUD::draw(GLFWwindow* window) {
 
   std::string game_time = scene->time.ToString();
   float w = fr.TextWidth(game_time, scale);
-  fr.RenderText(window, game_time, (width / 2.0f) - (w / 2.0f), height - (48 * scale),
-                1.0f * scale,
+  fr.RenderText(window, game_time, (width / 2.0f) - (w / 2.0f),
+                height - (48 * scale), 1.0f * scale,
                 glm::vec3(1.0f, 0.0f, 0.0f));
 
   // minimap stuff

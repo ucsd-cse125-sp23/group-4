@@ -153,7 +153,8 @@ void Scene::init(void) {
 
   sceneResources->models["wasp"] = waspModel;
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp"]->material = sceneResources->materials["marble"];
+  sceneResources->models["wasp"]->material =
+      sceneResources->materials["marble"];
 
   ///// maps:
 
@@ -479,8 +480,8 @@ void Scene::init(PlayerModel* player_model) {
 
   Player* player = new Player();
   player->camera = camera;               // give a reference to the game camera
-  player->pmodel = player_model;            // updating!
-  player->model = player_model;             // drawing!
+  player->pmodel = player_model;         // updating!
+  player->model = player_model;          // drawing!
   player->pmodel->setAnimation("walk");  // TODO: make this automated
   player->name = "Player 1";
   player->transform.position = vec3(0, 2, 0);

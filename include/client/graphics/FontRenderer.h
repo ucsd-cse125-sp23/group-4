@@ -7,20 +7,19 @@
 #include <GL/glew.h>
 #endif
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/rotate_normalized_axis.hpp>
+#include <ft2build.h>
 #include <math.h>
 #include <stdlib.h>
-#include <vector>
-#include <string>
+
+#include <glm/glm.hpp>
+#include <glm/gtx/rotate_normalized_axis.hpp>
+#include <glm/gtx/transform.hpp>
 #include <map>
 #include <stack>
 #include <string>
 #include <vector>
-#include "client/graphics/shader.h"
 
-#include <ft2build.h>
+#include "client/graphics/shader.h"
 #include FT_FREETYPE_H
 
 struct Character {
@@ -42,14 +41,12 @@ class FontRenderer {
   unsigned int VAO, VBO;
 
   FontRenderer() {
-
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     shader =
         LoadShaders("assets/shaders/text.vert", "assets/shaders/text.frag");
-    
 
     if (FT_Init_FreeType(&ft)) {
       std::cout << "ERROR::FREETYPE: Could not init FreeType Library"
@@ -109,11 +106,10 @@ class FontRenderer {
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
-
   }
 
- // return width of text 
- float TextWidth(std::string text, float scale) {
+  // return width of text
+  float TextWidth(std::string text, float scale) {
     std::string::const_iterator c;
     float width = 0;
     for (c = text.begin(); c != text.end(); c++) {
@@ -122,8 +118,8 @@ class FontRenderer {
       width += w;
     }
     return width;
- }
- void RenderText(GLFWwindow* window, std::string text, float x, float y,
+  }
+  void RenderText(GLFWwindow* window, std::string text, float x, float y,
                   float scale, glm::vec3 color) {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -176,5 +172,4 @@ class FontRenderer {
 
     glUseProgram(0);
   }
-
 };

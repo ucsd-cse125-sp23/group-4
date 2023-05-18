@@ -6,7 +6,6 @@ adapted from CSE 167 - Matthew
 #include "Scene.h"
 
 // The scene init definition
-#include "Scene.inl"
 #include <Player.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,6 +13,7 @@ adapted from CSE 167 - Matthew
 #include <iostream>
 #include <stack>
 
+#include "Scene.inl"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -22,9 +22,8 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-
 void Scene::update(float delta) {
-    //if (player) player->update(deltaTime);
+  // if (player) player->update(deltaTime);
 
   for (auto e : gamethings) {
     e->update(delta);
@@ -130,5 +129,4 @@ void Scene::gui() {
   }
 
   ImGui::End();
-
 }
