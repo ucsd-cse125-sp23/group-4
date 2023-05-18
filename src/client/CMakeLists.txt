@@ -108,6 +108,14 @@ set_target_properties(
   sfml-audio
   PROPERTIES CXX_STANDARD 98 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO)
 
+# Copy OpenAL32.dll to executable directory
+add_custom_command(
+  TARGET client
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+          ${FETCHCONTENT_BASE_DIR}/sfml-src/extlibs/bin/x64/openal32.dll
+          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 # Copy assets folder to executable root directory
 add_custom_command(
   TARGET client
