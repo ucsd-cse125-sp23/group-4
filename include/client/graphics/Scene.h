@@ -99,7 +99,7 @@ class Scene {
 
   Camera* camera;
 
-  // The container of nodes will be the scene graph after we connect the nodes
+  // by setting the child_nodes.
   // by setting the child_nodes.
   std::map<std::string, Node*> node;
 
