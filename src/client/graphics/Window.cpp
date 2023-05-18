@@ -167,9 +167,8 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-message::UserStateUpdate Window::idleCallback(GLFWwindow* window, float deltaTime) {
-  // gameScene->updateState(SceneState(gamestate));  // state handler TODO
-
+message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
+                                              float deltaTime) {
   // Perform any updates as necessary.
   Cam->UpdateView(window);
 
