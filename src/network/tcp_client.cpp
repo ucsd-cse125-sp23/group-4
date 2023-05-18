@@ -55,6 +55,7 @@ void Client::read() {
 }
 
 void Client::write(message::Message m) {
+  if (connection == nullptr) return;
   // std::cout << "Queueing write to server: " << m << std::endl;
   connection->write(m);
 }

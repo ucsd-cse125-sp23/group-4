@@ -13,9 +13,17 @@ struct UserState {
   float heading;
   // add more here... onground, animations, etc.
 
-  message::Message toMessage() {
-    // TODO(matthew) convert state to message to be sent
-    return message::Message();
+  message::UserStateUpdate toMessage() {
+    // convert state to message to be sent
+
+      message::UserStateUpdate m = message::UserStateUpdate();
+
+      m.id = id;
+      m.movx = movement.x;
+      m.movy = 0;
+      m.movz = movement.z;
+
+    return m;
   }
 };
 

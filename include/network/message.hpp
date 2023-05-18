@@ -13,12 +13,7 @@ namespace message {
 
 using PlayerID = boost::uuids::uuid;
 
-enum class Type {
-  Assign,
-  Greeting,
-  Notify,
-  GameStateUpdate,
-};
+enum class Type { Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate };
 
 struct Metadata {
   PlayerID player_id;
@@ -66,11 +61,50 @@ struct GameStateUpdate {
     ar& message;
   }
 };
+struct UserStateUpdate {
+  int id;
+  float movx;
+  float movy;
+  float movz;
+  bool jump;
+  float heading;
+
+  std::string toString() {
+    // clang-format off
+    std::string str = std::string("") + "{\n" +
+                      "  id: " + std::to_string(id) +
+                      ",\n" +  // NOLINT
+                      "  movement delta: {\n" +
+                      "  " + std::to_string(movx) +
+                      ", " + std::to_string(movy) +
+                      ", " + std::to_string(movz) +
+                      "\n" +  // NOLINT
+                      "  },\n" +
+                      "  jump: " + std::to_string(jump) +
+                      ",\n" +  // NOLINT
+                      "  heading: " + std::to_string(heading) +
+                      ",\n" +  // NOLINT
+                      "}";
+    // clang-format on
+    return str;
+  }
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id;
+    ar& movx;
+    ar& movy;
+    ar& movz;
+    ar& jump;
+    ar& heading;
+  }
+};
 
 struct Message {
   Type type;
   Metadata metadata;
-  boost::variant<Assign, Greeting, Notify, GameStateUpdate> body;
+  boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate>
+      body;
 
   std::string toString() const;
   friend std::ostream& operator<<(std::ostream&, const Message&);
