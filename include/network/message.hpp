@@ -1,66 +1,73 @@
 #pragma once
 
+#include <boost/serialization/variant.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_serialize.hpp>
+#include <boost/variant.hpp>
 #include <ctime>
 #include <ostream>
 #include <string>
-#include <variant>
 
 namespace message {
-enum Type {
+
+using PlayerID = boost::uuids::uuid;
+
+enum class Type {
+  Assign,
   Greeting,
-  Join,
-  Customize,
-  Ready,
-  Movement,
-  Item,
-  GameState,
-  Animation
+  Notify,
 };
 
 struct Metadata {
-  int player_id;
+  PlayerID player_id;
   std::time_t time;
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& player_id;
-    ar& time;
+  void serialize(Archive& ar, unsigned int) {
+    ar& player_id& time;
   }
 };
 
-struct GreetingBody {
-  std::string greeting;
+struct Assign {
+  std::string toString() { return "assign response"; }
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
+  void serialize(Archive& ar, unsigned int) {}
+};
+
+struct Greeting {
+  std::string greeting;
+  std::string toString() { return greeting; }
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
     ar& greeting;
   }
 };
 
-struct Movement {
-  std::string direction;
+struct Notify {
+  std::string message;
+  std::string toString() { return message; }
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& direction;
+  void serialize(Archive& ar, unsigned int) {
+    ar& message;
   }
 };
 
 struct Message {
   Type type;
   Metadata metadata;
-  GreetingBody body;
-  // std::variant<struct Greeting, struct Movement> body;
+  boost::variant<Assign, Greeting, Notify> body;
+
+  std::string toString() const;
+  friend std::ostream& operator<<(std::ostream&, const Message&);
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& type;
-    ar& metadata;
-    ar& body;
+  void serialize(Archive& ar, unsigned int) {
+    ar& type& metadata& body;
   }
-
-  std::string to_string() const;
-  friend std::ostream& operator<<(std::ostream&, const Message&);
 };
 
 }  // namespace message
