@@ -6,7 +6,6 @@ in vec2 texCoord0;	// UV coordinates
 
 uniform mat4 view;      // from world coord to eye coord
 
-uniform int renderMode;	// 0 = no texture, 1 = texture
 uniform sampler2D gSampler;
 
 // uniforms used for lighting
@@ -22,7 +21,7 @@ uniform vec3 specularColor;
 uniform vec3 emissionColor;
 uniform float shininess;
 
-// output color
+// You can output many things. The first vec4 type output determines the color of the fragment
 out vec4 fragColor;
 
 vec3 unitDir (vec4 p, vec4 q){
@@ -41,24 +40,36 @@ void main()
         lightsum += LightColors[i] * max(0, dot(LightDirections[i], fragNormal));
     }
 
+	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
+
+	lightsum += pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
+
+	vec3 color;
+
+	lightsum = sqrt(lightsum);
+
+	// Stepped lighting ramp
+	if(length(lightsum) > 1.85) {
+		color = diffuseColor * 1.2;
+	}
+	else if(length(lightsum) > 0.70) {
+		color = diffuseColor * 1.0;
+	}
+	else {
+		color = diffuseColor * 0.9;
+	}
+
+
 	// Compute irradiance (sum of ambient & direct lighting)
 	vec3 irradiance = ambientColor + lightsum;
 
 	// Diffuse reflectance
-	vec3 reflectance = irradiance * diffuseColor;
-
-	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
-
-	// Add in specular
-	reflectance += specularColor * pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
+	vec3 reflectance = irradiance * color;
 
 	// sampled texture color
 	vec4 texturedColor = texture2D(gSampler, texCoord0.st);
-	if (renderMode == 0) {
-		texturedColor = vec4(1);
-	}
 
 	// Gamma correction
-	fragColor = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
-	//fragColor = texturedColor;	// testing
+	fragColor = vec4(sqrt(reflectance)/* * vec3(texturedColor)*/, 1);
+	//fragColor = vec4(color, 1);
 }

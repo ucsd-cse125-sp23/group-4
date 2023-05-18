@@ -21,22 +21,34 @@ struct Material {
   glm::vec4 ambient = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   glm::vec4 diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);  // <- only one rn
   glm::vec4 specular = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  glm::vec4 emision = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+  glm::vec4 emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   float shininess = 10.0f;
 
-  void setUniforms(const glm::mat4& viewProjMtx, const glm::mat4& model) {
+  void setUniforms(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+                   const glm::mat4& model) {
     // TODO: optimize this glGetLocation call out to an init func?
-    glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false,
+    glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, GL_FALSE,
                        reinterpret_cast<const float*>(&viewProjMtx));
+    glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE,
+                       reinterpret_cast<const float*>(&viewMtx));
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE,
                        reinterpret_cast<const float*>(&model));
 
-    glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &diffuse[0]);
+    glUniform3fv(glGetUniformLocation(shader, "ambientColor"), 1, &ambient[0]);
+    glUniform3fv(glGetUniformLocation(shader, "diffuseColor"), 1, &diffuse[0]);
+    glUniform3fv(glGetUniformLocation(shader, "specularColor"), 1,
+                 &specular[0]);
+    glUniform3fv(glGetUniformLocation(shader, "emissionColor"), 1,
+                 &emission[0]);
+    glUniform1fv(glGetUniformLocation(shader, "shininess"), 1, &shininess);
 
+    int mode = 0;
     if (texture) {
+      mode = 1;
       texture->bindgl();
       glUniform1i(glGetUniformLocation(shader, "gSampler"), 0);
     }
+    glUniform1i(glGetUniformLocation(shader, "renderMode"), mode);
 
     // TODO: implement other shader cases + their uniform vars here! vvv
 
@@ -54,5 +66,9 @@ struct Material {
     glUniform4fv( lightpositions_loc, GLsizei(nlights), &lightpositions[0][0] );
     glUniform4fv( lightcolors_loc, GLsizei(nlights), &lightcolors[0][0] );
     */
+  }
+
+  void show() {
+    // TODO(matthew)
   }
 };
