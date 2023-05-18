@@ -167,16 +167,15 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-message::Message Window::idleCallback(GLFWwindow* window, float deltaTime,
-                                      message::Message gamestate) {
-  gameScene->updateState(SceneState(gamestate));  // update from server
+message::Message Window::idleCallback(GLFWwindow* window, float deltaTime) {
+  // gameScene->updateState(SceneState(gamestate));  // state handler TODO
 
   // Perform any updates as necessary.
   Cam->UpdateView(window);
 
   UserState inputChanges = gameScene->update(deltaTime);
 
-  return inputChanges.toMessage();
+  return inputChanges.toMessage();  // player input to be written to server
 }
 
 void Window::displayCallback(GLFWwindow* window) {

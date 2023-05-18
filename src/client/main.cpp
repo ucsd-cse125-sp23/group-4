@@ -144,15 +144,14 @@ int main(int argc, char* argv[]) {
     double deltaTime = nowTime - lastTime;
     lastTime = nowTime;
 
-    // POLL FROM SERVER
-    message::Message min = message::Message();  // TODO(???)
+    // POLL FROM SERVER (TODO)
 
-    // Idle callback. Updating objects, etc. can be done here.
-    // Send the game state here too!
-    message::Message mout = Window::idleCallback(window, deltaTime, min);
+    // Idle callback. Updating local objects, input, etc.
+    // Get a message back of all updates
+    message::Message mout = Window::idleCallback(window, deltaTime);
 
     // OUTPUT TO SERVER
-    // TODO(???)
+    // TODO(???) client.write(mout)
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);
