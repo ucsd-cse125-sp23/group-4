@@ -64,7 +64,7 @@ include_directories(
 	${tagguys_SOURCE_DIR}/include
 )
 
-add_executable(core_debug ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES} ${HEADERS})
+add_executable(core_debug ${SOURCES} ${HEADERS})
 target_compile_features(core_debug PRIVATE cxx_std_17)
 add_library(core ${PROJECT_SOURCE_DIR}/lib.cpp ${SOURCES} ${HEADERS})
 target_include_directories(core PUBLIC ${tagguys_SOURCE_DIR}/include)
