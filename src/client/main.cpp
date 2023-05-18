@@ -66,11 +66,10 @@ void print_versions() {
 #endif
 }
 
-void network_init() {
+std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
   auto config = get_config();
   Addr server_addr{config["server_address"], config["server_port"]};
 
-  boost::asio::io_context io_context;
   PlayerID player_id;
   auto connect_handler = [&](tcp::endpoint endpoint, Client& client) {
     std::cout << "(Client::connect) Connected to " << endpoint.address() << ":"
@@ -87,9 +86,13 @@ void network_init() {
     };
     auto greeting_handler = [&](const message::Greeting& body) {};
     auto notify_handler = [&](const message::Notify& body) {};
+    auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
+    };
 
     auto message_handler = boost::make_overloaded_function(
-        assign_handler, greeting_handler, notify_handler);
+        assign_handler, greeting_handler, notify_handler,
+        game_state_update_handler);
+
     boost::apply_visitor(message_handler, m.body);
   };
   auto write_handler = [&](std::size_t bytes_transferred,
@@ -98,14 +101,14 @@ void network_init() {
               << ") Successfully wrote " << bytes_transferred
               << " bytes to server" << std::endl;
   };
-  Client client(io_context, server_addr, connect_handler, read_handler,
-                write_handler);
-  io_context.run_for(std::chrono::seconds(3));
+  auto client = std::make_unique<Client>(
+      io_context, server_addr, connect_handler, read_handler, write_handler);
+  return client;
 }
 
 int main(int argc, char* argv[]) {
-  network_init();
-  return 0;
+  boost::asio::io_context io_context;
+  auto client = network_init(io_context);
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
@@ -144,8 +147,9 @@ int main(int argc, char* argv[]) {
     double deltaTime = nowTime - lastTime;
     lastTime = nowTime;
 
-    // POLL FROM SERVER (TODO)
-
+    // POLL FROM SERVER
+    io_context.poll();
+    
     // Idle callback. Updating local objects, input, etc.
     // Get a message back of all updates
     message::Message mout = Window::idleCallback(window, deltaTime);

@@ -17,6 +17,7 @@ enum class Type {
   Assign,
   Greeting,
   Notify,
+  GameStateUpdate,
 };
 
 struct Metadata {
@@ -56,10 +57,20 @@ struct Notify {
   }
 };
 
+struct GameStateUpdate {
+  std::string message;
+  std::string toString() { return message; }
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& message;
+  }
+};
+
 struct Message {
   Type type;
   Metadata metadata;
-  boost::variant<Assign, Greeting, Notify> body;
+  boost::variant<Assign, Greeting, Notify, GameStateUpdate> body;
 
   std::string toString() const;
   friend std::ostream& operator<<(std::ostream&, const Message&);
