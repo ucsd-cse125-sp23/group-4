@@ -168,7 +168,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 
 // update and draw functions
 message::Message Window::idleCallback(GLFWwindow* window, float deltaTime,
-                          message::Message gamestate) {
+                                      message::Message gamestate) {
   gameScene->updateState(SceneState(gamestate));  // update from server
 
   // Perform any updates as necessary.
