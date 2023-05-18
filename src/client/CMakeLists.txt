@@ -1,6 +1,7 @@
 project(client DESCRIPTION "tagguys client executable")
 
 set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+set(ASSIMP_BUILD_ZLIB OFF)
 set(IMGUI_ENABLE_STDLIB_SUPPORT ON)
 set(IMGUI_EXAMPLES OFF)
 
@@ -20,6 +21,11 @@ FetchContent_Declare(
   GIT_TAG 0.9.8.5
   GIT_PROGRESS TRUE)
 FetchContent_Declare(
+  zlib
+  GIT_REPOSITORY https://github.com/madler/zlib
+  GIT_TAG v1.2.13
+  GIT_PROGRESS TRUE)
+FetchContent_Declare(
   freetype
   GIT_REPOSITORY https://github.com/freetype/freetype
   GIT_TAG VER-2-13-0
@@ -32,13 +38,19 @@ FetchContent_Declare(
 FetchContent_Declare(
   assimp
   GIT_REPOSITORY https://github.com/assimp/assimp
-  GIT_TAG v5.2.5
+  GIT_TAG 18b6cff
   GIT_PROGRESS TRUE)
 FetchContent_Declare(
   freeglut
   GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
   GIT_TAG v3.4.0
   GIT_PROGRESS TRUE)
+
+FetchContent_MakeAvailable(zlib)
+set(ZLIB_ROOT ${zlib_BINARY_DIR})
+find_library(ZLIB_LIBRARY zlib PATHS ${zlib_BINARY_DIR} PATH_SUFFIXES lib)
+include_directories(${zlib_BINARY_DIR})
+
 FetchContent_MakeAvailable(
   glew
   glfw
