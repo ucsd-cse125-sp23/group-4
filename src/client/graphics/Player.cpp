@@ -17,6 +17,7 @@ UserState Player::update(float dt) {
     return UserState();  // don't move the player in no clip (for now)
 
   vec3 moveLocal = vec3(0);  // relative to... keyboard
+  bool jumping = false;
 
   // read inputs
   if (Input::GetInputState(InputAction::MoveForward) != InputState::None) {
@@ -30,6 +31,10 @@ UserState Player::update(float dt) {
   }
   if (Input::GetInputState(InputAction::MoveLeft) != InputState::None) {
     moveLocal += vec3(1, 0, 0);
+  }
+
+  if (Input::GetInputState(InputAction::MoveJump) != InputState::None) {
+    jumping = true;
   }
 
   moveLocal = normalize(moveLocal);
@@ -49,7 +54,7 @@ UserState Player::update(float dt) {
   myInputState.id = netId;
   myInputState.movement = moveWorld;
   myInputState.heading = azimuth;
-  myInputState.jump = false;
+  myInputState.jump = jumping;
 
   return myInputState;
 }

@@ -9,8 +9,9 @@
 struct UserState {
   int id;  // player id? fix this TODO
   glm::vec3 movement;
-  bool jump;
   float heading;
+  bool jump;
+
   // add more here... onground, animations, etc.
 
   message::UserStateUpdate toMessage() {
@@ -23,6 +24,7 @@ struct UserState {
     m.movy = 0;
     m.movz = movement.z;
     m.heading = heading;
+    m.jump = jump;
 
     return m;
   }
