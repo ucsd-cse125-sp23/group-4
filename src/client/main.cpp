@@ -22,6 +22,7 @@
 using message::PlayerID;
 
 PlayerID my_player_id;
+bool net_assigned = false;
 
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
@@ -82,6 +83,7 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
     auto assign_handler = [&](const message::Assign& body) {
       player_id = m.metadata.player_id;
       my_player_id = player_id;
+      net_assigned = true;
       message::Message new_m{message::Type::Greeting,
                              {player_id, std::time(nullptr)},
                              message::Greeting{"Hello, server!"}};
@@ -165,7 +167,7 @@ int main(int argc, char* argv[]) {
         message::Type::UserStateUpdate, {pid, std::time(nullptr)}, mout};
 
     // OUTPUT TO SERVER
-    client.get()->write(my_m);
+    if(net_assigned) client.get()->write(my_m);
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);
