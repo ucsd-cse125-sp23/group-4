@@ -16,6 +16,9 @@
 #include <string>
 #include <vector>
 
+#include "core/lib.hpp"
+#include "client/graphics/ColliderImporter.h"
+
 /* TEMP SERVER GAME STATE CODE (positions only) */
 
 struct GameThingState {
@@ -25,20 +28,21 @@ struct GameThingState {
   float posz;
   float heading;
 
+  Player* player;
+  ControlModifierData* control;
+
   GameThingState() {}
 
   void move(float x, float y, float z) {
-    posx += x;
-    posy += y;
-    posz += z;
+    control->horizontalVel = vec3f(x, y, z);
   }
 
   const message::GameStateUpdateItem toMessage() {
     message::GameStateUpdateItem p;
     p.id = id;
-    p.posx = posx;
-    p.posy = posy;
-    p.posz = posz;
+    p.posx = player->getPos().x;
+    p.posy = player->getPos().y;
+    p.posz = player->getPos().z;
     p.heading = heading;
 
     return p;
@@ -58,6 +62,15 @@ Server::Server(boost::asio::io_context& io_context, int port)
     : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
       timer_(boost::asio::steady_timer(io_context)) {
   std::cout << "(TCPServer) Server running on port " << port << std::endl;
+
+  Environment* environment = new Environment();
+  std::vector<ColliderData> mapColliders =
+      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
+  for (auto collider : mapColliders) {
+    environment->addConvex(collider.vertices);
+  }
+  initializeLevel(environment);
+
   do_accept();
   tick();
 }
@@ -83,7 +96,7 @@ void Server::tick() {
     update_num_++;
 
     std::vector<message::GameStateUpdateItem*> thingsOnServer;  // to send
-
+    level->tick();
     for (auto thing : server_gameState.objectStates) {
       thingsOnServer.push_back(
           new message::GameStateUpdateItem(thing.second.toMessage()));
@@ -171,6 +184,9 @@ void Server::do_accept() {
               i.posx = body.movx;
               i.posy = body.movy;
               i.posz = body.movz;
+              std::pair<Player*, ControlModifierData*> pair = initializePlayer();
+              i.control = pair.second;
+              i.player = pair.first;
               server_gameState.objectStates[rec_id] = i;  // add to object map
             } else {
               // id found
