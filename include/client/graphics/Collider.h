@@ -17,6 +17,7 @@
 
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Node.h"
+#include "core/math/vector.h"
 
 class Collider : public Node {
  public:
@@ -26,6 +27,14 @@ class Collider : public Node {
 
   Collider(std::vector<glm::vec3> v, Mesh* displayMesh) : Collider(v) {
     vertices = v;
+  }
+
+  std::vector<vec3f> GetVerticesCore() {
+    std::vector<vec3f> vfs;
+    for (auto v : vertices) {
+      vfs.push_back(vec3f(v.x, v.y, v.z));
+    }
+    return vfs;
   }
 
   void draw_debug(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx,
