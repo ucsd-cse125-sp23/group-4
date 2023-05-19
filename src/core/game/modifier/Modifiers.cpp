@@ -10,12 +10,14 @@
 Modifier::Modifier() : Modifier(true) {}
 Modifier::Modifier(bool serverOnly) : serverOnly(serverOnly) {}
 
-TimedModifierData::TimedModifierData(unsigned long long duration) : expire(level->getAge() + duration) {}
+TimedModifierData::TimedModifierData(unsigned long long duration) {
+    expire = duration == 0 ? 0 : level->getAge() + duration;
+}
 TimedModifier::TimedModifier() : Modifier() {}
 TimedModifier::TimedModifier(bool serverOnly) : Modifier(serverOnly) {}
 void TimedModifier::modify(Modifiable* obj, ModifierData* data) {
   TimedModifierData* cData = static_cast<TimedModifierData*>(data);
-  if (level->getAge() >= cData->expire) cData->markedRemove = true;
+  if (level->getAge() >= cData->expire && cData->expire > 0) cData->markedRemove = true;
 }
 
 SpeedBoostModifier::SpeedBoostModifier() : TimedModifier(false) {}
@@ -26,7 +28,7 @@ void SpeedBoostModifier::timedModify(Modifiable* obj, ModifierData* data) {
   }
 }
 
-void GravityModifier::modify(Modifiable* obj, ModifierData* data) {
+void GravityModifier::timedModify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj))
     pObj->vel +=
         vec3f(0.0f, -static_cast<GravityModifierData*>(data)->gravity, 0.0f);
