@@ -2,6 +2,7 @@
 
 #include <map>
 #include <network/message.hpp>
+#include <vector>
 
 #include "glm/glm.hpp"
 
@@ -14,7 +15,7 @@ struct SceneGameThingState {
   // add more here... onground, jump, animations, etc.
 
   SceneGameThingState() {}
-  SceneGameThingState(message::GameStateUpdateItem me) {
+  explicit SceneGameThingState(message::GameStateUpdateItem me) {
     id = me.id;
     position = glm::vec3(me.posx, me.posy, me.posz);
     heading = me.heading;
@@ -24,19 +25,16 @@ struct SceneGameThingState {
 // received from server and needs to be drawn
 struct SceneState {
   // want to be able to map an id to a GameThingState
-  // try a different data structure?
   std::map<int, SceneGameThingState> objectStates;
 
   SceneGameThingState GetUpdateFor(int id) { return objectStates[id]; }
 
   SceneState() {}
 
+  // convert message to SceneState
   explicit SceneState(message::GameStateUpdate state) {
-    // convert message to SceneState
-
-    std::vector<message::GameStateUpdateItem*> thingStates;
-
-    for (auto i : thingStates) {
+    // take list of all things and convert each one
+    for (auto i : state.things) {
       objectStates[i->id] = SceneGameThingState(*i);
     }
   }

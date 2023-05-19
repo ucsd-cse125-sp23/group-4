@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
         message::Type::UserStateUpdate, {pid, std::time(nullptr)}, mout};
 
     // OUTPUT TO SERVER
-    if(net_assigned) client.get()->write(my_m);
+    if (net_assigned) client.get()->write(my_m);
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);

@@ -9,6 +9,7 @@
 #include <ctime>
 #include <ostream>
 #include <string>
+#include <vector>
 
 namespace message {
 
@@ -61,7 +62,7 @@ struct GameStateUpdateItem {
   float posz;
   float heading;
 
-  GameStateUpdateItem(){};
+  GameStateUpdateItem() {}
 
   std::string toString() {
     // clang-format off
@@ -100,8 +101,8 @@ struct GameStateUpdate {
     std::string str = std::string("") + "{\n" +
                       "items:\n";
     // clang-format on
-    for(auto i : things) {
-        str += i->toString();
+    for (auto i : things) {
+      str += i->toString();
     }
     return str;
   }
