@@ -31,7 +31,7 @@ class Camera : public GameThing {
   void UpdateView();
   void UpdateView(Node* parent);
   void UpdateView(glm::mat4 worldMtx);
-  
+
   void Reset();
 
   // Access functions
