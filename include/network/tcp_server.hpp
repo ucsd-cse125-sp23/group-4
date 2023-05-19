@@ -18,7 +18,7 @@ class Server {
 
  private:
   int update_num_ = 1;
-  std::chrono::milliseconds tick_rate_ = std::chrono::milliseconds(2000);
+  std::chrono::milliseconds tick_rate_ = std::chrono::milliseconds(50);
   boost::asio::steady_timer timer_;
   tcp::acceptor acceptor_;
   std::unordered_map<PlayerID, std::unique_ptr<Connection<message::Message>>,

@@ -33,9 +33,9 @@ void Server::tick() {
     auto curr_time = std::chrono::steady_clock::now();
     auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         curr_time - prev_time);
-    std::cout
-        << "(TCPServer::tick) Updating game, time elapsed since last tick: "
-        << time_elapsed.count() << "ms" << std::endl;
+    // std::cout
+    //    << "(TCPServer::tick) Updating game, time elapsed since last tick: "
+    //    << time_elapsed.count() << "ms" << std::endl;
 
     // Temporary server loop demo (sending to client) ---
     update_num_++;
@@ -128,9 +128,9 @@ void Server::do_accept() {
         return;
       }
 
-      std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
-                << ") Successfully wrote " << length << " bytes to client "
-                << player_id << std::endl;
+      // std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
+      //          << ") Successfully wrote " << length << " bytes to client "
+      //          << player_id << std::endl;
     };
 
     // store new connection

@@ -105,9 +105,9 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
   };
   auto write_handler = [&](std::size_t bytes_transferred,
                            const message::Message& m, Client& client) {
-    std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
-              << ") Successfully wrote " << bytes_transferred
-              << " bytes to server" << std::endl;
+    // std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
+    //          << ") Successfully wrote " << bytes_transferred
+    //          << " bytes to server" << std::endl;
   };
   auto client = std::make_unique<Client>(
       io_context, server_addr, connect_handler, read_handler, write_handler);
