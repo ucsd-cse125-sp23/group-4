@@ -55,23 +55,13 @@ UserState Player::update(float dt) {
 }
 
 vec3 Player::move(vec3 movement) {
-  // use camera data here
+  // use camera-relative movement
   if (camera) {
     movement = vec3(camera->getCameraRotationMtx() * vec4(-movement, 1));
   }
 
-  faceDirection(movement);
+  setHeading(movement);
   // GameThing::move(movement);  // don't actually move. let the server do it
 
   return movement;  // send back the "world space" movement vector
-}
-
-void Player::faceDirection(vec3 direction) {
-  direction = normalize(direction);
-  azimuth = std::atan2(direction.x, direction.z) + (M_PI);  // aka azimuth
-
-  // purely visual, for now (rotation never applied to player node itself)
-  if (!model) return;
-
-  model->modelMtx = glm::eulerAngleY(azimuth);
 }

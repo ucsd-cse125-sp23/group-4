@@ -56,6 +56,7 @@ class GameThing : public Node {
   bool isUser = false;  // controls whether we want to read input and send it
 
   Transform transform;
+  float azimuth = 0;    // for visuals only (aka heading)
 
   virtual UserState update(float dt) {
     // --- example (spin spin) ---
@@ -86,10 +87,12 @@ class GameThing : public Node {
     setHeading(heading);
   }
   void setHeading(float heading) {
+    azimuth = heading;
+
     // purely visual, for now (rotation not applied to transform itself)
     if (!model) return;
 
-    model->modelMtx = glm::eulerAngleY(heading);
+    model->modelMtx = glm::eulerAngleY(azimuth);
   }
 
   void move(glm::vec3 movement) {
