@@ -26,7 +26,7 @@ class Camera : public GameThing {
 
   Camera();
 
-  void update(float dt);
+  UserState update(float dt);
 
   void UpdateView(GLFWwindow* window);
   void Reset();

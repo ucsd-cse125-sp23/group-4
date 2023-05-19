@@ -21,6 +21,9 @@
 
 using message::PlayerID;
 
+PlayerID my_player_id;
+bool net_assigned = false;
+
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
 }
@@ -79,6 +82,9 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
     std::cout << "(Connection::read) Received\n" << m << std::endl;
     auto assign_handler = [&](const message::Assign& body) {
       player_id = m.metadata.player_id;
+      my_player_id = player_id;
+      net_assigned = true;
+      // Window::gameScene->initFromServer(myId); // need a unique int id
       message::Message new_m{message::Type::Greeting,
                              {player_id, std::time(nullptr)},
                              message::Greeting{"Hello, server!"}};
@@ -87,11 +93,14 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
     auto greeting_handler = [&](const message::Greeting& body) {};
     auto notify_handler = [&](const message::Notify& body) {};
     auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
+      Window::gameScene->updateState(SceneState(body));
+    };
+    auto user_state_update_handler = [&](const message::UserStateUpdate& body) {
     };
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, greeting_handler, notify_handler,
-        game_state_update_handler);
+        game_state_update_handler, user_state_update_handler);
 
     boost::apply_visitor(message_handler, m.body);
   };
@@ -147,9 +156,19 @@ int main(int argc, char* argv[]) {
     double deltaTime = nowTime - lastTime;
     lastTime = nowTime;
 
+    // POLL FROM SERVER
     io_context.poll();
-    // Idle callback. Updating objects, etc. can be done here.
-    Window::idleCallback(window, deltaTime);
+
+    // Idle callback. Updating local objects, input, etc.
+    // Get a message back of all updates
+    message::UserStateUpdate mout = Window::idleCallback(window, deltaTime);
+
+    PlayerID pid = my_player_id;
+    message::Message my_m{
+        message::Type::UserStateUpdate, {pid, std::time(nullptr)}, mout};
+
+    // OUTPUT TO SERVER
+    if (net_assigned) client.get()->write(my_m);
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);

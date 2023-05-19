@@ -37,11 +37,24 @@ void Server::tick() {
         << "(TCPServer::tick) Updating game, time elapsed since last tick: "
         << time_elapsed.count() << "ms" << std::endl;
 
+    // Temporary server loop demo (sending to client) ---
+    update_num_++;
+
+    std::vector<message::GameStateUpdateItem*> thingsOnServer;  // to send
+
+    message::GameStateUpdateItem* p = new message::GameStateUpdateItem();
+    p->id = 3;  // just for testing
+    p->posx = update_num_ * 0.1f;
+    p->posy = 2;
+    p->posz = 2;
+    thingsOnServer.push_back(p);
+
     message::Message game_state_update{
         message::Type::GameStateUpdate,
         {boost::uuids::random_generator()(), std::time(nullptr)},
-        message::Greeting{"Game state update: " +
-                          std::to_string(update_num_++)}};
+        message::GameStateUpdate{thingsOnServer}};
+    // ---
+
     write_all(game_state_update);
 
     tick();
@@ -95,10 +108,12 @@ void Server::do_accept() {
       auto notify_handler = [&](const message::Notify& body) {};
       auto game_state_update_handler =
           [&](const message::GameStateUpdate& body) {};
+      auto user_state_update_handler =
+          [&](const message::UserStateUpdate& body) {};
 
       auto message_handler = boost::make_overloaded_function(
           assign_handler, greeting_handler, notify_handler,
-          game_state_update_handler);
+          game_state_update_handler, user_state_update_handler);
       boost::apply_visitor(message_handler, m.body);
 
       read(player_id);
