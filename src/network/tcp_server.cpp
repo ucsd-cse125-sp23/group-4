@@ -45,6 +45,8 @@ void Server::tick() {
     message::GameStateUpdateItem* p = new message::GameStateUpdateItem();
     p->id = 3;  // just for testing
     p->posx = update_num_ * 0.1f;
+    p->posy = 2;
+    p->posz = 2;
     thingsOnServer.push_back(p);
 
     message::Message game_state_update{
