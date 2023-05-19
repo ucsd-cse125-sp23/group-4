@@ -161,6 +161,8 @@ class Scene {
   }
 
   Player* createPlayer(int id, bool isUser);
+  void initFromServer(int myid);
+  void setToUserFocus(GameThing* t);
   void init(void);
   UserState update(float delta);          // broadcast to net
   void updateState(SceneState newState);  // receive from net

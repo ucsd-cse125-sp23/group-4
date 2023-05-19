@@ -84,6 +84,7 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
       player_id = m.metadata.player_id;
       my_player_id = player_id;
       net_assigned = true;
+      // Window::gameScene->initFromServer(myId); // need a unique int id
       message::Message new_m{message::Type::Greeting,
                              {player_id, std::time(nullptr)},
                              message::Greeting{"Hello, server!"}};
