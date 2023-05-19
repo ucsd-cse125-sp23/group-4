@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/serialization/variant.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
@@ -52,13 +53,62 @@ struct Notify {
   }
 };
 
-struct GameStateUpdate {
-  std::string message;
-  std::string toString() { return message; }
+struct GameStateUpdateItem {
+  friend class boost::serialization::access;
+  int id;
+  float posx;
+  float posy;
+  float posz;
+  float heading;
+
+  GameStateUpdateItem(){};
+
+  std::string toString() {
+    // clang-format off
+    std::string str = std::string("") + "{\n" +
+                      "  id: " + std::to_string(id) +
+                      ",\n" +  // NOLINT
+                      "  position: {\n" +
+                      "  " + std::to_string(posx) +
+                      ", " + std::to_string(posy) +
+                      ", " + std::to_string(posz) +
+                      "\n" +  // NOLINT
+                      "  },\n" +
+                      "  heading: " + std::to_string(heading) +
+                      ",\n" +  // NOLINT
+                      "}";
+    // clang-format on
+    return str;
+  }
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& message;
+    ar& id;
+    ar& posx;
+    ar& posy;
+    ar& posz;
+    ar& heading;
+  }
+};
+
+struct GameStateUpdate {
+  std::vector<GameStateUpdateItem*> things;
+  // add global params later
+
+  std::string toString() {
+    // clang-format off
+    std::string str = std::string("") + "{\n" +
+                      "items:\n";
+    // clang-format on
+    for(auto i : things) {
+        str += i->toString();
+    }
+    return str;
+  }
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& things;
   }
 };
 struct UserStateUpdate {

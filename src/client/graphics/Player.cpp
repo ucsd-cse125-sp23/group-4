@@ -61,7 +61,8 @@ vec3 Player::move(vec3 movement) {
   }
 
   faceDirection(movement);
-  GameThing::move(movement);
+  // GameThing::move(movement);  // don't actually move. let the server do it
+
   return movement;  // send back the "world space" movement vector
 }
 

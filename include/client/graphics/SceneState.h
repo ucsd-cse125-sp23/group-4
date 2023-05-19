@@ -12,6 +12,13 @@ struct SceneGameThingState {
   glm::vec3 position;
   float heading;
   // add more here... onground, jump, animations, etc.
+
+  SceneGameThingState() {}
+  SceneGameThingState(message::GameStateUpdateItem me) {
+    id = me.id;
+    position = glm::vec3(me.posx, me.posy, me.posz);
+    heading = me.heading;
+  }
 };
 
 // received from server and needs to be drawn
@@ -25,7 +32,14 @@ struct SceneState {
   SceneState() {}
 
   explicit SceneState(message::GameStateUpdate state) {
-    // TODO(matthew) convert message to SceneState
+    // convert message to SceneState
+
+      std::vector<message::GameStateUpdateItem*> thingStates;
+
+      for (auto i : thingStates) {
+          objectStates[i->id] = SceneGameThingState(*i);
+      }
+
   }
 };
 
