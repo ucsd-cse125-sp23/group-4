@@ -20,7 +20,14 @@ Camera::Camera() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Camera::UpdateView() {
+void Camera::UpdateView() { UpdateView(getWorldMtx()); }
+
+void Camera::UpdateView(Node* parent) {
+  glm::mat4 mtx = parent->transformMtx * transformMtx;
+  UpdateView(mtx);  // since Node doesn't know its own parent
+}
+
+void Camera::UpdateView(glm::mat4 worldMtx) {
   //// Compute camera world matrix
   transform.updateMtx(&transformMtx);
   if (!Fixed) {
@@ -31,7 +38,7 @@ void Camera::UpdateView() {
                  glm::eulerAngleX(glm::radians(-Incline)) * transformMtx;
 
   // Compute view matrix (inverse of world matrix)
-  glm::mat4 view = glm::inverse(getWorldMtx());
+  glm::mat4 view = glm::inverse(worldMtx);
 
   // Compute perspective projection matrix
   glm::mat4 project =
