@@ -262,7 +262,7 @@ void Scene::init(void) {
 
   // ---
   // temporary manual spawning 4 players:
-  createPlayer(1, true);
+  createPlayer(1);
   createPlayer(2);
   createPlayer(3);
   createPlayer(4);

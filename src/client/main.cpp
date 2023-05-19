@@ -115,6 +115,14 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
 }
 
 int main(int argc, char* argv[]) {
+  int pid = 1;  // default player id to control
+  if (argc > 1) {
+    int input = (*argv[1]) - '0';
+    if (input > 0 && input <= 4) {
+      pid = input;
+    }
+  }
+
   boost::asio::io_context io_context;
   auto client = network_init(io_context);
 
@@ -143,6 +151,8 @@ int main(int argc, char* argv[]) {
     char i = std::getchar();
     exit(EXIT_FAILURE);
   }
+
+  Window::gameScene->initFromServer(pid);  // temporary
 
   // Delta time logic (see
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
