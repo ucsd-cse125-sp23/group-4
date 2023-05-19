@@ -98,12 +98,13 @@ struct GameStateUpdate {
 
   std::string toString() {
     // clang-format off
-    std::string str = std::string("") + "{\n" +
-                      "items:\n";
+    std::string str = std::string("") + "{...\n" +
+                      "game things:\n";
     // clang-format on
     for (auto i : things) {
       str += i->toString();
     }
+    str += "\n}...\n";
     return str;
   }
 

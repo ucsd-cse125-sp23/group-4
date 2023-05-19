@@ -20,7 +20,7 @@ Camera::Camera() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Camera::UpdateView(GLFWwindow* window) {
+void Camera::UpdateView() {
   //// Compute camera world matrix
   transform.updateMtx(&transformMtx);
   if (!Fixed) {

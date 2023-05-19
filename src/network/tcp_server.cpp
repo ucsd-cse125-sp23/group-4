@@ -14,6 +14,7 @@
 #include <network/tcp_server.hpp>
 #include <numeric>
 #include <string>
+#include <vector>
 
 /* TEMP SERVER GAME STATE CODE (positions only) */
 
@@ -96,18 +97,6 @@ void Server::tick() {
     p->posz = 2;
     thingsOnServer.push_back(p);
     */
-
-    // Temporary server loop demo (sending to client) ---
-    update_num_++;
-
-    std::vector<message::GameStateUpdateItem*> thingsOnServer;  // to send
-
-    message::GameStateUpdateItem* p = new message::GameStateUpdateItem();
-    p->id = 3;  // just for testing
-    p->posx = update_num_ * 0.1f;
-    p->posy = 2;
-    p->posz = 2;
-    thingsOnServer.push_back(p);
 
     message::Message game_state_update{
         message::Type::GameStateUpdate,
