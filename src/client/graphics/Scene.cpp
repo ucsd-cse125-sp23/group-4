@@ -33,12 +33,15 @@ void Scene::initFromServer(int myid) {
 }
 
 void Scene::setToUserFocus(GameThing* t) {
+  myPlayer = nullptr;
+
   t->isUser = true;
   if (dynamic_cast<Player*>(t) != nullptr) {
     Player* player = dynamic_cast<Player*>(t);
     player->camera = camera;  // give a reference to the game camera
+    myPlayer = player;
   }
-  t->childnodes.push_back(camera);
+  t->childnodes.push_back(camera);  // parent camera to player
 }
 
 UserState Scene::update(float delta) {
@@ -105,6 +108,8 @@ void Scene::drawHUD(GLFWwindow* window) {
 }
 void Scene::draw() {
   // Pre-draw sequence:
+  camera->UpdateView(myPlayer);
+
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
   glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
 
