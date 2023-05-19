@@ -56,7 +56,7 @@ class GameThing : public Node {
   bool isUser = false;  // controls whether we want to read input and send it
 
   Transform transform;
-  float azimuth = 0;    // for visuals only (aka heading)
+  float azimuth = 0;  // for visuals only (aka heading)
 
   virtual UserState update(float dt) {
     // --- example (spin spin) ---
