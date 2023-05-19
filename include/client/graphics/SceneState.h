@@ -34,12 +34,11 @@ struct SceneState {
   explicit SceneState(message::GameStateUpdate state) {
     // convert message to SceneState
 
-      std::vector<message::GameStateUpdateItem*> thingStates;
+    std::vector<message::GameStateUpdateItem*> thingStates;
 
-      for (auto i : thingStates) {
-          objectStates[i->id] = SceneGameThingState(*i);
-      }
-
+    for (auto i : thingStates) {
+      objectStates[i->id] = SceneGameThingState(*i);
+    }
   }
 };
 
