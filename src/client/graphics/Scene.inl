@@ -2,6 +2,7 @@
  * Scene.inl
  * contains the definition of the scene graph
  *****************************************************/
+#include "client/graphics/Collider.h"
 #include "client/graphics/ColliderImporter.h"
 #include "client/graphics/Scene.h"
 
@@ -184,7 +185,6 @@ void Scene::init(void) {
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
   sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
-
   // THE player !!!
   sceneResources->models["playerRef"] = new Model;
   sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
@@ -196,7 +196,6 @@ void Scene::init(void) {
   SoundEffect* sfx = new SoundEffect();
   sceneResources->sounds["test"] = sfx;
   sfx->load("assets/sounds/sound_test.wav");
-
 
   ///// maps:
 
@@ -219,7 +218,7 @@ void Scene::init(void) {
   // sceneResources->models["mapColsTesting"]->transformMtx = translate(vec3(0,
   // -2, 0));   // needs to be world space
 
-  std::vector<Collider> mapColliders =
+  std::vector<ColliderData> mapColliders =
       ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
 
   node["collision"] = new Node("_colliders");
