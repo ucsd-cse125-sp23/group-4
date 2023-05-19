@@ -8,11 +8,50 @@
 #include <ctime>
 #include <iostream>
 #include <magic_enum.hpp>
+#include <map>
 #include <memory>
 #include <network/message.hpp>
 #include <network/tcp_server.hpp>
 #include <numeric>
 #include <string>
+
+/* TEMP SERVER GAME STATE CODE (positions only) */
+
+struct GameThingState {
+  int id;
+  float posx;
+  float posy;
+  float posz;
+  float heading;
+
+  GameThingState() {}
+
+  void move(float x, float y, float z) {
+    posx += x;
+    posy += y;
+    posz += z;
+  }
+
+  const message::GameStateUpdateItem toMessage() {
+    message::GameStateUpdateItem p;
+    p.id = id;
+    p.posx = posx;
+    p.posy = posy;
+    p.posz = posz;
+    p.heading = heading;
+
+    return p;
+  }
+};
+
+// stored in server
+struct GameState {
+  std::map<int, GameThingState> objectStates;
+
+  GameState() {}
+};
+
+/* *** */
 
 Server::Server(boost::asio::io_context& io_context, int port)
     : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
@@ -21,6 +60,8 @@ Server::Server(boost::asio::io_context& io_context, int port)
   do_accept();
   tick();
 }
+
+GameState server_gameState = GameState();
 
 void Server::tick() {
   auto prev_time = std::chrono::steady_clock::now();
@@ -37,17 +78,24 @@ void Server::tick() {
     //    << "(TCPServer::tick) Updating game, time elapsed since last tick: "
     //    << time_elapsed.count() << "ms" << std::endl;
 
-    // Temporary server loop demo (sending to client) ---
+    // Temporary server broadcast example (sending to client) ---
     update_num_++;
 
     std::vector<message::GameStateUpdateItem*> thingsOnServer;  // to send
 
+    for (auto thing : server_gameState.objectStates) {
+      thingsOnServer.push_back(
+          new message::GameStateUpdateItem(thing.second.toMessage()));
+    }
+
+    /*
     message::GameStateUpdateItem* p = new message::GameStateUpdateItem();
     p->id = 3;  // just for testing
     p->posx = update_num_ * 0.1f;
     p->posy = 2;
     p->posz = 2;
     thingsOnServer.push_back(p);
+    */
 
     message::Message game_state_update{
         message::Type::GameStateUpdate,
@@ -109,7 +157,29 @@ void Server::do_accept() {
       auto game_state_update_handler =
           [&](const message::GameStateUpdate& body) {};
       auto user_state_update_handler =
-          [&](const message::UserStateUpdate& body) {};
+          [&](const message::UserStateUpdate& body) {
+            int rec_id = body.id;
+
+            // Temporary server receive example (reading from client) ---
+
+            if (server_gameState.objectStates.find(rec_id) ==
+                server_gameState.objectStates.end()) {
+              // id not found
+              GameThingState i;
+              i.id = rec_id;
+              i.posx = body.movx;
+              i.posy = body.movy;
+              i.posz = body.movz;
+              server_gameState.objectStates[rec_id] = i;  // add to object map
+            } else {
+              // id found
+              server_gameState.objectStates[rec_id].move(body.movx, body.movy,
+                                                         body.movz);
+              server_gameState.objectStates[rec_id].heading = body.heading;
+            }
+
+            // ---
+          };
 
       auto message_handler = boost::make_overloaded_function(
           assign_handler, greeting_handler, notify_handler,

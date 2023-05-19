@@ -22,6 +22,7 @@ struct UserState {
     m.movx = movement.x;
     m.movy = 0;
     m.movz = movement.z;
+    m.heading = heading;
 
     return m;
   }
