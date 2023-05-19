@@ -22,6 +22,25 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
+void Scene::initFromServer(int myid) {
+  // TODO(matthew) make this better
+  for (auto e : gamethings) {
+    if (e->netId == myid) {
+      setToUserFocus(e);
+      return;
+    }
+  }
+}
+
+void Scene::setToUserFocus(GameThing* t) {
+  t->isUser = true;
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+    player->camera = camera;  // give a reference to the game camera
+  }
+  t->childnodes.push_back(camera);
+}
+
 UserState Scene::update(float delta) {
   UserState ourPlayerUpdates;
 
