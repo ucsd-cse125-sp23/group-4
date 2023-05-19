@@ -33,7 +33,7 @@ UserState Player::update(float dt) {
   }
 
   moveLocal = normalize(moveLocal);
-  moveLocal *= speed * dt;
+  // moveLocal *= speed * dt;  // this is for single-player
   bool moving = length(moveLocal) > 0;
 
   vec3 moveWorld = vec3(0);
