@@ -16,12 +16,12 @@ struct UserState {
   message::UserStateUpdate toMessage() {
     // convert state to message to be sent
 
-      message::UserStateUpdate m = message::UserStateUpdate();
+    message::UserStateUpdate m = message::UserStateUpdate();
 
-      m.id = id;
-      m.movx = movement.x;
-      m.movy = 0;
-      m.movz = movement.z;
+    m.id = id;
+    m.movx = movement.x;
+    m.movy = 0;
+    m.movz = movement.z;
 
     return m;
   }
