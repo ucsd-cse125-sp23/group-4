@@ -37,16 +37,33 @@ void HUD::draw(GLFWwindow* window) {
       } else {
         size = 0.5 * scale;
       }
-      fr.RenderText(window, name, windowSpace[0], windowSpace[1], size,
+      fr->RenderText(width, height, name, windowSpace[0], windowSpace[1], size,
                     glm::vec3(0.0f, 0.0f, 1.0f));
     }
   }
 
   drawLeaderboard(window, scale, player_times);
 
+  glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
   std::string game_time = scene->time.ToString();
-  float w = fr.TextWidth(game_time, 0.75 * scale);
-  fr.RenderText(window, game_time, width - (w + 25),
+  float w = fr->TextWidth(game_time, 0.75 * scale);
+
+  float x_left = width - (130 * scale);
+  float x_leftNDC = (x_left / width * 2) - 1;
+
+  float y_bot = height - (60 * 0.75 * scale);
+  float y_botNDC = (y_bot / height * 2) - 1;
+
+  glBegin(GL_QUADS);
+
+  glVertex2f(1, 1);
+  glVertex2f(x_leftNDC, 1);
+  glVertex2f(x_leftNDC, y_botNDC);
+  glVertex2f(1, y_botNDC);
+
+  glEnd();
+
+  fr->RenderText(width, height, game_time, width - (w + (15 * scale)),
                 height - (48 * 0.75 * scale), 0.75f * scale,
                 glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -88,8 +105,8 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string,
     str += " " + time.ToString();
   }
   
-  int size = (width / 12 > 250) ? 250 : width / 12;
-  int x = size * 4 - (25 * scale);
+  int size = (width / 10 > 250) ? 250 : width / 10;
+  int x = size * 3 - (25 * scale);
   int y = height - size - 10;
   for (int i = 0; i < 4; i++) {
     glViewport(x, y, size, size);
@@ -97,24 +114,50 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string,
     Camera viewport;
    
     glBegin(GL_TRIANGLES);
-    glColor4f(0.0, 0.0, 0.0, 0.25);
+    glColor4f(0.0, 0.0, 0.0, 0.5);
     glVertex2f(-1, -1);
     glVertex2f(1, -1);
     glVertex2f(0, 1);
     glEnd();
 
-    viewport.SetDistance(3.5f);
+    // draw the player model
+    viewport.SetDistance(2.5);
     viewport.UpdateView(window);
     glm::mat4 transform =
-        glm::translate(glm::mat4(1), glm::vec3(0.0f, -3.0f, 0.0f));
-    transform *= glm::rotate(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::translate(glm::mat4(1), glm::vec3(0.0f, -3.5f, 0.0f));
+    transform *= glm::rotate(glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     scene->sceneResources->models["player"]->draw(
         viewport.GetViewProjectMtx(), viewport.GetViewMtx(),
         transform, true);
     glViewport(0, 0, width, height);
 
-    fr.RenderText(window, str, x, y - 15, 0.2 * scale,
-                  glm::vec3(0.0, 0.0, 0.0));
+    // Draw highlight
+    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+    
+    // screen coordinates
+    float x_left = x;
+    float x_right = x + size;
+    float y_top = y - 27 + (60 * 0.2 * scale);
+    float y_bot = y - 27;
+
+    // convert to normalized device coordinate
+    float x_leftNDC = (x_left / width * 2) - 1;
+    float x_rightNDC = (x_right / width * 2) - 1;
+    float y_topNDC = (y_top / height * 2) - 1;
+    float y_botNDC = (y_bot / height * 2) - 1;
+
+    // render the text background
+    glBegin(GL_QUADS);
+
+    glVertex2f(x_rightNDC, y_topNDC);
+    glVertex2f(x_leftNDC, y_topNDC);
+    glVertex2f(x_leftNDC, y_botNDC);
+    glVertex2f(x_rightNDC, y_botNDC);
+
+    glEnd();
+
+    fr->RenderText(width, height, str, x + (4 * scale), y - 20, 0.2 * scale,
+                  glm::vec3(1.0, 1.0, 1.0));
 
     x += (size + (25 * scale));
 

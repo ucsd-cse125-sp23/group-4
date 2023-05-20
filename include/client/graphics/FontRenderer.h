@@ -40,7 +40,7 @@ class FontRenderer {
   GLuint shader;
   unsigned int VAO, VBO;
 
-  FontRenderer() {
+  FontRenderer(const char* filename) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -55,7 +55,7 @@ class FontRenderer {
     }
 
     FT_Face face;
-    if (FT_New_Face(ft, "assets/fonts/Violety Crumble.ttf", 0, &face)) {
+    if (FT_New_Face(ft, filename, 0, &face)) {
       std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
       return;
     }
@@ -119,10 +119,8 @@ class FontRenderer {
     }
     return width;
   }
-  void RenderText(GLFWwindow* window, std::string text, float x, float y,
+  void RenderText(int width, int height, std::string text, float x, float y,
                   float scale, glm::vec3 color) {
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(width), 0.0f,
                                       static_cast<float>(height));

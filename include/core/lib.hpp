@@ -5,3 +5,8 @@
 #include "core/game/modifier/ControlModifier.h"
 
 void test_core(const std::string &source);
+
+
+void initializeLevel(Environment* environment);
+void terminateLevel();
+std::pair<Player*, ControlModifierData*> initializePlayer();

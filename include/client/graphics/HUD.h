@@ -6,7 +6,7 @@
 
 class HUD {
  public:
-  FontRenderer fr;
+  FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
   Scene* scene;
   Texture map;
 

@@ -6,7 +6,7 @@
 
 class Start : public Scene, public InputListener {
  public:
-  FontRenderer fr;
+  FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
   Texture background;
   float timeElapsed;
   float offset;
