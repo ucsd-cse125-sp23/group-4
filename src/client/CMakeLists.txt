@@ -4,6 +4,7 @@ set(ASSIMP_WARNINGS_AS_ERRORS OFF)
 set(ASSIMP_BUILD_ZLIB OFF)
 set(IMGUI_ENABLE_STDLIB_SUPPORT ON)
 set(IMGUI_EXAMPLES OFF)
+set(CMAKE_POLICY_DEFAULT_CMP0074 NEW)
 
 FetchContent_Declare(
   glew
@@ -46,19 +47,34 @@ FetchContent_Declare(
   GIT_TAG v3.4.0
   GIT_PROGRESS TRUE)
 
-FetchContent_MakeAvailable(zlib)
-set(ZLIB_ROOT ${zlib_BINARY_DIR})
-find_library(ZLIB_LIBRARY zlib PATHS ${zlib_BINARY_DIR} PATH_SUFFIXES lib)
-include_directories(${zlib_BINARY_DIR})
+# override find_package(zlib)
+FetchContent_MakeAvailable(
+  zlib
+)
+file(RENAME ${zlib_SOURCE_DIR}/zconf.h.included ${zlib_SOURCE_DIR}/zconf.h)
+set(ZLIB_ROOT ${zlib_SOURCE_DIR})
+set(ZLIB_LIBRARY zlibstatic)
+
+# turn off install for freetype and assimp
+set(_disable_install TRUE)
+function(install)
+  if (NOT _disable_install)
+    _install(${ARGV})
+  endif()
+endfunction(install)
+FetchContent_MakeAvailable(
+  freetype
+  assimp
+)
+set(_disable_install FALSE)
 
 FetchContent_MakeAvailable(
   glew
   glfw
   glm
   freeglut
-  freetype
   imgui
-  assimp)
+)
 
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/main.cpp
