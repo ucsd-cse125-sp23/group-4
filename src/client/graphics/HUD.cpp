@@ -51,7 +51,7 @@ void HUD::draw(GLFWwindow* window) {
                 glm::vec3(1.0f, 0.0f, 0.0f));
 
   // minimap stuff
-  int map_size = (width / 5 > 350) ? 350 : width / 4;
+  int map_size = (width / 5 > 250) ? 250 : width / 4;
   glViewport(10, height - map_size + 10, map_size, map_size);
 
   drawMinimap();
@@ -88,7 +88,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string,
     str += " " + time.ToString();
   }
   
-  int size = (width / 12 > 350) ? 350 : width / 12;
+  int size = (width / 12 > 250) ? 250 : width / 12;
   int x = size * 4 - (25 * scale);
   int y = height - size - 10;
   for (int i = 0; i < 4; i++) {
