@@ -67,7 +67,7 @@ Server::Server(boost::asio::io_context& io_context, int port)
   std::vector<ColliderData> mapColliders =
       ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
   for (auto collider : mapColliders) {
-    environment->addConvex(collider.vertices);
+    environment->addConvex(collider.vertices, 0.2f);
   }
   initializeLevel(environment);
 
@@ -193,6 +193,7 @@ void Server::do_accept() {
               server_gameState.objectStates[rec_id].move(body.movx, body.movy,
                                                          body.movz);
               server_gameState.objectStates[rec_id].heading = body.heading;
+              server_gameState.objectStates[rec_id].control->doJump = body.jump;
             }
 
             // ---
