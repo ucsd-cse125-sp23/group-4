@@ -25,34 +25,34 @@ void HUD::draw(GLFWwindow* window) {
       glm::vec2 windowSpace = ((glm::vec2(normalizedSpace) + 1.0f) / 2.0f) *
                                   glm::vec2(width, height) +
                               glm::vec2(0.0f, 0.0f);
-      fr.RenderText(window, name, windowSpace[0], windowSpace[1], 0.5f * scale,
+
+      // Scale the size of the text based on camera distance
+      Camera* cam = scene->camera;
+      float deltaD = 10 - cam->GetDistance();
+      float size;
+      if (deltaD < 0) {
+        size = (0.5 * scale) / (0.5 * abs(deltaD));
+        if (size < 0.1 * scale) size = 0.1 * scale;
+        else if (size > 0.5 * scale) size = 0.5 * scale;
+      } else {
+        size = 0.5 * scale;
+      }
+      fr.RenderText(window, name, windowSpace[0], windowSpace[1], size,
                     glm::vec3(0.0f, 0.0f, 1.0f));
     }
   }
 
-  float y_pos = float(height) - (48 * 0.5f * scale);
-  for (auto times : player_times) {
-    std::string str = times.first;
-    Timer time = times.second;
-    str += " " + time.ToString();
-    fr.RenderText(window, str, 10.0f, y_pos, 0.5f * scale,
-                  glm::vec3(1.0f, 1.0f, 1.0f));
-    y_pos -= 48 * 0.5f * scale;
-  }
+  drawLeaderboard(window, scale, player_times);
 
   std::string game_time = scene->time.ToString();
-  float w = fr.TextWidth(game_time, scale);
-  fr.RenderText(window, game_time, (width / 2.0f) - (w / 2.0f),
-                height - (48 * scale), 1.0f * scale,
+  float w = fr.TextWidth(game_time, 0.75 * scale);
+  fr.RenderText(window, game_time, width - (w + 25),
+                height - (48 * 0.75 * scale), 0.75f * scale,
                 glm::vec3(1.0f, 0.0f, 0.0f));
 
   // minimap stuff
-  int map_size = (width / 4 > 350) ? 350 : width / 4;
-  glViewport(10, 10, map_size, map_size);
-  glScissor(10, 10, map_size, map_size);
-  glEnable(GL_SCISSOR_TEST);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_SCISSOR_TEST);
+  int map_size = (width / 5 > 350) ? 350 : width / 4;
+  glViewport(10, height - map_size + 10, map_size, map_size);
 
   drawMinimap();
 
@@ -60,7 +60,7 @@ void HUD::draw(GLFWwindow* window) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
-      glColor3f(1.0f, 1.0f, 1.0f);
+      glColor3f(0.0f, 0.0f, 1.0f);
       glPointSize(10);
       glBegin(GL_POINTS);
       glVertex3f(
@@ -76,25 +76,72 @@ void HUD::draw(GLFWwindow* window) {
   glDisable(GL_BLEND);
 }
 
+void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string, Timer> player_times) {
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+
+  Timer time;
+  std::string str;
+  for (auto times : player_times) {
+    str = times.first;
+    time = times.second;
+    str += " " + time.ToString();
+  }
+  
+  int size = (width / 12 > 350) ? 350 : width / 12;
+  int x = size * 4 - (25 * scale);
+  int y = height - size - 10;
+  for (int i = 0; i < 4; i++) {
+    glViewport(x, y, size, size);
+
+    Camera viewport;
+   
+    glBegin(GL_TRIANGLES);
+    glColor4f(0.0, 0.0, 0.0, 0.25);
+    glVertex2f(-1, -1);
+    glVertex2f(1, -1);
+    glVertex2f(0, 1);
+    glEnd();
+
+    viewport.SetDistance(3.5f);
+    viewport.UpdateView(window);
+    glm::mat4 transform =
+        glm::translate(glm::mat4(1), glm::vec3(0.0f, -3.0f, 0.0f));
+    transform *= glm::rotate(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    scene->sceneResources->models["player"]->draw(
+        viewport.GetViewProjectMtx(), viewport.GetViewMtx(),
+        transform, true);
+    glViewport(0, 0, width, height);
+
+    fr.RenderText(window, str, x, y - 15, 0.2 * scale,
+                  glm::vec3(0.0, 0.0, 0.0));
+
+    x += (size + (25 * scale));
+
+  }
+}
+
 void HUD::drawMinimap() {
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   map.bindgl();
   glEnable(GL_TEXTURE_2D);
 
   glColor3f(1.0f, 1.0f, 1.0f);
   glBegin(GL_QUADS);
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex2f(1, -1);
-
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex2f(1, 1);
 
   glTexCoord2f(1, 0);
-  glVertex2f(-1, 1);
-
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(-1, -1);
+  glVertex3f(1.0f, 1.0f, 0.0f);
+  glTexCoord2f(0, 0);
+  glVertex3f(-1.0f, 1.0f, 0.0f);
+  glTexCoord2f(0, 1);
+  glVertex3f(-1.0f, -1.0f, 0.0f);
+  glTexCoord2f(1, 1);
+  glVertex3f(1.0f, -1.0f, 0.0f);
 
   glEnd();
 
   glDisable(GL_TEXTURE_2D);
+
+  glDisable(GL_BLEND);
 }

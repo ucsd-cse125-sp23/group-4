@@ -12,10 +12,12 @@ class HUD {
 
   HUD(Scene* scn) {
     scene = scn;
-    map.init("assets/image/test_uv.png");
+    map.init("assets/image/sample.png");
   }
 
   void draw(GLFWwindow* window);
+
+  void drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string, Timer> player_times);
 
   void drawMinimap();
 };

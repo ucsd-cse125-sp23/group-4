@@ -2,7 +2,7 @@
 
 void Start::update(float delta) {
   timeElapsed += delta;
-  offset += 1.0f / float(15000);
+  offset += (0.25 * delta);
   if (timeElapsed >= 1.0 && renderText) {
     timeElapsed = 0.0f;
     renderText = false;
