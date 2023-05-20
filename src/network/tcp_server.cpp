@@ -16,8 +16,8 @@
 #include <string>
 #include <vector>
 
-#include "core/lib.hpp"
 #include "client/graphics/ColliderImporter.h"
+#include "core/lib.hpp"
 
 /* TEMP SERVER GAME STATE CODE (positions only) */
 
@@ -184,7 +184,8 @@ void Server::do_accept() {
               i.posx = body.movx;
               i.posy = body.movy;
               i.posz = body.movz;
-              std::pair<Player*, ControlModifierData*> pair = initializePlayer();
+              std::pair<Player*, ControlModifierData*> pair =
+                  initializePlayer();
               i.control = pair.second;
               i.player = pair.first;
               server_gameState.objectStates[rec_id] = i;  // add to object map
