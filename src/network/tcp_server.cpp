@@ -88,9 +88,9 @@ void Server::tick() {
     auto curr_time = std::chrono::steady_clock::now();
     auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         curr_time - prev_time);
-    // std::cout
-    //    << "(TCPServer::tick) Updating game, time elapsed since last tick: "
-    //    << time_elapsed.count() << "ms" << std::endl;
+    std::cout
+        << "(TCPServer::tick) Updating game, time elapsed since last tick: "
+        << time_elapsed.count() << "ms" << std::endl;
 
     // Temporary server broadcast example (sending to client) ---
     update_num_++;

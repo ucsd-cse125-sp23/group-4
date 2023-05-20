@@ -68,11 +68,28 @@ class GameThing : public Node {
 
   void updateFromState(SceneGameThingState state) {
     // update self from server input
-    setPosition(state.position);
+    setPositionTarget(state.position);
     setHeading(state.heading);
   }
 
   // transform helpers
+
+  const float t_rate = 0.065f;  // in seconds (50ms tickrate + lag)
+  glm::vec3 position_p;
+  glm::vec3 position_t;
+  float lerp_p = 0.0f;
+  void updateInterpolate(float dt) {
+    lerp_p += dt;
+    transform.position = glm::lerp(position_p, position_t,
+                                   std::clamp(lerp_p / t_rate, 0.0f, 1.0f));
+    transform.updateMtx(&transformMtx);
+  }
+  void setPositionTarget(glm::vec3 pos) {
+    // interpolated!
+    position_p = position_t;
+    position_t = pos;
+    lerp_p = 0.0f;
+  }
 
   void setPosition(glm::vec3 pos) {
     this->transform.position = pos;

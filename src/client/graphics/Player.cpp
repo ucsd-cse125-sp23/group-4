@@ -11,6 +11,9 @@ using glm::vec3;
 using glm::vec4;
 
 UserState Player::update(float dt) {
+  // interpolate states
+  updateInterpolate(dt);
+
   if (!isUser) return UserState();
 
   if (camera && camera->Fixed)
