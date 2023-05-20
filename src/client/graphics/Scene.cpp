@@ -108,7 +108,8 @@ void Scene::drawHUD(GLFWwindow* window) {
 }
 void Scene::draw() {
   // Pre-draw sequence:
-  camera->UpdateView(myPlayer);
+  camera->SetPositionTarget(myPlayer->transform.position);
+  camera->UpdateView();
 
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
   glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
