@@ -1,3 +1,4 @@
+#include <boost/variant.hpp>
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -24,6 +25,11 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
             std::cerr << "(Connection::read) Error: " << ec.message()
                       << std::endl;
             return;
+          }
+
+          if (const message::Assign* body =
+                  boost::get<message::Assign>(&m.body)) {
+            player_id_ = m.metadata.player_id;
           }
 
           read_handler(m, *this);
