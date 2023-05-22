@@ -30,6 +30,7 @@ void Server::tick() {
       std::cerr << "(TCPServer::tick) Error: " << ec.message() << std::endl;
       return;
     }
+
     auto curr_time = std::chrono::steady_clock::now();
     auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         curr_time - prev_time);
@@ -98,12 +99,9 @@ void Server::do_accept() {
       PlayerID player_id = m.metadata.player_id;
       auto assign_handler = [&](const message::Assign& body) {};
       auto greeting_handler = [&](const message::Greeting& body) {
-        message::Message new_m{
-            message::Type::Greeting,
-            {player_id, std::time(nullptr)},
-            message::Greeting{"Hello, player " +
-                              boost::uuids::to_string(player_id)}};
-        write(new_m, player_id);
+        std::string greeting =
+            "Hello, player " + boost::uuids::to_string(player_id);
+        write<message::Greeting>(player_id, greeting);
       };
       auto notify_handler = [&](const message::Notify& body) {};
       auto game_state_update_handler =
@@ -141,19 +139,13 @@ void Server::do_accept() {
     std::cout << this << std::endl;
 
     // assign client their player_id
-    message::Message new_m{message::Type::Assign,
-                           {player_id, std::time(nullptr)},
-                           message::Assign{}};
-    connection->write(new_m);
+    write<message::Assign>(player_id, player_id);
 
     // notify everyone a new player has joined
     // TODO: don't notify newly joined client
-    message::Message join_notification{
-        message::Type::Notify,
-        {player_id, std::time(nullptr)},
-        message::Notify{"Player " + boost::uuids::to_string(player_id) +
-                        " has joined"}};
-    write_all(join_notification);
+    std::string notification =
+        "Player " + boost::uuids::to_string(player_id) + " has joined";
+    write_all<message::Notify>(notification);
 
     connection->start();  // start reading from client
   };
@@ -163,8 +155,9 @@ void Server::do_accept() {
 
 void Server::read(const PlayerID& id) { connections_[id]->read(); }
 
-void Server::write(const message::Message& m, const PlayerID& id) {
+void Server::write(const PlayerID& id, const message::Message& m) {
   // std::cout << "Queueing write to client: " << m << std::endl;
+
   connections_[id]->write(m);
 }
 
