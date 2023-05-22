@@ -87,7 +87,6 @@ TEST_CASE("Single Object Multi Collider", "[benchmark]") {
 		std::cout << "5000 AABBs for ";
 		testEnvironment(environment, 20);
 	}
-
 	std::vector<vec3f> vertices;
 	for (int i = 0; i < 10; i++)
 		for (int j = 0; j < 10; j++)
@@ -137,6 +136,23 @@ TEST_CASE("Single Object Multi Collider", "[benchmark]") {
 }
 
 TEST_CASE("Single Object Multi Collider Spreadout", "[benchmark]") {
+  SECTION("100 AABB (spread out)") {
+    Environment* environment = new Environment();
+    for (int x = 0; x < 10; x++)
+      for (int z = 0; z < 10; z++)
+		environment->addBox(vec3f(-1 + (x-5), -1, -1 + (z-5)), vec3f(1 + (x-5), 1, 1 - (z-5)));
+    std::cout << "100 AABBs (spread out) for ";
+    testEnvironment(environment, 20);
+  }
+  SECTION("1600 AABB (spread out)") {
+    Environment* environment = new Environment();
+    for (int x = 0; x < 40; x++)
+      for (int z = 0; z < 40; z++)
+        environment->addBox(vec3f(-1 + (x - 20), -1, -1 + (z - 20)),
+                            vec3f(1 + (x - 20), 1, 1 - (z - 20)));
+    std::cout << "1600 AABBs (spread out) for ";
+    testEnvironment(environment, 20);
+  }
 	std::vector<vec3f> vertices;
 	SECTION("100 Convex of 1000 vertices (spread out)") {
 		Environment* environment = new Environment();
