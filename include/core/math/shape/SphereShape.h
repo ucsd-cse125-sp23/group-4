@@ -12,5 +12,5 @@ class SphereShape : public ConvexShape {
   };
 
  public:
-  explicit SphereShape(float radius) : radius(radius) {}
+  SphereShape(float radius) : radius(radius) {}
 };

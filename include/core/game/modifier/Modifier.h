@@ -9,6 +9,6 @@ class Modifier {
  public:
   const bool serverOnly;
   Modifier();
-  explicit Modifier(bool serverOnly);
+  Modifier(bool serverOnly);
   virtual void modify(Modifiable* obj, ModifierData* data) = 0;
 };

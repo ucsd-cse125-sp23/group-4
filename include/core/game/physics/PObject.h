@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <vector>
 
 #include "core/game/modifier/Modifiable.h"
@@ -14,15 +13,15 @@ class PObject : public Modifiable {
   static uint32_t maxId;
   bool toRemove = false;
   vec3f pos;
-
   CollisionBounds* bounds;
 
  public:
   uint32_t id;
   vec3f vel, oPos;
   bool onGround, static_;
-  explicit PObject(BoundingShape* shape, unsigned int layer = 0,
-                   float friction = 0.0f, bool static_ = false);
+  Level* level;
+  PObject(BoundingShape* shape, unsigned int layer = 0, float friction = 0.0f,
+          bool static_ = false);
   ~PObject();
   vec3f getPos();
   void setPos(vec3f pos);

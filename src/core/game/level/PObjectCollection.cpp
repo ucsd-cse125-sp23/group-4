@@ -8,6 +8,7 @@ PObject* PObjectCollection::getById(size_t id) {
 bool PObjectCollection::removeById(size_t id) {
   auto ite = this->objs.find(id);
   if (ite != this->objs.end()) {
+    delete (*ite).second;
     this->objs.erase(ite);
     return true;
   }

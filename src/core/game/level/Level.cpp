@@ -1,7 +1,5 @@
 #include "core/game/level/Level.h"
 
-#include <cstdint>
-
 #include "core/util/global.h"
 
 void Level::tick() {
@@ -61,8 +59,7 @@ void Level::tick() {
       if (collisions.empty() || ind == -1) break;
 
       vec3f norm = normalize(vec3f(minMTV));
-      if (self->vel.y < 0 &&
-          minMTV.y / (std::abs(minMTV.x) + std::abs(minMTV.z)) > 0.05)
+      if (self->vel.y < 0 && minMTV.y / (abs(minMTV.x) + abs(minMTV.z)) > 0.05)
         self->onGround = true;
       if (collisions[ind]->isStatic()) {
         // Shift object out
@@ -132,7 +129,7 @@ void Level::tick() {
 }
 
 Level::Level(Environment* environment)
-    : environment(environment), age(0), objects(PObjectCollection()) {
+    : environment(environment), age(1), objects(PObjectCollection()) {
   for (int i = 0; i < 10; i++)
     for (int j = 0; j < 10; j++) collisionTypeLUT[i][j] = CollisionType::NONE;
   eventManager = new EventManager(this);
@@ -147,5 +144,10 @@ void Level::setCollisionType(CollisionType type, int layer0, int layer1) {
   collisionTypeLUT[layer0][layer1] = type;
   collisionTypeLUT[layer1][layer0] = type;
 }
-void Level::addPObject(PObject* obj) { objects.addPObject(obj); }
-uint64_t Level::getAge() { return age; }
+void Level::addPObject(PObject* obj) {
+  objects.addPObject(obj);
+  obj->level = this;
+  if (auto player = dynamic_cast<Player*>(obj)) players[player->pid] = player;
+}
+unsigned long long Level::getAge() { return age; }
+Environment* Level::getEnvironment() { return environment; }
