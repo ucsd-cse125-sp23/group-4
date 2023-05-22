@@ -18,7 +18,7 @@ class PObject : public Modifiable {
  public:
   uint32_t id;
   vec3f vel, oPos;
-  bool onGround, static_;
+  bool onGround, static_, freeze;
   Level* level;
   PObject(BoundingShape* shape, unsigned int layer = 0, float friction = 0.0f,
           bool static_ = false);
