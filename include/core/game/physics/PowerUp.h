@@ -5,9 +5,9 @@
 
 class PowerUp : public PObject {
  private:
-  const GlobalEffect* effect;
+  GlobalEffect* effect;
 
  public:
   PowerUp(vec3f pos, GlobalEffect* effect);
-  void onTrigger(const PObject* other) override;
+  void onTrigger(PObject* other) override;
 };

@@ -7,7 +7,7 @@ PowerUp::PowerUp(vec3f pos, GlobalEffect* effect)
   this->setPos(pos);
 }
 
-PowerUp::onTrigger(PObject* other) {
+void PowerUp::onTrigger(PObject* other) {
   effect->apply(level, other);
   this->markRemove();
 }
