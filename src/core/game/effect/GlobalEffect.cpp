@@ -2,7 +2,6 @@
 
 #include "core/util/global.h"
 
-void GlobalEffect::apply(Level* level, PObject* target)
-{
-	apply(level, { target });
+void GlobalEffect::apply(Level* level, PObject* target) {
+  apply(level, {target});
 }

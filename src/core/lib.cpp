@@ -1,13 +1,15 @@
 #include "core/lib.hpp"
 
-#include <random>
 #include <chrono>
+#include <random>
+
 #include "core/game/level/Level.h"
 #include "core/game/physics/PowerUp.h"
 
 void initializeLevel(Environment* environment) {
   level = new Level(environment);
-  level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER, ENVIRONMENT_LAYER);
+  level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER,
+                          ENVIRONMENT_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER, PLAYER_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, POWER_LAYER, PLAYER_LAYER);
 }
@@ -23,28 +25,26 @@ std::pair<Player*, ControlModifierData*> initializePlayer() {
 
 void terminateLevel() { delete level; }
 
-void spawnPowerUp(vec3f min, vec3f max, const std::vector<GlobalEffect*>& effects) {
-    std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
-    float minT = -1;
-    Ray ray;
-    int n = 0;
-    while(n < 5)
-    {
-        ray = { vec3f(min.x + (max.x - min.x) * dist(rng), 1000.0, min.z + (max.z - min.z) * dist(rng)) , vec3f(0,-1,0) };
-        for (auto obj : level->getEnvironment()->getCollisions())
-        {
-            float t = obj->getBounds()->intersects(ray);
-            if (t >= 0 && t < minT)
-                minT = t;
-        }
-        if (minT >= 0)
-            break;
+void spawnPowerUp(vec3f min, vec3f max,
+                  const std::vector<GlobalEffect*>& effects) {
+  std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());
+  std::uniform_real_distribution<double> dist(0.0, 1.0);
+  float minT = -1;
+  Ray ray;
+  int n = 0;
+  while (n < 5) {
+    ray = {vec3f(min.x + (max.x - min.x) * dist(rng), 1000.0,
+                 min.z + (max.z - min.z) * dist(rng)),
+           vec3f(0, -1, 0)};
+    for (auto obj : level->getEnvironment()->getCollisions()) {
+      float t = obj->getBounds()->intersects(ray);
+      if (t >= 0 && t < minT) minT = t;
     }
-    if (minT < 0)
-        return;
+    if (minT >= 0) break;
+  }
+  if (minT < 0) return;
 
-    vec3f pos = ray.src + ray.dir * minT;
-    size_t i = static_cast<size_t>(dist(rng) * effects.size());
-    level->addPObject(new PowerUp(pos, effects[i]));
+  vec3f pos = ray.src + ray.dir * minT;
+  size_t i = static_cast<size_t>(dist(rng) * effects.size());
+  level->addPObject(new PowerUp(pos, effects[i]));
 }

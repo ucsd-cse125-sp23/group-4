@@ -3,5 +3,5 @@
 #include "core/math/vector.h"
 
 struct Ray {
-	vec3f src, dir;
+  vec3f src, dir;
 };

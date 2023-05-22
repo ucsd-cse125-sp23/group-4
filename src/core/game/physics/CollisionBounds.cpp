@@ -20,8 +20,8 @@ vec4f CollisionBounds::mtv(const CollisionBounds* other) const {
                           translate_scale(other->pos, other->scale));
 }
 bool CollisionBounds::contains(vec3f point) const {
-    return this->shape->contains(point, translate_scale(this->pos, this->scale));
+  return this->shape->contains(point, translate_scale(this->pos, this->scale));
 }
 float CollisionBounds::intersects(Ray ray) const {
-    return this->shape->intersects(ray, translate_scale(this->pos, this->scale));
+  return this->shape->intersects(ray, translate_scale(this->pos, this->scale));
 }

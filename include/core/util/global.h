@@ -1,19 +1,18 @@
 #pragma once
 
+#include "core/game/effect/ContextAwareGlobalEffect.h"
+#include "core/game/effect/StaticGlobalEffect.h"
 #include "core/game/event/EventManager.h"
 #include "core/game/level/Level.h"
+#include "core/game/modifier/AttractModifier.h"
 #include "core/game/modifier/ControlModifier.h"
+#include "core/game/modifier/FreezeModifier.h"
 #include "core/game/modifier/GravityModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
-#include "core/game/modifier/AttractModifier.h"
-#include "core/game/modifier/FreezeModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
-#include "core/math/shape/SphereShape.h"
 #include "core/math/shape/CylinderShape.h"
 #include "core/math/shape/OffsetShape.h"
-
-#include "core/game/effect/StaticGlobalEffect.h"
-#include "core/game/effect/ContextAwareGlobalEffect.h"
+#include "core/math/shape/SphereShape.h"
 
 extern int TAG_COOLDOWN;
 extern float JUMP_VELOCITY;
@@ -37,7 +36,6 @@ extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern AttractModifier* ATTRACT_MODIFIER;
 extern FreezeModifier* FREEZE_MODIFIER;
 
-
 extern GlobalEffect* SPEEDBOOST_EFFECT;
 extern GlobalEffect* SLOWDOWN_EFFECT;
 extern GlobalEffect* FREEZE_EFFECT;
@@ -47,7 +45,6 @@ extern GlobalEffect* SLOW_FALL_EFFECT;
 extern GlobalEffect* FAST_FALL_EFFECT;
 
 extern GlobalEffect* SWAP_POSITIONS_EFFECT;
-
 
 /*Good*/
 extern GlobalEffect* SPEEDBOOST_SELF_EFFECT;

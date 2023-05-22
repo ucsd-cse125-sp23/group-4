@@ -1,12 +1,12 @@
 #pragma once
 
 #include "core/math/shape/ConvexShape.h"
-#include "core/math/shape/PointShape.h"
-#include "core/math/shape/LineShape.h"
 
 #include <limits>
 #include <vector>
 
+#include "core/math/shape/LineShape.h"
+#include "core/math/shape/PointShape.h"
 #include "core/math/shape/Simplex.h"
 
 #define MAX_ITERATIONS 100
@@ -321,40 +321,36 @@ vec4f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx,
   return vec4f(-min.x, -min.y, -min.z, min.w);
 }
 
-
-bool ConvexShape::contains(const vec3f& point, const mat4f& thisMtx, const mat4f& otherMtx) const {
-    return this->collides(new PointShape(point), thisMtx, otherMtx);
+bool ConvexShape::contains(const vec3f& point, const mat4f& thisMtx,
+                           const mat4f& otherMtx) const {
+  return this->collides(new PointShape(point), thisMtx, otherMtx);
 }
 float ConvexShape::intersects(const Ray& ray, const mat4f& thisMtx) const {
-    mat3f thisIMtx = mat3f(thisMtx);
-    if (thisIMtx != mat3f::identity()) thisIMtx = inverse(thisIMtx);
+  mat3f thisIMtx = mat3f(thisMtx);
+  if (thisIMtx != mat3f::identity()) thisIMtx = inverse(thisIMtx);
 
-    vec3f mn = proj(vec3f(thisMtx * this->furthestPoint(-thisIMtx * ray.dir)), ray.dir);
-    vec3f mx = proj(vec3f(thisMtx * this->furthestPoint(thisIMtx * ray.dir)), ray.dir);
-    if (dot(mx - ray.src, ray.dir) / length_squared(ray.dir) < 0)
-        return -1;
-    LineShape* line = new LineShape(max(ray.src,mn), max(ray.src,mx));
+  vec3f mn =
+      proj(vec3f(thisMtx * this->furthestPoint(-thisIMtx * ray.dir)), ray.dir);
+  vec3f mx =
+      proj(vec3f(thisMtx * this->furthestPoint(thisIMtx * ray.dir)), ray.dir);
+  if (dot(mx - ray.src, ray.dir) / length_squared(ray.dir) < 0) return -1;
+  LineShape* line = new LineShape(max(ray.src, mn), max(ray.src, mx));
 
-    if (!this->collides(line, thisMtx))
-        return -1;
+  if (!this->collides(line, thisMtx)) return -1;
 
-    int n = 0;
-    while (n++ < MAX_ITERATIONS && distance_squared(line->a, line->b) > 0.0001f)
-    {
-        if (this->collides(line, thisMtx))
-        {
-            //std::cout << "Collides: " << line->a << " " << line->b << std::endl;
-            line->b = (line->b + line->a) / 2.0f;
-        }
-        else
-        {
-            //std::cout << "Misses: " << line->a << " " << line->b << std::endl;
-            line->b = (line->b - line->a) + line->b;
-            line->a = (line->a + line->b) / 2.0f;
-        }
+  int n = 0;
+  while (n++ < MAX_ITERATIONS && distance_squared(line->a, line->b) > 0.0001f) {
+    if (this->collides(line, thisMtx)) {
+      // std::cout << "Collides: " << line->a << " " << line->b << std::endl;
+      line->b = (line->b + line->a) / 2.0f;
+    } else {
+      // std::cout << "Misses: " << line->a << " " << line->b << std::endl;
+      line->b = (line->b - line->a) + line->b;
+      line->a = (line->a + line->b) / 2.0f;
     }
-    float t = dot((line->b + line->a) / 2.0f - ray.src, ray.dir) / length_squared(ray.dir);
-    delete line;
-    return t;
+  }
+  float t = dot((line->b + line->a) / 2.0f - ray.src, ray.dir) /
+            length_squared(ray.dir);
+  delete line;
+  return t;
 }
-

@@ -5,13 +5,13 @@
 #include "core/math/vector.h"
 
 struct AttractModifierData : TimedModifierData {
-    PObject* sink;
-    float factor;
-    AttractModifierData(unsigned long long duration, PObject* sink, float factor)
-        : TimedModifierData(duration), sink(sink), factor(factor) {}
+  PObject* sink;
+  float factor;
+  AttractModifierData(unsigned long long duration, PObject* sink, float factor)
+      : TimedModifierData(duration), sink(sink), factor(factor) {}
 };
 class AttractModifier : public TimedModifier {
-public:
-    AttractModifier();
-    void timedModify(Modifiable* obj, ModifierData* data) override;
+ public:
+  AttractModifier();
+  void timedModify(Modifiable* obj, ModifierData* data) override;
 };

@@ -5,11 +5,11 @@
 #include "core/math/vector.h"
 
 struct FreezeModifierData : TimedModifierData {
-    FreezeModifierData(unsigned long long duration)
-        : TimedModifierData(duration) {}
+  FreezeModifierData(unsigned long long duration)
+      : TimedModifierData(duration) {}
 };
 class FreezeModifier : public TimedModifier {
-public:
-    FreezeModifier();
-    void timedModify(Modifiable* obj, ModifierData* data) override;
+ public:
+  FreezeModifier();
+  void timedModify(Modifiable* obj, ModifierData* data) override;
 };

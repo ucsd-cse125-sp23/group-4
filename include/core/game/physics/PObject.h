@@ -14,6 +14,7 @@ class PObject : public Modifiable {
   bool toRemove = false;
   vec3f pos;
   CollisionBounds* bounds;
+
  public:
   uint32_t id;
   vec3f vel, oPos;

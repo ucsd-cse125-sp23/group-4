@@ -5,7 +5,8 @@
 struct TimedModifierData : public ModifierData {
   unsigned long long expire = -1;
   /*
-   * @param duration duration of the modifier instance before expiring (0 duration modifiers will never expire)
+   * @param duration duration of the modifier instance before expiring (0
+   * duration modifiers will never expire)
    *
    */
   TimedModifierData(unsigned long long duration);

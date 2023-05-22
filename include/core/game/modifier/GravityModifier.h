@@ -5,9 +5,10 @@
 
 struct GravityModifierData : TimedModifierData {
   float gravity;
-  GravityModifierData(float gravity, unsigned long long duration = 0) : TimedModifierData(duration), gravity(gravity) {}
+  GravityModifierData(float gravity, unsigned long long duration = 0)
+      : TimedModifierData(duration), gravity(gravity) {}
 };
 class GravityModifier : public TimedModifier {
  public:
-    void timedModify(Modifiable* obj, ModifierData* data) override;
+  void timedModify(Modifiable* obj, ModifierData* data) override;
 };
