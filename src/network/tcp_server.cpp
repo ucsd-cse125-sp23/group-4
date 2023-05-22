@@ -97,21 +97,15 @@ void Server::do_accept() {
       std::cout << "(Connection::read) Received:\n" << m << std::endl;
 
       PlayerID player_id = m.metadata.player_id;
-      auto assign_handler = [&](const message::Assign& body) {};
       auto greeting_handler = [&](const message::Greeting& body) {
         std::string greeting =
-            "Hello, player " + boost::uuids::to_string(player_id);
+            "Hello, player " + boost::uuids::to_string(player_id) + "!";
         write<message::Greeting>(player_id, greeting);
       };
-      auto notify_handler = [&](const message::Notify& body) {};
-      auto game_state_update_handler =
-          [&](const message::GameStateUpdate& body) {};
-      auto user_state_update_handler =
-          [&](const message::UserStateUpdate& body) {};
+      auto any_handler = [](const message::Message::Body&) {};
 
-      auto message_handler = boost::make_overloaded_function(
-          assign_handler, greeting_handler, notify_handler,
-          game_state_update_handler, user_state_update_handler);
+      auto message_handler =
+          boost::make_overloaded_function(greeting_handler, any_handler);
       boost::apply_visitor(message_handler, m.body);
 
       read(player_id);

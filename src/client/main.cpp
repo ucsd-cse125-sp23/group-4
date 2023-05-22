@@ -89,17 +89,13 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
       // Window::gameScene->initFromServer(myId); // need a unique int id
       client.write<message::Greeting>("Hello, server!");
     };
-    auto greeting_handler = [&](const message::Greeting& body) {};
-    auto notify_handler = [&](const message::Notify& body) {};
     auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
       Window::gameScene->updateState(SceneState(body));
     };
-    auto user_state_update_handler = [&](const message::UserStateUpdate& body) {
-    };
+    auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
-        assign_handler, greeting_handler, notify_handler,
-        game_state_update_handler, user_state_update_handler);
+        assign_handler, game_state_update_handler, any_handler);
 
     boost::apply_visitor(message_handler, m.body);
   };
