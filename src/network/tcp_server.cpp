@@ -88,10 +88,10 @@ void Server::tick() {
     auto curr_time = std::chrono::steady_clock::now();
     auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         curr_time - prev_time);
-    std::cout
+    /* std::cout
         << "(TCPServer::tick) Updating game, time elapsed since last tick: "
         << time_elapsed.count() << "ms" << std::endl;
-
+        */
     // Temporary server broadcast example (sending to client) ---
     update_num_++;
 
@@ -155,7 +155,7 @@ void Server::do_accept() {
         return;
       }
 
-      std::cout << "(Connection::read) Received:\n" << m << std::endl;
+      //std::cout << "(Connection::read) Received:\n" << m << std::endl;
 
       PlayerID player_id = m.metadata.player_id;
       auto assign_handler = [&](const message::Assign& body) {};
@@ -227,7 +227,7 @@ void Server::do_accept() {
         {player_id, std::make_unique<Connection<message::Message>>(
                         socket, conn_read_handler, conn_write_handler)});
     auto& connection = connections_[player_id];
-    std::cout << this << std::endl;
+    //std::cout << this << std::endl;
 
     // assign client their player_id
     message::Message new_m{message::Type::Assign,
