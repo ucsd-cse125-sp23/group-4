@@ -28,10 +28,15 @@ struct Metadata {
 };
 
 struct Assign {
-  std::string toString() { return "assign response"; }
+  PlayerID player_id;
+  std::string toString() {
+    return "assigning player_id: " + boost::uuids::to_string(player_id);
+  }
 
   template <typename Archive>
-  void serialize(Archive& ar, unsigned int) {}
+  void serialize(Archive& ar, unsigned int) {
+    ar& player_id;
+  }
 };
 
 struct Greeting {

@@ -78,17 +78,16 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
     std::cout << "(Client::connect) Connected to " << endpoint.address() << ":"
               << endpoint.port() << std::endl;
   };
+
   auto read_handler = [&](const message::Message& m, Client& client) {
     std::cout << "(Connection::read) Received\n" << m << std::endl;
+
     auto assign_handler = [&](const message::Assign& body) {
-      player_id = m.metadata.player_id;
+      player_id = body.player_id;
       my_player_id = player_id;
       net_assigned = true;
       // Window::gameScene->initFromServer(myId); // need a unique int id
-      message::Message new_m{message::Type::Greeting,
-                             {player_id, std::time(nullptr)},
-                             message::Greeting{"Hello, server!"}};
-      client.write(new_m);
+      client.write<message::Greeting>("Hello, server!");
     };
     auto greeting_handler = [&](const message::Greeting& body) {};
     auto notify_handler = [&](const message::Notify& body) {};
@@ -104,6 +103,7 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
 
     boost::apply_visitor(message_handler, m.body);
   };
+
   auto write_handler = [&](std::size_t bytes_transferred,
                            const message::Message& m, Client& client) {
     std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
