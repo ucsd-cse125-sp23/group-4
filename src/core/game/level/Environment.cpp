@@ -1,6 +1,7 @@
 #include "core/game/level/Environment.h"
 
 #include "core/util/global.h"
+#include "core/math/shape/ConvexMeshShape.h"
 
 void Environment::addPObject(PObject* obj) {
   collisions.push_back(obj);
