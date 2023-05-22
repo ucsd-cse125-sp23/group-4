@@ -56,7 +56,19 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
 }
 
 TaggedStatusModifier::TaggedStatusModifier() : Modifier(false) {}
-void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {}
+void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
+  if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
+    TaggedStatusModifierData* cData =
+        static_cast<TaggedStatusModifierData*>(data);
+    if (pObj->level->getAge() - cData->taggedTime < TAG_COOLDOWN)
+      pObj->vel = vec3f(0, 0, 0);
+    else if (cData->isIt) {
+      int lvl = (pObj->level->getAge() - cData->taggedTime)/200;
+      if (lvl > 5) lvl = 5;
+      pObj->addPos(lvl * 0.04f * pObj->vel * vec3f(1, 0, 1));
+    }
+  }
+}
 
 AttractModifier::AttractModifier() : TimedModifier(false) {}
 void AttractModifier::timedModify(Modifiable* obj, ModifierData* data) {
