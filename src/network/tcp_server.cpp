@@ -17,7 +17,7 @@
 Server::Server(boost::asio::io_context& io_context, int port)
     : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
       timer_(boost::asio::steady_timer(io_context)) {
-  std::cout << "(TCPServer) Server running on port " << port << std::endl;
+  std::cout << "(Server) Server running on port " << port << std::endl;
   do_accept();
   tick();
 }
@@ -27,16 +27,16 @@ void Server::tick() {
   timer_.expires_from_now(tick_rate_);
   timer_.async_wait([=](const boost::system::error_code& ec) {
     if (ec) {
-      std::cerr << "(TCPServer::tick) Error: " << ec.message() << std::endl;
+      std::cerr << "(Server::tick) Error waiting for timer: " << ec.message()
+                << std::endl;
       return;
     }
 
     auto curr_time = std::chrono::steady_clock::now();
     auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         curr_time - prev_time);
-    std::cout
-        << "(TCPServer::tick) Updating game, time elapsed since last tick: "
-        << time_elapsed.count() << "ms" << std::endl;
+    std::cout << "(Server::tick) Updating game, time elapsed since last tick: "
+              << time_elapsed.count() << "ms" << std::endl;
 
     // Temporary server loop demo (sending to client) ---
     update_num_++;
@@ -66,7 +66,8 @@ void Server::do_accept() {
   // handler on new client connections
   auto accept_handler = [=](boost::system::error_code ec, tcp::socket socket) {
     if (ec) {
-      std::cerr << "(TCPServer::accept) Error: " << ec.message() << std::endl;
+      std::cerr << "(Server::accept) Error accepting connection: "
+                << ec.message() << std::endl;
       return;
     }
 
@@ -74,16 +75,14 @@ void Server::do_accept() {
 
     // generate new player_id
     PlayerID player_id = boost::uuids::random_generator()();
-    std::cout
-        << "(TCPServer::accept) Accepted new client, assigning player_id: "
-        << player_id << std::endl;
+    std::cout << "(Server::accept) Accepted new client, assigning player_id: "
+              << player_id << std::endl;
 
     auto conn_read_handler = [=](boost::system::error_code ec,
                                  const message::Message& m) {
       if (ec) {
-        std::cerr << "(Connection::read) Error: " << ec.message() << std::endl;
         if (ec == boost::asio::error::eof) {
-          std::cout << "(Connection::read) Player " << player_id
+          std::cout << "(Server::read) Player " << player_id
                     << " disconnected, closing connection" << std::endl;
           // save value of this, since read_handler closure is destroyed when
           // connection is destroyed
@@ -93,8 +92,6 @@ void Server::do_accept() {
         }
         return;
       }
-
-      std::cout << "(Connection::read) Received:\n" << m << std::endl;
 
       PlayerID player_id = m.metadata.player_id;
       auto greeting_handler = [&](const message::Greeting& body) {
@@ -114,15 +111,7 @@ void Server::do_accept() {
     auto conn_write_handler = [=](boost::system::error_code ec,
                                   std::size_t length,
                                   const message::Message& m) {
-      if (ec) {
-        std::cerr << "(Connection::write, " << magic_enum::enum_name(m.type)
-                  << ") Error: " << ec.message() << std::endl;
-        return;
-      }
-
-      std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
-                << ") Successfully wrote " << length << " bytes to client "
-                << player_id << std::endl;
+      if (ec) return;
     };
 
     // store new connection
@@ -165,10 +154,10 @@ void Server::write_all(message::Message& m) {
 
 std::ostream& operator<<(std::ostream& os, Server* s) {
   std::size_t num_connections = s->connections_.size();
-  os << "(TCPServer) Number of active connections: " << num_connections;
+  os << "(Server) Number of active connections: " << num_connections;
 
   if (num_connections > 0) {
-    std::string clients_msg = "\n(TCPServer) Active clients:";
+    std::string clients_msg = "\n(Server) Active clients:";
     std::string clients = std::accumulate(
         std::next(s->connections_.begin()), s->connections_.end(),
         "  " + to_string(s->connections_.begin()->first),

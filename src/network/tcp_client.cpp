@@ -19,14 +19,14 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
           return;
         }
 
+        std::cout << "(Client::connect) Connected to " << endpoint.address()
+                  << ":" << endpoint.port() << std::endl;
+
         auto conn_read_handler = [=](boost::system::error_code ec,
                                      const message::Message& m) {
-          if (ec) {
-            std::cerr << "(Connection::read) Error: " << ec.message()
-                      << std::endl;
-            return;
-          }
+          if (ec) return;
 
+          // save player_id assigned by the server
           if (const message::Assign* body =
                   boost::get<message::Assign>(&m.body)) {
             player_id_ = body->player_id;
@@ -39,11 +39,7 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
         auto conn_write_handler = [=](boost::system::error_code ec,
                                       std::size_t bytes_transferred,
                                       const message::Message& m) {
-          if (ec) {
-            std::cerr << "(Connection::write) Error: " << ec.message()
-                      << std::endl;
-            return;
-          }
+          if (ec) return;
 
           write_handler(bytes_transferred, m, *this);
         };
