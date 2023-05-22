@@ -70,12 +70,14 @@ Server::Server(boost::asio::io_context& io_context, int port)
     environment->addConvex(collider.vertices, 0.2f);
   }
   initializeLevel(environment);
+  applyGameMode(new OneTaggerTimeGameMode());
 
   do_accept();
   tick();
 }
 
 GameState server_gameState = GameState();
+
 
 void Server::tick() {
   auto prev_time = std::chrono::steady_clock::now();
@@ -94,6 +96,17 @@ void Server::tick() {
         */
     // Temporary server broadcast example (sending to client) ---
     update_num_++;
+
+    if (level->players.size() > 1 && !tempOnce) {
+      tempOnce = true;
+      level->gameMode->initPlayers(level->players);
+      std::cout << "Game Started" << std::endl;
+    }
+    if (tempOnce && (count++)%20 == 0) {
+      for (auto pair : level->players)
+        std::cout << pair.first << ":" << queryScore(pair.first) << " ";
+      std::cout << std::endl;
+    }
 
     std::vector<message::GameStateUpdateItem*> thingsOnServer;  // to send
     level->tick();

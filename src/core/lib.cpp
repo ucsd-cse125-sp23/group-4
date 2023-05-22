@@ -25,6 +25,18 @@ std::pair<Player*, ControlModifierData*> initializePlayer() {
 
 void terminateLevel() { delete level; }
 
+void applyGameMode(GameMode* gamemode) {
+  gamemode->registerTrackers(level);
+  level->gameMode = gamemode;
+}
+int queryScore(uint32_t pid) { return level->gameMode->queryScore(pid); }
+std::vector<std::vector<uint32_t>> queryPlacements() {
+  return level->gameMode->queryPlacements();
+}
+void initPlayers(std::map<uint32_t, Player*> players) {
+  level->gameMode->initPlayers(players);
+}
+
 void spawnPowerUp(vec3f min, vec3f max,
                   const std::vector<GlobalEffect*>& effects) {
   std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());

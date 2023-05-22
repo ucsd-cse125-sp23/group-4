@@ -31,4 +31,9 @@ class Server {
   void write(const message::Message&, const PlayerID&);
   void write_all(message::Message&);
   void tick();
+
+
+  //Temp
+  bool tempOnce = false;
+  int count = 0;
 };

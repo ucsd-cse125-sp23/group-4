@@ -61,7 +61,7 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
     TaggedStatusModifierData* cData =
         static_cast<TaggedStatusModifierData*>(data);
     if (pObj->level->getAge() - cData->taggedTime < TAG_COOLDOWN)
-      pObj->vel = vec3f(0, 0, 0);
+      pObj->freeze = true;
     else if (cData->isIt) {
       int lvl = (pObj->level->getAge() - cData->taggedTime)/200;
       if (lvl > 5) lvl = 5;
@@ -82,6 +82,6 @@ void AttractModifier::timedModify(Modifiable* obj, ModifierData* data) {
 FreezeModifier::FreezeModifier() : TimedModifier(false) {}
 void FreezeModifier::timedModify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
-    pObj->vel = vec3f(0, 0, 0);
+    pObj->freeze = true;
   }
 }

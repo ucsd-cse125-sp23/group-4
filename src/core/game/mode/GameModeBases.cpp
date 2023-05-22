@@ -55,7 +55,7 @@ void NTaggerGameMode::initPlayers(std::map<uint32_t, Player*> players) {
     TaggedStatusModifierData* data = static_cast<TaggedStatusModifierData*>(
         pPerm[i]->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get());
     data->isIt = true;
-    data->taggedTime = 0;
+    data->taggedTime = level->getAge();
   }
 }
 
@@ -72,7 +72,7 @@ void TeamedTaggerGameMode::initPlayers(std::map<uint32_t, Player*> players) {
     TaggedStatusModifierData* data = static_cast<TaggedStatusModifierData*>(
         pPerm[i]->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get());
     data->isIt = true;
-    data->taggedTime = 0;
+    data->taggedTime = level->getAge();
   }
   for (int i = players.size() / 2; i < players.size(); i++)
     teams[1].push_back(pPerm[i]->pid);
