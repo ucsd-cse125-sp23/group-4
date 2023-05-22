@@ -152,10 +152,12 @@ struct UserStateUpdate {
 };
 
 struct Message {
+  using Body = boost::variant<Assign, Greeting, Notify, GameStateUpdate,
+                              UserStateUpdate>;
+
   Type type;
   Metadata metadata;
-  boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate>
-      body;
+  Body body;
 
   std::string toString() const;
   friend std::ostream& operator<<(std::ostream&, const Message&);
@@ -166,4 +168,5 @@ struct Message {
   }
 };
 
+Type get_type(const Message::Body&);
 }  // namespace message
