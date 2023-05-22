@@ -19,6 +19,7 @@ void TimedModifier::modify(Modifiable* obj, ModifierData* data) {
   TimedModifierData* cData = static_cast<TimedModifierData*>(data);
   if (level->getAge() >= cData->expire && cData->expire > 0)
     cData->markedRemove = true;
+  timedModify(obj, data);
 }
 
 SpeedBoostModifier::SpeedBoostModifier() : TimedModifier(false) {}
