@@ -1,5 +1,10 @@
 #include "core/util/global.h"
 
+#include "core/game/effect/AttractEffects.h"
+
+#include <random>
+#include <chrono>
+
 int TAG_COOLDOWN = 20;
 float JUMP_VELOCITY = 0.3f;
 float GRAVITY_STRENGTH = 0.01f;
@@ -24,29 +29,108 @@ AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
 FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
 
 
-StaticGlobalEffect* SPEEDBOOST_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+GlobalEffect* SPEEDBOOST_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, 0.2f)));
 	});
-StaticGlobalEffect* SLOWDOWN_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+GlobalEffect* SLOWDOWN_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, -0.2f)));
 	});
-StaticGlobalEffect* FREEZE_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+GlobalEffect* FREEZE_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->addModifierInstance(new ModifierInstance(FREEZE_MODIFIER, new FreezeModifierData(40)));
 	});
-StaticGlobalEffect* REVERSE_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+GlobalEffect* REVERSE_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->addModifierInstance(new ModifierInstance(SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, -2.0f)));
 	});
-StaticGlobalEffect* LAUNCH_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+GlobalEffect* LAUNCH_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
 	for (auto target : targets)
 		target->vel += vec3f(0.0f, 2.0f, 0.0f);
 	});
+GlobalEffect* SLOW_FALL_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+	for (auto target : targets)
+		target->addModifierInstance(new ModifierInstance(GRAVITY_MODIFIER, new GravityModifierData(-GRAVITY_STRENGTH/2, 200)));
+	});
+GlobalEffect* FAST_FALL_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+	for (auto target : targets)
+		target->addModifierInstance(new ModifierInstance(GRAVITY_MODIFIER, new GravityModifierData(GRAVITY_STRENGTH, 200)));
+	});
 
-StaticGlobalEffect* SLOW_FALL_EFFECT;
-StaticGlobalEffect* FAST_FALL_EFFECT;
-StaticGlobalEffect* SWAP_POSITIONS_EFFECT;
+int swaptable2[1][2] = { {1, 0} };
+int swaptable3[2][3] = { {1, 2, 0}, {2, 0, 1} };
+int swaptable4[9][4] = {
+	{1, 0, 3, 2},
+	{1, 2, 3, 0},
+	{1, 3, 0, 2},
+	{2, 0, 3, 1},
+	{2, 3, 0, 1},
+	{2, 3, 1, 0},
+	{3, 0, 1, 2},
+	{3, 2, 0, 1},
+	{3, 2, 1, 0}
+};
+void swap_positions(std::vector<PObject*> targets, int* inds, int len) {
+	vec3f poss[4] = { vec3f(0,0,0) };
+	for (int i = 0; i < len; i++)
+		poss[i] = targets[i]->getPos();
+	for (int i = 0; i < len; i++)
+		targets[i]->setPos(poss[inds[i]]);
+}
+GlobalEffect* SWAP_POSITIONS_EFFECT = new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+    std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());
+	std::uniform_real_distribution<double> dist(0.0, 1.0);
+	switch (targets.size())
+	{
+	case 2:
+		swap_positions(targets, swaptable2[0], 2);
+		break;
+	case 3:
+		swap_positions(targets, swaptable3[static_cast<int>(dist(rng)*2)], 3);
+		break;
+	case 4:
+		swap_positions(targets, swaptable4[static_cast<int>(dist(rng) * 9)], 4);
+		break;
+	default:
+		break;
+	}
+	});
 
-StaticGlobalEffect* ATTRACT_EFFECT = nullptr;
+
+
+
+extern GlobalEffect* SPEEDBOOST_SELF_EFFECT =
+	new ContextAwareGlobalEffect(SPEEDBOOST_EFFECT, ContextAwareGlobalEffect::Targets::SELF);
+extern GlobalEffect* REPELL_TAGGER_FROM_SELF = new AttractOtherToTaggersEffect();
+extern GlobalEffect* ATTRACT_OTHER_TO_TAGGERS_EFFECT = new RepellTaggersFromSelfEffect();
+extern GlobalEffect* FREEZE_OTHER_EFFECT =
+	new ContextAwareGlobalEffect(FREEZE_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+extern GlobalEffect* SLOWDOWN_OTHER_EFFECT =
+	new ContextAwareGlobalEffect(SLOWDOWN_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+extern GlobalEffect* REVERSE_OTHER_EFFECT =
+	new ContextAwareGlobalEffect(REVERSE_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+
+
+extern GlobalEffect* SPEEDBOOST_SELF_TAG_STATUS_EFFECT =
+	new ContextAwareGlobalEffect(SPEEDBOOST_EFFECT, ContextAwareGlobalEffect::Targets::SELF_TAG_STATUS);
+extern GlobalEffect* FREEZE_NOT_SELF_TAG_STATUS_EFFECT =
+	new ContextAwareGlobalEffect(FREEZE_EFFECT, ContextAwareGlobalEffect::Targets::NOT_SELF_TAG_STATUS);
+extern GlobalEffect* SLOWDOWN_NOT_SELF_TAG_STATUS_EFFECT =
+	new ContextAwareGlobalEffect(SLOWDOWN_EFFECT, ContextAwareGlobalEffect::Targets::NOT_SELF_TAG_STATUS);
+extern GlobalEffect* REVERSE_NOT_SELF_TAG_STATUS_EFFECT =
+	new ContextAwareGlobalEffect(REVERSE_EFFECT, ContextAwareGlobalEffect::Targets::NOT_SELF_TAG_STATUS);
+
+
+extern GlobalEffect* LAUNCH_OTHER_EFFECT =
+	new ContextAwareGlobalEffect(LAUNCH_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+extern GlobalEffect* LAUNCH_NOT_SELF_TAG_STATUS_EFFECT =
+	new ContextAwareGlobalEffect(LAUNCH_EFFECT, ContextAwareGlobalEffect::Targets::NOT_SELF_TAG_STATUS);
+extern GlobalEffect* SLOW_FALL_OTHER_EFFECT =
+	new ContextAwareGlobalEffect(SLOW_FALL_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+extern GlobalEffect* FAST_FALL_OTHER_EFFECT =
+	new ContextAwareGlobalEffect(FAST_FALL_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+extern GlobalEffect* SWAP_POSITIONS_OTHER_EFFECT =
+	new ContextAwareGlobalEffect(SWAP_POSITIONS_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+extern GlobalEffect* SWAP_POSITIONS_ALL_EFFECT =
+	new ContextAwareGlobalEffect(SWAP_POSITIONS_EFFECT, ContextAwareGlobalEffect::Targets::ALL);

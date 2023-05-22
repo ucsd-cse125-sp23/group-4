@@ -1,6 +1,7 @@
 #include "core/lib.hpp"
 
 #include <random>
+#include <chrono>
 #include "core/game/level/Level.h"
 #include "core/game/physics/PowerUp.h"
 
@@ -23,7 +24,8 @@ std::pair<Player*, ControlModifierData*> initializePlayer() {
 void terminateLevel() { delete level; }
 
 void spawnPowerUp(vec3f min, vec3f max, const std::vector<GlobalEffect*>& effects) {
-    std::mt19937 rng; std::uniform_real_distribution<double> dist(0.0, 1.0);
+    std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
     float minT = -1;
     Ray ray;
     int n = 0;

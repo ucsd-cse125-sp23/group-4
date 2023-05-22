@@ -38,24 +38,35 @@ extern AttractModifier* ATTRACT_MODIFIER;
 extern FreezeModifier* FREEZE_MODIFIER;
 
 
-extern StaticGlobalEffect* SPEEDBOOST_EFFECT;
-extern StaticGlobalEffect* SLOWDOWN_EFFECT;
-extern StaticGlobalEffect* FREEZE_EFFECT;
-extern StaticGlobalEffect* REVERSE_EFFECT;
-extern StaticGlobalEffect* LAUNCH_EFFECT;
-extern StaticGlobalEffect* SLOW_FALL_EFFECT;
-extern StaticGlobalEffect* FAST_FALL_EFFECT;
-extern StaticGlobalEffect* SWAP_POSITIONS_EFFECT;
+extern GlobalEffect* SPEEDBOOST_EFFECT;
+extern GlobalEffect* SLOWDOWN_EFFECT;
+extern GlobalEffect* FREEZE_EFFECT;
+extern GlobalEffect* REVERSE_EFFECT;
+extern GlobalEffect* LAUNCH_EFFECT;
+extern GlobalEffect* SLOW_FALL_EFFECT;
+extern GlobalEffect* FAST_FALL_EFFECT;
 
-extern StaticGlobalEffect* ATTRACT_EFFECT;
-/*
-extern GlobalEffect* SLOWDOWN_OTHER_EFFECT;
+extern GlobalEffect* SWAP_POSITIONS_EFFECT;
+
+
+/*Good*/
+extern GlobalEffect* SPEEDBOOST_SELF_EFFECT;
+extern GlobalEffect* REPELL_TAGGER_FROM_SELF;
+extern GlobalEffect* ATTRACT_OTHER_TO_TAGGERS_EFFECT;
 extern GlobalEffect* FREEZE_OTHER_EFFECT;
-extern GlobalEffect* FLIP_CONTROL_OTHER_EFFECT;
-extern GlobalEffect* ATTRACT_OTHER_EFFECT;
+extern GlobalEffect* SLOWDOWN_OTHER_EFFECT;
+extern GlobalEffect* REVERSE_OTHER_EFFECT;
+
+/*Ok*/
+extern GlobalEffect* SPEEDBOOST_SELF_TAG_STATUS_EFFECT;
+extern GlobalEffect* FREEZE_NOT_SELF_TAG_STATUS_EFFECT;
+extern GlobalEffect* SLOWDOWN_NOT_SELF_TAG_STATUS_EFFECT;
+extern GlobalEffect* REVERSE_NOT_SELF_TAG_STATUS_EFFECT;
+
+/*Neutral*/
 extern GlobalEffect* LAUNCH_OTHER_EFFECT;
-extern GlobalEffect* SWAP_POSITIONS_OTHER_EFFECT;
-extern GlobalEffect* SWAP_POSITIONS_ALL_EFFECT;
+extern GlobalEffect* LAUNCH_NOT_SELF_TAG_STATUS_EFFECT;
 extern GlobalEffect* SLOW_FALL_OTHER_EFFECT;
 extern GlobalEffect* FAST_FALL_OTHER_EFFECT;
-*/
+extern GlobalEffect* SWAP_POSITIONS_OTHER_EFFECT;
+extern GlobalEffect* SWAP_POSITIONS_ALL_EFFECT;

@@ -41,6 +41,7 @@ set( HEADERS
 	${tagguys_SOURCE_DIR}/include/core/game/event/EventManager.h
 	
 	${tagguys_SOURCE_DIR}/include/core/game/effect/GlobalEffect.h
+	${tagguys_SOURCE_DIR}/include/core/game/effect/AttractEffects.h
 	${tagguys_SOURCE_DIR}/include/core/game/effect/StaticGlobalEffect.h
 	${tagguys_SOURCE_DIR}/include/core/game/effect/ContextAwareGlobalEffect.h
 	
