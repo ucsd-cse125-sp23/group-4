@@ -109,7 +109,7 @@ class Scene {
     camera->name = "_camera";
     camera->Fixed = false;
     gamethings.push_back(camera);
-    time.time = 15.0f; 
+    time.time = 7.0f; 
     time.countdown = true;
 
     sceneResources = new SceneResourceMap();
@@ -153,7 +153,7 @@ class Scene {
     node["world"] = new Node("world");
   }
   virtual void init(void);
-  void init(PlayerModel* player);
+  virtual void init(PlayerModel* player);
   virtual void update(float delta);
   virtual void draw();
 
