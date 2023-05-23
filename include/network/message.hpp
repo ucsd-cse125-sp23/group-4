@@ -18,22 +18,22 @@ using PlayerID = boost::uuids::uuid;
 enum class Type { Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate };
 
 struct Metadata {
-  PlayerID player_id;
-  std::time_t time;
+  PlayerID pid;      // client id
+  std::time_t time;  // time of request being sent
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& player_id& time;
+    ar& pid& time;
   }
 };
 
 struct Assign {
-  PlayerID player_id;
+  PlayerID pid;
   std::string to_string() const;
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& player_id;
+    ar& pid;
   }
 };
 

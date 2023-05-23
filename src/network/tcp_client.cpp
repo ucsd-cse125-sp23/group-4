@@ -29,7 +29,7 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
           // save player_id assigned by the server
           if (const message::Assign* body =
                   boost::get<message::Assign>(&m.body)) {
-            pid = body->player_id;
+            pid_ = body->pid;
           }
 
           read_handler(m, *this);

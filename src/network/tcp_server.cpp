@@ -155,11 +155,11 @@ void Server::do_accept() {
         return;
       }
 
-      PlayerID player_id = m.metadata.player_id;
+      PlayerID new_pid = m.metadata.pid;
       auto greeting_handler = [&](const message::Greeting& body) {
         std::string greeting =
-            "Hello, player " + boost::uuids::to_string(player_id) + "!";
-        write<message::Greeting>(player_id, greeting);
+            "Hello, player " + boost::uuids::to_string(new_pid) + "!";
+        write<message::Greeting>(new_pid, greeting);
       };
       auto user_state_update_handler =
           [&](const message::UserStateUpdate& body) {
@@ -196,7 +196,7 @@ void Server::do_accept() {
           greeting_handler, user_state_update_handler, any_handler);
       boost::apply_visitor(message_handler, m.body);
 
-      read(player_id);
+      read(new_pid);
     };
 
     auto conn_write_handler = [=](boost::system::error_code ec,
@@ -238,7 +238,7 @@ void Server::write(const PlayerID& id, const message::Message& m) {
 void Server::write_all(message::Message& m) {
   // std::cout << "Queueing write to all clients: " << m << std::endl;
   for (auto& kv : connections_) {
-    m.metadata.player_id = kv.first;
+    m.metadata.pid = kv.first;
     kv.second->write(m);
   }
 }

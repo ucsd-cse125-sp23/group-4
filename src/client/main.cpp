@@ -77,7 +77,7 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
 
   auto read_handler = [&](const message::Message& m, Client& client) {
     auto assign_handler = [&](const message::Assign& body) {
-      player_id = body.player_id;
+      player_id = body.pid;
       my_player_id = player_id;
       net_assigned = true;
       // Window::gameScene->initFromServer(myId); // need a unique int id

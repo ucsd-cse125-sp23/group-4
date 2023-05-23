@@ -16,7 +16,7 @@ std::string Message::to_string() const {
       "{" +                                                                     "\n" // NOLINT
       "  type: " + std::string(magic_enum::enum_name(type)) + "," +             "\n" // NOLINT
       "  metadata: {," +                                                        "\n" // NOLINT
-      "    player_id: " + boost::uuids::to_string(metadata.player_id) + "," +   "\n" // NOLINT
+      "    player_id: " + boost::uuids::to_string(metadata.pid) + "," +   "\n" // NOLINT
       "    time: " + std::to_string(metadata.time) + "," +                      "\n" // NOLINT
       "  }," +                                                                  "\n" // NOLINT
       "  body: {" +                                                             "\n" // NOLINT
@@ -43,7 +43,7 @@ Type get_type(const Message::Body& body) {
 }
 
 std::string Assign::to_string() const {
-  return "assigning player_id: " + boost::uuids::to_string(player_id);
+  return "assigning player_id: " + boost::uuids::to_string(pid);
 }
 
 std::string Greeting::to_string() const { return greeting; }
