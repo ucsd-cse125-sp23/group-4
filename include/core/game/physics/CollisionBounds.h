@@ -18,4 +18,6 @@ class CollisionBounds {
   vec3f getScale() const;
   bool collides(const CollisionBounds* other) const;
   vec4f mtv(const CollisionBounds* other) const;
+  bool contains(vec3f point) const;
+  float intersects(Ray ray) const;
 };

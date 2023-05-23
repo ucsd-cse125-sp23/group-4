@@ -70,12 +70,14 @@ Server::Server(boost::asio::io_context& io_context, int port)
     environment->addConvex(collider.vertices, 0.2f);
   }
   initializeLevel(environment);
+  applyGameMode(new OneTaggerTimeGameMode());
 
   do_accept();
   tick();
 }
 
 GameState server_gameState = GameState();
+
 
 void Server::tick() {
   auto prev_time = std::chrono::steady_clock::now();
@@ -88,12 +90,23 @@ void Server::tick() {
     auto curr_time = std::chrono::steady_clock::now();
     auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         curr_time - prev_time);
-    std::cout
+    /* std::cout
         << "(TCPServer::tick) Updating game, time elapsed since last tick: "
         << time_elapsed.count() << "ms" << std::endl;
-
+        */
     // Temporary server broadcast example (sending to client) ---
     update_num_++;
+
+    if (level->players.size() > 1 && !tempOnce) {
+      tempOnce = true;
+      level->gameMode->initPlayers(level->players);
+      std::cout << "Game Started" << std::endl;
+    }
+    if (tempOnce && (count++)%20 == 0) {
+      for (auto pair : level->players)
+        std::cout << pair.first << ":" << queryScore(pair.first) << " ";
+      std::cout << std::endl;
+    }
 
     std::vector<message::GameStateUpdateItem*> thingsOnServer;  // to send
     level->tick();
@@ -155,7 +168,7 @@ void Server::do_accept() {
         return;
       }
 
-      std::cout << "(Connection::read) Received:\n" << m << std::endl;
+      //std::cout << "(Connection::read) Received:\n" << m << std::endl;
 
       PlayerID player_id = m.metadata.player_id;
       auto assign_handler = [&](const message::Assign& body) {};
@@ -227,7 +240,7 @@ void Server::do_accept() {
         {player_id, std::make_unique<Connection<message::Message>>(
                         socket, conn_read_handler, conn_write_handler)});
     auto& connection = connections_[player_id];
-    std::cout << this << std::endl;
+    //std::cout << this << std::endl;
 
     // assign client their player_id
     message::Message new_m{message::Type::Assign,

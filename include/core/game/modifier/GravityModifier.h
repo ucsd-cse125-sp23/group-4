@@ -3,11 +3,12 @@
 #include "core/game/modifier/Modifier.h"
 #include "core/game/physics/PObject.h"
 
-struct GravityModifierData : ModifierData {
+struct GravityModifierData : TimedModifierData {
   float gravity;
-  explicit GravityModifierData(float gravity) : gravity(gravity) {}
+  GravityModifierData(float gravity, unsigned long long duration = 0)
+      : TimedModifierData(duration), gravity(gravity) {}
 };
-class GravityModifier : public Modifier {
+class GravityModifier : public TimedModifier {
  public:
-  void modify(Modifiable* obj, ModifierData* data) override;
+  void timedModify(Modifiable* obj, ModifierData* data) override;
 };

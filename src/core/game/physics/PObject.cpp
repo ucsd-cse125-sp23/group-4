@@ -17,7 +17,12 @@ void PObject::tick() {
   Modifiable::tick();
 
   oPos = pos;
-  pos += vel;
+  pos.y += vel.y;
+  if (!freeze) {
+    pos.x += vel.x;
+    pos.z += vel.z;
+  }
+  freeze = false;
   this->bounds->setPos(pos);
 }
 vec3f PObject::getPos() { return pos; }

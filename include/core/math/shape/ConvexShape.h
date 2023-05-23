@@ -36,6 +36,10 @@ class ConvexShape : public BoundingShape {
             const mat4f& otherMtx = mat4f::identity()) const override;
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(),
             const mat4f& otherMtx = mat4f::identity()) const override;
+  bool contains(const vec3f& point, const mat4f& thisMtx = mat4f::identity(),
+                const mat4f& otherMtx = mat4f::identity()) const override;
+  float intersects(const Ray& ray,
+                   const mat4f& thisMtx = mat4f::identity()) const override;
 
   const ConvexShape** seperate() const override { return self; }
   const size_t count() const override { return 1; }
