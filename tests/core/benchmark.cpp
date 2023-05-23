@@ -41,16 +41,18 @@ inline Time tick(Timer& timer) {
 	return { ret };
 }
 
-void testEnvironment(Environment* environment, int S) {
+void testEnvironment(Environment* environment, int S, int P = 1) {
 	REQUIRE_NOTHROW(initializeLevel(environment));
-	std::pair<Player*, ControlModifierData*> pair;
-	REQUIRE_NOTHROW(pair = initializePlayer());
+	std::vector<std::pair<Player*, ControlModifierData*>> pairs;
+    for (int i = 0; i < P; i++)
+	  REQUIRE_NOTHROW(pairs.push_back(initializePlayer()));
 
 	Timer timer;
 	Time minT = { DBL_MAX }, maxT = { DBL_MIN }, sum = { 0 };
 	for (int i = 0; i < S; i++)
 	{
-		pair.first->setPos(vec3f(0.0, 0.9, 0.0));
+        for (auto pair : pairs)
+		  pair.first->setPos(vec3f(0.0, 0.9, 0.0));
 		tick(timer);
 		level->tick();
 		Time time = tick(timer);
@@ -187,4 +189,40 @@ TEST_CASE("Single Object Multi Collider Spreadout", "[benchmark]") {
 		std::cout << "1600 Convexs of 8000 vertices (spread out) for ";
 		testEnvironment(environment, 20);
 	}
+}
+
+
+TEST_CASE("Multi Object Multi Collider Spreadout", "[benchmark]") {
+  std::vector<vec3f> vertices;
+  SECTION("2 Player with 1600 Convex of 1000 vertices (spread out)") {
+    Environment* environment = new Environment();
+    for (int x = 0; x < 40; x++)
+      for (int z = 0; z < 40; z++) {
+        for (int i = 0; i < 10; i++)
+          for (int j = 0; j < 10; j++)
+            for (int k = 0; k < 10; k++)
+              vertices.push_back(vec3f((i - 5.0) / 5 + (x - 20), (j - 5.0) / 5,
+                                       (k - 5.0) / 5 + (z - 20)));
+        environment->addConvex(vertices);
+        vertices.clear();
+      }
+    std::cout << "2 Player with 1600 Convexs of 1000 vertices (spread out) for ";
+    testEnvironment(environment, 20, 2);
+  }
+  SECTION("4 Player with 1600 Convex of 1000 vertices (spread out)") {
+    Environment* environment = new Environment();
+    for (int x = 0; x < 40; x++)
+      for (int z = 0; z < 40; z++) {
+        for (int i = 0; i < 10; i++)
+          for (int j = 0; j < 10; j++)
+            for (int k = 0; k < 10; k++)
+              vertices.push_back(vec3f((i - 5.0) / 5 + (x - 20), (j - 5.0) / 5,
+                                       (k - 5.0) / 5 + (z - 20)));
+        environment->addConvex(vertices);
+        vertices.clear();
+      }
+    std::cout
+        << "4 Player with 1600 Convexs of 1000 vertices (spread out) for ";
+    testEnvironment(environment, 20, 4);
+  }
 }
