@@ -14,7 +14,7 @@ int ENVIRONMENT_LAYER = 1;
 int POWER_LAYER = 2;
 
 SphereShape* POWERUP_BASE_SHAPE = new SphereShape(0.4);
-CylinderShape* PLAYER_BASE_SHAPE = new CylinderShape(1.0, 0.5);
+CylinderShape* PLAYER_BASE_SHAPE = new CylinderShape(1.0, 1.3);
 OffsetShape* PLAYER_BOUNDING_SHAPE =
     new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, 0.5f, 0.0f));
 
