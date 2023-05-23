@@ -7,6 +7,7 @@
 #include <network/connection.hpp>
 #include <network/message.hpp>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 using boost::asio::ip::tcp;
@@ -28,7 +29,31 @@ class Server {
   friend std::ostream& operator<<(std::ostream&, Server*);
   void do_accept();
   void read(const PlayerID&);
-  void write(const message::Message&, const PlayerID&);
+  void write(const PlayerID&, const message::Message&);
+  template <typename T, typename... Args>
+  void write(const PlayerID&, Args&&...);
   void write_all(message::Message&);
+  template <typename T, typename... Args>
+  void write_all(Args&&...);
   void tick();
 };
+
+template <typename T, typename... Args>
+void Server::write(const PlayerID& player_id, Args&&... args) {
+  T body{std::forward<Args>(args)...};
+  message::Type type = message::get_type(body);
+  message::Metadata metadata{player_id, std::time(nullptr)};
+  message::Message m{type, metadata, body};
+  write(player_id, m);
+}
+
+template <typename T, typename... Args>
+void Server::write_all(Args&&... args) {
+  for (const auto& kv : connections_) {
+    T body{std::forward<Args>(args)...};
+    message::Type type = message::get_type(body);
+    message::Metadata metadata{kv.first, std::time(nullptr)};
+    message::Message m{type, metadata, body};
+    write(kv.first, m);
+  }
+}

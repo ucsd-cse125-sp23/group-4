@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "Camera.h"
 #include "GameThing.h"
 #include "InputListener.h"
@@ -31,5 +33,7 @@ class Player : public GameThing, InputListener {
   }
 
   UserState update(float dt);
-  glm::vec3 move(glm::vec3 movement);  // NOLINT
+  glm::vec3 move(glm::vec3 movement);
+
+  void faceDirection(glm::vec3 direction);
 };
