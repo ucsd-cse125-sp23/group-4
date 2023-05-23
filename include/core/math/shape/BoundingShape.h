@@ -4,6 +4,7 @@
 #include "core/math/vector.h"
 
 class ConvexShape;
+class AABShape;
 
 class BoundingShape {
  public:
@@ -22,4 +23,6 @@ class BoundingShape {
 
   virtual const ConvexShape** seperate() const = 0;
   virtual const size_t count() const = 0;
+
+  virtual AABShape* bounds() const = 0;
 };

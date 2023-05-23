@@ -14,6 +14,8 @@ class CollisionBounds {
 
   void setPos(vec3f pos);
   void setScale(vec3f scale);
+  vec3f getPos() const;
+  vec3f getScale() const;
   bool collides(const CollisionBounds* other) const;
   vec4f mtv(const CollisionBounds* other) const;
 };

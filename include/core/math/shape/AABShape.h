@@ -4,7 +4,6 @@
 
 class AABShape : public ConvexShape {
 private:
-    vec3f minP, maxP;
 protected:
     vec4f furthestPoint(vec3f dir) const override {
         return vec4f(
@@ -15,5 +14,8 @@ protected:
         );
     };
  public:
-     AABShape(vec3f min, vec3f max) : minP(min), maxP(max) {}
+    const vec3f minP, maxP;
+    AABShape(vec3f min, vec3f max) : minP(min), maxP(max) {}
+
+  AABShape* bounds() const { return new AABShape(minP, maxP); }
 };
