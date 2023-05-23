@@ -2,6 +2,34 @@
 
 #include "core/util/global.h"
 
+
+void response(PObject* self, PObject* other, vec4f mtv) {
+  vec3f norm = normalize(vec3f(mtv));
+  /*If object is falling and mtv is atleast a little up, the we determine the object to
+   * be onGround*/
+  if (self->vel.y < 0 && norm.y / (std::abs(norm.x) + std::abs(norm.z)) > 0.05)
+    self->onGround = true;
+  if (other->isStatic()) {
+    self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
+    self->vel = tangent(self->vel, norm);
+    self->vel -= self->vel * mtv.w * other->getBounds()->friction;
+  } else {
+    if (other->vel.y < 0 &&
+        norm.y / (std::abs(norm.x) + std::abs(norm.z)) > -0.05)
+      other->onGround = true;
+
+    self->addPos(vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
+    self->vel = tangent(self->vel, norm);
+    self->vel -=
+        self->vel * mtv.w * other->getBounds()->friction * 0.5f;
+    other->addPos(-vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
+    other->vel = tangent(other->vel, /* - */norm);
+    other->vel -= other->vel * mtv.w * self->getBounds()->friction * 0.5f;
+  }
+
+  other->onCollision(self);
+  self->onCollision(other);
+}
 void Level::tick() {
   std::vector<size_t> allIds = this->objects.getAllIds();
   for (size_t id : allIds) {
@@ -46,52 +74,14 @@ void Level::tick() {
         }
       }
       if (collisions.empty() || ind == -1) break;
-
-      vec3f norm = normalize(vec3f(minMTV));
-      if (self->vel.y < 0 && minMTV.y / (abs(minMTV.x) + abs(minMTV.z)) > 0.05)
-        self->onGround = true;
-      if (collisions[ind]->isStatic()) {
-        // Shift object out
-        // Set object velocity to only tangential
-        // Apply friction on object tangent velocoty
-        self->addPos(vec3f(minMTV) * (minMTV.w + 0.0001f));
-        self->vel = tangent(self->vel, norm);
-        self->vel -=
-            self->vel * minMTV.w * collisions[ind]->getBounds()->friction;
-      } else {
-        if (collisions[ind]->vel.y < 0 && -minMTV.y > 0)
-          collisions[ind]->onGround = true;
-        // As above but halved;
-        self->addPos(vec3f(minMTV) * (minMTV.w * 0.5f + 0.0001f));
-        self->vel = tangent(self->vel, norm);
-        self->vel -= self->vel * minMTV.w *
-                     collisions[ind]->getBounds()->friction * 0.5f;
-        collisions[ind]->addPos(-vec3f(minMTV) * (minMTV.w * 0.5f + 0.001f));
-        collisions[ind]->vel = tangent(collisions[ind]->vel, -norm);
-        collisions[ind]->vel -= collisions[ind]->vel * minMTV.w *
-                                self->getBounds()->friction * 0.5f;
-      }
-      collisions[ind]->onCollision(self);
-      self->onCollision(collisions[ind]);
+      response(self, collisions[ind], minMTV);
       collisions[ind] = collisions.back();
       collisions.pop_back();
     }
 
     std::pair<PObject*, vec4f> pair = environment->mtv(self);
     while (pair.first != nullptr) {
-      PObject* obj = pair.first;
-      vec4f mtv = pair.second;
-      vec3f norm = normalize(vec3f(mtv));
-      /*If object is falling and mtv is "mostly" up, the we determine the object to be onGround*/
-      if (self->vel.y < 0 && mtv.y / (std::abs(mtv.x) + std::abs(mtv.z)) > 0.05)
-        self->onGround = true;
-      //Non static environmental PObjects don't exist
-      /* if (obj->isStatic()) {*/
-      self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
-      self->vel = tangent(self->vel, norm);
-      self->vel -= self->vel * mtv.w * obj->getBounds()->friction;
-      /*}*/
-
+      response(self, pair.first, pair.second);
       pair = environment->mtv(self);
     }
   }

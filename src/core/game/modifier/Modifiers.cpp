@@ -43,11 +43,12 @@ ControlModifierData::ControlModifierData(float jumpVel)
 void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     ControlModifierData* cData = static_cast<ControlModifierData*>(data);
-    vec3f dv =
-        clampBySign(cData->horizontalVel, cData->horizontalVel - pObj->vel) *
-        0.6f;
-    if (!pObj->onGround) dv *= 0.5f;
-    pObj->vel += vec3f(dv.x, 0.0f, dv.z);
+    vec3f dv = (cData->horizontalVel - pObj->vel) * 0.6f;
+    if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
+      dv *= 0.6f;
+    if (!pObj->onGround) dv *= 0.4f;
+    pObj->vel.x += dv.x;
+    pObj->vel.z += dv.z;
     if (pObj->onGround && cData->doJump) {
       pObj->vel.y = cData->jumpVel;
       pObj->onGround = false;

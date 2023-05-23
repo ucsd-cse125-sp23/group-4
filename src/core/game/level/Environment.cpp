@@ -102,6 +102,7 @@ Environment::BVHNode* constructBVHHelper(
   return top;
 }
 void Environment::constructBVH() {
+  if (collisions.size() == 0) return;
   std::vector<BVHNode*> leaves;
   for (PObject* obj : collisions) {
     leaves.push_back(new BVHNode(obj->getBounds()->shape->bounds()));
@@ -111,39 +112,45 @@ void Environment::constructBVH() {
 }
 std::vector<PObject*> Environment::collides(BoundingShape* shape) {
   std::vector<PObject*> hits;
-  std::stack<BVHNode*> stack;
-  stack.push(this->root);
-  while (!stack.empty()) {
-    BVHNode* curr = stack.top();
-    stack.pop();
-    if (shape->collides(curr->bound)) {
-      if (curr->obj == nullptr) {
-        stack.push(curr->left);
-        stack.push(curr->right);
-      } else {
-        const CollisionBounds* bounds = curr->obj->getBounds();
-        if (bounds->shape->collides(
-                shape, translate_scale(bounds->getPos(), bounds->getScale())))
-          hits.push_back(curr->obj);
+  if (this->root != nullptr) {
+    std::stack<BVHNode*> stack;
+    stack.push(this->root);
+    while (!stack.empty()) {
+      BVHNode* curr = stack.top();
+      stack.pop();
+      if (shape->collides(curr->bound)) {
+        if (curr->obj == nullptr) {
+          stack.push(curr->left);
+          stack.push(curr->right);
+        } else {
+          const CollisionBounds* bounds = curr->obj->getBounds();
+          if (bounds->shape->collides(
+                  shape, translate_scale(bounds->getPos(), bounds->getScale())))
+            hits.push_back(curr->obj);
+        }
       }
     }
   }
   return hits;
 }
 std::vector<PObject*> Environment::collides(PObject* self) {
-  std::vector<PObject*> hits; std::stack<BVHNode*> stack;
-  stack.push(this->root);
-  mat4f transform = translate_scale(self->getBounds()->getPos(), self->getBounds()->getScale());
-  const BoundingShape* shape = self->getBounds()->shape;
-  while (!stack.empty()) {
-    BVHNode* curr = stack.top();
-    stack.pop();
-    if (shape->collides(curr->bound, transform)) {
-      if (curr->obj == nullptr) {
-        stack.push(curr->left);
-        stack.push(curr->right);
-      } else if (self->getBounds()->collides(curr->obj->getBounds())){
-        hits.push_back(curr->obj);
+  std::vector<PObject*> hits;
+  if (this->root != nullptr) {
+    std::stack<BVHNode*> stack;
+    stack.push(this->root);
+    mat4f transform = translate_scale(self->getBounds()->getPos(),
+                                      self->getBounds()->getScale());
+    const BoundingShape* shape = self->getBounds()->shape;
+    while (!stack.empty()) {
+      BVHNode* curr = stack.top();
+      stack.pop();
+      if (shape->collides(curr->bound, transform)) {
+        if (curr->obj == nullptr) {
+          stack.push(curr->left);
+          stack.push(curr->right);
+        } else if (self->getBounds()->collides(curr->obj->getBounds())) {
+          hits.push_back(curr->obj);
+        }
       }
     }
   }
@@ -152,25 +159,27 @@ std::vector<PObject*> Environment::collides(PObject* self) {
 std::pair<PObject*, vec4f> Environment::mtv(PObject* self) {
   vec4f minMTV = vec4f(0.0f, 0.0f, 0.0f, std::numeric_limits<float>::max());
   PObject* minObj = nullptr;
-  std::stack<BVHNode*> stack;
-  stack.push(this->root);
-  mat4f transform = translate_scale(self->getBounds()->getPos(),
-                                    (self->getBounds()->getScale()));
-  const BoundingShape* shape = self->getBounds()->shape;
-  while (!stack.empty()) {
-    BVHNode* curr = stack.top();
-    stack.pop();
-    if (shape->collides(curr->bound, transform)) {
-      if (curr->obj == nullptr) {
-        stack.push(curr->left);
-        stack.push(curr->right);
-      } else {
-        vec4f v = self->getBounds()->mtv(curr->obj->getBounds());
-        if (v.w > 0)
-          if (v.w < minMTV.w) {
-            minMTV = v;
-            minObj = curr->obj;
-          }
+  if (this->root != nullptr) {
+    std::stack<BVHNode*> stack;
+    stack.push(this->root);
+    mat4f transform = translate_scale(self->getBounds()->getPos(),
+                                      (self->getBounds()->getScale()));
+    const BoundingShape* shape = self->getBounds()->shape;
+    while (!stack.empty()) {
+      BVHNode* curr = stack.top();
+      stack.pop();
+      if (shape->collides(curr->bound, transform)) {
+        if (curr->obj == nullptr) {
+          stack.push(curr->left);
+          stack.push(curr->right);
+        } else {
+          vec4f v = self->getBounds()->mtv(curr->obj->getBounds());
+          if (v.w > 0)
+            if (v.w < minMTV.w) {
+              minMTV = v;
+              minObj = curr->obj;
+            }
+        }
       }
     }
   }

@@ -415,11 +415,3 @@ inline TVector3<T> sameSign(const TVector3<T>& v0, const TVector3<T>& v1) {
   return TVector3<T>((v0.x > 0) ^ (v1.x <= 0), (v0.y > 0) ^ (v1.y <= 0),
                      (v0.z > 0) ^ (v1.z <= 0));
 }
-/**
- * Clamp vec to between 0 and sign of ref
- * ex. ref = (1,-1,1) and vec = (-1,-2,0) => returns (0,-2,0)
- */
-template <typename T>
-inline TVector3<T> clampBySign(const TVector3<T>& ref, const TVector3<T>& vec) {
-  return vec * sameSign(ref, vec);
-}
