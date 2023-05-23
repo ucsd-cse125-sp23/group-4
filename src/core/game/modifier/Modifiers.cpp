@@ -51,7 +51,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
     pObj->vel.z += dv.z;
     if (pObj->onGround && cData->doJump) {
       vec3f dj = pObj->lastSurfaceNormal;
-      float c = dj.y;
+      float c = std::max(0.0f, dj.y);
       float d = (1 - c) / 0.5f;
       dj *= std::min(1.0f, d*d);
       dj.y = 1.0f / (1.0f + std::exp(-15.0f * (c - 0.36f)));
