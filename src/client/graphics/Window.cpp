@@ -173,6 +173,7 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
 
   gameScene->update(deltaTime);
 
+  Lobby* lobby;
   if (dynamic_cast<Start*>(gameScene) != nullptr) {
     Start* startScreen = dynamic_cast<Start*>(gameScene);
     if (startScreen->gameStart) {
@@ -181,10 +182,17 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
     }
   } else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
     Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
-    inGame = lobby->ready;
+    if (lobby->gameStart) {
+      gameScene = new Load(Cam);
+      gameScene->init(lobby->selectedModel);
+      //hud = new HUD(gameScene);
+    }
+  } else if (dynamic_cast<Load*>(gameScene) != nullptr) {
+    Load* load = dynamic_cast<Load*>(gameScene);
+    inGame = load->gameStart;
     if (inGame) {
       gameScene = new Scene(Cam);
-      gameScene->init(lobby->selectedModel);
+      gameScene->init(load->selectedModel);
       hud = new HUD(gameScene);
     }
   }

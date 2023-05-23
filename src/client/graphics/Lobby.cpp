@@ -5,19 +5,27 @@
 void Lobby::update(float delta) {
   GameThing* display = gamethings[index];
   display->update(delta);
-  if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-    ready = true;
-    selectedModel = player_models[index];
-  }
-  if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
-    index++;
-    if (index >= gamethings.size()) index = 0;
-    buildSceneTree();
-  }
-  if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
-    index--;
-    if (index < 0) index = gamethings.size() - 1;
-    buildSceneTree();
+  if (ready) {
+    wait.Update(delta);
+    offset += (7 * delta);
+    if (wait.time == 0) {
+      gameStart = true;
+    }
+  } else {
+    if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
+      ready = true;
+      selectedModel = player_models[index];
+    }
+    if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
+      index++;
+      if (index >= gamethings.size()) index = 0;
+      buildSceneTree();
+    }
+    if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
+      index--;
+      if (index < 0) index = gamethings.size() - 1;
+      buildSceneTree();
+    }
   }
 }
 
@@ -33,6 +41,7 @@ void Lobby::draw() {
   glEnable(GL_DEPTH_TEST);
   Scene::draw();
   drawPlayers();
+  lockIn();
 }
 
 void Lobby::drawBackground() {
@@ -74,11 +83,7 @@ void Lobby::drawBackground() {
 
   float flag_size = (width / 2.5) > 800 ? 800 : width / 2.5f;
   glViewport(0, height - (200 * scale), flag_size, 75 * scale);
-  glScissor(0, height - (200 * scale), flag_size, 75 * scale);
-  glEnable(GL_SCISSOR_TEST);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_SCISSOR_TEST);
-  flag.bindgl();
+  flag.bindgl(); 
 
   glColor3f(1.0f, 1.0f, 1.0f);
   glBegin(GL_QUADS);
@@ -171,4 +176,50 @@ void Lobby::drawPlayers() {
     x += (size + (30 * scale));
   }
   glViewport(0, 0, width, height);
+}
+
+void Lobby::lockIn() {
+  if (ready) {
+    GLFWwindow* window = glfwGetCurrentContext();
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    float scale = float(width) / float(800);
+    glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
+    
+    float x = -1 + offset;
+    if (x > 1) x = 1;
+    glBegin(GL_QUADS);
+
+    glVertex2f(x, 0.1);
+    glVertex2f(-1, 0.1);
+    glVertex2f(-1, -0.1);
+    glVertex2f(x, -0.1);
+
+    glEnd();
+
+    glColor3f(1, 1, 1);
+    glLineWidth(5);
+    glBegin(GL_LINES);
+    
+    glVertex2f(-1, 0.1);
+    glVertex2f(x, 0.1);
+
+    glVertex2f(-1, -0.1);
+    glVertex2f(x, -0.1);
+    glEnd();
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+
+    float text_Xndc = -1.5 + offset;
+    if (text_Xndc > -0.2) text_Xndc = -0.2;
+    float text_Yndc = -0.07;
+    float textX = ((text_Xndc + 1) / 2) * width;
+    float textY = ((text_Yndc + 1) / 2) * height;
+    fr->RenderText(width, height, "Ready!", textX, textY, scale,
+                   glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
+  }
 }

@@ -17,9 +17,6 @@ void Texture::init(const char* filename) {
   int width, height, nrChannels;
   unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
 
-  std::cout << filename << std::endl;
-  std::cout << "Number of channels: " << nrChannels << std::endl;
-
   if (data) {
     if (nrChannels == 3) {
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,

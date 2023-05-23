@@ -89,6 +89,8 @@ void HUD::draw(GLFWwindow* window) {
 
   glViewport(0, 0, width, height);
 
+  gameOver();
+
   glDisable(GL_CULL_FACE);
   glDisable(GL_BLEND);
 }
@@ -187,4 +189,23 @@ void HUD::drawMinimap() {
   glDisable(GL_TEXTURE_2D);
 
   glDisable(GL_BLEND);
+}
+
+void HUD::gameOver() {
+  GLFWwindow* window = glfwGetCurrentContext();
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+  float scale = float(width) / float(800);
+  if (scene->time.time <= 0.1) {
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    float w = fr->TextWidth("Time's Up!", offset * scale);
+    fr->RenderText(width, height, "Time's Up!", (width / 2) - (w / 2), height / 2,
+                   offset * scale,
+                   glm::vec3(1, 0, 0));
+    offset--;
+    if (offset < 1) offset = 1;
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
+  }
 }
