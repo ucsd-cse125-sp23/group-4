@@ -54,7 +54,10 @@ GlobalEffect* REVERSE_EFFECT =
     });
 GlobalEffect* LAUNCH_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
-      for (auto target : targets) target->vel += vec3f(0.0f, 2.0f, 0.0f);
+      for (auto target : targets) {
+        target->vel += vec3f(0.0f, 2.0f, 0.0f);
+        target->onGround = false;
+      }
     });
 GlobalEffect* SLOW_FALL_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
