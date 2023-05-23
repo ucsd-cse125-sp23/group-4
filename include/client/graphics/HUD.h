@@ -13,7 +13,7 @@ class HUD {
 
   HUD(Scene* scn) {
     scene = scn;
-    map.init("assets/image/tagguys/frame_0.gif");
+    map.init("assets/image/tagguys/frame_0_delay-0.08s.png");
     offset = 10;
   }
 
