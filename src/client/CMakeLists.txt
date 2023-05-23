@@ -5,6 +5,12 @@ set(ASSIMP_BUILD_ZLIB OFF)
 set(IMGUI_ENABLE_STDLIB_SUPPORT ON)
 set(IMGUI_EXAMPLES OFF)
 set(CMAKE_POLICY_DEFAULT_CMP0074 NEW)
+set(SFML_USE_STATIC_STD_LIBS TRUE)
+set(SFML_BUILD_AUDIO ON)
+set(SFML_BUILD_EXAMPLES OFF)
+set(SFML_BUILD_GRAPHICS OFF)
+set(SFML_BUILD_WINDOW OFF)
+set(SFML_BUILD_NETWORK OFF)
 
 FetchContent_Declare(
   glew
@@ -62,19 +68,23 @@ function(install)
     _install(${ARGV})
   endif()
 endfunction(install)
-FetchContent_MakeAvailable(
-  freetype
-  assimp
-)
+
 set(_disable_install FALSE)
 
+FetchContent_Declare(
+  SFML
+  GIT_REPOSITORY https://github.com/SFML/SFML
+  GIT_TAG 2.5.1
+  GIT_PROGRESS TRUE)
 FetchContent_MakeAvailable(
   glew
   glfw
   glm
   freeglut
+  freetype
   imgui
-)
+  assimp
+  SFML)
 
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/main.cpp
@@ -115,13 +125,26 @@ target_link_libraries(
           imgui-opengl3
           assimp
           freeglut_static
-          freetype)
+          freetype
+          sfml-audio)
 
 if(APPLE)
   target_compile_options(client PRIVATE -Wno-deprecated-declarations)
   add_compile_definitions(FREEGLUT_BUILD_DEMOS=OFF
                           OPENGL_gl_LIBRARY=/usr/local/lib/libGL.dylib)
 endif()
+
+set_target_properties(
+  sfml-audio
+  PROPERTIES CXX_STANDARD 98 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO)
+
+# Copy OpenAL32.dll to executable directory
+add_custom_command(
+  TARGET client
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+          ${FETCHCONTENT_BASE_DIR}/sfml-src/extlibs/bin/x64/openal32.dll
+          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 # Copy assets folder to executable root directory
 add_custom_command(

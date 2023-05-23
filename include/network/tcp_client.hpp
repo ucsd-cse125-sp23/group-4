@@ -15,19 +15,18 @@ struct Addr {
   int port;
 };
 
-class TCPClient {
+class Client {
  public:
-  using ConnectHandler = std::function<void(tcp::endpoint, TCPClient &)>;
-  using ReadHandler =
-      std::function<void(const message::Message &, TCPClient &)>;
-  using WriteHandler = std::function<void(std::size_t, TCPClient &)>;
-  TCPClient(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
-            WriteHandler);
+  using ConnectHandler = std::function<void(tcp::endpoint, Client &)>;
+  using ReadHandler = std::function<void(const message::Message &, Client &)>;
+  using WriteHandler =
+      std::function<void(std::size_t, const message::Message &, Client &)>;
+  Client(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
+         WriteHandler);
+  void read();
   void write(message::Message);
 
  private:
-  void read();
-
   std::unique_ptr<Connection<message::Message>> connection;
   tcp::socket socket_;
 };
