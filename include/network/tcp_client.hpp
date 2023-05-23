@@ -7,6 +7,7 @@
 #include <network/connection.hpp>
 #include <network/message.hpp>
 #include <string>
+#include <utility>
 
 using boost::asio::ip::tcp;
 
@@ -25,8 +26,20 @@ class Client {
          WriteHandler);
   void read();
   void write(message::Message);
+  template <typename T, typename... Args>
+  void write(Args &&...);
 
  private:
   std::unique_ptr<Connection<message::Message>> connection;
+  message::PlayerID player_id_;
   tcp::socket socket_;
 };
+
+template <typename T, typename... Args>
+void Client::write(Args &&...args) {
+  T body{std::forward<Args>(args)...};
+  message::Type type = message::get_type(body);
+  message::Metadata metadata{player_id_, std::time(nullptr)};
+  message::Message m{type, metadata, body};
+  connection->write(m);
+}
