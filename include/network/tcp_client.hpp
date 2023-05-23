@@ -22,16 +22,19 @@ class Client {
   using ReadHandler = std::function<void(const message::Message &, Client &)>;
   using WriteHandler =
       std::function<void(std::size_t, const message::Message &, Client &)>;
+
   Client(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
          WriteHandler);
+
   void read();
   void write(message::Message);
   template <typename T, typename... Args>
   void write(Args &&...);
 
+  message::PlayerID pid_;
+
  private:
   std::unique_ptr<Connection<message::Message>> connection;
-  message::PlayerID player_id_;
   tcp::socket socket_;
 };
 
@@ -39,7 +42,7 @@ template <typename T, typename... Args>
 void Client::write(Args &&...args) {
   T body{std::forward<Args>(args)...};
   message::Type type = message::get_type(body);
-  message::Metadata metadata{player_id_, std::time(nullptr)};
+  message::Metadata metadata{pid_, std::time(nullptr)};
   message::Message m{type, metadata, body};
   connection->write(m);
 }
