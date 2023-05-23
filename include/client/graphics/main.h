@@ -8,24 +8,20 @@
 #include <GL/glew.h>
 #endif
 #include <GLFW/glfw3.h>
-
-
-#include <stdlib.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
-
 #include <iostream>
-#include <vector>
 #include <memory>
 #include <string>
-
-#include <imgui/imgui.h>
-#include <imgui/misc/cpp/imgui_stdlib.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
+#include <vector>
 
 #include "Window.h"
 
