@@ -31,17 +31,6 @@ void Level::tick() {
           break;
       }
     }
-    for (PObject* obj : this->environment->getCollisions()) {
-      switch (collisionTypeLUT[selfBounds->layer][obj->getBounds()->layer]) {
-        case CollisionType::NONE:
-        case CollisionType::TRIGGER:
-          break;
-        case CollisionType::COLLISION:
-          collisions.push_back(obj);
-          break;
-      }
-    }
-
     while (!collisions.empty()) {
       size_t ind = -1;
       vec4f minMTV = vec4f(0.0f, 0.0f, 0.0f, std::numeric_limits<float>::max());
@@ -90,6 +79,24 @@ void Level::tick() {
       collisions[ind] = collisions.back();
       collisions.pop_back();
     }
+
+    std::pair<PObject*, vec4f> pair = environment->mtv(self);
+    while (pair.first != nullptr) {
+      PObject* obj = pair.first;
+      vec4f mtv = pair.second;
+      vec3f norm = normalize(vec3f(mtv));
+      /*If object is falling and mtv is "mostly" up, the we determine the object to be onGround*/
+      if (self->vel.y < 0 && mtv.y / (std::abs(mtv.x) + std::abs(mtv.z)) > 0.05)
+        self->onGround = true;
+      //Non static environmental PObjects don't exist
+      /* if (obj->isStatic()) {*/
+      self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
+      self->vel = tangent(self->vel, norm);
+      self->vel -= self->vel * mtv.w * obj->getBounds()->friction;
+      /*}*/
+
+      pair = environment->mtv(self);
+    }
   }
 
   for (size_t id : allIds) {
@@ -112,20 +119,13 @@ void Level::tick() {
           break;
       }
     }
-    for (PObject* obj : this->environment->getCollisions()) {
-      switch (collisionTypeLUT[selfBounds->layer][obj->getBounds()->layer]) {
-        case CollisionType::NONE:
-        case CollisionType::COLLISION:
-          break;
-        case CollisionType::TRIGGER:
-          if (selfBounds->collides(obj->getBounds())) {
-            self->onTrigger(obj);
-            obj->onTrigger(self);
-            this->eventManager->fireTriggerEvent(self, obj);
-          }
-          break;
+    for (PObject* obj : this->environment->collides(self))
+      if (collisionTypeLUT[selfBounds->layer][obj->getBounds()->layer] ==
+          CollisionType::TRIGGER) {
+        self->onTrigger(obj);
+        obj->onTrigger(self);
+        this->eventManager->fireTriggerEvent(self, obj);
       }
-    }
   }
 
   this->age++;
@@ -133,6 +133,7 @@ void Level::tick() {
 
 Level::Level(Environment* environment)
     : environment(environment), age(0), objects(PObjectCollection()) {
+  environment->constructBVH();
   for (int i = 0; i < 10; i++)
     for (int j = 0; j < 10; j++) collisionTypeLUT[i][j] = CollisionType::NONE;
   eventManager = new EventManager(this);

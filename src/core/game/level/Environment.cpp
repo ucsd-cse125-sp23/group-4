@@ -61,12 +61,13 @@ Environment::BVHNode* constructBVHHelper(
   Environment::BVHNode* top = new Environment::BVHNode(new AABShape(minP, maxP));
   const int axis = maxInd(maxP - minP);
   std::sort(nodes.begin(), nodes.end(),
-            [axis](Environment::BVHNode* a, Environment::BVHNode* b) {
-    return a->bound->minP[axis] < b->bound->maxP[axis];
-  });
+    [axis](Environment::BVHNode* a, Environment::BVHNode* b) {
+      return a->bound->minP[axis] < b->bound->minP[axis];
+    }
+  );
 
   size_t beg = 0, end = nodes.size(), mid = nodes.size() / 2;
-  while (end - beg > 1) {
+  while (end - beg > 4) {
     float v0, v1;
     minP = nodes[0]->bound->minP;
     maxP = nodes[0]->bound->maxP;
