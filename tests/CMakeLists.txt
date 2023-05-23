@@ -14,3 +14,9 @@ add_executable(tests ${TEST_SOURCES})
 target_link_libraries(tests Catch2::Catch2WithMain core)
 
 add_test(NAME test_all COMMAND tests)
+
+
+add_executable(test_benchmark ${CMAKE_CURRENT_SOURCE_DIR}/core/benchmark.cpp)
+target_link_libraries(test_benchmark Catch2::Catch2WithMain core)
+
+add_test(NAME test_benchmarks COMMAND test_benchmark)
