@@ -184,6 +184,13 @@ void Scene::init(void) {
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
   sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
+  // ASSIMP player !!! ************************************************
+  AssimpModel* assimpModel = new AssimpModel();
+  sceneResources->models["playerASSIMP"] = assimpModel;
+  //sceneResources->models["playerASSIMP"]->mesh = sceneResources->meshes["player"];
+  // TODO(matthew) work on this
+  sceneResources->models["playerASSIMP"]->material =
+      sceneResources->materials["toon.blue"];
 
   // THE player !!!
   sceneResources->models["playerRef"] = new Model;
