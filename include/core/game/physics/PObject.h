@@ -20,6 +20,10 @@ class PObject : public Modifiable {
   vec3f vel, oPos;
   bool onGround, static_, freeze;
   Level* level;
+
+  vec3f lastSurfaceNormal;
+  float lastSurfaceFriction;
+
   PObject(BoundingShape* shape, unsigned int layer = 0, float friction = 0.0f,
           bool static_ = false);
   ~PObject();

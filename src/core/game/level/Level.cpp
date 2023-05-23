@@ -13,6 +13,9 @@ void response(PObject* self, PObject* other, vec4f mtv) {
     self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
     self->vel = tangent(self->vel, norm);
     self->vel -= self->vel * mtv.w * other->getBounds()->friction;
+
+    self->lastSurfaceNormal = norm;
+    self->lastSurfaceFriction = other->getBounds()->friction;
   } else {
     if (other->vel.y < 0 &&
         norm.y / (std::abs(norm.x) + std::abs(norm.z)) > -0.05)
@@ -25,6 +28,11 @@ void response(PObject* self, PObject* other, vec4f mtv) {
     other->addPos(-vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
     other->vel = tangent(other->vel, /* - */norm);
     other->vel -= other->vel * mtv.w * self->getBounds()->friction * 0.5f;
+
+    self->lastSurfaceNormal = norm;
+    self->lastSurfaceFriction = other->getBounds()->friction * 0.5f;
+    other->lastSurfaceNormal = -norm;
+    other->lastSurfaceFriction = self->getBounds()->friction * 0.5f;
   }
 
   other->onCollision(self);
