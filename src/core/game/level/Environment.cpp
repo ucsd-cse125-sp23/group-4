@@ -109,10 +109,31 @@ void Environment::constructBVH() {
   }
   this->root = constructBVHHelper(leaves);
 }
+std::vector<PObject*> Environment::collides(BoundingShape* shape) {
+  std::vector<PObject*> hits;
+  std::stack<BVHNode*> stack;
+  stack.push(this->root);
+  while (!stack.empty()) {
+    BVHNode* curr = stack.top();
+    stack.pop();
+    if (shape->collides(curr->bound)) {
+      if (curr->obj == nullptr) {
+        stack.push(curr->left);
+        stack.push(curr->right);
+      } else {
+        const CollisionBounds* bounds = curr->obj->getBounds();
+        if (bounds->shape->collides(
+                shape, translate_scale(bounds->getPos(), bounds->getScale())))
+          hits.push_back(curr->obj);
+      }
+    }
+  }
+  return hits;
+}
 std::vector<PObject*> Environment::collides(PObject* self) {
   std::vector<PObject*> hits; std::stack<BVHNode*> stack;
   stack.push(this->root);
-  mat4f transform = translate_scale(self->getBounds()->getPos(), (self->getBounds()->getScale()));
+  mat4f transform = translate_scale(self->getBounds()->getPos(), self->getBounds()->getScale());
   const BoundingShape* shape = self->getBounds()->shape;
   while (!stack.empty()) {
     BVHNode* curr = stack.top();

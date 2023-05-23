@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/math/shape/ConvexShape.h"
+#include "core/math/shape/AABShape.h"
 
 class LineShape : public ConvexShape {
  private:
@@ -13,4 +14,6 @@ class LineShape : public ConvexShape {
  public:
   vec3f a, b;
   LineShape(vec3f a, vec3f b) : a(a), b(b) {}
+
+  AABShape* bounds() const { return new AABShape(min(a, b), max(a, b)); }
 };

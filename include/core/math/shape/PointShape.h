@@ -11,4 +11,6 @@ class PointShape : public ConvexShape {
 
  public:
   PointShape(vec3f point) : point(point) {}
+
+  AABShape* bounds() const { return new AABShape(point, point); }
 };

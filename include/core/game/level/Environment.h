@@ -15,6 +15,7 @@ class Environment {
   void addConvex(std::initializer_list<vec3f> vertices, float friction = 0.0f);
 
   void constructBVH();
+  std::vector<PObject*> collides(BoundingShape* shape);
   std::vector<PObject*> collides(PObject* self);
   std::pair<PObject*, vec4f> mtv(PObject* self);
 

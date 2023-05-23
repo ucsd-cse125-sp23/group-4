@@ -5,6 +5,7 @@
 
 #include "core/game/level/Level.h"
 #include "core/game/physics/PowerUp.h"
+#include "core/math/shape/LineShape.h"
 
 void initializeLevel(Environment* environment) {
   level = new Level(environment);
@@ -42,16 +43,19 @@ void spawnPowerUp(vec3f min, vec3f max,
   std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());
   std::uniform_real_distribution<double> dist(0.0, 1.0);
   float minT = -1;
+  //Sufficiently efficient ray casting
   Ray ray;
   int n = 0;
   while (n < 5) {
     ray = {vec3f(min.x + (max.x - min.x) * dist(rng), 1000.0,
                  min.z + (max.z - min.z) * dist(rng)),
            vec3f(0, -1, 0)};
-    for (auto obj : level->getEnvironment()->getCollisions()) {
+    LineShape* line = new LineShape(ray.src, ray.src + ray.dir * 1e9f);
+    for (auto obj : level->getEnvironment()->collides(line)) {
       float t = obj->getBounds()->intersects(ray);
       if (t >= 0 && t < minT) minT = t;
     }
+    delete line;
     if (minT >= 0) break;
   }
   if (minT < 0) return;
