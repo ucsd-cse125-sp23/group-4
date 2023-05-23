@@ -80,13 +80,6 @@ TEST_CASE("Single Object Multi Collider", "[benchmark]") {
 		std::cout << "1000 AABBs for ";
 		testEnvironment(environment, 20);
 	}
-	SECTION("5000 AABB") {
-		Environment* environment = new Environment();
-		for (int i = 0; i < 5000; i++)
-			environment->addBox(vec3f(-1, -1, -1), vec3f(1, 1, 1));
-		std::cout << "5000 AABBs for ";
-		testEnvironment(environment, 20);
-	}
 	std::vector<vec3f> vertices;
 	for (int i = 0; i < 10; i++)
 		for (int j = 0; j < 10; j++)
@@ -97,20 +90,6 @@ TEST_CASE("Single Object Multi Collider", "[benchmark]") {
 		for (int i = 0; i < 100; i++)
 			environment->addConvex(vertices);
 		std::cout << "100 Convexs of 1000 vertices for ";
-		testEnvironment(environment, 20);
-	}
-	SECTION("500 Convex of 1000 vertices") {
-		Environment* environment = new Environment();
-		for (int i = 0; i < 500; i++)
-			environment->addConvex(vertices);
-		std::cout << "500 Convexs of 1000 vertices for ";
-		testEnvironment(environment, 20);
-	}
-	SECTION("1000 Convex of 1000 vertices") {
-		Environment* environment = new Environment();
-		for (int i = 0; i < 1000; i++)
-			environment->addConvex(vertices);
-		std::cout << "1000 Convexs of 1000 vertices for ";
 		testEnvironment(environment, 20);
 	}
 
@@ -124,13 +103,6 @@ TEST_CASE("Single Object Multi Collider", "[benchmark]") {
 		for (int i = 0; i < 100; i++)
 			environment->addConvex(vertices);
 		std::cout << "100 Convexs of 8000 vertices for ";
-		testEnvironment(environment, 20);
-	}
-	SECTION("500 Convex of 8000 vertices") {
-		Environment* environment = new Environment();
-		for (int i = 0; i < 500; i++)
-			environment->addConvex(vertices);
-		std::cout << "500 Convexs of 8000 vertices for ";
 		testEnvironment(environment, 20);
 	}
 }
