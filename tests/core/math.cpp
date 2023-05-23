@@ -110,7 +110,16 @@ TEST_CASE("Assignment Vector Operations", "[vector]") {
   u *= 2.0f;
   CHECK(u == vec3f(2, 8, 18));
 }
-TEST_CASE("Special Vector Operations", "[vector]") { vec3f v = vec3f(1, 1, 0); }
+TEST_CASE("Special Vector Operations", "[vector]") { 
+  CHECK(tangent(vec3f(1, 0, 0), vec3f(0, 1, 0)) == vec3f(1, 0, 0));
+  CHECK(tangent(vec3f(-1, 0, 0), vec3f(0, 1, 0)) == vec3f(-1, 0, 0));
+  CHECK(tangent(vec3f(0, 0, 1), vec3f(0, 1, 0)) == vec3f(0, 0, 1));
+  CHECK(tangent(vec3f(0, 0, -1), vec3f(0, 1, 0)) == vec3f(0, 0, -1));
+  CHECK(tangent(vec3f(1, 0, 1), vec3f(0, 1, 0)) == vec3f(1, 0, 1));
+  CHECK(tangent(vec3f(-1, 0, 1), vec3f(0, 1, 0)) == vec3f(-1, 0, 1));
+  CHECK(tangent(vec3f(-1, 0, 1), vec3f(0, 1, 0)) == vec3f(-1, 0, 1));
+  CHECK(tangent(vec3f(-1, 0, -1), vec3f(0, 1, 0)) == vec3f(-1, 0, -1));
+}
 
 TEST_CASE("Baisc Matrix Operations", "[matrix]") {
   mat3f m0(1, 2, 3, 4, 5, 6, 7, 8, 9);
