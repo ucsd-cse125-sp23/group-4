@@ -109,7 +109,7 @@ class Scene {
     camera->name = "_camera";
     camera->Fixed = false;
     gamethings.push_back(camera);
-    time.time = 300.f;  // 5 minutes
+    time.time = 15.0f; 
     time.countdown = true;
 
     sceneResources = new SceneResourceMap();

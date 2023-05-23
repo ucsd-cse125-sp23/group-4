@@ -10,7 +10,10 @@ class Lobby : public Scene, public InputListener {
   Texture background;
   Texture flag;
 
+  Timer wait;
   bool ready;
+  bool gameStart;
+  float offset;
   std::vector<PlayerModel*> player_models;
   PlayerModel* selectedModel;
   int index;
@@ -23,6 +26,11 @@ class Lobby : public Scene, public InputListener {
 
     background.init("assets/image/character_select.png");
     flag.init("assets/image/flag.png");
+
+    wait.time = 5;
+    wait.countdown = true;
+    gameStart = false;
+    offset = 0;
   }
 
   void init(void);
@@ -32,6 +40,7 @@ class Lobby : public Scene, public InputListener {
   void draw();
   void drawBackground();
   void drawPlayers();
+  void lockIn();
 
   ~Lobby() {
     for (std::pair<std::string, Node*> entry : node) {
