@@ -69,7 +69,11 @@ function(install)
   endif()
 endfunction(install)
 
+FetchContent_MakeAvailable(
+    freetype
+    assimp)
 set(_disable_install FALSE)
+
 
 FetchContent_Declare(
   SFML
@@ -81,9 +85,7 @@ FetchContent_MakeAvailable(
   glfw
   glm
   freeglut
-  freetype
   imgui
-  assimp
   SFML)
 
 set(SOURCES
