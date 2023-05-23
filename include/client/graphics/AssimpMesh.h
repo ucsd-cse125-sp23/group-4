@@ -32,6 +32,7 @@ struct Vertex {
     glm::vec3  normal;
     glm::uvec4 boneInds    = glm::vec4(0,0,0,0);
     glm::vec4  boneWeights = glm::vec4(1,0,0,0);
+    glm::vec2  uv          = glm::vec2(0,0);
 };
 
 /** The AssimpMesh class for storing a mesh with a binded skeleton. */
@@ -42,7 +43,10 @@ public:
 
     std::string name;
     AssimpNode* node;
+    /** vertex relative to world space (default pose) */
     std::vector<Vertex>       vertices;
+    /** vertex relative to world space (current pose) */
+    std::vector<Vertex>       worldVerticies;
     std::vector<unsigned int> indices;
     std::vector<AssimpJoint*> joints;
     glm::mat4 matBindingInvs[MAX_BONES];
@@ -52,7 +56,13 @@ public:
     void gl_load();
     void gl_delete();
     void imGui();
-private:
+
+    void draw();
+    void gl_load2();
+    void gl_update2();
+
+   private:
     unsigned int VAO, VBO, EBO;
-    bool isLoaded;
+    unsigned int VAO2, VBO2, EBO2;
+    bool isLoaded, isLoaded2;
 };

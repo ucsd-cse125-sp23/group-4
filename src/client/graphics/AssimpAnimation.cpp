@@ -31,11 +31,9 @@ void AssimpChannel::eval(double currentTick) {
             printf("LINEAR NOT SUPPORTED\n");
             break;
         case ASSIMP_EXTRAP_MODE::CYCLE:
+        default:
             // TODO: not tested
             eval(std::fmod((currentTick-start),glm::abs(end-start)));
-            break;
-        default:
-            // TODO: bug - this mode does not work
             break;
         }
         return;

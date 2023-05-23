@@ -23,7 +23,7 @@ class PlayerModel : public Model {
 
   AnimationPlayer* currAnim = nullptr;
 
-  void setAnimation(std::string animName) {
+  virtual void setAnimation(std::string animName) {
     if (anims.find(animName) == anims.end()) {
       return;  // anim not found!
     }
@@ -31,7 +31,7 @@ class PlayerModel : public Model {
     currAnim = anims[animName];
   }
 
-  void update(float dt) {
+  virtual void update(float dt) {
     // update anim + skeleton + skin
     if (currAnim) {
       currAnim->Update(dt);
@@ -42,7 +42,7 @@ class PlayerModel : public Model {
     skin->updateSkin(skel);
   }
 
-  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+  virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
             const glm::mat4& transformMtx) {
     if (!material || !mesh) return;
 

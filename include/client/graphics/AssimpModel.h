@@ -12,6 +12,7 @@
 #include "client/graphics/AssimpNode.h"
 #include "client/graphics/AssimpMesh.h"
 #include "client/graphics/AssimpAnimation.h"
+#include "client/graphics/PlayerModel.h"
 
 /** The AssimpModel class for loading and displaying an animated model file.
   * 
@@ -20,7 +21,7 @@
   * every bone/joint must have a channel with at least two values;
   * Fixed timestamp keyframing is preferred.
   */
-class AssimpModel {
+class AssimpModel : public PlayerModel, public SkinnedMesh {
 public:
     AssimpModel();
     // TODO
@@ -39,9 +40,24 @@ public:
       */
     bool useAnimation(int animationInd);
 
-    void update(float deltaTimeInMs);
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
     void imGui();
+
+    // PlayerModel
+    void setAnimation(std::string name);
+    void update(float deltaTimeInMs);
+    void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+              const glm::mat4& transformMtx);
+    // SkinnedMesh
+    void init(const char* filename) {
+      if (!loadAssimp(filename)) { exit(EXIT_FAILURE); }
+    }
+    // Model
+    void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+              const glm::mat4& transformMtx, const bool ignoreDepth = false);
+
+    void draw();
+
 private:
     std::string name;
     AssimpNode* rootNode;
@@ -53,6 +69,7 @@ private:
     bool isAnimated, isPaused;
     int currentAnimation;
     std::vector<AssimpAnimation> animations;
+    glm::mat4 betterView = glm::mat4(1.0);
     char** animModes;
     bool drawNode = false;
 

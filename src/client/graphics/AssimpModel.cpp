@@ -36,6 +36,7 @@ bool AssimpModel::loadAssimp(const char* path) {
     loadAssimpHelperAnim(scene);
     loadAssimpHelperImgui();
     useMesh();
+    betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)), glm::vec3(0, -120, 0));
     return true;
 }
 
@@ -87,6 +88,7 @@ void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const a
                                   aiMesh->mNormals[i].y,
                                   aiMesh->mNormals[i].z);
         mesh->vertices.push_back(vertex);
+        mesh->worldVerticies.push_back(vertex);
     }
 
     for(unsigned int i = 0; i < aiMesh->mNumFaces; i++) {
@@ -164,7 +166,7 @@ void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const a
             vertexBindedBones[vw.vertexInd]++;
         }
     }
-    printf("%s MAX_BONE: %d\n", mesh->name.c_str(), maxBoneAffected);
+    // printf("%s MAX_BONE: %d\n", mesh->name.c_str(), maxBoneAffected);
     // printf("MAX_BONE_VERT: %u %u %u %u\n", mesh->vertices[vw.vertexInd].boneInds.x, mesh->vertices[vw.vertexInd].boneInds.y, mesh->vertices[vw.vertexInd].boneInds.z. mesh->vertices[vw.vertexInd].boneInds.w);
 }
 
@@ -338,7 +340,10 @@ void AssimpModel::useMesh() {
 }
 
 bool AssimpModel::useAnimation(int animationInd) {
-    printf("Using %d\n", animationInd);
+    printf("Assimp: Animation - Using %d\t: %s\n", animationInd,
+           animationInd < 0 || animationInd >= animations.size()
+               ? "Mesh | Unknown"
+               : animations[animationInd].name.c_str());
 
     if(animationInd < 0) {
         currentAnimation = -1;
@@ -414,5 +419,69 @@ void AssimpModel::imGuiJointMenu() {
                 }
             }
         }
+    }
+}
+
+void AssimpModel::setAnimation(std::string name) {
+    for (int i = 0; i < animations.size(); i++) {
+        if (animations[i].name.compare(name) == 0) {
+            useAnimation(i);
+            isPaused = false;
+            return;
+        }
+    }
+
+    // use default pose
+    std::cout << "Assimp: Animation - cannot find " << name.c_str()
+              << " using Mesh instead" << std::endl;
+    useAnimation(-1);
+}
+
+void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+    const glm::mat4& transformMtx) {
+
+    if (!material) {
+        return;
+    }
+
+    GLuint shader = material->shader;
+
+    glUseProgram(shader);
+    material->setUniforms(viewProjMtx, viewMtx,
+                          transformMtx * modelMtx * betterView);
+    for (int i = 0; i < meshes.size(); i++) {
+        meshes[i]->draw();
+    }
+    glUseProgram(0);
+}
+
+void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+                       const glm::mat4& transformMtx, const bool ignoreDepth) {
+
+    if (!material) {
+        return;
+    }
+
+    GLuint shader = material->shader;
+    glUseProgram(shader);
+
+    if (ignoreDepth) glDisable(GL_DEPTH_TEST);
+    material->setUniforms(viewProjMtx, viewMtx,
+                          transformMtx * modelMtx * betterView);
+    for (int i = 0; i < meshes.size(); i++) {
+        meshes[i]->draw();
+    }
+    if (ignoreDepth) glEnable(GL_DEPTH_TEST);
+
+    glUseProgram(0);
+}
+
+void AssimpModel::draw() {
+    if (!isAnimated) {
+        useMesh();
+    }
+
+    for (int i = 0; i < meshes.size(); i++) {
+        meshes[i]->draw();
     }
 }
