@@ -25,4 +25,9 @@ class CylinderShape : public ConvexShape {
  public:
   CylinderShape(float height, float radius)
       : halfheight(height / 2), radius(radius) {}
+
+  AABShape* bounds() const {
+    return new AABShape(vec3f(-radius, -halfheight, -radius),
+                        vec3f(radius, halfheight, radius));
+  }
 };

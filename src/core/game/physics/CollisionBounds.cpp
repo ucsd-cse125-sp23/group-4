@@ -9,6 +9,8 @@ CollisionBounds::CollisionBounds(BoundingShape* shape, unsigned int layer,
       friction(friction) {}
 void CollisionBounds::setPos(vec3f pos) { this->pos = pos; }
 void CollisionBounds::setScale(vec3f scale) { this->scale = scale; }
+vec3f CollisionBounds::getPos() const { return this->pos; }
+vec3f CollisionBounds::getScale() const { return this->scale; }
 
 bool CollisionBounds::collides(const CollisionBounds* other) const {
   return this->shape->collides(other->shape,
