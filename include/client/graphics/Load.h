@@ -24,7 +24,7 @@ class Load : public Scene {
 	for (int i = 0; i < 24; i++) {
       Texture frame;
       std::string filename =
-        "assets/image/tagguys/frame_" + std::to_string(i) + ".gif";
+        "assets/image/tagguys/frame_" + std::to_string(i) + "_delay-0.08s.png";
       frame.init(filename.c_str());
       frames.push_back(frame);
 	}
