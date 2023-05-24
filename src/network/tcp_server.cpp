@@ -66,30 +66,30 @@ void Server::do_accept() {
     do_accept();  // start accepting new connections
 
     // generate new player_id
-    PlayerID player_id = boost::uuids::random_generator()();
+    ClientID new_client_id = boost::uuids::random_generator()();
     std::cout << "(Server::accept) Accepted new client, assigning player_id: "
-              << player_id << std::endl;
+              << new_client_id << std::endl;
 
     auto conn_read_handler = [=](boost::system::error_code ec,
                                  const message::Message& m) {
       if (ec) {
         if (ec == boost::asio::error::eof) {
-          std::cout << "(Server::read) Player " << player_id
+          std::cout << "(Server::read) Player " << new_client_id
                     << " disconnected, closing connection" << std::endl;
           // save value of this, since read_handler closure is destroyed when
           // connection is destroyed
           auto saved_this = this;
-          connections_.erase(player_id);
+          connections_.erase(new_client_id);
           std::cout << saved_this << std::endl;
         }
         return;
       }
 
-      PlayerID new_pid = m.metadata.pid;
+      ClientID client_id = m.metadata.id;
       auto greeting_handler = [&](const message::Greeting& body) {
         std::string greeting =
-            "Hello, player " + boost::uuids::to_string(new_pid) + "!";
-        write<message::Greeting>(new_pid, greeting);
+            "Hello, client " + boost::uuids::to_string(client_id) + "!";
+        write<message::Greeting>(client_id, greeting);
       };
       auto user_state_update_handler =
           [&](const message::UserStateUpdate& body) { game_.update(body); };
@@ -99,7 +99,7 @@ void Server::do_accept() {
           greeting_handler, user_state_update_handler, any_handler);
       boost::apply_visitor(message_handler, m.body);
 
-      read(new_pid);
+      read(client_id);
     };
 
     auto conn_write_handler = [=](boost::system::error_code ec,
@@ -110,18 +110,19 @@ void Server::do_accept() {
 
     // store new connection
     connections_.insert(
-        {player_id, std::make_unique<Connection<message::Message>>(
-                        socket, conn_read_handler, conn_write_handler)});
-    auto& connection = connections_[player_id];
+        {new_client_id, std::make_unique<Connection<message::Message>>(
+                            socket, conn_read_handler, conn_write_handler)});
+    auto& connection = connections_[new_client_id];
     std::cout << this << std::endl;
 
     // assign client their player_id
-    write<message::Assign>(player_id, player_id);
+    int new_player_id = game_.create_player();
+    write<message::Assign>(new_client_id, new_player_id);
 
     // notify everyone a new player has joined
     // TODO: don't notify newly joined client
     std::string notification =
-        "Player " + boost::uuids::to_string(player_id) + " has joined";
+        "Client " + boost::uuids::to_string(new_client_id) + " has joined";
     write_all<message::Notify>(notification);
 
     connection->start();  // start reading from client
@@ -130,9 +131,9 @@ void Server::do_accept() {
   acceptor_.async_accept(accept_handler);
 }
 
-void Server::read(const PlayerID& id) { connections_[id]->read(); }
+void Server::read(const ClientID& id) { connections_[id]->read(); }
 
-void Server::write(const PlayerID& id, const message::Message& m) {
+void Server::write(const ClientID& id, const message::Message& m) {
   // std::cout << "Queueing write to client: " << m << std::endl;
 
   connections_[id]->write(m);
@@ -141,7 +142,7 @@ void Server::write(const PlayerID& id, const message::Message& m) {
 void Server::write_all(message::Message& m) {
   // std::cout << "Queueing write to all clients: " << m << std::endl;
   for (auto& kv : connections_) {
-    m.metadata.pid = kv.first;
+    m.metadata.id = kv.first;
     kv.second->write(m);
   }
 }

@@ -8,6 +8,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/functional/overloaded_function.hpp>
+#include <chrono>
 #include <config/lib.hpp>
 #include <cstdio>
 #include <ctime>
@@ -15,12 +16,11 @@
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 #include <string>
+#include <thread>
 
 #include "Window.h"
 
-using message::PlayerID;
-
-PlayerID my_player_id;
+int pid;
 bool net_assigned = false;
 
 void error_callback(int error, const char* description) {
@@ -72,15 +72,12 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
   auto config = get_config();
   Addr server_addr{config["server_address"], config["server_port"]};
 
-  PlayerID player_id;
   auto connect_handler = [](tcp::endpoint endpoint, Client& client) {};
 
   auto read_handler = [&](const message::Message& m, Client& client) {
     auto assign_handler = [&](const message::Assign& body) {
-      player_id = body.pid;
-      my_player_id = player_id;
       net_assigned = true;
-      // Window::gameScene->initFromServer(myId); // need a unique int id
+      Window::gameScene->initFromServer(body.pid);  // need a unique int id
       client.write<message::Greeting>("Hello, server!");
     };
     auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
@@ -102,14 +99,6 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
 }
 
 int main(int argc, char* argv[]) {
-  int pid = 1;  // default player id to control
-  if (argc > 1) {
-    int input = (*argv[1]) - '0';
-    if (input > 0 && input <= 4) {
-      pid = input;
-    }
-  }
-
   boost::asio::io_context io_context;
   auto client = network_init(io_context);
 
@@ -139,7 +128,13 @@ int main(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  Window::gameScene->initFromServer(pid);  // temporary
+  // wait for server assignment, TODO: replace with start screen UI
+  while (!net_assigned) {
+    std::cout << "(net_assigned: " << net_assigned << ") ";
+    std::cout << "Waiting for server to assign pid..." << std::endl;
+    io_context.poll();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
 
   // Delta time logic (see
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
@@ -159,12 +154,8 @@ int main(int argc, char* argv[]) {
     // Get a message back of all updates
     message::UserStateUpdate mout = Window::idleCallback(window, deltaTime);
 
-    PlayerID pid = my_player_id;
-    message::Message my_m{
-        message::Type::UserStateUpdate, {pid, std::time(nullptr)}, mout};
-
     // OUTPUT TO SERVER
-    if (net_assigned) client.get()->write(my_m);
+    if (net_assigned) client->write<message::UserStateUpdate>(mout);
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);

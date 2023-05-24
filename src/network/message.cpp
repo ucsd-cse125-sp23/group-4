@@ -43,7 +43,7 @@ Type get_type(const Message::Body& body) {
 }
 
 std::string Assign::to_string() const {
-  return "assigning player_id: " + boost::uuids::to_string(pid);
+  return "assigning player_id: " + std::to_string(pid);
 }
 
 std::string Greeting::to_string() const { return greeting; }

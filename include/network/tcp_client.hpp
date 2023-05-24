@@ -31,7 +31,7 @@ class Client {
   template <typename T, typename... Args>
   void write(Args &&...);
 
-  message::PlayerID pid_;
+  message::ClientID id_;
 
  private:
   std::unique_ptr<Connection<message::Message>> connection;
@@ -42,7 +42,7 @@ template <typename T, typename... Args>
 void Client::write(Args &&...args) {
   T body{std::forward<Args>(args)...};
   message::Type type = message::get_type(body);
-  message::Metadata metadata{pid_, std::time(nullptr)};
+  message::Metadata metadata{id_, std::time(nullptr)};
   message::Message m{type, metadata, body};
   connection->write(m);
 }

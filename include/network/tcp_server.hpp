@@ -12,7 +12,7 @@
 #include <vector>
 
 using boost::asio::ip::tcp;
-using message::PlayerID;
+using message::ClientID;
 
 class Server {
  public:
