@@ -27,7 +27,8 @@
 #include <vector>
 
 #include "client/graphics/Node.h"
-// #include "Input.h"
+#include "client/graphics/SceneState.h"
+#include "client/graphics/UserState.h"
 
 struct Transform {
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -51,15 +52,45 @@ struct Transform {
 // a GameThing (tm)
 class GameThing : public Node {
  public:
+  int netId = -1;  // used to connect with network/core data (-1 means unset)
+  bool isUser = false;  // controls whether we want to read input and send it
+
   Transform transform;
 
-  virtual void update(float dt) {
-    // --- example ---
+  virtual UserState update(float dt) {
+    // --- example (spin spin) ---
     transform.rotation += glm::vec3(0, 30 * dt, 0);  // spin on y axis
     transform.updateMtx(&transformMtx);  // needed to update node matrix
+
+    return UserState();
+  }
+
+  void updateFromState(SceneGameThingState state) {
+    // update self from server input
+    setPosition(state.position);
+    setHeading(state.heading);
   }
 
   // transform helpers
+
+  void setPosition(glm::vec3 pos) {
+    this->transform.position = pos;
+    transform.updateMtx(&transformMtx);
+  }
+
+  void setHeading(glm::vec3 direction) {
+    direction = normalize(direction);
+    // aka azimuth:
+    float heading = std::atan2(direction.x, direction.z) + (M_PI);
+
+    setHeading(heading);
+  }
+  void setHeading(float heading) {
+    // purely visual, for now (rotation not applied to transform itself)
+    if (!model) return;
+
+    model->modelMtx = glm::eulerAngleY(heading);
+  }
 
   void move(glm::vec3 movement) {
     // movement is in world space

@@ -1,16 +1,13 @@
 #pragma once
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
-#include <vector>
-#include <string>
+#include <assimp/Importer.hpp>
 #include <map>
+#include <string>
+#include <vector>
 
-#include "client/graphics/core.h"
-#include "client/graphics/AssimpNode.h"
-#include "client/graphics/AssimpMesh.h"
 #include "client/graphics/AssimpAnimation.h"
 #include "client/graphics/PlayerModel.h"
 
@@ -27,18 +24,18 @@ public:
     // TODO
     // ~AssimpModel();
 
-    /** Load a model file (displaying default pose).
-      * Returns whether the model file is loaded properly.
-      * If the node has already been initialized, returns false.
-      */
-    bool loadAssimp(const char* path);
+  /** Load a model file (displaying default pose).
+   * Returns whether the model file is loaded properly.
+   * If the node has already been initialized, returns false.
+   */
+  bool loadAssimp(const char* path);
 
-    /** Set model to use default pose */
-    void useMesh();
-    /** Set model to use specified animation (-1 = use default pose)
-      * returns false if animationInd is invalid
-      */
-    bool useAnimation(int animationInd);
+  /** Set model to use default pose */
+  void useMesh();
+  /** Set model to use specified animation (-1 = use default pose)
+   * returns false if animationInd is invalid
+   */
+  bool useAnimation(int animationInd);
 
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
     void imGui();
@@ -73,36 +70,39 @@ private:
     char** animModes;
     bool drawNode = false;
 
-    struct ControlInfo {
-        bool useControl = false;
-        glm::vec3 pose = glm::vec3(1);
-        glm::vec3 scale = glm::vec3(1);
-        glm::vec3 offset = glm::vec3(1);
-    };
+  struct ControlInfo {
+    bool useControl = false;
+    glm::vec3 pose = glm::vec3(1);
+    glm::vec3 scale = glm::vec3(1);
+    glm::vec3 offset = glm::vec3(1);
+  };
 
-    std::map<std::string, ControlInfo> nodeControlMap;
+  std::map<std::string, ControlInfo> nodeControlMap;
 
-    /** Prepare a new AssimpNode node
-      * accTransform: accumulative transform from parent node
-      * aiNode: aiNode from the importer corresponded to this node
-      * scene: the scene created by the importer
-      */
-    void loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform, aiNode *aiNode, const aiScene *scene);
-    /** Prepare a new AssimpMesh mesh
-      * aiMesh: aiMesh from the importer corresponded to this mesh
-      * scene: the scene created by the importer
-      */
-    void loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
-    /** Adds skeleton/joints to a new AssimpMesh mesh
-      * aiMesh: aiMesh from the importer corresponded to this mesh
-      * scene: the scene created by the importer
-      */
-    void loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh *aiMesh, const aiScene *scene);
-    /** Add animations to this model
-      * scene: the scene created by the importer
-      */
-    void loadAssimpHelperAnim(const aiScene *scene);
-    /** Prepare ImGui information for this model */
-    void loadAssimpHelperImgui();
-    void imGuiJointMenu();
+  /** Prepare a new AssimpNode node
+   * accTransform: accumulative transform from parent node
+   * aiNode: aiNode from the importer corresponded to this node
+   * scene: the scene created by the importer
+   */
+  void loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
+                            aiNode* aiNode, const aiScene* scene);
+  /** Prepare a new AssimpMesh mesh
+   * aiMesh: aiMesh from the importer corresponded to this mesh
+   * scene: the scene created by the importer
+   */
+  void loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
+                            const aiScene* scene);
+  /** Adds skeleton/joints to a new AssimpMesh mesh
+   * aiMesh: aiMesh from the importer corresponded to this mesh
+   * scene: the scene created by the importer
+   */
+  void loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh* aiMesh,
+                            const aiScene* scene);
+  /** Add animations to this model
+   * scene: the scene created by the importer
+   */
+  void loadAssimpHelperAnim(const aiScene* scene);
+  /** Prepare ImGui information for this model */
+  void loadAssimpHelperImgui();
+  void imGuiJointMenu();
 };

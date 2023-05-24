@@ -17,13 +17,14 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Scene.h"
+#include "UserState.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // Window Properties
 int Window::width;
 int Window::height;
-const char* Window::windowTitle = "CSE 125 graphics engine :)";
+const char* Window::windowTitle = "tagguys :O";
 
 // Game stuff to render
 Scene* Window::gameScene;
@@ -166,11 +167,14 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::idleCallback(GLFWwindow* window, float deltaTime) {
+message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
+                                              float deltaTime) {
   // Perform any updates as necessary.
   Cam->UpdateView(window);
 
-  gameScene->update(deltaTime);
+  UserState inputChanges = gameScene->update(deltaTime);
+
+  return inputChanges.toMessage();  // player input to be written to server
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -242,6 +246,9 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
         break;
       case GLFW_KEY_C:
         Cam->Fixed = !(Cam->Fixed);
+        break;
+      case GLFW_KEY_X:
+        gameScene->sceneResources->sounds["test"]->play();  // temporary
         break;
       default:
         break;

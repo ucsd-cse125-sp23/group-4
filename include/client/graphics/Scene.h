@@ -22,18 +22,23 @@
 #include <utility>
 #include <vector>
 
-#include "./shader.h"
-#include "Camera.h"
-#include "Cube.h"
-#include "GameThing.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Model.h"
-#include "Node.h"
-#include "Obj.h"
-#include "PlayerModel.h"
-#include "Skeleton.h"
-#include "Texture.h"
+#include "client/graphics/AssimpModel.h"
+#include "client/graphics/Camera.h"
+#include "client/graphics/Cube.h"
+#include "client/graphics/GameThing.h"
+#include "client/graphics/Material.h"
+#include "client/graphics/Mesh.h"
+#include "client/graphics/Model.h"
+#include "client/graphics/Node.h"
+#include "client/graphics/Obj.h"
+#include "client/graphics/Player.h"
+#include "client/graphics/PlayerModel.h"
+#include "client/graphics/SceneState.h"
+#include "client/graphics/Skeleton.h"
+#include "client/graphics/SoundEffect.h"
+#include "client/graphics/Texture.h"
+#include "client/graphics/UserState.h"
+#include "client/graphics/shader.h"
 
 struct Character {
   unsigned int TextureID;  // ID handle of the glyph texture
@@ -54,6 +59,7 @@ class SceneResourceMap {
   std::map<std::string, Texture*> textures;
   std::map<std::string, Model*>
       models;  // more complex; meshes + other info combined
+  std::map<std::string, SoundEffect*> sounds;
   // std::map< std::string, Light* > light;
 
   SceneResourceMap() {}
@@ -84,6 +90,10 @@ class SceneResourceMap {
     for (auto entry : models) {
       delete entry.second;
     }
+    // sounds
+    for (auto entry : sounds) {
+      delete entry.second;
+    }
   }
 };
 
@@ -96,6 +106,8 @@ class Scene {
   SceneResourceMap* sceneResources;
 
   Camera* camera;
+
+  SceneState gameStateCache;
 
   // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
@@ -149,8 +161,13 @@ class Scene {
     node["world"] = new Node("world");
   }
 
+  Player* createPlayer(int id, bool isUser);
+  void initFromServer(int myid);
+  void setToUserFocus(GameThing* t);
   void init(void);
-  void update(float delta);
+  UserState update(float delta);          // broadcast to net
+  void updateState(SceneState newState);  // receive from net
+
   void drawHUD(GLFWwindow* window);
   void draw();
 
