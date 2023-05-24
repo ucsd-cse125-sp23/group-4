@@ -35,7 +35,7 @@ struct SceneState {
   explicit SceneState(message::GameStateUpdate state) {
     // take list of all things and convert each one
     for (auto i : state.things) {
-      objectStates[i->id] = SceneGameThingState(*i);
+      objectStates[i.id] = SceneGameThingState(i);
     }
   }
 };

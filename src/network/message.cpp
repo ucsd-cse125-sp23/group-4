@@ -74,7 +74,7 @@ std::string GameStateUpdate::to_string() const {
                       "game things:\n";
   // clang-format on
   for (auto i : things) {
-    str += i->to_string();
+    str += i.to_string();
   }
   str += "\n}...\n";
   return str;

@@ -19,67 +19,19 @@
 #include "client/graphics/ColliderImporter.h"
 #include "core/lib.hpp"
 
-/* TEMP SERVER GAME STATE CODE (positions only) */
-
-struct GameThingState {
-  int id;
-  float posx;
-  float posy;
-  float posz;
-  float heading;
-
-  Player* player;
-  ControlModifierData* control;
-
-  GameThingState() {}
-
-  void move(float x, float y, float z) {
-    control->horizontalVel = vec3f(x, y, z);
-  }
-
-  const message::GameStateUpdateItem toMessage() {
-    message::GameStateUpdateItem p;
-    p.id = id;
-    p.posx = player->getPos().x;
-    p.posy = player->getPos().y;
-    p.posz = player->getPos().z;
-    p.heading = heading;
-
-    return p;
-  }
-};
-
-// stored in server
-struct GameState {
-  std::map<int, GameThingState> objectStates;
-
-  GameState() {}
-};
-
-/* *** */
-
 Server::Server(boost::asio::io_context& io_context, int port)
     : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
-      timer_(boost::asio::steady_timer(io_context)) {
+      timer_(boost::asio::steady_timer(io_context)),
+      game_(Game()) {
   std::cout << "(Server) Server running on port " << port << std::endl;
-
-  Environment* environment = new Environment();
-  std::vector<ColliderData> mapColliders =
-      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
-  for (auto collider : mapColliders) {
-    environment->addConvex(collider.vertices, 0.2f);
-  }
-  initializeLevel(environment);
 
   do_accept();
   tick();
 }
 
-GameState server_gameState = GameState();
-
 void Server::tick() {
   auto prev_time = std::chrono::steady_clock::now();
-  timer_.expires_from_now(tick_rate_);
+  timer_.expires_from_now(TICK_RATE);
   timer_.async_wait([=](const boost::system::error_code& ec) {
     if (ec) {
       std::cerr << "(Server::tick) Error waiting for timer: " << ec.message()
@@ -93,32 +45,10 @@ void Server::tick() {
     std::cout << "(Server::tick) Updating game, time elapsed since last tick: "
               << time_elapsed.count() << "ms" << std::endl;
 
-    // Temporary server broadcast example (sending to client) ---
-    update_num_++;
-
-    std::vector<message::GameStateUpdateItem*> thingsOnServer;  // to send
-    level->tick();
-    for (auto thing : server_gameState.objectStates) {
-      thingsOnServer.push_back(
-          new message::GameStateUpdateItem(thing.second.toMessage()));
-    }
-
-    /*
-    message::GameStateUpdateItem* p = new message::GameStateUpdateItem();
-    p->id = 3;  // just for testing
-    p->posx = update_num_ * 0.1f;
-    p->posy = 2;
-    p->posz = 2;
-    thingsOnServer.push_back(p);
-    */
-
-    message::Message game_state_update{
-        message::Type::GameStateUpdate,
-        {boost::uuids::random_generator()(), std::time(nullptr)},
-        message::GameStateUpdate{thingsOnServer}};
-    // ---
-
-    write_all(game_state_update);
+    // advance game, send update to client
+    game_.tick();
+    auto things = game_.to_network();
+    write_all<message::GameStateUpdate>(things);
 
     tick();
   });
@@ -162,34 +92,7 @@ void Server::do_accept() {
         write<message::Greeting>(new_pid, greeting);
       };
       auto user_state_update_handler =
-          [&](const message::UserStateUpdate& body) {
-            int rec_id = body.id;
-
-            // Temporary server receive example (reading from client) ---
-
-            if (server_gameState.objectStates.find(rec_id) ==
-                server_gameState.objectStates.end()) {
-              // id not found
-              GameThingState i;
-              i.id = rec_id;
-              i.posx = body.movx;
-              i.posy = body.movy;
-              i.posz = body.movz;
-              std::pair<Player*, ControlModifierData*> pair =
-                  initializePlayer();
-              i.control = pair.second;
-              i.player = pair.first;
-              server_gameState.objectStates[rec_id] = i;  // add to object map
-            } else {
-              // id found
-              server_gameState.objectStates[rec_id].move(body.movx, body.movy,
-                                                         body.movz);
-              server_gameState.objectStates[rec_id].heading = body.heading;
-              server_gameState.objectStates[rec_id].control->doJump = body.jump;
-            }
-
-            // ---
-          };
+          [&](const message::UserStateUpdate& body) { game_.update(body); };
       auto any_handler = [](const message::Message::Body&) {};
 
       auto message_handler = boost::make_overloaded_function(

@@ -77,7 +77,7 @@ struct GameStateUpdateItem {
 };
 
 struct GameStateUpdate {
-  std::vector<GameStateUpdateItem*> things;
+  std::vector<GameStateUpdateItem> things;
   // add global params later
   std::string to_string() const;
 
