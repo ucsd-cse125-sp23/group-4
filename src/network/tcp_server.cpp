@@ -128,6 +128,7 @@ void Server::do_accept() {
     connection->start();  // start reading from client
   };
 
+  std::cout << "(Server::do_accept) Accepting new connections" << std::endl;
   acceptor_.async_accept(accept_handler);
 }
 

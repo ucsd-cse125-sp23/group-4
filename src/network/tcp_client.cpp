@@ -11,6 +11,8 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
     : socket_(io_context) {
   tcp::resolver resolver(io_context);
   auto endpoints = resolver.resolve(addr.host, std::to_string(addr.port));
+  std::cout << "(Client::Client) Attempting to connect to " << addr
+            << std::endl;
   boost::asio::async_connect(
       socket_, endpoints,
       [=](boost::system::error_code ec, tcp::endpoint endpoint) {
@@ -19,8 +21,8 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
           return;
         }
 
-        std::cout << "(Client::connect) Connected to " << endpoint.address()
-                  << ":" << endpoint.port() << std::endl;
+        std::cout << "(Client::async_connect) Connected to "
+                  << endpoint.address() << ":" << endpoint.port() << std::endl;
 
         auto conn_read_handler = [=](boost::system::error_code ec,
                                      const message::Message& m) {

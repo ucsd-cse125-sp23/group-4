@@ -14,6 +14,9 @@ using boost::asio::ip::tcp;
 struct Addr {
   std::string host;
   int port;
+  friend std::ostream &operator<<(std::ostream &os, const Addr &a) {
+    return os << a.host << ":" << a.port;
+  }
 };
 
 class Client {
