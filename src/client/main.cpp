@@ -17,7 +17,6 @@
 #include <cstdio>
 #include <ctime>
 #include <iostream>
-#include <magic_enum.hpp>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 #include <string>
@@ -79,42 +78,29 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
   Addr server_addr{config["server_address"], config["server_port"]};
 
   PlayerID player_id;
-  auto connect_handler = [&](tcp::endpoint endpoint, Client& client) {
-    std::cout << "(Client::connect) Connected to " << endpoint.address() << ":"
-              << endpoint.port() << std::endl;
-  };
+  auto connect_handler = [](tcp::endpoint endpoint, Client& client) {};
+
   auto read_handler = [&](const message::Message& m, Client& client) {
-    std::cout << "(Connection::read) Received\n" << m << std::endl;
     auto assign_handler = [&](const message::Assign& body) {
-      player_id = m.metadata.player_id;
+      player_id = body.player_id;
       my_player_id = player_id;
       net_assigned = true;
       // Window::gameScene->initFromServer(myId); // need a unique int id
-      message::Message new_m{message::Type::Greeting,
-                             {player_id, std::time(nullptr)},
-                             message::Greeting{"Hello, server!"}};
-      client.write(new_m);
+      client.write<message::Greeting>("Hello, server!");
     };
-    auto greeting_handler = [&](const message::Greeting& body) {};
-    auto notify_handler = [&](const message::Notify& body) {};
     auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
       Window::gameScene->updateState(SceneState(body));
     };
-    auto user_state_update_handler = [&](const message::UserStateUpdate& body) {
-    };
+    auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
-        assign_handler, greeting_handler, notify_handler,
-        game_state_update_handler, user_state_update_handler);
+        assign_handler, game_state_update_handler, any_handler);
 
     boost::apply_visitor(message_handler, m.body);
   };
+
   auto write_handler = [&](std::size_t bytes_transferred,
-                           const message::Message& m, Client& client) {
-    std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
-              << ") Successfully wrote " << bytes_transferred
-              << " bytes to server" << std::endl;
-  };
+                           const message::Message& m, Client& client) {};
   auto client = std::make_unique<Client>(
       io_context, server_addr, connect_handler, read_handler, write_handler);
   return client;
