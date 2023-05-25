@@ -93,7 +93,7 @@ void Scene::updateState(message::GameStateUpdate newState) {
     }
 
     // if t isn't in our gamethings yet, add it now
-    if(!exists) createPlayer(t.second.id);
+    if (!exists) createPlayer(t.second.id);
   }
 
   // loop through GameThings and update their state
