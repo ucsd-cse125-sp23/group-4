@@ -39,9 +39,9 @@
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
+#include "client/graphics/Timer.h"
 #include "client/graphics/UserState.h"
 #include "client/graphics/shader.h"
-#include "client/graphics/Timer.h"
 
 class SceneResourceMap {
  public:
@@ -120,7 +120,7 @@ class Scene {
     camera->name = "_camera";
     camera->Fixed = false;
     gamethings.push_back(camera);
-    time.time = 300.0f; 
+    time.time = 300.0f;
     time.countdown = true;
 
     sceneResources = new SceneResourceMap();

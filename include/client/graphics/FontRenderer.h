@@ -17,6 +17,7 @@
 #include <map>
 #include <stack>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "client/graphics/shader.h"
@@ -40,7 +41,7 @@ class FontRenderer {
   GLuint shader;
   unsigned int VAO, VBO;
 
-  FontRenderer(const char* filename) {
+  explicit FontRenderer(const char* filename) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -121,12 +122,11 @@ class FontRenderer {
   }
   void RenderText(int width, int height, std::string text, float x, float y,
                   float scale, glm::vec3 color) {
-
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(width), 0.0f,
                                       static_cast<float>(height));
     glUseProgram(shader);
     glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE,
-                       (float*)&projection);
+                       reinterpret_cast<float*>(&projection));
 
     // activate corresponding render state
     glUseProgram(shader);

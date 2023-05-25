@@ -1,8 +1,11 @@
 #pragma once
 
-#include "FontRenderer.h"
-#include "Player.h"
-#include "Scene.h"
+#include <map>
+#include <string>
+
+#include "client/graphics/FontRenderer.h"
+#include "client/graphics/Player.h"
+#include "client/graphics/Scene.h"
 
 class HUD {
  public:
@@ -19,7 +22,8 @@ class HUD {
 
   void draw(GLFWwindow* window);
 
-  void drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string, Timer> player_times);
+  void drawLeaderboard(GLFWwindow* window, float scale,
+                       std::map<std::string, Timer> player_times);
 
   void drawMinimap();
 

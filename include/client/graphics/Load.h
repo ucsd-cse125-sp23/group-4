@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "client/graphics/Scene.h"
 #include "client/graphics/Texture.h"
 
@@ -14,25 +17,23 @@ class Load : public Scene {
   PlayerModel* selectedModel;
 
   Load(Camera* camFromWindow) : Scene(camFromWindow) {
-	index = 0;
+    index = 0;
     timeOnFrame = 0;
     time.time = 10;
     time.countdown = true;
     forward = true;
     gameStart = false;
 
-	for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 24; i++) {
       Texture frame;
-      std::string filename =
-        "assets/image/tagguys/frame_" + std::to_string(i) + "_delay-0.08s.png";
+      std::string filename = "assets/image/tagguys/frame_" + std::to_string(i) +
+                             "_delay-0.08s.png";
       frame.init(filename.c_str());
       frames.push_back(frame);
-	}
+    }
   }
 
-  void init(PlayerModel* player) { 
-    selectedModel = player;
-  }
+  void init(PlayerModel* player) { selectedModel = player; }
 
   void update(float delta) {
     time.Update(delta);
@@ -81,7 +82,6 @@ class Load : public Scene {
     curFrame.bindgl();
     glEnable(GL_TEXTURE_2D);
 
-
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_QUADS);
 
@@ -99,6 +99,5 @@ class Load : public Scene {
     glDisable(GL_TEXTURE_2D);
 
     glDisable(GL_BLEND);
-
   }
 };

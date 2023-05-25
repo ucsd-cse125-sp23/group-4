@@ -1,8 +1,12 @@
 #pragma once
-#include "client/graphics/Scene.h"
-#include "client/graphics/InputListener.h"
-#include "client/graphics/Input.h"
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "client/graphics/FontRenderer.h"
+#include "client/graphics/Input.h"
+#include "client/graphics/InputListener.h"
+#include "client/graphics/Scene.h"
 
 class Lobby : public Scene, public InputListener {
  public:
@@ -18,8 +22,7 @@ class Lobby : public Scene, public InputListener {
   PlayerModel* selectedModel;
   int index;
 
-
-  Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
+  explicit Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
     gamethings.clear();
     ready = false;
     index = 0;
