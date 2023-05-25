@@ -1,5 +1,3 @@
-#include <boost/variant.hpp>
-#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <network/message.hpp>

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <cstddef>
-#include <functional>
 #include <memory>
 #include <network/connection.hpp>
 #include <network/message.hpp>
