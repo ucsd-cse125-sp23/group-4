@@ -2,19 +2,10 @@
 
 void Lobby::init(void) {
   // Create a mesh palette
-  sceneResources->meshes["wasp"] =
-      new SkinnedMesh();  // can only be tied to one object? (not a static
+  sceneResources->meshes["player"] =
+      new Obj();  // can only be tied to one object? (not a static
                           // resource)
-  sceneResources->meshes["wasp"]->init("assets/models/wasp.skin");
-
-  sceneResources->skeletons["wasp"] = new Skeleton();
-  sceneResources->skeletons["wasp"]->Load("assets/models/wasp.skel");
-
-  AnimationClip* animClip = new AnimationClip();
-  animClip->Load("assets/models/wasp_walk.anim");
-  sceneResources->animations["wasp"]["walk"] = new AnimationPlayer();
-  sceneResources->animations["wasp"]["walk"]->SetClip(animClip);
-  sceneResources->animations["wasp"]["walk"]->speed = 4.0f;  // walk faster
+  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
 
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =
@@ -81,86 +72,66 @@ void Lobby::init(void) {
   sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
   // Create a model palette
-  PlayerModel* waspModel = new PlayerModel;
-  waspModel->skel = sceneResources->skeletons["wasp"];
-  waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel->anims = sceneResources->animations["wasp"];
+  sceneResources->models["player"] = new Model;
+  sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
+  sceneResources->models["player"]->material = sceneResources->materials["toon.blue"];
+  player_models.push_back(sceneResources->models["player"]);
 
-  sceneResources->models["wasp"] = waspModel;
-  sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
-  player_models.push_back(waspModel);
+  sceneResources->models["player2"] = new Model;
+  sceneResources->models["player2"]->mesh = sceneResources->meshes["player"];
+  sceneResources->models["player2"]->material =
+      sceneResources->materials["marble"]; 
+  player_models.push_back(sceneResources->models["player2"]);
 
-  PlayerModel* waspModel2 = new PlayerModel;
-  waspModel2->skel = sceneResources->skeletons["wasp"];
-  waspModel2->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel2->anims = sceneResources->animations["wasp"];
-
-  sceneResources->models["wasp2"] = waspModel2;
-  sceneResources->models["wasp2"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp2"]->material =
-      sceneResources->materials["marble"];
-  player_models.push_back(waspModel2);
-
-  PlayerModel* waspModel3 = new PlayerModel;
-  waspModel3->skel = sceneResources->skeletons["wasp"];
-  waspModel3->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel3->anims = sceneResources->animations["wasp"];
-
-  sceneResources->models["wasp3"] = waspModel3;
-  sceneResources->models["wasp3"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp3"]->material =
+  sceneResources->models["player3"] = new Model;
+  sceneResources->models["player3"]->mesh = sceneResources->meshes["player"];
+  sceneResources->models["player3"]->material =
       sceneResources->materials["ceramic"];
-  player_models.push_back(waspModel3);
+  player_models.push_back(sceneResources->models["player3"]);
 
-  PlayerModel* waspModel4 = new PlayerModel;
-  waspModel4->skel = sceneResources->skeletons["wasp"];
-  waspModel4->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel4->anims = sceneResources->animations["wasp"];
-
-  sceneResources->models["wasp4"] = waspModel4;
-  sceneResources->models["wasp4"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp4"]->material =
+  sceneResources->models["player4"] = new Model;
+  sceneResources->models["player4"]->mesh = sceneResources->meshes["player"];
+  sceneResources->models["player4"]->material =
       sceneResources->materials["silver"];
-  player_models.push_back(waspModel4);
+  player_models.push_back(sceneResources->models["player4"]);
 
   ///////////////////////////////////////////////////////
   printf("\nScene: done loading resources!\n");
   ///////////////////////////////////////////////////////
 
-  GameThing* thing_wasp = new GameThing;
-  thing_wasp->name = "wasp1";
-  gamethings.push_back(thing_wasp);
+  GameThing* thing_player = new GameThing;
+  thing_player->name = "player1";
+  gamethings.push_back(thing_player);
 
-  GameThing* thing_wasp2 = new GameThing;
-  thing_wasp2->name = "wasp2";
-  gamethings.push_back(thing_wasp2);
+  GameThing* thing_player2 = new GameThing;
+  thing_player2->name = "player2";
+  gamethings.push_back(thing_player2);
 
-  GameThing* thing_wasp3 = new GameThing;
-  thing_wasp3->name = "wasp3";
-  gamethings.push_back(thing_wasp3);
+  GameThing* thing_player3 = new GameThing;
+  thing_player3->name = "player3";
+  gamethings.push_back(thing_player3);
 
-  GameThing* thing_wasp4 = new GameThing;
-  thing_wasp4->name = "wasp4";
-  gamethings.push_back(thing_wasp4);
+  GameThing* thing_player4 = new GameThing;
+  thing_player4->name = "player4";
+  gamethings.push_back(thing_player4);
 
   // Build the scene graph
-  node["wasp1"] = thing_wasp;
-  node["wasp2"] = thing_wasp2;
-  node["wasp3"] = thing_wasp3;
-  node["wasp4"] = thing_wasp4;
+  node["player1"] = thing_player;
+  node["player2"] = thing_player2;
+  node["player3"] = thing_player3;
+  node["player4"] = thing_player4;
 
-  thing_wasp->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
-  thing_wasp->model = sceneResources->models["wasp"];
+  thing_player->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player->model = sceneResources->models["player"];
 
-  thing_wasp2->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
-  thing_wasp2->model = sceneResources->models["wasp2"];
+  thing_player2->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player2->model = sceneResources->models["player2"];
 
-  thing_wasp3->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
-  thing_wasp3->model = sceneResources->models["wasp3"];
+  thing_player3->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player3->model = sceneResources->models["player3"];
 
-  thing_wasp4->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
-  thing_wasp4->model = sceneResources->models["wasp4"];
+  thing_player4->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player4->model = sceneResources->models["player4"];
 
   buildSceneTree();
 }

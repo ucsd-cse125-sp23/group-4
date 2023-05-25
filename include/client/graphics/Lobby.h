@@ -18,8 +18,8 @@ class Lobby : public Scene, public InputListener {
   bool ready;
   bool gameStart;
   float offset;
-  std::vector<PlayerModel*> player_models;
-  PlayerModel* selectedModel;
+  std::vector<Model*> player_models;
+  Model* selectedModel;
   int index;
 
   explicit Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
