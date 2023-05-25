@@ -27,6 +27,7 @@ void PObject::tick() {
     pos.x += vel.x;
     pos.z += vel.z;
   }
+  if (vel.y < -0.01) onGround = false;
   freeze = false;
   this->bounds->setPos(pos);
 }
