@@ -16,7 +16,7 @@ class Load : public Scene {
   bool forward;
   PlayerModel* selectedModel;
 
-  Load(Camera* camFromWindow) : Scene(camFromWindow) {
+  explicit Load(Camera* camFromWindow) : Scene(camFromWindow) {
     index = 0;
     timeOnFrame = 0;
     time.time = 10;

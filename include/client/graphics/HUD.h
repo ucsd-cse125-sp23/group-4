@@ -14,7 +14,7 @@ class HUD {
   Texture map;
   float offset;
 
-  HUD(Scene* scn) {
+  explicit HUD(Scene* scn) {
     scene = scn;
     map.init("assets/image/tagguys/frame_0_delay-0.08s.png");
     offset = 10;

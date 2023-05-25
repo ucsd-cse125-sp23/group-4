@@ -13,7 +13,7 @@ class Start : public Scene, public InputListener {
   bool gameStart;
   bool renderText;
 
-  Start(Camera* camFromWindow) : Scene(camFromWindow) {
+  explicit Start(Camera* camFromWindow) : Scene(camFromWindow) {
     gamethings.clear();
     timeElapsed = 0.0f;
     offset = 0.0f;

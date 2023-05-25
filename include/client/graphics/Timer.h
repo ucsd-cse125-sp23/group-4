@@ -11,9 +11,9 @@ class Timer {
   }
 
   void Update(float deltaTime) {
-    if (!countdown)
+    if (!countdown) {
       time += deltaTime;
-    else {
+    } else {
       time -= deltaTime;
       if (time < 0) {
         time = 0.0f;
@@ -23,7 +23,7 @@ class Timer {
 
   std::string ToString() {
     int minutes = floor(time / 60);
-    int seconds = (time >= 1) ? ((int)time % 60) : 0;
+    int seconds = (time >= 1) ? (static_cast<int>(time) % 60) : 0;
     return std::to_string(minutes) + "m" + std::to_string(seconds) + "s";
   }
 };
