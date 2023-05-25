@@ -3,8 +3,6 @@
 #include "core/game/modifier/Modifier.h"
 #include "core/game/physics/PObject.h"
 #include "core/math/vector.h"
-#include "core/game/physics/PObject.h"
-#include "core/game/modifier/Modifier.h"
 
 struct ControlModifierData : ModifierData {
   vec3f horizontalVel;

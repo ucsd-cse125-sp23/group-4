@@ -4,7 +4,6 @@
 
 #include "core/game/modifier/Modifier.h"
 
-
 struct TimedModifierData : public ModifierData {
   uint64_t expire = -1;
   explicit TimedModifierData(uint64_t expire) : expire(expire) {}

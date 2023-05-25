@@ -8,7 +8,7 @@ void HUD::draw(GLFWwindow* window) {
 
   std::map<std::string, Timer> player_times;
 
-  float scale = float(width) / float(800);
+  float scale = static_cast<float>(width) / float(800);
 
   for (GameThing* e : scene->gamethings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
@@ -32,13 +32,15 @@ void HUD::draw(GLFWwindow* window) {
       float size;
       if (deltaD < 0) {
         size = (0.5 * scale) / (0.5 * abs(deltaD));
-        if (size < 0.1 * scale) size = 0.1 * scale;
-        else if (size > 0.5 * scale) size = 0.5 * scale;
+        if (size < 0.1 * scale)
+          size = 0.1 * scale;
+        else if (size > 0.5 * scale)
+          size = 0.5 * scale;
       } else {
         size = 0.5 * scale;
       }
       fr->RenderText(width, height, name, windowSpace[0], windowSpace[1], size,
-                    glm::vec3(0.0f, 0.0f, 1.0f));
+                     glm::vec3(0.0f, 0.0f, 1.0f));
     }
   }
 
@@ -64,8 +66,8 @@ void HUD::draw(GLFWwindow* window) {
   glEnd();
 
   fr->RenderText(width, height, game_time, width - (w + (15 * scale)),
-                height - (48 * 0.75 * scale), 0.75f * scale,
-                glm::vec3(1.0f, 0.0f, 0.0f));
+                 height - (48 * 0.75 * scale), 0.75f * scale,
+                 glm::vec3(1.0f, 0.0f, 0.0f));
 
   // minimap stuff
   int map_size = (width / 5 > 250) ? 250 : width / 4;
@@ -95,7 +97,8 @@ void HUD::draw(GLFWwindow* window) {
   glDisable(GL_BLEND);
 }
 
-void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string, Timer> player_times) {
+void HUD::drawLeaderboard(GLFWwindow* window, float scale,
+                          std::map<std::string, Timer> player_times) {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
@@ -106,7 +109,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string,
     time = times.second;
     str += " " + time.ToString();
   }
-  
+
   int size = (width / 10 > 250) ? 250 : width / 10;
   int x = size * 3 - (25 * scale);
   int y = height - size - 10;
@@ -114,7 +117,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string,
     glViewport(x, y, size, size);
 
     Camera viewport;
-   
+
     glBegin(GL_TRIANGLES);
     glColor4f(0.0, 0.0, 0.0, 0.5);
     glVertex2f(-1, -1);
@@ -129,13 +132,12 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string,
         glm::translate(glm::mat4(1), glm::vec3(0.0f, -3.5f, 0.0f));
     transform *= glm::rotate(glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     scene->sceneResources->models["player"]->draw(
-        viewport.GetViewProjectMtx(), viewport.GetViewMtx(),
-        transform, true);
+        viewport.GetViewProjectMtx(), viewport.GetViewMtx(), transform, true);
     glViewport(0, 0, width, height);
 
     // Draw highlight
     glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-    
+
     // screen coordinates
     float x_left = x;
     float x_right = x + size;
@@ -159,10 +161,9 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale, std::map<std::string,
     glEnd();
 
     fr->RenderText(width, height, str, x + (4 * scale), y - 20, 0.2 * scale,
-                  glm::vec3(1.0, 1.0, 1.0));
+                   glm::vec3(1.0, 1.0, 1.0));
 
     x += (size + (25 * scale));
-
   }
 }
 
@@ -195,14 +196,13 @@ void HUD::gameOver() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = float(width) / float(800);
+  float scale = static_cast<float>(width) / float(800);
   if (scene->time.time <= 0.1) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     float w = fr->TextWidth("Time's Up!", offset * scale);
-    fr->RenderText(width, height, "Time's Up!", (width / 2) - (w / 2), height / 2,
-                   offset * scale,
-                   glm::vec3(1, 0, 0));
+    fr->RenderText(width, height, "Time's Up!", (width / 2) - (w / 2),
+                   height / 2, offset * scale, glm::vec3(1, 0, 0));
     offset--;
     if (offset < 1) offset = 1;
     glDisable(GL_CULL_FACE);

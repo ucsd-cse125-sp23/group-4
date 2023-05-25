@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <map>
 #include <vector>
-#include <algorithm>
 
 #include "core/game/modifier/ModifierInstance.h"
 

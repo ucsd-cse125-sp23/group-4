@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <vector>
 
-#include "core/math/vector.h"
 #include "core/game/modifier/Modifiable.h"
 #include "core/game/modifier/ModifierInstance.h"
 #include "core/game/physics/CollisionBounds.h"

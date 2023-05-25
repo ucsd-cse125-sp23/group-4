@@ -6,8 +6,6 @@
 
 #include "core/math/shape/ConvexShape.h"
 
-#include <vector>
-
 class ConvexMeshShape : public ConvexShape {
  private:
   size_t size;

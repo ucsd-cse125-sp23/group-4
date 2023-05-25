@@ -5,8 +5,6 @@
 #include "core/game/modifier/TimedModifier.h"
 #include "core/game/physics/PObject.h"
 #include "core/math/vector.h"
-#include "core/game/physics/PObject.h"
-#include "core/game/modifier/TimedModifier.h"
 
 struct SpeedBoostModifierData : TimedModifierData {
   float factorIncrease;

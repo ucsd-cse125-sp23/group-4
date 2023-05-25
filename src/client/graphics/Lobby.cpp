@@ -48,7 +48,7 @@ void Lobby::drawBackground() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = float(width) / float(800);
+  float scale = static_cast<float>(width) / float(800);
 
   glColor3f(213.0f / 256.0f, 236.0f / 256.0f, 241.0f / 256.0f);
   glBegin(GL_QUADS);
@@ -66,7 +66,7 @@ void Lobby::drawBackground() {
 
   glColor3f(1.0f, 1.0f, 1.0f);
   glBegin(GL_QUADS);
- 
+
   glTexCoord2f(0.0f, 1.0f);
   glVertex2f(-1, -1);
 
@@ -83,7 +83,7 @@ void Lobby::drawBackground() {
 
   float flag_size = (width / 2.5) > 800 ? 800 : width / 2.5f;
   glViewport(0, height - (200 * scale), flag_size, 75 * scale);
-  flag.bindgl(); 
+  flag.bindgl();
 
   glColor3f(1.0f, 1.0f, 1.0f);
   glBegin(GL_QUADS);
@@ -108,8 +108,8 @@ void Lobby::drawBackground() {
   glEnable(GL_BLEND);
 
   fr->RenderText(flag_size, 75 * scale, "Use arrow keys to make selection", 10,
-                 75 * scale - (48 * 0.35 * scale) - 25,
-                 0.35 * scale, glm::vec3(50.0 / 256.0, 65.0 / 256.0, 68.0 / 256.0));
+                 75 * scale - (48 * 0.35 * scale) - 25, 0.35 * scale,
+                 glm::vec3(50.0 / 256.0, 65.0 / 256.0, 68.0 / 256.0));
   fr->RenderText(flag_size, 75 * scale, "Press enter to lock in", 10,
                  75 * scale - (2 * 48 * 0.35 * scale) - 25, 0.35 * scale,
                  glm::vec3(50.0 / 256.0, 65.0 / 256.0, 68.0 / 256.0));
@@ -138,12 +138,12 @@ void Lobby::drawPlayers() {
 
   int size = (width / 8 > 200) ? 200 : width / 8;
   float midpoint = width / 2.0f;
-  int x = midpoint - (4 * (size - (30 * scale))) + 10; // TODO: fix spacing
+  int x = midpoint - (4 * (size - (30 * scale))) + 10;  // TODO: fix spacing
   int y = 30;
   for (int i = 0; i < 4; i++) {
     glViewport(x, y, size, size);
 
-    glColor3f(255.0  / 256.0, 243.0 / 256.0, 201 / 256.0);
+    glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
     glBegin(GL_TRIANGLES);
     glVertex2f(0, 1);
     glVertex2f(1, 0);
@@ -183,9 +183,9 @@ void Lobby::lockIn() {
     GLFWwindow* window = glfwGetCurrentContext();
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    float scale = float(width) / float(800);
+    float scale = static_cast<float>(width) / float(800);
     glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
-    
+
     float x = -1 + offset;
     if (x > 1) x = 1;
     glBegin(GL_QUADS);
@@ -200,7 +200,7 @@ void Lobby::lockIn() {
     glColor3f(1, 1, 1);
     glLineWidth(5);
     glBegin(GL_LINES);
-    
+
     glVertex2f(-1, 0.1);
     glVertex2f(x, 0.1);
 

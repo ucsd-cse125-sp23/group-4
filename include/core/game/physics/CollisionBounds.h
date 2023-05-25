@@ -2,7 +2,6 @@
 
 #include "core/math/shape/BoundingShape.h"
 
-
 class CollisionBounds {
  private:
   vec3f pos, scale;

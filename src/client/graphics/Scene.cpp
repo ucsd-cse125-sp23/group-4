@@ -66,7 +66,6 @@ void Scene::updateState(SceneState newState) {
     // please check for non-null too!
     e->updateFromState(currState);
   }
-
 }
 
 void Scene::draw() {

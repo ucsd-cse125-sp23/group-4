@@ -65,7 +65,7 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  //gameScene = new Start(Cam);
+  // gameScene = new Start(Cam);
   gameScene = new Scene(Cam);
   gameScene->init();
   hud = new HUD(gameScene);
