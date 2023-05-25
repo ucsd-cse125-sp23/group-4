@@ -1,12 +1,9 @@
-#include <boost/asio.hpp>
 #include <boost/functional/overloaded_function.hpp>
 #include <config/lib.hpp>
 #include <network/tcp_server.hpp>
 #include <server/game.hpp>
 
 int main(int argc, char* argv[]) {
-  auto config = get_config();
-
   auto game = Game();
 
   auto accept_handler = [&game](ClientID client_id, Server& server) {
@@ -51,10 +48,9 @@ int main(int argc, char* argv[]) {
     server.write_all<message::GameStateUpdate>(things);
   };
 
-  boost::asio::io_context io_context;
-  Server server(io_context, config["server_port"], accept_handler, read_handler,
+  auto config = get_config();
+  Server server(config["server_port"], accept_handler, read_handler,
                 write_handler, tick_handler);
-  io_context.run();
 
   return 0;
 }

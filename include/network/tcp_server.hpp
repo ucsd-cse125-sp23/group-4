@@ -20,8 +20,7 @@ class Server {
       std::function<void(std::size_t, const message::Message&, Server&)>;
   using TickHandler = std::function<void(Server&)>;
 
-  Server(boost::asio::io_context& io_context, int port, AcceptHandler,
-         ReadHandler, WriteHandler, TickHandler);
+  Server(int port, AcceptHandler, ReadHandler, WriteHandler, TickHandler);
 
   void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);
@@ -38,6 +37,7 @@ class Server {
 
   friend std::ostream& operator<<(std::ostream&, Server*);
 
+  boost::asio::io_context io_context_;
   AcceptHandler accept_handler_;
   ReadHandler read_handler_;
   WriteHandler write_handler_;

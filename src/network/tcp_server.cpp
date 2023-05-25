@@ -1,3 +1,4 @@
+#include <boost/asio.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <chrono>
@@ -8,11 +9,11 @@
 #include <numeric>
 #include <string>
 
-Server::Server(boost::asio::io_context& io_context, int port,
-               AcceptHandler accept_handler, ReadHandler read_handler,
+Server::Server(int port, AcceptHandler accept_handler, ReadHandler read_handler,
                WriteHandler write_handler, TickHandler tick_handler)
-    : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
-      timer_(boost::asio::steady_timer(io_context)),
+    : io_context_(boost::asio::io_context()),
+      acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)),
+      timer_(boost::asio::steady_timer(io_context_)),
       accept_handler_(accept_handler),
       read_handler_(read_handler),
       write_handler_(write_handler),
@@ -20,6 +21,7 @@ Server::Server(boost::asio::io_context& io_context, int port,
   std::cout << "(Server::Server) Server running on port " << port << std::endl;
   do_accept();
   tick();
+  io_context_.run();
 }
 
 void Server::tick() {
