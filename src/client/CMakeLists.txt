@@ -41,11 +41,6 @@ FetchContent_Declare(
   GIT_TAG v5.2.5
   GIT_PROGRESS TRUE)
 FetchContent_Declare(
-  freeglut
-  GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
-  GIT_TAG v3.4.0
-  GIT_PROGRESS TRUE)
-FetchContent_Declare(
   SFML
   GIT_REPOSITORY https://github.com/SFML/SFML
   GIT_TAG 2.5.1
@@ -95,7 +90,6 @@ target_link_libraries(
           imgui-glfw
           imgui-opengl3
           assimp
-          freeglut_static
           freetype
           sfml-audio)
 
