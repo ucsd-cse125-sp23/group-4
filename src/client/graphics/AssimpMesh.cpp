@@ -8,41 +8,39 @@
 
 glm::mat4 AssimpJoint::update() { return matWorldTransform * matBindingInv; }
 
-AssimpMesh::AssimpMesh() 
-        : node(nullptr), isLoaded(false), isLoaded2(false), material(nullptr) {
-    for(int i = 0; i < MAX_BONES; i++) {
-        matBindingInvs[i] = glm::mat4(1.0f);
-    }
+AssimpMesh::AssimpMesh()
+    : node(nullptr), isLoaded(false), isLoaded2(false), material(nullptr) {
+  for (int i = 0; i < MAX_BONES; i++) {
+    matBindingInvs[i] = glm::mat4(1.0f);
+  }
 }
 
 void AssimpMesh::update() {
-    for(int i = 0; i < joints.size(); i++) {
-        matBindingInvs[i] = joints[i]->update();
+  for (int i = 0; i < joints.size(); i++) {
+    matBindingInvs[i] = joints[i]->update();
+  }
+
+  for (int i = 0; i < vertices.size(); i++) {
+    Vertex& v = vertices[i];
+    glm::vec4 animPos = glm::vec4(0.0);
+    glm::vec4 animNorm = glm::vec4(0.0);
+    glm::vec4 vPos4 = glm::vec4(v.position.x, v.position.y, v.position.z, 1.0);
+    glm::vec4 vNorm4 = glm::vec4(v.normal.x, v.normal.y, v.normal.z, 0.0);
+
+    for (int b = 0; b < 4; b++) {
+      glm::vec4 bPos4 =
+          matBindingInvs[v.boneInds[b]] * vPos4 * v.boneWeights[b];
+      glm::vec4 bNorm4 =
+          matBindingInvs[v.boneInds[b]] * vNorm4 * v.boneWeights[b];
+      animPos = animPos + bPos4;
+      animNorm = animNorm + bNorm4;
     }
+    animPos = animPos / animPos[3];
+    animNorm = glm::normalize(animNorm);
 
-    for(int i = 0; i < vertices.size(); i++) {
-        Vertex& v = vertices[i];
-        glm::vec4 animPos  = glm::vec4(0.0);
-        glm::vec4 animNorm = glm::vec4(0.0);
-        glm::vec4 vPos4 =
-            glm::vec4(v.position.x, v.position.y, v.position.z, 1.0);
-        glm::vec4 vNorm4 = glm::vec4(v.normal.x, v.normal.y, v.normal.z, 0.0);
-
-        for(int b = 0; b < 4; b++) {
-          glm::vec4 bPos4 =
-              matBindingInvs[v.boneInds[b]] * vPos4 * v.boneWeights[b];
-          glm::vec4 bNorm4 =
-              matBindingInvs[v.boneInds[b]] * vNorm4 * v.boneWeights[b];
-          animPos = animPos + bPos4;
-          animNorm = animNorm + bNorm4;
-        }
-        animPos = animPos / animPos[3];
-        animNorm = glm::normalize(animNorm);
-
-        worldVerticies[i].position = glm::vec3(animPos.x, animPos.y, animPos.z);
-        worldVerticies[i].normal =
-            glm::vec3(animNorm.x, animNorm.y, animNorm.z);
-    }
+    worldVerticies[i].position = glm::vec3(animPos.x, animPos.y, animPos.z);
+    worldVerticies[i].normal = glm::vec3(animNorm.x, animNorm.y, animNorm.z);
+  }
 }
 
 void AssimpMesh::draw(const glm::mat4& viewProjMtx, GLuint shader) {
@@ -165,47 +163,42 @@ void AssimpMesh::imGui() {
   }
 }
 
-void AssimpMesh::draw() { 
-    /*if (!isLoaded2) {
-        gl_load2();
-    }*/
-
-    //gl_update2();
-    gl_load2();
-    glBindVertexArray(VAO2);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+void AssimpMesh::draw() {
+  gl_load2();
+  glBindVertexArray(VAO2);
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
 }
 
 void AssimpMesh::gl_load2() {
-    if (!isLoaded2) {
-        glGenVertexArrays(1, &VAO2);
-        glGenBuffers(1, &VBO2);
-        glGenBuffers(1, &EBO2);
-        isLoaded2 = true;
-    }
+  if (!isLoaded2) {
+    glGenVertexArrays(1, &VAO2);
+    glGenBuffers(1, &VBO2);
+    glGenBuffers(1, &EBO2);
+    isLoaded2 = true;
+  }
 
-    glBindVertexArray(VAO2);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+  glBindVertexArray(VAO2);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO2);
 
-    glBufferData(GL_ARRAY_BUFFER, worldVerticies.size() * sizeof(Vertex),
-                 &worldVerticies[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, worldVerticies.size() * sizeof(Vertex),
+               &worldVerticies[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
-                 &indices[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+               &indices[0], GL_STATIC_DRAW);
 
-    // vertex positions
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    // vertex normals
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void*)offsetof(Vertex, normal));
-    // uvs
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void*)offsetof(Vertex, uv));
+  // vertex positions
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+  // vertex normals
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (void*)offsetof(Vertex, normal));
+  // uvs
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (void*)offsetof(Vertex, uv));
 
-    glBindVertexArray(0);
+  glBindVertexArray(0);
 }

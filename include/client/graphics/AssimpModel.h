@@ -12,17 +12,17 @@
 #include "client/graphics/PlayerModel.h"
 
 /** The AssimpModel class for loading and displaying an animated model file.
-  * 
-  * IMPORTANT:
-  * Due to defect in curent implementation, 
-  * every bone/joint must have a channel with at least two values;
-  * Fixed timestamp keyframing is preferred.
-  */
+ *
+ * IMPORTANT:
+ * Due to defect in curent implementation,
+ * every bone/joint must have a channel with at least two values;
+ * Fixed timestamp keyframing is preferred.
+ */
 class AssimpModel : public PlayerModel, public SkinnedMesh {
-public:
-    AssimpModel();
-    // TODO
-    // ~AssimpModel();
+ public:
+  AssimpModel();
+  // TODO
+  // ~AssimpModel();
 
   /** Load a model file (displaying default pose).
    * Returns whether the model file is loaded properly.
@@ -31,7 +31,6 @@ public:
   bool loadAssimp(const char* path);
 
   void loadShader(GLuint shader);
-  void loadTexture(Texture* texture);
 
   /** Set model to use default pose */
   void useMesh();
@@ -40,38 +39,40 @@ public:
    */
   bool useAnimation(int animationInd);
 
-    void draw(const glm::mat4& viewProjMtx, GLuint shader);
-    void imGui();
+  void draw(const glm::mat4& viewProjMtx, GLuint shader);
+  void imGui();
 
-    // PlayerModel
-    void setAnimation(std::string name);
-    void update(float deltaTimeInMs);
-    void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-              const glm::mat4& transformMtx);
-    // SkinnedMesh
-    void init(const char* filename) {
-      if (!loadAssimp(filename)) { exit(EXIT_FAILURE); }
+  // PlayerModel
+  void setAnimation(std::string name);
+  void update(float deltaTimeInMs);
+  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+            const glm::mat4& transformMtx);
+  // SkinnedMesh
+  void init(const char* filename) {
+    if (!loadAssimp(filename)) {
+      exit(EXIT_FAILURE);
     }
-    // Model
-    void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-              const glm::mat4& transformMtx, const bool ignoreDepth = false);
+  }
+  // Model
+  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+            const glm::mat4& transformMtx, const bool ignoreDepth = false);
 
-    void draw();
+  void draw();
 
-private:
-    std::string name;
-    AssimpNode* rootNode;
-    unsigned int numNode;
-    std::map<std::string, AssimpNode*> nodeMap;
-    std::map<std::string, AssimpJoint*> jointMap;
-    std::vector<bool> meshVisibilities;
-    std::vector<AssimpMesh*> meshes;
-    bool isAnimated, isPaused, useShader;
-    int currentAnimation;
-    std::vector<AssimpAnimation> animations;
-    glm::mat4 betterView = glm::mat4(1.0);
-    char** animModes;
-    bool drawNode = false;
+ private:
+  std::string name;
+  AssimpNode* rootNode;
+  unsigned int numNode;
+  std::map<std::string, AssimpNode*> nodeMap;
+  std::map<std::string, AssimpJoint*> jointMap;
+  std::vector<bool> meshVisibilities;
+  std::vector<AssimpMesh*> meshes;
+  bool isAnimated, isPaused, useShader;
+  int currentAnimation;
+  std::vector<AssimpAnimation> animations;
+  glm::mat4 betterView = glm::mat4(1.0);
+  char** animModes;
+  bool drawNode = false;
 
   struct ControlInfo {
     bool useControl = false;

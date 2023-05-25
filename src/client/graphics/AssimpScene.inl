@@ -155,10 +155,7 @@ void Scene::init(void) {
   sceneResources->models["assimp"] = assimpModel;
   sceneResources->models["assimp"]->mesh = sceneResources->meshes["assimp"];
   sceneResources->models["assimp"]->material = sceneResources->materials["toon.blue"];
-  am->loadShader(sceneResources->shaderPrograms["toon"]);
-
-  // TODO: DEBUG NEED TO REMOVE
-  am->loadTexture(sceneResources->textures["grid"]);
+  am->loadShader(sceneResources->shaderPrograms["basic"]);
 
   ///// maps:
 

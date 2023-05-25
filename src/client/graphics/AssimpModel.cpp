@@ -38,32 +38,24 @@ bool AssimpModel::loadAssimp(const char* path) {
   name = std::string(path);
   name = name.substr(name.find_last_of('/') + 1);
 
-    nodeMap.clear();
-    rootNode = new AssimpNode(numNode++);
-    loadAssimpHelperNode(rootNode, glm::mat4(1.0f), scene->mRootNode, scene);
-    loadAssimpHelperAnim(scene);
-    loadAssimpHelperImgui();
-    useMesh();
-    betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)), glm::vec3(0, -120, 0));
-    return true;
+  nodeMap.clear();
+  rootNode = new AssimpNode(numNode++);
+  loadAssimpHelperNode(rootNode, glm::mat4(1.0f), scene->mRootNode, scene);
+  loadAssimpHelperAnim(scene);
+  loadAssimpHelperImgui();
+  useMesh();
+  betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)),
+                              glm::vec3(0, -120, 0));
+  return true;
 }
 
 void AssimpModel::loadShader(GLuint shader) {
-    useShader = true;
-    for (int i = 0; i < meshes.size(); i++) {
-        if (meshes[i]->material) {
-            meshes[i]->material->shader = shader;
-        }
+  useShader = true;
+  for (int i = 0; i < meshes.size(); i++) {
+    if (meshes[i]->material) {
+      meshes[i]->material->shader = shader;
     }
-}
-
-// TODO: DEBUG NEED TO REMOVE
-void AssimpModel::loadTexture(Texture* texture) {
-    for (int i = 0; i < meshes.size(); i++) {
-        if (meshes[i]->material && meshes[i]->material->texture) {
-            meshes[i]->material->texture = texture;
-        }
-    }
+  }
 }
 
 void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
@@ -105,29 +97,27 @@ void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
 
 void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
                                        const aiScene* scene) {
-    if (!aiMesh->HasTextureCoords(0) || aiMesh->mNumUVComponents[0] != 2) {
-        printf("Assimp: Ignoring %s UV - length is not 2: %u.\n",
+  if (!aiMesh->HasTextureCoords(0) || aiMesh->mNumUVComponents[0] != 2) {
+    printf("Assimp: Ignoring %s UV - length is not 2: %u.\n",
            aiMesh->mName.C_Str(), aiMesh->mNumUVComponents[0]);
-    }
+  }
 
-    // Is it possible to use vector.resize() & index?
-    mesh->name = aiMesh->mName.C_Str();
+  // Is it possible to use vector.resize() & index?
+  mesh->name = aiMesh->mName.C_Str();
 
-    for(unsigned int i = 0; i < aiMesh->mNumVertices; i++) {
-        Vertex vertex;
-        vertex.position = glm::vec3(aiMesh->mVertices[i].x,
-                                    aiMesh->mVertices[i].y,
-                                    aiMesh->mVertices[i].z);
-        vertex.normal = glm::vec3(aiMesh->mNormals[i].x,
-                                  aiMesh->mNormals[i].y,
-                                  aiMesh->mNormals[i].z);
-        if (aiMesh->HasTextureCoords(0) && aiMesh->mNumUVComponents[0] == 2) {
-            vertex.uv = glm::vec2(aiMesh->mTextureCoords[0][i].x, 
-                                  aiMesh->mTextureCoords[0][i].y);
-        }
-        mesh->vertices.push_back(vertex);
-        mesh->worldVerticies.push_back(vertex);
+  for (unsigned int i = 0; i < aiMesh->mNumVertices; i++) {
+    Vertex vertex;
+    vertex.position = glm::vec3(aiMesh->mVertices[i].x, aiMesh->mVertices[i].y,
+                                aiMesh->mVertices[i].z);
+    vertex.normal = glm::vec3(aiMesh->mNormals[i].x, aiMesh->mNormals[i].y,
+                              aiMesh->mNormals[i].z);
+    if (aiMesh->HasTextureCoords(0) && aiMesh->mNumUVComponents[0] == 2) {
+      vertex.uv = glm::vec2(aiMesh->mTextureCoords[0][i].x,
+                            aiMesh->mTextureCoords[0][i].y);
     }
+    mesh->vertices.push_back(vertex);
+    mesh->worldVerticies.push_back(vertex);
+  }
 
   for (unsigned int i = 0; i < aiMesh->mNumFaces; i++) {
     aiFace f = aiMesh->mFaces[i];
@@ -140,94 +130,75 @@ void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
     loadAssimpHelperSkel(mesh, aiMesh, scene);
   }
 
-    // load material
-    mesh->material = new Material();
-    aiMaterial* aiMaterial = scene->mMaterials[aiMesh->mMaterialIndex];
+  // load material
+  mesh->material = new Material();
+  aiMaterial* aiMaterial = scene->mMaterials[aiMesh->mMaterialIndex];
 
-    aiColor3D color(0.f, 0.f, 0.f);
-    aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-    mesh->material->diffuse = glm::vec4(color.r, color.g, color.b, 1.0f);
-    aiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
-    mesh->material->specular = glm::vec4(color.r, color.g, color.b, 1.0f);
-    aiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
-    mesh->material->ambient = glm::vec4(color.r, color.g, color.b, 1.0f);
-    aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color);
-    mesh->material->emission = glm::vec4(color.r, color.g, color.b, 1.0f);
-    //float f = mesh->material->shininess;
-    //aiMaterial->Get(AI_MATKEY_SHININESS, f);
-    //mesh->material->shininess = f;
+  aiColor3D color(0.f, 0.f, 0.f);
+  aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+  mesh->material->diffuse = glm::vec4(color.r, color.g, color.b, 1.0f);
+  aiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
+  mesh->material->specular = glm::vec4(color.r, color.g, color.b, 1.0f);
+  aiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
+  mesh->material->ambient = glm::vec4(color.r, color.g, color.b, 1.0f);
+  aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+  mesh->material->emission = glm::vec4(color.r, color.g, color.b, 1.0f);
+  // float f = mesh->material->shininess;
+  // aiMaterial->Get(AI_MATKEY_SHININESS, f);
+  // mesh->material->shininess = f;
 
-    // load UV texture
-    if(aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-    //if (false) {
-        aiString texFile;
-        aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texFile);
+  // load UV texture
+  if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+    aiString texFile;
+    aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texFile);
+    printf(
+        "Assimp: Mesh \"%s\" has %u textures, loading the first one: "
+        "\"%s\"\n",
+        aiMesh->mName.C_Str(),
+        aiMaterial->GetTextureCount(aiTextureType_DIFFUSE),
+        aiMaterial->GetName().C_Str());
+
+    if (const aiTexture* aiTexture =
+            scene->GetEmbeddedTexture(texFile.C_Str())) {
+      // embedded file
+      printf("Assimp: Loading \"%s\" texture - embedded W:H = %u:%u\n",
+             aiMaterial->GetName().C_Str(), aiTexture->mWidth,
+             aiTexture->mHeight);
+      if (aiTexture->mHeight == 0) {
+        printf("        (Compressed: %s file)\n", aiTexture->achFormatHint);
+        int ok, width, height, numOfChannels;
+        ok = stbi_info_from_memory(
+            reinterpret_cast<const unsigned char*>(aiTexture->pcData),
+            aiTexture->mWidth, &width, &height, &numOfChannels);
         printf(
-            "Assimp: Mesh \"%s\" has %u textures, loading the first one: "
-            "\"%s\"\n",
-            aiMesh->mName.C_Str(),
-            aiMaterial->GetTextureCount(aiTextureType_DIFFUSE),
-            aiMaterial->GetName().C_Str());
+            "Assimp: Loading \"%s\" texture info %d - W:H = "
+            "%d:%d[%d]\n",
+            aiMaterial->GetName().C_Str(), ok, width, height, numOfChannels);
 
-        if(const aiTexture* aiTexture = scene->GetEmbeddedTexture(texFile.C_Str())) {
-            // embedded file
-            printf("Assimp: Loading \"%s\" texture - embedded W:H = %u:%u\n",
-                    aiMaterial->GetName().C_Str(), aiTexture->mWidth,
-                    aiTexture->mHeight);
-            if(aiTexture->mHeight == 0) {
-                printf("        (Compressed: %s file)\n", aiTexture->achFormatHint);
-                int ok, width, height, numOfChannels;
-                ok = stbi_info_from_memory(
-                    reinterpret_cast<const unsigned char*>(aiTexture->pcData),
-                    aiTexture->mWidth, &width, &height, &numOfChannels);
-                printf(
-                    "Assimp: Loading \"%s\" texture info %d - W:H = "
-                    "%d:%d[%d]\n",
-                    aiMaterial->GetName().C_Str(), ok, width, height,
-                    numOfChannels);
-                // TODO: DEBUG NEED TO REMOVE
-                /*unsigned char* data = stbi_load_from_memory(
-                    reinterpret_cast<const unsigned char*>(aiTexture->pcData),
-                    aiTexture->mWidth, &width, &height, &numOfChannels, 3);*/
-                unsigned char* data =
-                    stbi_load("assets/animation/Texture-Bee.JPG", &width,
-                              &height, &numOfChannels, 3);
-                if(ok == 0 || !data) {
-                    printf("Assimp: Loading \"%s\" texture failed\n",
-                            aiMaterial->GetName().C_Str());
-                } else {
-                    printf("Assimp: Loading \"%s\" texture successed - W:H = %d:%d[%d]\n",
-                            aiMaterial->GetName().C_Str(), width, height, numOfChannels);
-
-                    mesh->material->texture = new Texture();
-                    glGenTextures(1, &(mesh->material->texture->textureID));
-                    glBindTexture(GL_TEXTURE_2D,
-                                  mesh->material->texture->textureID);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                                    GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                                    GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R,
-                                    GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                    GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                    GL_NEAREST);
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                                 GL_RGB, GL_UNSIGNED_BYTE, data);
-                    stbi_image_free(data);
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                }
-            } else {
-                printf("        (Not compressed, not implemented so nothing will happen)\n");
-            }
+        if (ok == 0) {
+          printf("Assimp: Loading \"%s\" texture failed\n",
+                 aiMaterial->GetName().C_Str());
         } else {
-            // compressed file
-            printf("Assimp: Loading \"%s\" texture - external.\n",
-                    aiMaterial->GetName().C_Str());
-            printf("        (Not implemented so nothing will happen)\n");
+          printf("Assimp: Loading \"%s\" texture successed - W:H = %d:%d[%d]\n",
+                 aiMaterial->GetName().C_Str(), width, height, numOfChannels);
+
+          mesh->material->texture = new Texture();
+          mesh->material->texture->init(
+              reinterpret_cast<const unsigned char*>(aiTexture->pcData),
+              aiTexture->mWidth);
         }
+      } else {
+        printf(
+            "        (Not compressed, not implemented so nothing will "
+            "happen)\n");
+      }
+    } else {
+      // compressed file
+      printf("Assimp: Loading \"%s\" texture - external.\n",
+             aiMaterial->GetName().C_Str());
+      printf("        (Not implemented so nothing will happen)\n");
     }
+  }
 }
 
 void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh* aiMesh,
@@ -255,47 +226,45 @@ void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh* aiMesh,
     nodeMap[joint->name]->joints.push_back(joint);
   }
 
-    int maxBoneAffected = 0;
-    std::vector<int> vertexBindedBones(mesh->vertices.size(), 0);
-    for(int i = 0; i < mesh->joints.size(); i++) {
-        AssimpJoint* joint = mesh->joints[i];
-        for(int j = 0; j < joint->weights.size(); j++) {
-            VertexWeight& vw = joint->weights[j];
-            if(maxBoneAffected < vertexBindedBones[vw.vertexInd]) {
-                maxBoneAffected = vertexBindedBones[vw.vertexInd];
+  int maxBoneAffected = 0;
+  std::vector<int> vertexBindedBones(mesh->vertices.size(), 0);
+  for (int i = 0; i < mesh->joints.size(); i++) {
+    AssimpJoint* joint = mesh->joints[i];
+    for (int j = 0; j < joint->weights.size(); j++) {
+      VertexWeight& vw = joint->weights[j];
+      if (maxBoneAffected < vertexBindedBones[vw.vertexInd]) {
+        maxBoneAffected = vertexBindedBones[vw.vertexInd];
+      }
+      switch (vertexBindedBones[vw.vertexInd]) {
+        case 0:
+          mesh->vertices[vw.vertexInd].boneInds.x = i;
+          mesh->vertices[vw.vertexInd].boneWeights.x = vw.weight;
+          break;
+        case 1:
+          mesh->vertices[vw.vertexInd].boneInds.y = i;
+          mesh->vertices[vw.vertexInd].boneWeights.y = vw.weight;
+          break;
+        case 2:
+          mesh->vertices[vw.vertexInd].boneInds.z = i;
+          mesh->vertices[vw.vertexInd].boneWeights.z = vw.weight;
+          break;
+        case 3:
+          mesh->vertices[vw.vertexInd].boneInds.w = i;
+          mesh->vertices[vw.vertexInd].boneWeights.w = vw.weight;
+          break;
+        default:
+          for (int n = 0; n < 3; n++) {
+            if (mesh->vertices[vw.vertexInd].boneWeights[n] < vw.weight) {
+              mesh->vertices[vw.vertexInd].boneInds[n] = i;
+              mesh->vertices[vw.vertexInd].boneWeights[n] = vw.weight;
+              break;
             }
-            switch (vertexBindedBones[vw.vertexInd]) {
-            case 0:
-                mesh->vertices[vw.vertexInd].boneInds.x = i;
-                mesh->vertices[vw.vertexInd].boneWeights.x = vw.weight;
-                break;
-            case 1:
-                mesh->vertices[vw.vertexInd].boneInds.y = i;
-                mesh->vertices[vw.vertexInd].boneWeights.y = vw.weight;
-                break;
-            case 2:
-                mesh->vertices[vw.vertexInd].boneInds.z = i;
-                mesh->vertices[vw.vertexInd].boneWeights.z = vw.weight;
-                break;
-            case 3:
-                mesh->vertices[vw.vertexInd].boneInds.w = i;
-                mesh->vertices[vw.vertexInd].boneWeights.w = vw.weight;
-                break;
-            default:
-                for(int n = 0; n < 3; n++) {
-                    if(mesh->vertices[vw.vertexInd].boneWeights[n] < vw.weight) {
-                        mesh->vertices[vw.vertexInd].boneInds[n] = i;
-                        mesh->vertices[vw.vertexInd].boneWeights[n] = vw.weight;
-                        break;
-                    }
-                }
-                break;
-            }
-            vertexBindedBones[vw.vertexInd]++;
-        }
+          }
+          break;
+      }
+      vertexBindedBones[vw.vertexInd]++;
     }
-    // printf("%s MAX_BONE: %d\n", mesh->name.c_str(), maxBoneAffected);
-    // printf("MAX_BONE_VERT: %u %u %u %u\n", mesh->vertices[vw.vertexInd].boneInds.x, mesh->vertices[vw.vertexInd].boneInds.y, mesh->vertices[vw.vertexInd].boneInds.z. mesh->vertices[vw.vertexInd].boneInds.w);
+  }
 }
 
 void AssimpModel::loadAssimpHelperAnim(const aiScene* scene) {
@@ -456,10 +425,10 @@ void AssimpModel::imGui() {
 void AssimpModel::useMesh() { useAnimation(-1); }
 
 bool AssimpModel::useAnimation(int animationInd) {
-    printf("Assimp: Animation - Using %d\t: %s\n", animationInd,
-           animationInd < 0 || animationInd >= animations.size()
-               ? "Mesh | Unknown"
-               : animations[animationInd].name.c_str());
+  printf("Assimp: Animation - Using %d\t: %s\n", animationInd,
+         animationInd < 0 || animationInd >= animations.size()
+             ? "Mesh | Unknown"
+             : animations[animationInd].name.c_str());
 
   if (animationInd < 0) {
     currentAnimation = -1;
@@ -539,71 +508,70 @@ void AssimpModel::imGuiJointMenu() {
 }
 
 void AssimpModel::setAnimation(std::string name) {
-    for (int i = 0; i < animations.size(); i++) {
-        if (animations[i].name.compare(name) == 0) {
-            useAnimation(i);
-            isPaused = false;
-            return;
-        }
+  for (int i = 0; i < animations.size(); i++) {
+    if (animations[i].name.compare(name) == 0) {
+      useAnimation(i);
+      isPaused = false;
+      return;
     }
+  }
 
-    // use default pose
-    std::cout << "Assimp: Animation - cannot find " << name.c_str()
-              << " using Mesh instead" << std::endl;
-    useAnimation(-1);
+  // use default pose
+  std::cout << "Assimp: Animation - cannot find " << name.c_str()
+            << " using Mesh instead" << std::endl;
+  useAnimation(-1);
 }
 
 void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-    const glm::mat4& transformMtx) {
+                       const glm::mat4& transformMtx) {
+  if (!material) {
+    return;
+  }
 
-    if (!material) {
-        return;
-    }
+  GLuint shader = material->shader;
 
-    GLuint shader = material->shader;
-
-    glUseProgram(shader);
-    material->setUniforms(viewProjMtx, viewMtx,
-                          transformMtx * modelMtx * betterView);
-    for (int i = 0; i < meshes.size(); i++) {
-        meshes[i]->draw();
-    }
-    glUseProgram(0);
+  glUseProgram(shader);
+  material->setUniforms(viewProjMtx, viewMtx,
+                        transformMtx * modelMtx * betterView);
+  for (int i = 0; i < meshes.size(); i++) {
+    meshes[i]->draw();
+  }
+  glUseProgram(0);
 }
 
 // currently in use
 void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
                        const glm::mat4& transformMtx, const bool ignoreDepth) {
-    if (!material) {
-        return;
+  if (!material) {
+    return;
+  }
+
+  GLuint shader = material->shader;
+  glUseProgram(shader);
+
+  if (ignoreDepth) glDisable(GL_DEPTH_TEST);
+  material->setUniforms(viewProjMtx, viewMtx,
+                        transformMtx * modelMtx * betterView);
+  for (int i = 0; i < meshes.size(); i++) {
+    if (useShader && meshes[i]->material) {
+      GLuint shaderM = meshes[i]->material->shader;
+      glUseProgram(shaderM);
+      meshes[i]->material->setUniforms(viewProjMtx, viewMtx,
+                                       transformMtx * modelMtx * betterView);
     }
+    meshes[i]->draw();
+  }
+  if (ignoreDepth) glEnable(GL_DEPTH_TEST);
 
-    GLuint shader = material->shader;
-    glUseProgram(shader);
-
-    if (ignoreDepth) glDisable(GL_DEPTH_TEST);
-    material->setUniforms(viewProjMtx, viewMtx,
-                          transformMtx * modelMtx * betterView);
-    for (int i = 0; i < meshes.size(); i++) {
-        if (useShader && meshes[i]->material) {
-            GLuint shaderM = meshes[i]->material->shader;
-            glUseProgram(shaderM);
-            meshes[i]->material->setUniforms(
-                viewProjMtx, viewMtx, transformMtx * modelMtx * betterView);
-        }
-        meshes[i]->draw();
-    }
-    if (ignoreDepth) glEnable(GL_DEPTH_TEST);
-
-    glUseProgram(0);
+  glUseProgram(0);
 }
 
 void AssimpModel::draw() {
-    if (!isAnimated) {
-        useMesh();
-    }
+  if (!isAnimated) {
+    useMesh();
+  }
 
-    for (int i = 0; i < meshes.size(); i++) {
-        meshes[i]->draw();
-    }
+  for (int i = 0; i < meshes.size(); i++) {
+    meshes[i]->draw();
+  }
 }
