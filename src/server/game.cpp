@@ -2,7 +2,6 @@
 #include <core/lib.hpp>
 #include <network/message.hpp>
 #include <server/game.hpp>
-#include <vector>
 
 GameThing::GameThing(int& id, Player* p, ControlModifierData* c)
     : id(id), player(p), control(c), heading(0) {}
@@ -49,9 +48,13 @@ void Game::update(const message::UserStateUpdate& update) {
 
 void Game::tick() { level->tick(); }
 
-std::vector<message::GameStateUpdateItem> Game::to_network() {
-  std::vector<message::GameStateUpdateItem> things(game_things_.size());
-  std::transform(game_things_.begin(), game_things_.end(), things.begin(),
-                 [](auto&& thing) { return thing.second.to_network(); });
+std::unordered_map<int, message::GameStateUpdateItem> Game::to_network() {
+  std::unordered_map<int, message::GameStateUpdateItem> things(
+      game_things_.size());
+  std::transform(game_things_.begin(), game_things_.end(),
+                 std::inserter(things, things.end()), [](auto&& thing) {
+                   return std::pair<int, message::GameStateUpdateItem>(
+                       thing.first, thing.second.to_network());
+                 });
   return things;
 }

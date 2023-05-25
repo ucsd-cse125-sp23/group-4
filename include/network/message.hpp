@@ -1,7 +1,7 @@
 #pragma once
 
+#include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/variant.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
@@ -9,7 +9,7 @@
 #include <ctime>
 #include <ostream>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace message {
 
@@ -76,7 +76,7 @@ struct GameStateUpdateItem {
 };
 
 struct GameStateUpdate {
-  std::vector<GameStateUpdateItem> things;
+  std::unordered_map<int, GameStateUpdateItem> things;
   // add global params later
   std::string to_string() const;
 
@@ -87,7 +87,7 @@ struct GameStateUpdate {
 };
 
 struct UserStateUpdate {
-  int id;
+  int id = -1;  // assume -1 IDs invalid
   float movx;
   float movy;
   float movz;

@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 
 #include "Input.h"
-#include "UserState.h"
 
 using glm::mat4x4;
 using glm::vec3;

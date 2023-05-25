@@ -17,7 +17,6 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Scene.h"
-#include "UserState.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -183,9 +182,11 @@ void Window::displayCallback(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  // Render the objects.
-  gameScene->draw();
-  gameScene->drawHUD(window);
+  // Render the scene
+  if (gameScene) {
+    gameScene->draw();
+    gameScene->drawHUD(window);
+  }
 
   Input::handle(false);
   if (_debugmode) {
@@ -194,7 +195,7 @@ void Window::displayCallback(GLFWwindow* window) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    gameScene->gui();
+    if (gameScene) gameScene->gui();
 
     // imguiDraw(skeleton, animClip);   // simple helper method
 

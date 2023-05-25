@@ -3,7 +3,6 @@
 #include <core/lib.hpp>
 #include <network/message.hpp>
 #include <unordered_map>
-#include <vector>
 
 #include "client/graphics/ColliderImporter.h"
 
@@ -29,7 +28,7 @@ class Game {
   int create_player();
   void update(const message::UserStateUpdate&);
   void tick();
-  std::vector<message::GameStateUpdateItem> to_network();
+  std::unordered_map<int, message::GameStateUpdateItem> to_network();
 
  private:
   GameThingMap game_things_;

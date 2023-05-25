@@ -20,8 +20,9 @@
 
 #include "Window.h"
 
-int pid;
 bool net_assigned = false;
+
+bool game_exit = false;
 
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
@@ -76,12 +77,13 @@ std::unique_ptr<Client> network_init() {
 
   auto read_handler = [](const message::Message& m, Client& client) {
     auto assign_handler = [&client](const message::Assign& body) {
-      net_assigned = true;
       Window::gameScene->initFromServer(body.pid);  // need a unique int id
       client.write<message::Greeting>("Hello, server!");
+
+      net_assigned = true;
     };
     auto game_state_update_handler = [](const message::GameStateUpdate& body) {
-      Window::gameScene->updateState(SceneState(body));
+      Window::gameScene->updateState(body);
     };
     auto any_handler = [](const message::Message::Body&) {};
 
@@ -120,7 +122,8 @@ int main(int argc, char* argv[]) {
     char i = std::getchar();
     exit(EXIT_FAILURE);
   }
-  // Initialize objects/pointers for rendering; exit if initialization fails.
+
+  // Initialize game scene for rendering; exit if initialization fails.
   if (!Window::initializeObjects()) {
     std::cout << "Press enter...";
     char i = std::getchar();
@@ -129,10 +132,16 @@ int main(int argc, char* argv[]) {
 
   // wait for server assignment, TODO: replace with start screen UI
   while (!net_assigned) {
+    if (glfwWindowShouldClose(window)) {
+      game_exit = true;
+      break;
+    }
+
     std::cout << "(net_assigned: " << net_assigned << ") ";
     std::cout << "Waiting for server to assign pid..." << std::endl;
     client->poll();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    Window::displayCallback(window);  // TODO: this should be lobby draw
   }
 
   // Delta time logic (see
@@ -140,7 +149,7 @@ int main(int argc, char* argv[]) {
   double lastTime = glfwGetTime();
 
   // Loop while GLFW window should stay open.
-  while (!glfwWindowShouldClose(window)) {
+  while (!game_exit && !glfwWindowShouldClose(window)) {
     // - Measure time
     double nowTime = glfwGetTime();
     double deltaTime = nowTime - lastTime;
@@ -154,7 +163,8 @@ int main(int argc, char* argv[]) {
     message::UserStateUpdate mout = Window::idleCallback(window, deltaTime);
 
     // OUTPUT TO SERVER
-    if (net_assigned) client->write<message::UserStateUpdate>(mout);
+    if (net_assigned && mout.id >= 0)
+      client->write<message::UserStateUpdate>(mout);
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);

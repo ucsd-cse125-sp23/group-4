@@ -230,14 +230,6 @@ void Scene::init(void) {
   player->transform.updateMtx(&(player->transformMtx));
   // gamethings.push_back(player);
 
-  // ---
-  // temporary manual spawning 4 players:
-  createPlayer(1);
-  createPlayer(2);
-  createPlayer(3);
-  createPlayer(4);
-  // ---
-
   // Build the scene graph
   node["teapot1"] = thing_example;
   node["teapot2"] = new Node("teapotChild");

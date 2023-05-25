@@ -97,6 +97,7 @@ class SceneResourceMap {
 
 class Scene {
  public:
+  static int _myPlayerId;
   static bool _freecam;
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
@@ -104,7 +105,7 @@ class Scene {
   SceneResourceMap* sceneResources;
 
   Camera* camera;
-  Player* myPlayer;
+  Player* myPlayer = nullptr;
 
   // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
@@ -158,7 +159,7 @@ class Scene {
     node["world"] = new Node("world");
   }
 
-  Player* createPlayer(int id, bool isUser);
+  Player* createPlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
   void init(void);

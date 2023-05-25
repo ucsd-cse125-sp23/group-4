@@ -18,20 +18,23 @@ adapted from CSE 167 - Matthew
 using glm::mat4x4;
 using glm::vec3;
 
+int Scene::_myPlayerId = -1;
+
 bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-Player* Scene::createPlayer(int id, bool isUser = false) {
-  // creating a player to be rendered... TODO call this from state update when needed!
+Player* Scene::createPlayer(int id) {
+  bool isUser = false;
+  if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
+
+  // creating a player to be rendered... TODO call this from state update!
   std::string playername = "player" + std::to_string(id);
 
   Player* player = new Player();
   player->netId = id;
   if (isUser) {
-    player->isUser = true;
-    player->camera = camera;  // give a reference to the game camera
-    player->childnodes.push_back(camera);
+    setToUserFocus(player);
   }
   // player->pmodel = waspModel;            // updating! TODO fix me
 
@@ -51,15 +54,7 @@ Player* Scene::createPlayer(int id, bool isUser = false) {
   return player;
 }
 
-void Scene::initFromServer(int myid) {
-  // TODO(matthew) make this better
-  for (auto e : gamethings) {
-    if (e->netId == myid) {
-      setToUserFocus(e);
-      return;
-    }
-  }
-}
+void Scene::initFromServer(int myid) { _myPlayerId = myid; }
 
 void Scene::setToUserFocus(GameThing* t) {
   myPlayer = nullptr;
@@ -74,7 +69,7 @@ void Scene::setToUserFocus(GameThing* t) {
 }
 
 message::UserStateUpdate Scene::update(float delta) {
-  message::UserStateUpdate ourPlayerUpdate;
+  message::UserStateUpdate ourPlayerUpdate = message::UserStateUpdate();
 
   for (auto e : gamethings) {
     auto currUpdate = e->update(delta);
@@ -86,13 +81,28 @@ message::UserStateUpdate Scene::update(float delta) {
 }
 
 void Scene::updateState(message::GameStateUpdate newState) {
-  // loop through GameThings, send newest state data
+  // check if new graphical objects need to be created
+  for (auto& t : newState.things) {
+    // TODO(matthew): change gamethings to a map
+    bool exists = false;
+    for (auto e : gamethings) {
+      if (e->netId == t.second.id) {
+        exists = true;
+        break;
+      }
+    }
+
+    // if t isn't in our gamethings yet, add it now
+    if(!exists) createPlayer(t.second.id);
+  }
+
+  // loop through GameThings and update their state
   for (auto e : gamethings) {
     int currId = e->netId;
 
     if (currId == -1) continue;  // skip thing
 
-    message::GameStateUpdateItem currState = newState.things[currId];
+    message::GameStateUpdateItem currState = newState.things.at(currId);
     // please check for non-null too!
     e->updateFromState(currState);
   }
@@ -137,7 +147,7 @@ void Scene::drawHUD(GLFWwindow* window) {
 }
 void Scene::draw() {
   // Pre-draw sequence:
-  camera->SetPositionTarget(myPlayer->transform.position);
+  if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
   camera->UpdateView();
 
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
