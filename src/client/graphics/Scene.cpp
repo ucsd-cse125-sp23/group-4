@@ -22,6 +22,35 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
+Player* Scene::createPlayer(int id, bool isUser = false) {
+  // creating a player to be rendered... TODO call this from state update when needed!
+  std::string playername = "player" + std::to_string(id);
+
+  Player* player = new Player();
+  player->netId = id;
+  if (isUser) {
+    player->isUser = true;
+    player->camera = camera;  // give a reference to the game camera
+    player->childnodes.push_back(camera);
+  }
+  // player->pmodel = waspModel;            // updating! TODO fix me
+
+  // copy into a new model object
+  Model* myModel = new Model(*sceneResources->models["playerRef"]);
+  player->model = myModel;
+  sceneResources->models[playername + ".model"] = myModel;
+  // player->pmodel->setAnimation("walk");  // TODO: make this automated
+
+  player->name = playername;
+  player->transform.position = vec3(4 + id * 3, 2, 4 + id * 5);
+  player->transform.updateMtx(&(player->transformMtx));
+
+  gamethings.push_back(player);
+  node["world"]->childnodes.push_back(player);
+
+  return player;
+}
+
 void Scene::initFromServer(int myid) {
   // TODO(matthew) make this better
   for (auto e : gamethings) {
@@ -44,26 +73,26 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-UserState Scene::update(float delta) {
-  UserState ourPlayerUpdates;
+message::UserStateUpdate Scene::update(float delta) {
+  message::UserStateUpdate ourPlayerUpdate;
 
   for (auto e : gamethings) {
-    UserState currUpdate = e->update(delta);
+    auto currUpdate = e->update(delta);
 
-    if (e->isUser) ourPlayerUpdates = currUpdate;
+    if (e->isUser) ourPlayerUpdate = currUpdate;
   }
 
-  return ourPlayerUpdates;
+  return ourPlayerUpdate;
 }
 
-void Scene::updateState(SceneState newState) {
+void Scene::updateState(message::GameStateUpdate newState) {
   // loop through GameThings, send newest state data
   for (auto e : gamethings) {
     int currId = e->netId;
 
     if (currId == -1) continue;  // skip thing
 
-    SceneGameThingState currState = newState.GetUpdateFor(currId);
+    message::GameStateUpdateItem currState = newState.things[currId];
     // please check for non-null too!
     e->updateFromState(currState);
   }

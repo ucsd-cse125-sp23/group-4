@@ -25,13 +25,12 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
+#include <network/message.hpp>
 #include <network/tcp_server.hpp>
 #include <utility>
 #include <vector>
 
 #include "client/graphics/Node.h"
-#include "client/graphics/SceneState.h"
-#include "client/graphics/UserState.h"
 
 struct Transform {
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -61,17 +60,18 @@ class GameThing : public Node {
   Transform transform;
   float azimuth = 0;  // for visuals only (aka heading)
 
-  virtual UserState update(float dt) {
+  virtual message::UserStateUpdate update(float dt) {
     // --- example (spin spin) ---
     transform.rotation += glm::vec3(0, 30 * dt, 0);  // spin on y axis
     transform.updateMtx(&transformMtx);  // needed to update node matrix
 
-    return UserState();
+    return message::UserStateUpdate();
   }
 
-  void updateFromState(SceneGameThingState state) {
+  void updateFromState(message::GameStateUpdateItem state) {
     // update self from server input
-    setPositionTarget(state.position);
+    glm::vec3 pos = glm::vec3(state.posx, state.posy, state.posz);
+    setPositionTarget(pos);
     setHeading(state.heading);
   }
 

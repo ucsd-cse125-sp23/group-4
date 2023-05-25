@@ -68,11 +68,11 @@ void Camera::CamZoom(float y) {
   SetDistance(dist);
 }
 
-UserState Camera::update(float dt) {
+message::UserStateUpdate Camera::update(float dt) {
   // interpolate camera
   position_prev = glm::lerp(position_prev, position_target, lerpSpeed * dt);
 
-  if (!Fixed) return UserState();
+  if (!Fixed) return message::UserStateUpdate();
 
   vec3 moveLocal = vec3(0);
 
@@ -97,7 +97,7 @@ UserState Camera::update(float dt) {
 
   if (length(moveLocal) > 0) move_local(moveLocal);
 
-  return UserState();
+  return message::UserStateUpdate();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -10,14 +10,14 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
-UserState Player::update(float dt) {
+message::UserStateUpdate Player::update(float dt) {
   // interpolate states
   updateInterpolate(dt);
 
-  if (!isUser) return UserState();
+  if (!isUser) return message::UserStateUpdate();
 
   if (camera && camera->Fixed)
-    return UserState();  // don't move the player in no clip (for now)
+    return message::UserStateUpdate();  // don't move the player in no clip
 
   vec3 moveLocal = vec3(0);  // relative to... keyboard
   bool jumping = false;
@@ -53,9 +53,11 @@ UserState Player::update(float dt) {
   if (tagged) time += dt;  // move this to server TODO
 
   // Get ready to send a message to the server: ***
-  UserState myInputState;
+  message::UserStateUpdate myInputState;
   myInputState.id = netId;
-  myInputState.movement = moveWorld;
+  myInputState.movx = moveWorld.x;
+  myInputState.movy = 0;
+  myInputState.movz = moveWorld.z;
   myInputState.heading = azimuth;
   myInputState.jump = jumping;
 

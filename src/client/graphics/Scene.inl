@@ -11,35 +11,6 @@
 
 using namespace glm;
 
-Player* Scene::createPlayer(int id, bool isUser = false) {
-  // temporary helper
-  std::string playername = "player" + std::to_string(id);
-
-  Player* player = new Player();
-  player->netId = id;
-  if (isUser) {
-    player->isUser = true;
-    player->camera = camera;  // give a reference to the game camera
-    player->childnodes.push_back(camera);
-  }
-  // player->pmodel = waspModel;            // updating! TODO fix me
-
-  // copy into a new model object
-  Model* myModel = new Model(*sceneResources->models["playerRef"]);
-  player->model = myModel;
-  sceneResources->models[playername + ".model"] = myModel;
-  // player->pmodel->setAnimation("walk");  // TODO: make this automated
-
-  player->name = playername;
-  player->transform.position = vec3(4 + id * 3, 2, 4 + id * 5);
-  player->transform.updateMtx(&(player->transformMtx));
-
-  gamethings.push_back(player);
-  node["world"]->childnodes.push_back(player);
-
-  return player;
-}
-
 void Scene::init(void) {
   // Create a mesh palette
   sceneResources->meshes["cube"] = new Cube();

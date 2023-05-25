@@ -32,7 +32,7 @@ class Camera : public GameThing {
 
   Camera();
 
-  UserState update(float dt);
+  message::UserStateUpdate update(float dt);
 
   void SetPositionTarget(glm::vec3 v) {
     position_target = v + glm::vec3(0, 4, 0);  // center above player
