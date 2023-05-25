@@ -74,25 +74,25 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
 
   auto connect_handler = [](tcp::endpoint endpoint, Client& client) {};
 
-  auto read_handler = [&](const message::Message& m, Client& client) {
-    auto assign_handler = [&](const message::Assign& body) {
+  auto read_handler = [](const message::Message& m, Client& client) {
+    auto assign_handler = [&client](const message::Assign& body) {
       net_assigned = true;
       Window::gameScene->initFromServer(body.pid);  // need a unique int id
       client.write<message::Greeting>("Hello, server!");
     };
-    auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
+    auto game_state_update_handler = [](const message::GameStateUpdate& body) {
       Window::gameScene->updateState(SceneState(body));
     };
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, game_state_update_handler, any_handler);
-
     boost::apply_visitor(message_handler, m.body);
   };
 
-  auto write_handler = [&](std::size_t bytes_transferred,
-                           const message::Message& m, Client& client) {};
+  auto write_handler = [](std::size_t bytes_transferred,
+                          const message::Message& m, Client& client) {};
+
   auto client = std::make_unique<Client>(
       io_context, server_addr, connect_handler, read_handler, write_handler);
   return client;

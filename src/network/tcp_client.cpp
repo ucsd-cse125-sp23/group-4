@@ -13,7 +13,8 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
             << std::endl;
   boost::asio::async_connect(
       socket_, endpoints,
-      [=](boost::system::error_code ec, tcp::endpoint endpoint) {
+      [this, connect_handler, read_handler, write_handler](
+          boost::system::error_code ec, tcp::endpoint endpoint) {
         if (ec) {
           std::cerr << "Error: " << ec.message() << std::endl;
           return;
@@ -22,7 +23,8 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
         std::cout << "(Client::async_connect) Connected to "
                   << endpoint.address() << ":" << endpoint.port() << std::endl;
 
-        auto conn_read_handler = [=](boost::system::error_code ec,
+        auto conn_read_handler = [this, read_handler](
+                                     boost::system::error_code ec,
                                      const message::Message& m) {
           if (ec) return;
 
@@ -35,7 +37,8 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
           read_handler(m, *this);
         };
 
-        auto conn_write_handler = [=](boost::system::error_code ec,
+        auto conn_write_handler = [this, write_handler](
+                                      boost::system::error_code ec,
                                       std::size_t bytes_transferred,
                                       const message::Message& m) {
           if (ec) return;
