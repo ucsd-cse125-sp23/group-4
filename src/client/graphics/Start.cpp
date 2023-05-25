@@ -12,6 +12,12 @@ void Start::update(float delta, UserState& ourPlayerUpdates) {
     renderText = true;
   }
 
+  timeOnFrame += delta;
+  if (timeOnFrame >= 0.1 && index < frames.size() - 1) {
+    index++;
+    timeOnFrame = 0;
+  }
+
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
     gameStart = true;
   }
@@ -25,11 +31,7 @@ void Start::draw() {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
   float scale = static_cast<float>(width) / static_cast<float>(800);
-  std::string name = "Tag Guys";
-  float n_width = fr->TextWidth(name, 2 * scale);
-  fr->RenderText(width, height, name, (width / 2.0f) - (n_width / 2.0f) - 25.0f,
-                 (height) - (48 * 4 * scale), 2 * scale,
-                 glm::vec3(0.0f, 0.0f, 0.0f));
+  drawName();
   if (renderText) {
     std::string prompt = "Press enter to start game";
     float p_width = fr->TextWidth(prompt, 0.5 * scale);
@@ -57,6 +59,35 @@ void Start::drawBackground() {
   glVertex3f(-1.0f, -1.0f, 0.0f);
   glTexCoord2f(1 + offset, 1);
   glVertex3f(1.0f, -1.0f, 0.0f);
+
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
+}
+
+void Start::drawName() {
+  GLFWwindow* window = glfwGetCurrentContext();
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  Texture curFrame = frames[index];
+  curFrame.bindgl();
+  glEnable(GL_TEXTURE_2D);
+
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBegin(GL_QUADS);
+
+  glTexCoord2f(1, 0);
+  glVertex3f(0.75f, 1.0f, 0.0f);
+  glTexCoord2f(0, 0);
+  glVertex3f(-0.75f, 1.0f, 0.0f);
+  glTexCoord2f(0, 1);
+  glVertex3f(-0.75f, -0.5f, 0.0f);
+  glTexCoord2f(1, 1);
+  glVertex3f(0.75f, -0.5f, 0.0f);
 
   glEnd();
 

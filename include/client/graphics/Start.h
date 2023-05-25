@@ -8,6 +8,9 @@ class Start : public Scene, public InputListener {
  public:
   FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
   Texture background;
+  std::vector<Texture> frames;
+  float timeOnFrame;
+  int index;
   float timeElapsed;
   float offset;
   bool gameStart;
@@ -20,11 +23,23 @@ class Start : public Scene, public InputListener {
     background.init("assets/image/clouds.png");
     gameStart = false;
     renderText = true;
+
+    timeOnFrame = 0;
+    index = 0;
+    for (int i = 1; i < 33; i++) {
+      Texture frame;
+      std::string filename = "assets/image/tagguys_open/frame_" +
+                             std::to_string(i) + "_delay-0.1s.png";
+      frame.init(filename.c_str());
+      frames.push_back(frame);
+    }
   }
 
   void draw();
 
   void drawBackground();
+
+  void drawName();
 
   void update(float delta, UserState& ourPlayerUpdates);
 };
