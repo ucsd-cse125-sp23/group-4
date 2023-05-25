@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 
-#include "client/graphics/Scene.h"
 #include "client/graphics/Texture.h"
+#include "client/graphics/UserState.h"
 
-class Load : public Scene {
+class Load {
  public:
   std::vector<Texture> frames;
   int index;
@@ -14,9 +14,8 @@ class Load : public Scene {
   Timer time;
   bool gameStart;
   bool forward;
-  PlayerModel* selectedModel;
 
-  explicit Load(Camera* camFromWindow) : Scene(camFromWindow) {
+  explicit Load(Camera* camFromWindow) {
     index = 0;
     timeOnFrame = 0;
     time.time = 10;
@@ -33,9 +32,7 @@ class Load : public Scene {
     }
   }
 
-  void init(PlayerModel* player) { selectedModel = player; }
-
-  void update(float delta, UserState& ourPlayerUpdates) {
+  void update(float delta) {
     time.Update(delta);
     if (time.time == 0) {
       gameStart = true;
