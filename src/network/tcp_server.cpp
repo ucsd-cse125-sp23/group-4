@@ -76,7 +76,6 @@ void Server::do_accept() {
       }
 
       read_handler_(m, *this);
-      read(m.metadata.id);
     };
 
     auto conn_write_handler = [this](boost::system::error_code ec,
@@ -91,18 +90,13 @@ void Server::do_accept() {
     connections_.insert(
         {new_client_id, std::make_unique<Connection<message::Message>>(
                             socket, conn_read_handler, conn_write_handler)});
-    auto& connection = connections_[new_client_id];
-    std::cout << this << std::endl;
-
     accept_handler_(new_client_id, *this);
-    connection->start();  // start reading from client
+    std::cout << this << std::endl;  // print Server status
   };
 
   std::cout << "(Server::do_accept) Accepting new connections" << std::endl;
   acceptor_.async_accept(accept_handler);
 }
-
-void Server::read(const ClientID& id) { connections_[id]->read(); }
 
 void Server::write(const ClientID& id, const message::Message& m) {
   // std::cout << "Queueing write to client: " << m << std::endl;

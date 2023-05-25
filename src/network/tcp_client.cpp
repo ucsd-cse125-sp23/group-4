@@ -33,7 +33,6 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
           }
 
           read_handler(m, *this);
-          read();
         };
 
         auto conn_write_handler = [=](boost::system::error_code ec,
@@ -47,13 +46,7 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
         connection = std::make_unique<Connection<message::Message>>(
             socket_, conn_read_handler, conn_write_handler);
         connect_handler(endpoint, *this);
-        read();
       });
-}
-
-void Client::read() {
-  // std::cout << "Queueing read handler" << std::endl;
-  connection->read();
 }
 
 void Client::write(message::Message m) {

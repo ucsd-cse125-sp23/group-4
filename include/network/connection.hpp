@@ -20,15 +20,13 @@ class Connection {
   using WriteHandler = std::function<void(boost::system::error_code ec,
                                           std::size_t length, const T& t)>;
 
-  Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
-      : socket_(std::move(s)), read_handler(rh), write_handler(wh) {}
+  Connection(tcp::socket&, ReadHandler, WriteHandler);
 
   ~Connection() {
     std::cout << "(~Connection) Closing connection and its socket" << std::endl;
     socket_.close();
   }
 
-  void start();
   void read();
   void write(const T&);
 
@@ -50,7 +48,8 @@ class Connection {
 };
 
 template <typename T>
-void Connection<T>::start() {
+Connection<T>::Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
+    : socket_(std::move(s)), read_handler(rh), write_handler(wh) {
   read();
 }
 
@@ -131,10 +130,11 @@ void Connection<T>::read() {
                     << inbound_data_size + header_length_ << " bytes)\n"
                     << t << std::endl;
           read_handler(ec, t);
+          read();
         } catch (const boost::system::error_code& ec) {
           std::cerr << "(Connection::read) Error parsing data: " << ec.message()
                     << std::endl;
-          return read_handler(ec, T());
+          read_handler(ec, T());
         }
       });
 }

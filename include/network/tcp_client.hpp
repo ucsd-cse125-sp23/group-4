@@ -27,7 +27,6 @@ class Client {
   Client(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
          WriteHandler);
 
-  void read();
   void write(message::Message);
   template <typename T, typename... Args>
   void write(Args &&...);

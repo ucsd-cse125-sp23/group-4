@@ -23,7 +23,6 @@ class Server {
   Server(boost::asio::io_context& io_context, int port, AcceptHandler,
          ReadHandler, WriteHandler, TickHandler);
 
-  void read(const ClientID&);
   void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);
   template <typename T, typename... Args>
