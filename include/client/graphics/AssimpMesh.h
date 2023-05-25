@@ -8,6 +8,7 @@
 
 #include "client/graphics/AssimpNode.h"
 #include "client/graphics/core.h"
+#include "client/graphics/Material.h"
 
 class AssimpNode;
 
@@ -50,6 +51,8 @@ class AssimpMesh {
     std::vector<unsigned int> indices;
     std::vector<AssimpJoint*> joints;
     glm::mat4 matBindingInvs[MAX_BONES];
+    /** holds shader specified when  */
+    Material* material;
 
     void update();
     void draw(const glm::mat4& viewProjMtx, GLuint shader);

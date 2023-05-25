@@ -13,7 +13,7 @@ using namespace glm;
 void Scene::init(void) {
   AssimpModel* am = new AssimpModel();
   if (!am->loadAssimp(
-          "assets/model/Animation -Avocado.fbx")) {
+          "assets/animation/Animation -Bee.fbx")) {
     exit(EXIT_FAILURE);
   }
 
@@ -155,6 +155,10 @@ void Scene::init(void) {
   sceneResources->models["assimp"] = assimpModel;
   sceneResources->models["assimp"]->mesh = sceneResources->meshes["assimp"];
   sceneResources->models["assimp"]->material = sceneResources->materials["toon.blue"];
+  am->loadShader(sceneResources->shaderPrograms["toon"]);
+
+  // TODO: DEBUG NEED TO REMOVE
+  am->loadTexture(sceneResources->textures["grid"]);
 
   ///// maps:
 

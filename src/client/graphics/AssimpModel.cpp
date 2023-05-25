@@ -3,10 +3,12 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "AssimpMath.h"
+// #define STB_IMAGE_IMPLEMENTATION
+#include "client/graphics/imported/stb_image.h"
+
+#include "client/graphics/AssimpMath.h"
 
 AssimpModel::AssimpModel()
     : name("N/A"),
@@ -14,6 +16,7 @@ AssimpModel::AssimpModel()
       numNode(0),
       isAnimated(false),
       isPaused(true),
+      useShader(false),
       currentAnimation(-1),
       animModes(nullptr) {}
 
@@ -43,6 +46,24 @@ bool AssimpModel::loadAssimp(const char* path) {
     useMesh();
     betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)), glm::vec3(0, -120, 0));
     return true;
+}
+
+void AssimpModel::loadShader(GLuint shader) {
+    useShader = true;
+    for (int i = 0; i < meshes.size(); i++) {
+        if (meshes[i]->material) {
+            meshes[i]->material->shader = shader;
+        }
+    }
+}
+
+// TODO: DEBUG NEED TO REMOVE
+void AssimpModel::loadTexture(Texture* texture) {
+    for (int i = 0; i < meshes.size(); i++) {
+        if (meshes[i]->material && meshes[i]->material->texture) {
+            meshes[i]->material->texture = texture;
+        }
+    }
 }
 
 void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
@@ -84,8 +105,13 @@ void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
 
 void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
                                        const aiScene* scene) {
-  // Is it possible to use vector.resize() & index?
-  mesh->name = aiMesh->mName.C_Str();
+    if (!aiMesh->HasTextureCoords(0) || aiMesh->mNumUVComponents[0] != 2) {
+        printf("Assimp: Ignoring %s UV - length is not 2: %u.\n",
+           aiMesh->mName.C_Str(), aiMesh->mNumUVComponents[0]);
+    }
+
+    // Is it possible to use vector.resize() & index?
+    mesh->name = aiMesh->mName.C_Str();
 
     for(unsigned int i = 0; i < aiMesh->mNumVertices; i++) {
         Vertex vertex;
@@ -95,6 +121,10 @@ void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
         vertex.normal = glm::vec3(aiMesh->mNormals[i].x,
                                   aiMesh->mNormals[i].y,
                                   aiMesh->mNormals[i].z);
+        if (aiMesh->HasTextureCoords(0) && aiMesh->mNumUVComponents[0] == 2) {
+            vertex.uv = glm::vec2(aiMesh->mTextureCoords[0][i].x, 
+                                  aiMesh->mTextureCoords[0][i].y);
+        }
         mesh->vertices.push_back(vertex);
         mesh->worldVerticies.push_back(vertex);
     }
@@ -109,6 +139,95 @@ void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
   if (aiMesh->mNumBones > 0) {
     loadAssimpHelperSkel(mesh, aiMesh, scene);
   }
+
+    // load material
+    mesh->material = new Material();
+    aiMaterial* aiMaterial = scene->mMaterials[aiMesh->mMaterialIndex];
+
+    aiColor3D color(0.f, 0.f, 0.f);
+    aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    mesh->material->diffuse = glm::vec4(color.r, color.g, color.b, 1.0f);
+    aiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
+    mesh->material->specular = glm::vec4(color.r, color.g, color.b, 1.0f);
+    aiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
+    mesh->material->ambient = glm::vec4(color.r, color.g, color.b, 1.0f);
+    aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+    mesh->material->emission = glm::vec4(color.r, color.g, color.b, 1.0f);
+    //float f = mesh->material->shininess;
+    //aiMaterial->Get(AI_MATKEY_SHININESS, f);
+    //mesh->material->shininess = f;
+
+    // load UV texture
+    if(aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+    //if (false) {
+        aiString texFile;
+        aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texFile);
+        printf(
+            "Assimp: Mesh \"%s\" has %u textures, loading the first one: "
+            "\"%s\"\n",
+            aiMesh->mName.C_Str(),
+            aiMaterial->GetTextureCount(aiTextureType_DIFFUSE),
+            aiMaterial->GetName().C_Str());
+
+        if(const aiTexture* aiTexture = scene->GetEmbeddedTexture(texFile.C_Str())) {
+            // embedded file
+            printf("Assimp: Loading \"%s\" texture - embedded W:H = %u:%u\n",
+                    aiMaterial->GetName().C_Str(), aiTexture->mWidth,
+                    aiTexture->mHeight);
+            if(aiTexture->mHeight == 0) {
+                printf("        (Compressed: %s file)\n", aiTexture->achFormatHint);
+                int ok, width, height, numOfChannels;
+                ok = stbi_info_from_memory(
+                    reinterpret_cast<const unsigned char*>(aiTexture->pcData),
+                    aiTexture->mWidth, &width, &height, &numOfChannels);
+                printf(
+                    "Assimp: Loading \"%s\" texture info %d - W:H = "
+                    "%d:%d[%d]\n",
+                    aiMaterial->GetName().C_Str(), ok, width, height,
+                    numOfChannels);
+                // TODO: DEBUG NEED TO REMOVE
+                /*unsigned char* data = stbi_load_from_memory(
+                    reinterpret_cast<const unsigned char*>(aiTexture->pcData),
+                    aiTexture->mWidth, &width, &height, &numOfChannels, 3);*/
+                unsigned char* data =
+                    stbi_load("assets/animation/Texture-Bee.JPG", &width,
+                              &height, &numOfChannels, 3);
+                if(ok == 0 || !data) {
+                    printf("Assimp: Loading \"%s\" texture failed\n",
+                            aiMaterial->GetName().C_Str());
+                } else {
+                    printf("Assimp: Loading \"%s\" texture successed - W:H = %d:%d[%d]\n",
+                            aiMaterial->GetName().C_Str(), width, height, numOfChannels);
+
+                    mesh->material->texture = new Texture();
+                    glGenTextures(1, &(mesh->material->texture->textureID));
+                    glBindTexture(GL_TEXTURE_2D,
+                                  mesh->material->texture->textureID);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                                    GL_REPEAT);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                                    GL_REPEAT);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R,
+                                    GL_REPEAT);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                                    GL_NEAREST);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                    GL_NEAREST);
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                                 GL_RGB, GL_UNSIGNED_BYTE, data);
+                    stbi_image_free(data);
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                }
+            } else {
+                printf("        (Not compressed, not implemented so nothing will happen)\n");
+            }
+        } else {
+            // compressed file
+            printf("Assimp: Loading \"%s\" texture - external.\n",
+                    aiMaterial->GetName().C_Str());
+            printf("        (Not implemented so nothing will happen)\n");
+        }
+    }
 }
 
 void AssimpModel::loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh* aiMesh,
@@ -452,9 +571,9 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
     glUseProgram(0);
 }
 
+// currently in use
 void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
                        const glm::mat4& transformMtx, const bool ignoreDepth) {
-
     if (!material) {
         return;
     }
@@ -466,6 +585,12 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
     material->setUniforms(viewProjMtx, viewMtx,
                           transformMtx * modelMtx * betterView);
     for (int i = 0; i < meshes.size(); i++) {
+        if (useShader && meshes[i]->material) {
+            GLuint shaderM = meshes[i]->material->shader;
+            glUseProgram(shaderM);
+            meshes[i]->material->setUniforms(
+                viewProjMtx, viewMtx, transformMtx * modelMtx * betterView);
+        }
         meshes[i]->draw();
     }
     if (ignoreDepth) glEnable(GL_DEPTH_TEST);
