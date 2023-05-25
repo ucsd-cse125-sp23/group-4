@@ -11,17 +11,14 @@ class Load {
   std::vector<Texture> frames;
   int index;
   float timeOnFrame;
-  Timer time;
-  bool gameStart;
   bool forward;
+  double lastTime;
 
-  explicit Load(Camera* camFromWindow) {
+  explicit Load() {
     index = 0;
     timeOnFrame = 0;
-    time.time = 10;
-    time.countdown = true;
     forward = true;
-    gameStart = false;
+    lastTime = glfwGetTime();
 
     for (int i = 0; i < 24; i++) {
       Texture frame;
@@ -32,11 +29,11 @@ class Load {
     }
   }
 
-  void update(float delta) {
-    time.Update(delta);
-    if (time.time == 0) {
-      gameStart = true;
-    }
+  void update() {
+    double nowTime = glfwGetTime();
+    float delta = nowTime - lastTime;
+    lastTime = nowTime;
+    
     timeOnFrame += delta;
     if (timeOnFrame >= 0.05) {
       if (forward) {
