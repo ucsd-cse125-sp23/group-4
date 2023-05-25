@@ -8,7 +8,7 @@ void HUD::draw(GLFWwindow* window) {
 
   std::map<std::string, Timer> player_times;
 
-  float scale = static_cast<float>(width) / float(800);
+  float scale = static_cast<float>(width) / static_cast<float>(800);
 
   for (GameThing* e : scene->gamethings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
@@ -196,7 +196,7 @@ void HUD::gameOver() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = static_cast<float>(width) / float(800);
+  float scale = static_cast<float>(width) / static_cast<float>(800);
   if (scene->time.time <= 0.1) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);

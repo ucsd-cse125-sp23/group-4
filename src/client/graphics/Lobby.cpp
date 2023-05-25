@@ -48,7 +48,7 @@ void Lobby::drawBackground() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = static_cast<float>(width) / float(800);
+  float scale = static_cast<float>(width) / static_cast<float>(800);
 
   glColor3f(213.0f / 256.0f, 236.0f / 256.0f, 241.0f / 256.0f);
   glBegin(GL_QUADS);
@@ -134,7 +134,7 @@ void Lobby::drawPlayers() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = float(width) / float(800);
+  float scale = static_cast<float>(width) / static_cast<float>(800);
 
   int size = (width / 8 > 200) ? 200 : width / 8;
   float midpoint = width / 2.0f;

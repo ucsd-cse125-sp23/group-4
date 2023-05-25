@@ -23,7 +23,7 @@ void Start::draw() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = static_cast<float>(width) / float(800);
+  float scale = static_cast<float>(width) / static_cast<float>(800);
   std::string name = "Tag Guys";
   float n_width = fr->TextWidth(name, 2 * scale);
   fr->RenderText(width, height, name, (width / 2.0f) - (n_width / 2.0f) - 25.0f,

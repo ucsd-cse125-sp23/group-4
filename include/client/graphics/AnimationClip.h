@@ -11,7 +11,6 @@
 #include "client/graphics/Pose.h"
 #include "client/graphics/core.h"
 #include "client/graphics/imported/Tokenizer.h"
-using namespace glm;
 
 ////////////////////////////////////////////////////////////////////////////////
 
