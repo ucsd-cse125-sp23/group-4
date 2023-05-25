@@ -1,6 +1,7 @@
 #include "client/graphics/Start.h"
 
-void Start::update(float delta) {
+void Start::update(float delta, UserState& ourPlayerUpdates) {
+  Scene::update(delta, ourPlayerUpdates);
   timeElapsed += delta;
   offset += (0.25 * delta);
   if (timeElapsed >= 1.0 && renderText) {

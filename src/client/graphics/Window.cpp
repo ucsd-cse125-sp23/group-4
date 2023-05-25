@@ -177,7 +177,9 @@ message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
   // Perform any updates as necessary.
   Cam->UpdateView(window);
 
-  UserState inputChanges = gameScene->update(deltaTime);
+  UserState inputChanges;
+
+  gameScene->update(deltaTime, inputChanges);
   /*
   Lobby* lobby;
   if (dynamic_cast<Start*>(gameScene) != nullptr) {

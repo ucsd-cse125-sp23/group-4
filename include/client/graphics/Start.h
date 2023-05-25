@@ -26,5 +26,5 @@ class Start : public Scene, public InputListener {
 
   void drawBackground();
 
-  void update(float delta);
+  void update(float delta, UserState& ourPlayerUpdates);
 };

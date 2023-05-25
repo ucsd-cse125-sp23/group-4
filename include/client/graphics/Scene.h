@@ -169,9 +169,10 @@ class Scene {
   void setToUserFocus(GameThing* t);
   virtual void init(void);
   virtual void init(PlayerModel* player);
-  UserState update(float delta);          // broadcast to net
-  void updateState(SceneState newState);  // receive from net
-  void draw();
+  virtual void update(float delta,
+                      UserState& ourPlayerUpdates);  // broadcast to net
+  void updateState(SceneState newState);             // receive from net
+  virtual void draw();
 
   void gui();
 

@@ -35,7 +35,7 @@ class Load : public Scene {
 
   void init(PlayerModel* player) { selectedModel = player; }
 
-  void update(float delta) {
+  void update(float delta, UserState& ourPlayerUpdates) {
     time.Update(delta);
     if (time.time == 0) {
       gameStart = true;
