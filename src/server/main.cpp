@@ -1,8 +1,8 @@
 #include <boost/asio.hpp>
 #include <boost/functional/overloaded_function.hpp>
 #include <config/lib.hpp>
-#include <network/game.hpp>
 #include <network/tcp_server.hpp>
+#include <server/game.hpp>
 
 int main(int argc, char* argv[]) {
   auto config = get_config();
