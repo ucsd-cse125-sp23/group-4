@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "client/graphics/FontRenderer.h"
 #include "client/graphics/Input.h"
 #include "client/graphics/InputListener.h"
