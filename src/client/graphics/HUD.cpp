@@ -6,7 +6,7 @@ void HUD::draw(GLFWwindow* window) {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
-  std::map<std::string, Timer> player_times;
+  std::map<std::string, Player*> players;
 
   float scale = static_cast<float>(width) / static_cast<float>(800);
 
@@ -14,7 +14,7 @@ void HUD::draw(GLFWwindow* window) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       std::string name = player->name;
-      player_times[name] = player->time;
+      players[name] = player;
       const unsigned char* cname =
           reinterpret_cast<const unsigned char*>(name.c_str());
       glm::vec4 position = glm::vec4(player->transform.position, 1.0f);
@@ -44,7 +44,7 @@ void HUD::draw(GLFWwindow* window) {
     }
   }
 
-  drawLeaderboard(window, scale, player_times);
+  drawLeaderboard(window, scale, players);
 
   glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
   std::string game_time = scene->time.ToString();
@@ -98,22 +98,22 @@ void HUD::draw(GLFWwindow* window) {
 }
 
 void HUD::drawLeaderboard(GLFWwindow* window, float scale,
-                          std::map<std::string, Timer> player_times) {
+                          std::map<std::string, Player*> players) {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-
-  Timer time;
-  std::string str;
-  for (auto times : player_times) {
-    str = times.first;
-    time = times.second;
-    str += " " + time.ToString();
-  }
 
   int size = (width / 10 > 250) ? 250 : width / 10;
   int x = size * 3 - (25 * scale);
   int y = height - size - 10;
-  for (int i = 0; i < 4; i++) {
+
+  Player* player;
+  std::string str;
+  for (auto p : players) {
+    str = p.first;
+    player = p.second;
+    Timer time = player->time;
+    str += " " + time.ToString();
+
     glViewport(x, y, size, size);
 
     Camera viewport;

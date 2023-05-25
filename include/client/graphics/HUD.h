@@ -23,7 +23,7 @@ class HUD {
   void draw(GLFWwindow* window);
 
   void drawLeaderboard(GLFWwindow* window, float scale,
-                       std::map<std::string, Timer> player_times);
+                       std::map<std::string, Player*> players);
 
   void drawMinimap();
 

@@ -150,16 +150,16 @@ void Lobby::init(void) {
   node["wasp3"] = thing_wasp3;
   node["wasp4"] = thing_wasp4;
 
-  thing_wasp->transform.position = vec3(0.0f, 0.0f, 0.0f);
+  thing_wasp->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
   thing_wasp->model = sceneResources->models["wasp"];
 
-  thing_wasp2->transform.position = vec3(0.0f, 0.0f, 0.0f);
+  thing_wasp2->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
   thing_wasp2->model = sceneResources->models["wasp2"];
 
-  thing_wasp3->transform.position = vec3(0.0f, 0.0f, 0.0f);
+  thing_wasp3->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
   thing_wasp3->model = sceneResources->models["wasp3"];
 
-  thing_wasp4->transform.position = vec3(0.0f, 0.0f, 0.0f);
+  thing_wasp4->transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
   thing_wasp4->model = sceneResources->models["wasp4"];
 
   buildSceneTree();

@@ -183,7 +183,7 @@ void Lobby::lockIn() {
     GLFWwindow* window = glfwGetCurrentContext();
     int width, height;
     glfwGetWindowSize(window, &width, &height);
-    float scale = static_cast<float>(width) / float(800);
+    float scale = static_cast<float>(width) / static_cast<float>(800);
     glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
 
     float x = -1 + offset;
