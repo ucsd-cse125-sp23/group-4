@@ -68,7 +68,7 @@ void print_versions() {
 #endif
 }
 
-std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
+std::unique_ptr<Client> network_init() {
   auto config = get_config();
   Addr server_addr{config["server_address"], config["server_port"]};
 
@@ -93,14 +93,13 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
   auto write_handler = [](std::size_t bytes_transferred,
                           const message::Message& m, Client& client) {};
 
-  auto client = std::make_unique<Client>(
-      io_context, server_addr, connect_handler, read_handler, write_handler);
+  auto client = std::make_unique<Client>(server_addr, connect_handler,
+                                         read_handler, write_handler);
   return client;
 }
 
 int main(int argc, char* argv[]) {
-  boost::asio::io_context io_context;
-  auto client = network_init(io_context);
+  auto client = network_init();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
@@ -132,7 +131,7 @@ int main(int argc, char* argv[]) {
   while (!net_assigned) {
     std::cout << "(net_assigned: " << net_assigned << ") ";
     std::cout << "Waiting for server to assign pid..." << std::endl;
-    io_context.poll();
+    client->poll();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
@@ -148,7 +147,7 @@ int main(int argc, char* argv[]) {
     lastTime = nowTime;
 
     // POLL FROM SERVER
-    io_context.poll();
+    client->poll();
 
     // Idle callback. Updating local objects, input, etc.
     // Get a message back of all updates

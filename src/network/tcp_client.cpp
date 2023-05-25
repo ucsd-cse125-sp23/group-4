@@ -1,13 +1,13 @@
+#include <boost/asio.hpp>
 #include <iostream>
 #include <memory>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 
-Client::Client(boost::asio::io_context& io_context, Addr& addr,
-               ConnectHandler connect_handler, ReadHandler read_handler,
-               WriteHandler write_handler)
-    : socket_(io_context) {
-  tcp::resolver resolver(io_context);
+Client::Client(Addr& addr, ConnectHandler connect_handler,
+               ReadHandler read_handler, WriteHandler write_handler)
+    : io_context_(boost::asio::io_context()), socket_(io_context_) {
+  tcp::resolver resolver(io_context_);
   auto endpoints = resolver.resolve(addr.host, std::to_string(addr.port));
   std::cout << "(Client::Client) Attempting to connect to " << addr
             << std::endl;
@@ -56,3 +56,5 @@ void Client::write(message::Message m) {
   // std::cout << "Queueing write to server: " << m << std::endl;
   connection->write(m);
 }
+
+void Client::poll() { io_context_.poll(); }

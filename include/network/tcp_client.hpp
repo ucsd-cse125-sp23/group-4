@@ -24,9 +24,9 @@ class Client {
   using WriteHandler =
       std::function<void(std::size_t, const message::Message &, Client &)>;
 
-  Client(boost::asio::io_context &, Addr &, ConnectHandler, ReadHandler,
-         WriteHandler);
+  Client(Addr &, ConnectHandler, ReadHandler, WriteHandler);
 
+  void poll();
   void write(message::Message);
   template <typename T, typename... Args>
   void write(Args &&...);
@@ -34,8 +34,9 @@ class Client {
   message::ClientID id_;
 
  private:
-  std::unique_ptr<Connection<message::Message>> connection;
+  boost::asio::io_context io_context_;
   tcp::socket socket_;
+  std::unique_ptr<Connection<message::Message>> connection;
 };
 
 template <typename T, typename... Args>
