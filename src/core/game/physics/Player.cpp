@@ -2,7 +2,7 @@
 
 #include "core/util/global.h"
 
-uint32_t Player::maxId = 0;
+uint32_t Player::maxId = 1;
 
 Player::Player()
     : PObject(PLAYER_BOUNDING_SHAPE, PLAYER_LAYER, 0, false),
