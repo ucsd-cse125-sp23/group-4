@@ -13,15 +13,15 @@ std::string Message::to_string() const {
   // clang-format off
   std::string str =
       std::string("") +
-      "{" +                                                                     "\n" // NOLINT
-      "  type: " + std::string(magic_enum::enum_name(type)) + "," +             "\n" // NOLINT
-      "  metadata: {," +                                                        "\n" // NOLINT
-      "    player_id: " + boost::uuids::to_string(metadata.player_id) + "," +   "\n" // NOLINT
-      "    time: " + std::to_string(metadata.time) + "," +                      "\n" // NOLINT
-      "  }," +                                                                  "\n" // NOLINT
-      "  body: {" +                                                             "\n" // NOLINT
-      "    " + body_str +                                                       "\n" // NOLINT
-      "  }" +                                                                   "\n" // NOLINT
+      "{" +                                                             "\n"
+      "  type: " + std::string(magic_enum::enum_name(type)) + "," +     "\n"
+      "  metadata: {," +                                                "\n"
+      "    client_id: " + boost::uuids::to_string(metadata.id) + "," + "\n"
+      "    time: " + std::to_string(metadata.time) + "," +              "\n"
+      "  }," +                                                          "\n"
+      "  body: {" +                                                     "\n"
+      + body_str +                                                      "\n"
+      "  }" +                                                           "\n"
       "}";
   // clang-format on
   return str;
@@ -43,7 +43,7 @@ Type get_type(const Message::Body& body) {
 }
 
 std::string Assign::to_string() const {
-  return "assigning player_id: " + boost::uuids::to_string(player_id);
+  return "assigning player_id: " + std::to_string(pid);
 }
 
 std::string Greeting::to_string() const { return greeting; }
@@ -52,18 +52,14 @@ std::string Notify::to_string() const { return message; }
 
 std::string GameStateUpdateItem::to_string() const {
   // clang-format off
-    std::string str = std::string("") + "{\n" +
-                      "  id: " + std::to_string(id) +
-                      ",\n" +
-                      "  position: {\n" +
-                      "  " + std::to_string(posx) +
-                      ", " + std::to_string(posy) +
-                      ", " + std::to_string(posz) +
-                      "\n" +
-                      "  },\n" +
-                      "  heading: " + std::to_string(heading) +
-                      ",\n" +
-                      "}";
+    std::string str = std::string("") +
+      "      id: " + std::to_string(id) + "," +     "\n"
+      "      position: {" +                         "\n"
+      "        " + std::to_string(posx) + "," +     "\n"
+      "        " + std::to_string(posy) + "," +     "\n"
+      "        " + std::to_string(posz) + "," +     "\n"
+      "      }," +                                  "\n"
+      "      heading: " + std::to_string(heading) + "\n";
   // clang-format on
   return str;
 }
@@ -74,7 +70,7 @@ std::string GameStateUpdate::to_string() const {
                       "game things:\n";
   // clang-format on
   for (auto i : things) {
-    str += i->to_string();
+    str += i.second.to_string();
   }
   str += "\n}...\n";
   return str;
@@ -82,20 +78,15 @@ std::string GameStateUpdate::to_string() const {
 
 std::string UserStateUpdate::to_string() const {
   // clang-format off
-    std::string str = std::string("") + "{\n" +
-                      "  id: " + std::to_string(id) +
-                      ",\n" +
-                      "  movement delta: {\n" +
-                      "  " + std::to_string(movx) +
-                      ", " + std::to_string(movy) +
-                      ", " + std::to_string(movz) +
-                      "\n" +
-                      "  },\n" +
-                      "  jump: " + std::to_string(jump) +
-                      ",\n" +
-                      "  heading: " + std::to_string(heading) +
-                      ",\n" +
-                      "}";
+    std::string str = std::string("") +
+      "      id: " + std::to_string(id) + "," +     "\n"
+      "      movement_delta: {" +                   "\n"
+      "        " + std::to_string(movx) + "," +     "\n"
+      "        " + std::to_string(movy) + "," +     "\n"
+      "        " + std::to_string(movz) + "," +     "\n"
+      "      }," +                                  "\n"
+      "      jump: " + std::to_string(jump) +       "\n"
+      "      heading: " + std::to_string(heading) + "\n";
   // clang-format on
   return str;
 }

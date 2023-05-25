@@ -1,8 +1,8 @@
 #include "core/util/global.h"
 
 int TAG_COOLDOWN = 20;
-float JUMP_VELOCITY = 0.3f;
-float GRAVITY_STRENGTH = 0.01f;
+float JUMP_VELOCITY = 1.2f;
+float GRAVITY_STRENGTH = 0.2f;
 
 int PLAYER_LAYER = 0;
 int ENVIRONMENT_LAYER = 1;

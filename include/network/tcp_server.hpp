@@ -8,38 +8,49 @@
 #include <network/message.hpp>
 #include <unordered_map>
 #include <utility>
-#include <vector>
 
 using boost::asio::ip::tcp;
-using message::PlayerID;
+using message::ClientID;
 
 class Server {
  public:
-  Server(boost::asio::io_context& io_context, int port);
+  using AcceptHandler = std::function<void(ClientID, Server&)>;
+  using ReadHandler = std::function<void(const message::Message&, Server&)>;
+  using WriteHandler =
+      std::function<void(std::size_t, const message::Message&, Server&)>;
+  using TickHandler = std::function<void(Server&)>;
 
- private:
-  int update_num_ = 1;
-  std::chrono::milliseconds tick_rate_ = std::chrono::milliseconds(2000);
-  boost::asio::steady_timer timer_;
-  tcp::acceptor acceptor_;
-  std::unordered_map<PlayerID, std::unique_ptr<Connection<message::Message>>,
-                     boost::hash<PlayerID>>
-      connections_;
+  Server(int port, AcceptHandler, ReadHandler, WriteHandler, TickHandler);
 
-  friend std::ostream& operator<<(std::ostream&, Server*);
-  void do_accept();
-  void read(const PlayerID&);
-  void write(const PlayerID&, const message::Message&);
-  template <typename T, typename... Args>
-  void write(const PlayerID&, Args&&...);
+  void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);
   template <typename T, typename... Args>
+  void write(const ClientID&, Args&&...);
+  template <typename T, typename... Args>
   void write_all(Args&&...);
+
+  constexpr static std::chrono::milliseconds TICK_RATE{50};
+
+ private:
+  void do_accept();
   void tick();
+
+  friend std::ostream& operator<<(std::ostream&, Server*);
+
+  boost::asio::io_context io_context_;
+  AcceptHandler accept_handler_;
+  ReadHandler read_handler_;
+  WriteHandler write_handler_;
+  TickHandler tick_handler_;
+  boost::asio::steady_timer timer_;
+  tcp::acceptor acceptor_;
+  std::unordered_map<ClientID, std::unique_ptr<Connection<message::Message>>,
+                     boost::hash<ClientID>>
+      connections_;
 };
 
 template <typename T, typename... Args>
-void Server::write(const PlayerID& player_id, Args&&... args) {
+void Server::write(const ClientID& player_id, Args&&... args) {
   T body{std::forward<Args>(args)...};
   message::Type type = message::get_type(body);
   message::Metadata metadata{player_id, std::time(nullptr)};

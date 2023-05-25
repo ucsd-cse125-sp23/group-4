@@ -18,6 +18,7 @@
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
 #include <map>
+#include <network/message.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -33,11 +34,9 @@
 #include "client/graphics/Obj.h"
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
-#include "client/graphics/SceneState.h"
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
-#include "client/graphics/UserState.h"
 #include "client/graphics/shader.h"
 
 struct Character {
@@ -99,6 +98,7 @@ class SceneResourceMap {
 
 class Scene {
  public:
+  static int _myPlayerId;
   static bool _freecam;
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
@@ -106,8 +106,7 @@ class Scene {
   SceneResourceMap* sceneResources;
 
   Camera* camera;
-
-  SceneState gameStateCache;
+  Player* myPlayer = nullptr;
 
   // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
@@ -161,12 +160,13 @@ class Scene {
     node["world"] = new Node("world");
   }
 
-  Player* createPlayer(int id, bool isUser);
+  Player* createPlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
   void init(void);
-  UserState update(float delta);          // broadcast to net
-  void updateState(SceneState newState);  // receive from net
+
+  message::UserStateUpdate update(float delta);         // broadcast to net
+  void updateState(message::GameStateUpdate newState);  // receive from net
 
   void drawHUD(GLFWwindow* window);
   void draw();
