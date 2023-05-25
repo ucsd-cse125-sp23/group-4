@@ -28,7 +28,7 @@ Client::Client(Addr& addr, ConnectHandler connect_handler,
                                      const message::Message& m) {
           if (ec) return;
 
-          // save player_id assigned by the server
+          // save client_id assigned by the server
           if (const message::Assign* body =
                   boost::get<message::Assign>(&m.body)) {
             id_ = m.metadata.id;
@@ -52,9 +52,6 @@ Client::Client(Addr& addr, ConnectHandler connect_handler,
       });
 }
 
-void Client::write(message::Message m) {
-  // std::cout << "Queueing write to server: " << m << std::endl;
-  connection->write(m);
-}
+void Client::write(message::Message m) { connection->write(m); }
 
 void Client::poll() { io_context_.poll(); }

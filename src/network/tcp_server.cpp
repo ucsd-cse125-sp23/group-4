@@ -101,12 +101,10 @@ void Server::do_accept() {
 }
 
 void Server::write(const ClientID& id, const message::Message& m) {
-  // std::cout << "Queueing write to client: " << m << std::endl;
   connections_[id]->write(m);
 }
 
 void Server::write_all(message::Message& m) {
-  // std::cout << "Queueing write to all clients: " << m << std::endl;
   for (auto& kv : connections_) {
     m.metadata.id = kv.first;
     kv.second->write(m);
