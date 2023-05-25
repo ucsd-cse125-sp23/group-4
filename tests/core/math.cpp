@@ -3,7 +3,6 @@
 
 #include "core/math/matrix.h"
 #include "core/math/vector.h"
-#include "core/math/matrix.h"
 
 using Catch::Matchers::WithinAbs;
 
@@ -48,7 +47,6 @@ TEST_CASE("Basic Vector Operations", "[vector]") {
   CHECK_THAT(max(a), WithinAbs(3.000, 0.001));
   CHECK(min(a, b) == a);
   CHECK(max(a, b) == b);
-
 
   vec4i w = vec4i(1, 2, 3, 4);
   vec4i x = vec4i(2, 3, 4, 5);
@@ -142,7 +140,6 @@ TEST_CASE("Baisc Matrix Operations", "[matrix]") {
   CHECK_THAT(m0(2, 2), WithinAbs(1, 0.001));
   m0 = mat3f(1, 2, 3, 4, 5, 6, 7, 8, 9);
   CHECK(m0 * vec3f(1, 2, 3) == vec3f(14, 32, 50));
-
 
   mat4f m1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 

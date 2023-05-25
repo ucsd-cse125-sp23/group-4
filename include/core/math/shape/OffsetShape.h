@@ -2,7 +2,6 @@
 
 #include "core/math/shape/ConvexShape.h"
 
-
 class OffsetShape : public ConvexShape {
  private:
   ConvexShape* original;

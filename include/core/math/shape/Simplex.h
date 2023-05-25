@@ -6,7 +6,6 @@
 
 #include "core/math/vector.h"
 
-
 struct Simplex {
  private:
   std::array<vec3f, 4> pts;

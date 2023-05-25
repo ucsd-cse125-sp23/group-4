@@ -2,7 +2,6 @@
 
 #include "core/math/shape/ConvexMeshShape.h"
 
-
 class AABShape : public ConvexMeshShape {
  public:
   AABShape(vec3f min, vec3f max)

@@ -2,7 +2,6 @@
 
 #include "core/math/shape/ConvexShape.h"
 
-
 class SphereShape : public ConvexShape {
  private:
   float radius;

@@ -2,8 +2,6 @@
 
 #include "core/game/event/EventManager.h"
 #include "core/game/level/Level.h"
-
-
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/modifier/GravityModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"

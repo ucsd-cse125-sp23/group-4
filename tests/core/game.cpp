@@ -2,7 +2,6 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 using Catch::Matchers::WithinAbs;
 
-#include "core/lib.hpp"
 #include <string>
 
 #include "core/lib.hpp"
@@ -63,7 +62,6 @@ Environment* jumpEnvironment() {
   environment->addBox(vec3f(1, 0, -5), vec3f(3, 3, 5));
   environment->addBox(vec3f(3, 0, -5), vec3f(5, 4, 5));
 
-
   return environment;
 }
 
@@ -101,7 +99,6 @@ TEST_CASE("Collision", "[game]") {
     level->tick();
     CHECK(isAt(player, vec3f(2.5f, -3.01f, 0.0f)));
   }
-
 
   REQUIRE_NOTHROW(terminateLevel());
 }

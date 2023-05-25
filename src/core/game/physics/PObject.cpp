@@ -1,6 +1,5 @@
 #include "core/game/physics/PObject.h"
 
-
 uint32_t PObject::maxId = 0;
 
 PObject::PObject(BoundingShape* shape, unsigned int layer, float friction,

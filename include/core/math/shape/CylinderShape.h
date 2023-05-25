@@ -2,7 +2,6 @@
 
 #include "core/math/shape/ConvexShape.h"
 
-
 static int sign(float f) {
   if (f == 0)
     return 0;

@@ -1,11 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "core/math/vector.h"
 #include "core/math/matrix.h"
 #include "core/math/shape/AABShape.h"
 #include "core/math/shape/CylinderShape.h"
-#include "core/math/shape/AABShape.h"
 #include "core/math/shape/OffsetShape.h"
 #include "core/math/shape/SphereShape.h"
 #include "core/math/vector.h"

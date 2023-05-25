@@ -141,7 +141,6 @@ inline bool operator!=(const TMat3<T>& m0, const TMat3<T>& m1) {
   return !(m0 == m1);
 }
 
-
 using mat3f = TMat3<float>;
 using mat4f = TMat4<float>;
 template <typename T>
@@ -178,7 +177,6 @@ inline std::ostream& operator<<(std::ostream& os, const TMat3<T>& v) {
             << " " << v(2, 0) << ", " << v(2, 1) << ", " << v(2, 2) << ")"
             << std::endl;
 }
-
 
 template <typename T>
 inline TMat4<T> operator+(const TMat4<T>& m0, const TMat4<T>& m1) {
@@ -387,9 +385,6 @@ TMat4<T> transpose(const TMat4<T>& m) {
                   m(2, 3), m(3, 3));
 }
 
-
-
-
 template <typename T>
 inline TMat3<T> operator+(const TMat3<T>& m0, const TMat3<T>& m1) {
   TMat3<T> ret;
@@ -539,8 +534,6 @@ TMat3<T> transpose(const TMat3<T>& m) {
                   m(1, 2), m(2, 2));
 }
 
-
-
 template <typename T>
 TMat4<T> translate(TVector3<T> pos) {
   return TMat4<T>(T(1), T(0), T(0), pos[0], T(0), T(1), T(0), pos[1], T(0),
@@ -572,7 +565,6 @@ TMat4<T> scale(TVector3<T> s) {
   return TMat4<T>(s[0], T(0), T(0), T(0), T(0), s[1], T(0), T(0), T(0), T(0),
                   s[2], T(0), T(0), T(0), T(0), T(1));
 }
-
 
 template <typename T>
 TMat4<T> translate_scale(TVector3<T> t, TVector3<T> s) {
