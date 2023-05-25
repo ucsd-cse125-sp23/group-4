@@ -4,7 +4,7 @@ void Lobby::init(void) {
   // Create a mesh palette
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
-                          // resource)
+                  // resource)
   sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
 
   // Create a shader program with a vertex shader and a fragment shader.
@@ -74,13 +74,14 @@ void Lobby::init(void) {
   // Create a model palette
   sceneResources->models["player"] = new Model;
   sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
-  sceneResources->models["player"]->material = sceneResources->materials["toon.blue"];
+  sceneResources->models["player"]->material =
+      sceneResources->materials["toon.blue"];
   player_models.push_back(sceneResources->models["player"]);
 
   sceneResources->models["player2"] = new Model;
   sceneResources->models["player2"]->mesh = sceneResources->meshes["player"];
   sceneResources->models["player2"]->material =
-      sceneResources->materials["marble"]; 
+      sceneResources->materials["marble"];
   player_models.push_back(sceneResources->models["player2"]);
 
   sceneResources->models["player3"] = new Model;
@@ -122,15 +123,19 @@ void Lobby::init(void) {
   node["player4"] = thing_player4;
 
   thing_player->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
   thing_player->model = sceneResources->models["player"];
 
   thing_player2->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player2->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
   thing_player2->model = sceneResources->models["player2"];
 
   thing_player3->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player3->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
   thing_player3->model = sceneResources->models["player3"];
 
   thing_player4->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player4->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
   thing_player4->model = sceneResources->models["player4"];
 
   buildSceneTree();
