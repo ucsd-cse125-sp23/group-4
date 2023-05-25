@@ -1,8 +1,7 @@
 /**************************************************
  * Collider.h
  * Special implementation of Node
- * Just a holder for collision data (vertices) currently.
- * TODO: integrate collision detection
+ * Just a holder for collision data (vertices) for drawing.
  *****************************************************/
 #define GLM_FORCE_RADIANS
 
@@ -15,6 +14,7 @@
 #include <string>
 #include <vector>
 
+#include "client/graphics/ColliderData.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Node.h"
 
@@ -22,10 +22,23 @@ class Collider : public Node {
  public:
   std::vector<glm::vec3> vertices;  // passed in as world space
 
+  explicit Collider(ColliderData data) {
+    name = data.name;
+    // TODO(matthew)
+  }
+
   explicit Collider(std::vector<glm::vec3> v) { vertices = v; }
 
   Collider(std::vector<glm::vec3> v, Mesh* displayMesh) : Collider(v) {
     vertices = v;
+  }
+
+  std::vector<vec3f> GetVerticesCore() {
+    std::vector<vec3f> vfs;
+    for (auto v : vertices) {
+      vfs.push_back(vec3f(v.x, v.y, v.z));
+    }
+    return vfs;
   }
 
   void draw_debug(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx,

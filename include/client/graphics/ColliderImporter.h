@@ -8,26 +8,24 @@
  *   std::vector<Collider> mapColliders =
  *       ColliderImporter::ImportCollisionData("assets/models/file.obj");
  *****************************************************/
-#define GLM_FORCE_RADIANS
 
 #pragma once
 
 #include <stdio.h>
 
-#include <glm/glm.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "client/graphics/Collider.h"
-#include "client/graphics/Mesh.h"
+#include "client/graphics/ColliderData.h"
+#include "core/math/vector.h"
 
 class ColliderImporter {
  public:
-  static std::vector<Collider> ImportCollisionData(const char* filename) {
-    std::vector<Collider> result;
+  static std::vector<ColliderData> ImportCollisionData(const char* filename) {
+    std::vector<ColliderData> result;
 
-    std::vector<glm::vec3> temp_vertices, vertices;
+    std::vector<vec3f> temp_vertices, vertices;
     // std::vector< glm::vec3 > temp_normals, normals;
     // std::vector< unsigned int > temp_vertexIndices, indices;
     // std::vector< unsigned int > temp_normalIndices;
@@ -55,7 +53,7 @@ class ColliderImporter {
         // separate object. for collision we need to separate these
 
         if (temp_vertices.size() > 0) {
-          Collider c = Collider(temp_vertices);
+          ColliderData c = ColliderData(temp_vertices);
           c.name = std::string(currColName);
           result.push_back(c);
 
@@ -67,11 +65,11 @@ class ColliderImporter {
         fscanf(file, "%s", temp_str);
         currColName = std::string(temp_str);
       } else if (strcmp(lineHeader, "v") == 0) {
-        glm::vec3 vertex;
+        vec3f vertex;
         fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
         temp_vertices.push_back(vertex);
       } else if (strcmp(lineHeader, "vn") == 0) {
-        glm::vec3 normal;
+        vec3f normal;
         fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
         // temp_normals.push_back(normal);
       } else if (strcmp(lineHeader, "f") == 0) {
