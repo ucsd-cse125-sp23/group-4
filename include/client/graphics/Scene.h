@@ -25,20 +25,23 @@
 #include <utility>
 #include <vector>
 
-#include "./shader.h"
-#include "Camera.h"
-#include "Cube.h"
-#include "GameThing.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Model.h"
-#include "Node.h"
-#include "Obj.h"
-#include "Player.h"
-#include "PlayerModel.h"
-#include "Skeleton.h"
-#include "Texture.h"
-#include "Timer.h"
+#include "client/graphics/Camera.h"
+#include "client/graphics/Cube.h"
+#include "client/graphics/GameThing.h"
+#include "client/graphics/Material.h"
+#include "client/graphics/Mesh.h"
+#include "client/graphics/Model.h"
+#include "client/graphics/Node.h"
+#include "client/graphics/Obj.h"
+#include "client/graphics/Player.h"
+#include "client/graphics/PlayerModel.h"
+#include "client/graphics/SceneState.h"
+#include "client/graphics/Skeleton.h"
+#include "client/graphics/SoundEffect.h"
+#include "client/graphics/Texture.h"
+#include "client/graphics/UserState.h"
+#include "client/graphics/shader.h"
+#include "client/graphics/Timer.h"
 
 class SceneResourceMap {
  public:
@@ -52,6 +55,7 @@ class SceneResourceMap {
   std::map<std::string, Texture*> textures;
   std::map<std::string, Model*>
       models;  // more complex; meshes + other info combined
+  std::map<std::string, SoundEffect*> sounds;
   // std::map< std::string, Light* > light;
 
   SceneResourceMap() {}
@@ -82,6 +86,10 @@ class SceneResourceMap {
     for (auto entry : models) {
       delete entry.second;
     }
+    // sounds
+    for (auto entry : sounds) {
+      delete entry.second;
+    }
   }
 };
 
@@ -95,6 +103,9 @@ class Scene {
 
   Camera* camera;
 
+  SceneState gameStateCache;
+
+  // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
   // by setting the child_nodes.
   std::map<std::string, Node*> node;
@@ -109,7 +120,7 @@ class Scene {
     camera->name = "_camera";
     camera->Fixed = false;
     gamethings.push_back(camera);
-    time.time = 7.0f; 
+    time.time = 300.0f; 
     time.countdown = true;
 
     sceneResources = new SceneResourceMap();
@@ -152,10 +163,15 @@ class Scene {
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
   }
+
+  Player* createPlayer(int id, bool isUser);
+  void initFromServer(int myid);
+  void setToUserFocus(GameThing* t);
   virtual void init(void);
   virtual void init(PlayerModel* player);
-  virtual void update(float delta);
-  virtual void draw();
+  UserState update(float delta);          // broadcast to net
+  void updateState(SceneState newState);  // receive from net
+  void draw();
 
   void gui();
 

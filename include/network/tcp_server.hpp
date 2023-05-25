@@ -1,22 +1,59 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <boost/container_hash/hash.hpp>
+#include <chrono>
 #include <memory>
 #include <network/connection.hpp>
+#include <network/message.hpp>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
-#include "network/message.hpp"
-
 using boost::asio::ip::tcp;
+using message::PlayerID;
 
-class TCPServer {
+class Server {
  public:
-  TCPServer(boost::asio::io_context& io_context, int port);
+  Server(boost::asio::io_context& io_context, int port);
 
  private:
+  int update_num_ = 1;
+  std::chrono::milliseconds tick_rate_ = std::chrono::milliseconds(2000);
+  boost::asio::steady_timer timer_;
   tcp::acceptor acceptor_;
-  std::vector<std::shared_ptr<Connection<message::Message>>> connections_;
+  std::unordered_map<PlayerID, std::unique_ptr<Connection<message::Message>>,
+                     boost::hash<PlayerID>>
+      connections_;
 
+  friend std::ostream& operator<<(std::ostream&, Server*);
   void do_accept();
-  void write(const message::Message&);
+  void read(const PlayerID&);
+  void write(const PlayerID&, const message::Message&);
+  template <typename T, typename... Args>
+  void write(const PlayerID&, Args&&...);
+  void write_all(message::Message&);
+  template <typename T, typename... Args>
+  void write_all(Args&&...);
+  void tick();
 };
+
+template <typename T, typename... Args>
+void Server::write(const PlayerID& player_id, Args&&... args) {
+  T body{std::forward<Args>(args)...};
+  message::Type type = message::get_type(body);
+  message::Metadata metadata{player_id, std::time(nullptr)};
+  message::Message m{type, metadata, body};
+  write(player_id, m);
+}
+
+template <typename T, typename... Args>
+void Server::write_all(Args&&... args) {
+  for (const auto& kv : connections_) {
+    T body{std::forward<Args>(args)...};
+    message::Type type = message::get_type(body);
+    message::Metadata metadata{kv.first, std::time(nullptr)};
+    message::Message m{type, metadata, body};
+    write(kv.first, m);
+  }
+}

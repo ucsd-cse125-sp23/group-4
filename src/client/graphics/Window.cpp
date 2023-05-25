@@ -17,13 +17,14 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Scene.h"
+#include "UserState.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // Window Properties
 int Window::width;
 int Window::height;
-const char* Window::windowTitle = "CSE 125 graphics engine :)";
+const char* Window::windowTitle = "tagguys :O";
 bool Window::inGame;
 
 // Game stuff to render
@@ -64,7 +65,11 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  gameScene = new Start(Cam);
+  //gameScene = new Start(Cam);
+  gameScene = new Scene(Cam);
+  gameScene->init();
+  hud = new HUD(gameScene);
+
   return true;
 }
 
@@ -167,35 +172,39 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::idleCallback(GLFWwindow* window, float deltaTime) {
+message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
+                                              float deltaTime) {
   // Perform any updates as necessary.
   Cam->UpdateView(window);
 
-  gameScene->update(deltaTime);
-
+  UserState inputChanges = gameScene->update(deltaTime);
+  /*
   Lobby* lobby;
   if (dynamic_cast<Start*>(gameScene) != nullptr) {
-    Start* startScreen = dynamic_cast<Start*>(gameScene);
-    if (startScreen->gameStart) {
-      gameScene = new Lobby(Cam);
-      gameScene->init();
-    }
-  } else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
-    Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
-    if (lobby->gameStart) {
-      gameScene = new Load(Cam);
-      gameScene->init(lobby->selectedModel);
-      //hud = new HUD(gameScene);
-    }
-  } else if (dynamic_cast<Load*>(gameScene) != nullptr) {
-    Load* load = dynamic_cast<Load*>(gameScene);
-    inGame = load->gameStart;
-    if (inGame) {
-      gameScene = new Scene(Cam);
-      gameScene->init(load->selectedModel);
-      hud = new HUD(gameScene);
-    }
+      Start* startScreen = dynamic_cast<Start*>(gameScene);
+      if (startScreen->gameStart) {
+          gameScene = new Lobby(Cam);
+          gameScene->init();
+      }
   }
+  else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
+      Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
+      if (lobby->gameStart) {
+          gameScene = new Load(Cam);
+          gameScene->init(lobby->selectedModel);
+          //hud = new HUD(gameScene);
+      }
+  }
+  else if (dynamic_cast<Load*>(gameScene) != nullptr) {
+      Load* load = dynamic_cast<Load*>(gameScene);
+      inGame = load->gameStart;
+      if (inGame) {
+          gameScene = new Scene(Cam);
+          gameScene->init(load->selectedModel);
+          hud = new HUD(gameScene);
+      }
+  }*/
+  return inputChanges.toMessage();  // player input to be written to server
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -209,7 +218,7 @@ void Window::displayCallback(GLFWwindow* window) {
 
   // Render the objects.
   gameScene->draw();
-  if (inGame) hud->draw(window);
+  hud->draw(window);
 
   Input::handle(false);
   if (_debugmode) {
@@ -267,6 +276,9 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
         break;
       case GLFW_KEY_C:
         Cam->Fixed = !(Cam->Fixed);
+        break;
+      case GLFW_KEY_X:
+        gameScene->sceneResources->sounds["test"]->play();  // temporary
         break;
       default:
         break;

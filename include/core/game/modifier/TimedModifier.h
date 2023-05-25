@@ -1,13 +1,18 @@
 #pragma once
 
+#include <cstdint>
+
 #include "core/game/modifier/Modifier.h"
 
 
 struct TimedModifierData : public ModifierData {
-	unsigned long long expire = -1;
-	TimedModifierData(unsigned long long expire) : expire(expire) {}
+  uint64_t expire = -1;
+  explicit TimedModifierData(uint64_t expire) : expire(expire) {}
 };
 class TimedModifier : public Modifier {
-	void modify(Modifiable* obj, ModifierData* data) override;
-	virtual void timedModify(Modifiable* obj, ModifierData* data) = 0;
+ public:
+  TimedModifier();
+  explicit TimedModifier(bool serverOnly);
+  void modify(Modifiable* obj, ModifierData* data) override;
+  virtual void timedModify(Modifiable* obj, ModifierData* data) = 0;
 };

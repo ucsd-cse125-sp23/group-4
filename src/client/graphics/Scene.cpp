@@ -22,14 +22,51 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-void Scene::update(float delta) {
-  // if (player) player->update(deltaTime);
+void Scene::initFromServer(int myid) {
+  // TODO(matthew) make this better
+  for (auto e : gamethings) {
+    if (e->netId == myid) {
+      setToUserFocus(e);
+      return;
+    }
+  }
+}
+
+void Scene::setToUserFocus(GameThing* t) {
+  t->isUser = true;
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+    player->camera = camera;  // give a reference to the game camera
+  }
+  t->childnodes.push_back(camera);
+}
+
+UserState Scene::update(float delta) {
+  UserState ourPlayerUpdates;
 
   for (auto e : gamethings) {
-    e->update(delta);
+    UserState currUpdate = e->update(delta);
+
+    if (e->isUser) ourPlayerUpdates = currUpdate;
   }
 
   time.Update(delta);
+
+  return ourPlayerUpdates;
+}
+
+void Scene::updateState(SceneState newState) {
+  // loop through GameThings, send newest state data
+  for (auto e : gamethings) {
+    int currId = e->netId;
+
+    if (currId == -1) continue;  // skip thing
+
+    SceneGameThingState currState = newState.GetUpdateFor(currId);
+    // please check for non-null too!
+    e->updateFromState(currState);
+  }
+
 }
 
 void Scene::draw() {

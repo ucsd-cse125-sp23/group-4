@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <network/message.hpp>
+
 #include "client/graphics/Camera.h"
 #include "client/graphics/HUD.h"
 #include "client/graphics/Lobby.h"
@@ -40,8 +42,9 @@ class Window {
   static void resizeCallback(GLFWwindow* window, int width, int height);
 
   // update and draw functions
-  static void idleCallback(GLFWwindow* window, float deltaTime);
-  static void displayCallback(GLFWwindow* window);
+  static message::UserStateUpdate idleCallback(GLFWwindow* window,
+                                               float deltaTime);
+  static void displayCallback(GLFWwindow*);
 
   // helper to reset the camera
   static void resetCamera();

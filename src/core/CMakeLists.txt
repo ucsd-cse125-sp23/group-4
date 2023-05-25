@@ -53,8 +53,20 @@ include_directories(
 	${tagguys_SOURCE_DIR}/include
 )
 
-add_executable(core_debug ${PROJECT_SOURCE_DIR}/main.cpp ${SOURCES} ${HEADERS})
-target_compile_features(core_debug PRIVATE cxx_std_17)
-add_library(core ${PROJECT_SOURCE_DIR}/lib.cpp ${SOURCES} ${HEADERS})
+set(_CORE_SOURCES
+    ${PROJECT_SOURCE_DIR}/lib.cpp
+    ${PROJECT_SOURCE_DIR}/util/global.cpp
+    ${PROJECT_SOURCE_DIR}/game/level/Level.cpp
+    ${PROJECT_SOURCE_DIR}/game/level/Environment.cpp
+    ${PROJECT_SOURCE_DIR}/game/level/StatisticManager.cpp
+    ${PROJECT_SOURCE_DIR}/game/level/PObjectCollection.cpp
+    ${PROJECT_SOURCE_DIR}/math/ConvexShape.cpp
+    ${PROJECT_SOURCE_DIR}/game/physics/CollisionBounds.cpp
+    ${PROJECT_SOURCE_DIR}/game/physics/PObject.cpp
+    ${PROJECT_SOURCE_DIR}/game/physics/Player.cpp
+    ${PROJECT_SOURCE_DIR}/game/modifier/Modifiers.cpp
+    ${PROJECT_SOURCE_DIR}/game/event/EventManager.cpp)
+
+add_library(core ${_CORE_SOURCES})
 target_include_directories(core PUBLIC ${tagguys_SOURCE_DIR}/include)
 target_compile_features(core PRIVATE cxx_std_17)

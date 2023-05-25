@@ -1,66 +1,127 @@
 #pragma once
 
+#include <boost/serialization/variant.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_serialize.hpp>
+#include <boost/variant.hpp>
 #include <ctime>
 #include <ostream>
 #include <string>
-#include <variant>
+#include <vector>
 
 namespace message {
-enum Type {
-  Greeting,
-  Join,
-  Customize,
-  Ready,
-  Movement,
-  Item,
-  GameState,
-  Animation
-};
+
+using PlayerID = boost::uuids::uuid;
+
+enum class Type { Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate };
 
 struct Metadata {
-  int player_id;
+  PlayerID player_id;
   std::time_t time;
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& player_id;
-    ar& time;
+  void serialize(Archive& ar, unsigned int) {
+    ar& player_id& time;
   }
 };
 
-struct GreetingBody {
-  std::string greeting;
+struct Assign {
+  PlayerID player_id;
+  std::string to_string() const;
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
+  void serialize(Archive& ar, unsigned int) {
+    ar& player_id;
+  }
+};
+
+struct Greeting {
+  std::string greeting;
+  std::string to_string() const;
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
     ar& greeting;
   }
 };
 
-struct Movement {
-  std::string direction;
+struct Notify {
+  std::string message;
+  std::string to_string() const;
 
   template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& direction;
+  void serialize(Archive& ar, unsigned int) {
+    ar& message;
+  }
+};
+
+struct GameStateUpdateItem {
+  friend class boost::serialization::access;
+  int id;
+  float posx;
+  float posy;
+  float posz;
+  float heading;
+  std::string to_string() const;
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id;
+    ar& posx;
+    ar& posy;
+    ar& posz;
+    ar& heading;
+  }
+};
+
+struct GameStateUpdate {
+  std::vector<GameStateUpdateItem*> things;
+  // add global params later
+  std::string to_string() const;
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& things;
+  }
+};
+
+struct UserStateUpdate {
+  int id;
+  float movx;
+  float movy;
+  float movz;
+  bool jump;
+  float heading;
+  std::string to_string() const;
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id;
+    ar& movx;
+    ar& movy;
+    ar& movz;
+    ar& jump;
+    ar& heading;
   }
 };
 
 struct Message {
+  using Body = boost::variant<Assign, Greeting, Notify, GameStateUpdate,
+                              UserStateUpdate>;
   Type type;
   Metadata metadata;
-  GreetingBody body;
-  // std::variant<struct Greeting, struct Movement> body;
-
-  template <typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {
-    ar& type;
-    ar& metadata;
-    ar& body;
-  }
-
+  Body body;
   std::string to_string() const;
   friend std::ostream& operator<<(std::ostream&, const Message&);
+
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& type& metadata& body;
+  }
 };
+
+Type get_type(const Message::Body&);
 
 }  // namespace message
