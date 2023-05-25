@@ -16,13 +16,16 @@
 #else
 #include <GL/glew.h>
 #endif
+
 #include <GLFW/glfw3.h>
 #include <math.h>
 
+#include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
+#include <network/tcp_server.hpp>
 #include <utility>
 #include <vector>
 
@@ -73,8 +76,11 @@ class GameThing : public Node {
   }
 
   // transform helpers
-
-  const float t_rate = 0.065f;  // in seconds (50ms tickrate + lag)
+  const float t_rate =
+      std::chrono::duration_cast<std::chrono::duration<double>>(
+          Server::TICK_RATE)
+          .count() +
+      0.015f;  // in seconds (50ms tickrate + lag)
   glm::vec3 position_p;
   glm::vec3 position_t;
   float lerp_p = 0.0f;

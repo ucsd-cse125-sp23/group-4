@@ -31,8 +31,7 @@ class Server {
   template <typename T, typename... Args>
   void write_all(Args&&...);
 
-  constexpr static std::chrono::milliseconds TICK_RATE =
-      std::chrono::milliseconds(50);
+  constexpr static std::chrono::milliseconds TICK_RATE{50};
 
  private:
   void do_accept();
