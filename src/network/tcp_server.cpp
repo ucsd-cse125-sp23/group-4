@@ -1,30 +1,23 @@
-#include <algorithm>
-#include <boost/bind/bind.hpp>
-#include <boost/functional/overloaded_function.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include <boost/variant.hpp>
 #include <chrono>
-#include <ctime>
 #include <iostream>
-#include <magic_enum.hpp>
-#include <map>
 #include <memory>
 #include <network/message.hpp>
 #include <network/tcp_server.hpp>
 #include <numeric>
 #include <string>
-#include <vector>
 
-#include "client/graphics/ColliderImporter.h"
-#include "core/lib.hpp"
-
-Server::Server(boost::asio::io_context& io_context, int port)
+Server::Server(boost::asio::io_context& io_context, int port,
+               AcceptHandler accept_handler, ReadHandler read_handler,
+               WriteHandler write_handler, TickHandler tick_handler)
     : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
       timer_(boost::asio::steady_timer(io_context)),
-      game_(Game()) {
-  std::cout << "(Server) Server running on port " << port << std::endl;
-
+      accept_handler_(accept_handler),
+      read_handler_(read_handler),
+      write_handler_(write_handler),
+      tick_handler_(tick_handler) {
+  std::cout << "(Server::Server) Server running on port " << port << std::endl;
   do_accept();
   tick();
 }
@@ -32,7 +25,7 @@ Server::Server(boost::asio::io_context& io_context, int port)
 void Server::tick() {
   auto prev_time = std::chrono::steady_clock::now();
   timer_.expires_from_now(TICK_RATE);
-  timer_.async_wait([=](const boost::system::error_code& ec) {
+  timer_.async_wait([this, prev_time](const boost::system::error_code& ec) {
     if (ec) {
       std::cerr << "(Server::tick) Error waiting for timer: " << ec.message()
                 << std::endl;
@@ -45,18 +38,15 @@ void Server::tick() {
     std::cout << "(Server::tick) Updating game, time elapsed since last tick: "
               << time_elapsed.count() << "ms" << std::endl;
 
-    // advance game, send update to client
-    game_.tick();
-    auto things = game_.to_network();
-    write_all<message::GameStateUpdate>(things);
-
+    tick_handler_(*this);
     tick();
   });
 }
 
 void Server::do_accept() {
   // handler on new client connections
-  auto accept_handler = [=](boost::system::error_code ec, tcp::socket socket) {
+  auto accept_handler = [this](boost::system::error_code ec,
+                               tcp::socket socket) {
     if (ec) {
       std::cerr << "(Server::accept) Error accepting connection: "
                 << ec.message() << std::endl;
@@ -65,13 +55,13 @@ void Server::do_accept() {
 
     do_accept();  // start accepting new connections
 
-    // generate new player_id
+    // generate id for new client
     ClientID new_client_id = boost::uuids::random_generator()();
-    std::cout << "(Server::accept) Accepted new client, assigning player_id: "
+    std::cout << "(Server::accept) Accepted new client, assigning client_id: "
               << new_client_id << std::endl;
 
-    auto conn_read_handler = [=](boost::system::error_code ec,
-                                 const message::Message& m) {
+    auto conn_read_handler = [this, new_client_id](boost::system::error_code ec,
+                                                   const message::Message& m) {
       if (ec) {
         if (ec == boost::asio::error::eof) {
           std::cout << "(Server::read) Player " << new_client_id
@@ -85,27 +75,16 @@ void Server::do_accept() {
         return;
       }
 
-      ClientID client_id = m.metadata.id;
-      auto greeting_handler = [&](const message::Greeting& body) {
-        std::string greeting =
-            "Hello, client " + boost::uuids::to_string(client_id) + "!";
-        write<message::Greeting>(client_id, greeting);
-      };
-      auto user_state_update_handler =
-          [&](const message::UserStateUpdate& body) { game_.update(body); };
-      auto any_handler = [](const message::Message::Body&) {};
-
-      auto message_handler = boost::make_overloaded_function(
-          greeting_handler, user_state_update_handler, any_handler);
-      boost::apply_visitor(message_handler, m.body);
-
-      read(client_id);
+      read_handler_(m, *this);
+      read(m.metadata.id);
     };
 
-    auto conn_write_handler = [=](boost::system::error_code ec,
-                                  std::size_t length,
-                                  const message::Message& m) {
+    auto conn_write_handler = [this](boost::system::error_code ec,
+                                     std::size_t length,
+                                     const message::Message& m) {
       if (ec) return;
+
+      write_handler_(length, m, *this);
     };
 
     // store new connection
@@ -115,16 +94,7 @@ void Server::do_accept() {
     auto& connection = connections_[new_client_id];
     std::cout << this << std::endl;
 
-    // assign client their player_id
-    int new_player_id = game_.create_player();
-    write<message::Assign>(new_client_id, new_player_id);
-
-    // notify everyone a new player has joined
-    // TODO: don't notify newly joined client
-    std::string notification =
-        "Client " + boost::uuids::to_string(new_client_id) + " has joined";
-    write_all<message::Notify>(notification);
-
+    accept_handler_(new_client_id, *this);
     connection->start();  // start reading from client
   };
 
@@ -136,7 +106,6 @@ void Server::read(const ClientID& id) { connections_[id]->read(); }
 
 void Server::write(const ClientID& id, const message::Message& m) {
   // std::cout << "Queueing write to client: " << m << std::endl;
-
   connections_[id]->write(m);
 }
 
