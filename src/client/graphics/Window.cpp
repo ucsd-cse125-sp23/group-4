@@ -65,6 +65,7 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects() {
   // gameScene = new Start(Cam);
+  // gameScene->init();
   gameScene = new Scene(Cam);
   gameScene->init();
   hud = new HUD(gameScene);
@@ -173,7 +174,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 // update and draw functions
 message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
                                               float deltaTime) {
-  message::UserStateUpdate inputChanges = message::UserStateUpdate();
+  message::UserStateUpdate inputChanges;
 
   gameScene->update(deltaTime, inputChanges);
   /*

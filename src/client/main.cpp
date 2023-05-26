@@ -127,23 +127,31 @@ int main(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  double lastTime = glfwGetTime();
+  
+
   // wait for server assignment, TODO: replace with start screen UI
   while (!net_assigned) {
     if (glfwWindowShouldClose(window)) {
       game_exit = true;
       break;
     }
+    double nowTime = glfwGetTime();
+    double deltaTime = nowTime - lastTime;
+    lastTime = nowTime;
 
     std::cout << "(net_assigned: " << net_assigned << ") ";
     std::cout << "Waiting for server to assign pid..." << std::endl;
     client->poll();
 
+    
+    message::UserStateUpdate mout = Window::idleCallback(window, deltaTime);
     Window::displayCallback(window);  // TODO: this should be lobby draw
   }
 
   // Delta time logic (see
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
-  double lastTime = glfwGetTime();
+  
 
   // Loop while GLFW window should stay open.
   while (!game_exit && !glfwWindowShouldClose(window)) {
