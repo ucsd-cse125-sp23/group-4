@@ -142,6 +142,7 @@ int main(int argc, char* argv[]) {
     client->poll();
 
     Window::displayCallback(window);  // TODO: this should be lobby draw
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
   // Delta time logic (see
@@ -168,6 +169,8 @@ int main(int argc, char* argv[]) {
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
   Window::cleanUp();
