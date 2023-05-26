@@ -7,17 +7,14 @@
 
 #pragma once
 
+#include <utility>
+
 #include "Camera.h"
 #include "GameThing.h"
 #include "InputListener.h"
 #include "PlayerModel.h"
 
-using glm::vec3;
-
 class Player : public GameThing, InputListener {
- private:
-  float azimuth = 0;
-
  public:
   float speed = 10;
 
@@ -35,13 +32,8 @@ class Player : public GameThing, InputListener {
     tagged = true;
   }
 
-  void update(float dt);
-  void move(vec3 movement);  // NOLINT
+  message::UserStateUpdate update(float dt);
+  glm::vec3 move(glm::vec3 movement);
 
-  void faceDirection(vec3 direction);
-
-  // networking interface v00001  --
-  void setPosition(vec3 pos);
-  void setHeading(float rot);
-  //                              --
+  void faceDirection(glm::vec3 direction);
 };

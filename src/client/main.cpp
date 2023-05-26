@@ -6,6 +6,9 @@
 #include <stdlib.h>
 
 #include <boost/asio.hpp>
+#include <boost/bind/bind.hpp>
+#include <boost/functional/overloaded_function.hpp>
+#include <chrono>
 #include <config/lib.hpp>
 #include <cstdio>
 #include <ctime>
@@ -13,8 +16,13 @@
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 #include <string>
+#include <thread>
 
 #include "Window.h"
+
+bool net_assigned = false;
+
+bool game_exit = false;
 
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
@@ -61,30 +69,39 @@ void print_versions() {
 #endif
 }
 
-int main(int argc, char* argv[]) {
+std::unique_ptr<Client> network_init() {
   auto config = get_config();
-
-  // NETWORK CODE
-  boost::asio::io_context io_context;
   Addr server_addr{config["server_address"], config["server_port"]};
-  auto connect_handler = [&](tcp::endpoint endpoint, TCPClient& client) {
-    std::cout << "Connected to " << endpoint.address() << ":" << endpoint.port()
-              << std::endl;
-    message::GreetingBody g = {"Hello!"};
-    message::Message m = {message::Type::Greeting, {1, std::time(nullptr)}, g};
-    std::cout << "Sending to server: " << m << std::endl;
-    client.write(m);
+
+  auto connect_handler = [](tcp::endpoint endpoint, Client& client) {};
+
+  auto read_handler = [](const message::Message& m, Client& client) {
+    auto assign_handler = [&client](const message::Assign& body) {
+      Window::gameScene->initFromServer(body.pid);  // need a unique int id
+      client.write<message::Greeting>("Hello, server!");
+
+      net_assigned = true;
+    };
+    auto game_state_update_handler = [](const message::GameStateUpdate& body) {
+      Window::gameScene->updateState(body);
+    };
+    auto any_handler = [](const message::Message::Body&) {};
+
+    auto message_handler = boost::make_overloaded_function(
+        assign_handler, game_state_update_handler, any_handler);
+    boost::apply_visitor(message_handler, m.body);
   };
-  auto read_handler = [&](const message::Message& m, TCPClient& client) {
-    std::cout << "Recevied " << m << std::endl;
-  };
-  auto write_handler = [&](std::size_t bytes_transferred, TCPClient& client) {
-    std::cout << "Wrote " << bytes_transferred << " bytes to server"
-              << std::endl;
-  };
-  TCPClient client(io_context, server_addr, connect_handler, read_handler,
-                   write_handler);
-  io_context.run();
+
+  auto write_handler = [](std::size_t bytes_transferred,
+                          const message::Message& m, Client& client) {};
+
+  auto client = std::make_unique<Client>(server_addr, connect_handler,
+                                         read_handler, write_handler);
+  return client;
+}
+
+int main(int argc, char* argv[]) {
+  auto client = network_init();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
@@ -105,11 +122,26 @@ int main(int argc, char* argv[]) {
     char i = std::getchar();
     exit(EXIT_FAILURE);
   }
-  // Initialize objects/pointers for rendering; exit if initialization fails.
+
+  // Initialize game scene for rendering; exit if initialization fails.
   if (!Window::initializeObjects()) {
     std::cout << "Press enter...";
     char i = std::getchar();
     exit(EXIT_FAILURE);
+  }
+
+  // wait for server assignment, TODO: replace with start screen UI
+  while (!net_assigned) {
+    if (glfwWindowShouldClose(window)) {
+      game_exit = true;
+      break;
+    }
+
+    std::cout << "(net_assigned: " << net_assigned << ") ";
+    std::cout << "Waiting for server to assign pid..." << std::endl;
+    client->poll();
+
+    Window::displayCallback(window);  // TODO: this should be lobby draw
   }
 
   // Delta time logic (see
@@ -117,14 +149,22 @@ int main(int argc, char* argv[]) {
   double lastTime = glfwGetTime();
 
   // Loop while GLFW window should stay open.
-  while (!glfwWindowShouldClose(window)) {
+  while (!game_exit && !glfwWindowShouldClose(window)) {
     // - Measure time
     double nowTime = glfwGetTime();
     double deltaTime = nowTime - lastTime;
     lastTime = nowTime;
 
-    // Idle callback. Updating objects, etc. can be done here.
-    Window::idleCallback(window, deltaTime);
+    // POLL FROM SERVER
+    client->poll();
+
+    // Idle callback. Updating local objects, input, etc.
+    // Get a message back of all updates
+    message::UserStateUpdate mout = Window::idleCallback(window, deltaTime);
+
+    // OUTPUT TO SERVER
+    if (net_assigned && mout.id >= 0)
+      client->write<message::UserStateUpdate>(mout);
 
     // Main render display callback. Rendering of objects is done here.
     Window::displayCallback(window);

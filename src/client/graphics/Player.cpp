@@ -9,11 +9,17 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
-void Player::update(float dt) {
-  if (camera && camera->Fixed)
-    return;  // don't move the player in no clip (for now)
+message::UserStateUpdate Player::update(float dt) {
+  // interpolate states
+  updateInterpolate(dt);
 
-  vec3 moveLocal = vec3(0);
+  if (!isUser) return message::UserStateUpdate();
+
+  if (camera && camera->Fixed)
+    return message::UserStateUpdate();  // don't move the player in no clip
+
+  vec3 moveLocal = vec3(0);  // relative to... keyboard
+  bool jumping = false;
 
   // read inputs
   if (Input::GetInputState(InputAction::MoveForward) != InputState::None) {
@@ -29,34 +35,42 @@ void Player::update(float dt) {
     moveLocal += vec3(1, 0, 0);
   }
 
-  moveLocal = normalize(moveLocal);
-  moveLocal *= speed * dt;
-  bool moving = length(moveLocal) > 0;
-
-  if (moving) {
-    move(moveLocal);
-    pmodel->update(dt);
+  if (Input::GetInputState(InputAction::MoveJump) != InputState::None) {
+    jumping = true;
   }
 
-  if (tagged) time += dt;
+  moveLocal = normalize(moveLocal);
+  // moveLocal *= speed * dt;  // this is for single-player
+  bool moving = length(moveLocal) > 0;
+
+  vec3 moveWorld = vec3(0);
+  if (moving) {
+    moveWorld = move(moveLocal);
+    if (pmodel) pmodel->update(dt);
+  }
+
+  if (tagged) time += dt;  // move this to server TODO
+
+  // Get ready to send a message to the server: ***
+  message::UserStateUpdate myInputState;
+  myInputState.id = netId;
+  myInputState.movx = moveWorld.x;
+  myInputState.movy = 0;
+  myInputState.movz = moveWorld.z;
+  myInputState.heading = azimuth;
+  myInputState.jump = jumping;
+
+  return myInputState;
 }
 
-void Player::move(vec3 movement) {
-  // use camera data here
+vec3 Player::move(vec3 movement) {
+  // use camera-relative movement
   if (camera) {
     movement = vec3(camera->getCameraRotationMtx() * vec4(-movement, 1));
   }
 
-  faceDirection(movement);
-  GameThing::move(movement);
-}
+  setHeading(movement);
+  // GameThing::move(movement);  // don't actually move. let the server do it
 
-void Player::faceDirection(vec3 direction) {
-  direction = normalize(direction);
-  azimuth = std::atan2(direction.x, direction.z) + (M_PI);  // aka azimuth
-
-  // purely visual, for now (rotation never applied to player node itself)
-  if (!pmodel) return;
-
-  pmodel->modelMtx = glm::eulerAngleY(azimuth);
+  return movement;  // send back the "world space" movement vector
 }

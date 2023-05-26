@@ -2,6 +2,7 @@
  * Scene.inl
  * contains the definition of the scene graph
  *****************************************************/
+#include "client/graphics/Collider.h"
 #include "client/graphics/ColliderImporter.h"
 #include "client/graphics/Scene.h"
 
@@ -9,6 +10,7 @@
 #include <math.h>
 
 using namespace glm;
+
 void Scene::init(void) {
   // Create a mesh palette
   sceneResources->meshes["cube"] = new Cube();
@@ -154,6 +156,13 @@ void Scene::init(void) {
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
   sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
+  // THE player !!!
+  sceneResources->models["playerRef"] = new Model;
+  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
+  // TODO(matthew) copy over mesh too?
+  sceneResources->models["playerRef"]->material =
+      sceneResources->materials["toon.blue"];
+
   // Sound palette
   SoundEffect* sfx = new SoundEffect();
   sceneResources->sounds["test"] = sfx;
@@ -180,7 +189,7 @@ void Scene::init(void) {
   // sceneResources->models["mapColsTesting"]->transformMtx = translate(vec3(0,
   // -2, 0));   // needs to be world space
 
-  std::vector<Collider> mapColliders =
+  std::vector<ColliderData> mapColliders =
       ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
 
   node["collision"] = new Node("_colliders");
@@ -219,7 +228,7 @@ void Scene::init(void) {
   player->name = "Player 1";
   player->transform.position = vec3(0, 2, 0);
   player->transform.updateMtx(&(player->transformMtx));
-  gamethings.push_back(player);
+  // gamethings.push_back(player);
 
   // Build the scene graph
   node["teapot1"] = thing_example;
@@ -229,7 +238,7 @@ void Scene::init(void) {
   node["playerA"] = thing_modeltest;
   node["playerB"] = thing_modeltestB;
   node["ground"] = new Node("ground");
-  node["wasp"] = player;
+  node["wasp"] = player;  // deprecated node
 
   node["map"] = new Node("_map");
   node["map"]->model = sceneResources->models["map1"];
@@ -274,8 +283,6 @@ void Scene::init(void) {
     }
   }
 
-  player->childnodes.push_back(camera);
-
   // "world" node already exists
   node["world"]->childnodes.push_back(node["playerA"]);
   node["world"]->childnodes.push_back(node["playerB"]);
@@ -283,7 +290,6 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["cubeT"]);
   node["teapot1"]->childnodes.push_back(node["teapot2"]);
   node["world"]->childnodes.push_back(node["bunny"]);
-  node["world"]->childnodes.push_back(node["wasp"]);  // test player
 
   node["world"]->childnodes.push_back(node["ground"]);
   node["world"]->childnodes.push_back(node["collision"]);

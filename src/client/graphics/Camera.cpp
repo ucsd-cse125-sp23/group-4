@@ -20,9 +20,18 @@ Camera::Camera() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Camera::UpdateView(GLFWwindow* window) {
+void Camera::UpdateView() {
+  glm::mat4 root = glm::translate(position_prev);
+  UpdateView(root);
+}
+
+void Camera::UpdateView(Node* parent) {
+  UpdateView(parent->transformMtx);  // since Node doesn't know its own parent
+}
+
+void Camera::UpdateView(glm::mat4 rootMtx) {
   //// Compute camera world matrix
-  transform.updateMtx(&transformMtx);
+  transform.updateMtx(&transformMtx);  // shouldn't be in draw but oh well
   if (!Fixed) {
     transformMtx = glm::mat4(1);
     transformMtx[3][2] += Distance;
@@ -31,7 +40,7 @@ void Camera::UpdateView(GLFWwindow* window) {
                  glm::eulerAngleX(glm::radians(-Incline)) * transformMtx;
 
   // Compute view matrix (inverse of world matrix)
-  glm::mat4 view = glm::inverse(getWorldMtx());
+  glm::mat4 view = glm::inverse(rootMtx * transformMtx);
 
   // Compute perspective projection matrix
   glm::mat4 project =
@@ -59,8 +68,11 @@ void Camera::CamZoom(float y) {
   SetDistance(dist);
 }
 
-void Camera::update(float dt) {
-  if (!Fixed) return;
+message::UserStateUpdate Camera::update(float dt) {
+  // interpolate camera
+  position_prev = glm::lerp(position_prev, position_target, lerpSpeed * dt);
+
+  if (!Fixed) return message::UserStateUpdate();
 
   vec3 moveLocal = vec3(0);
 
@@ -84,6 +96,8 @@ void Camera::update(float dt) {
   moveLocal *= 12 * dt;
 
   if (length(moveLocal) > 0) move_local(moveLocal);
+
+  return message::UserStateUpdate();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

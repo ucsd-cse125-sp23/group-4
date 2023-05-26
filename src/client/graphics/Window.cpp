@@ -23,7 +23,7 @@
 // Window Properties
 int Window::width;
 int Window::height;
-const char* Window::windowTitle = "CSE 125 graphics engine :)";
+const char* Window::windowTitle = "tagguys :O";
 
 // Game stuff to render
 Scene* Window::gameScene;
@@ -166,11 +166,11 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::idleCallback(GLFWwindow* window, float deltaTime) {
-  // Perform any updates as necessary.
-  Cam->UpdateView(window);
+message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
+                                              float deltaTime) {
+  auto inputChanges = gameScene->update(deltaTime);
 
-  gameScene->update(deltaTime);
+  return inputChanges;  // player input to be written to server
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -182,9 +182,11 @@ void Window::displayCallback(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  // Render the objects.
-  gameScene->draw();
-  gameScene->drawHUD(window);
+  // Render the scene
+  if (gameScene) {
+    gameScene->draw();
+    gameScene->drawHUD(window);
+  }
 
   Input::handle(false);
   if (_debugmode) {
@@ -193,7 +195,7 @@ void Window::displayCallback(GLFWwindow* window) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    gameScene->gui();
+    if (gameScene) gameScene->gui();
 
     // imguiDraw(skeleton, animClip);   // simple helper method
 
