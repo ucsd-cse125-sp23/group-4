@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "client/graphics/AssimpNode.h"
-#include "client/graphics/core.h"
 #include "client/graphics/Material.h"
+#include "client/graphics/core.h"
 
 class AssimpNode;
 

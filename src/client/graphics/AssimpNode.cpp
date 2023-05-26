@@ -57,10 +57,11 @@ void AssimpNode::imGui() {
               parent ? parent->name.c_str() : "none");
   ImGui::Text("joints: %lu", joints.size());
   if (meshes.size() > 0) {
-    if (ImGui::TreeNode((reinterpret_cast<void*>((intptr_t)numTreeNode++), "Meshes (%lu)",
-                        meshes.size())) {
+    if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                        "Meshes (%lu)", meshes.size())) {
       for (int i = 0; i < meshes.size(); i++) {
-        if (ImGui::TreeNode((void*)(intptr_t)i, "Mesh %d", i)) {
+        if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Mesh %d",
+                            i)) {
           ImGui::TreePop();
         }
       }
@@ -68,10 +69,11 @@ void AssimpNode::imGui() {
     }
   }
   if (children.size() > 0) {
-    if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Children (%lu)",
-                        children.size())) {
+    if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                        "Children (%lu)", children.size())) {
       for (int i = 0; i < children.size(); i++) {
-        if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i)) {
+        if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Child %d",
+                            i)) {
           children[i]->imGui();
           ImGui::TreePop();
         }

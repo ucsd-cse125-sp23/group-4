@@ -3,12 +3,12 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+
 #include <glm/gtc/matrix_transform.hpp>
 
 // #define STB_IMAGE_IMPLEMENTATION
-#include "client/graphics/imported/stb_image.h"
-
 #include "client/graphics/AssimpMath.h"
+#include "client/graphics/imported/stb_image.h"
 
 AssimpModel::AssimpModel()
     : name("N/A"),
@@ -329,9 +329,9 @@ void AssimpModel::loadAssimpHelperImgui() {
   for (int i = 0; i < animations.size() + 1; i++) {
     animModes[i] = new char[256];
   }
-  snprintf(animModes[0], 256, "Mesh");
+  snprintf(animModes[0], sizeof(animModes[0]), "Mesh");
   for (int i = 0; i < animations.size(); i++) {
-    snprintf(animModes[1 + i], 256, "Animation %d", i + 1);
+    snprintf(animModes[1 + i], sizeof(animModes[1 + i]), "Animation %d", i + 1);
   }
 
   for (auto& n : nodeMap) {
@@ -348,24 +348,24 @@ void AssimpModel::imGui() {
   // Node Tree
   ImGui::SeparatorText("Node Tree");
   ImGui::Checkbox("draw node", &drawNode);
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Node Highlight (%lu)",
-                      nodeMap.size())) {
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                      "Node Highlight (%lu)", nodeMap.size())) {
     for (auto it = nodeMap.begin(); it != nodeMap.end(); it++) {
       std::string name = it->first;
       ImGui::Checkbox(name.c_str(), &it->second->isMarked);
     }
     ImGui::TreePop();
   }
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Node Tree (%lu)",
-                      nodeMap.size())) {
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                      "Node Tree (%lu)", nodeMap.size())) {
     rootNode->imGui();
     ImGui::TreePop();
   }
 
   // Meshes
   ImGui::SeparatorText("Meshes");
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Meshes (%lu)",
-                      meshes.size())) {
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                      "Meshes (%lu)", meshes.size())) {
     for (int i = 0; i < meshes.size(); i++) {
       if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Mesh %d", i)) {
         bool visibility = meshVisibilities[i];
@@ -380,10 +380,11 @@ void AssimpModel::imGui() {
 
   // Animations
   ImGui::SeparatorText("Animations");
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Animations (%lu)",
-                      animations.size())) {
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                      "Animations (%lu)", animations.size())) {
     for (int i = 0; i < animations.size(); i++) {
-      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Animation %d", i)) {
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Animation %d",
+                          i)) {
         animations[i].imGui();
         ImGui::TreePop();
       }

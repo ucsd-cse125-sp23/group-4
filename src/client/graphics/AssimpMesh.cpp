@@ -84,7 +84,8 @@ void AssimpMesh::gl_load() {
 
   // vertex positions
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(0));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        reinterpret_cast<void*>(0));
   // vertex normals
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
@@ -118,10 +119,11 @@ void AssimpMesh::imGui() {
   ImGui::SameLine();
   ImGui::Text("index (%lu)", indices.size());
   ImGui::Text("joints (%lu)", joints.size());
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Verticies (%lu)",
-                      vertices.size())) {
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                      "Verticies (%lu)", vertices.size())) {
     for (int i = 0; i < vertices.size(); i++) {
-      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Vertex %d", i)) {
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Vertex %d",
+                          i)) {
         ImGui::Text("Pos (%f,%f,%f)", vertices[i].position.x,
                     vertices[i].position.y, vertices[i].position.z);
         ImGui::Text("Norm(%f,%f,%f)", vertices[i].normal.x,
@@ -137,11 +139,11 @@ void AssimpMesh::imGui() {
     }
     ImGui::TreePop();
   }
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Joints (%lu)",
-                      joints.size())) {
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+                      "Joints (%lu)", joints.size())) {
     for (int i = 0; i < joints.size(); i++) {
-      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Joint %5d (%5lu) %s", i,
-                          joints[i]->weights.size(),
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i),
+                          "Joint %5d (%5lu) %s", i, joints[i]->weights.size(),
                           joints[i]->node->name.c_str())) {
         AssimpJoint* joint = joints[i];
         for (int j = 0; j < joint->weights.size(); j++) {
@@ -190,7 +192,8 @@ void AssimpMesh::gl_load2() {
 
   // vertex positions
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(0));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        reinterpret_cast<void*>(0));
   // vertex normals
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
