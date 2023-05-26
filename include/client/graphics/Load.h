@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "client/graphics/Texture.h"
-#include "client/graphics/UserState.h"
 
 class Load {
  public:

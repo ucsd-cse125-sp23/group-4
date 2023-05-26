@@ -68,16 +68,17 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-void Scene::update(float delta, UserState& ourPlayerUpdates) {
+void Scene::update(float delta, message::UserStateUpdate& ourPlayerUpdates) {
   // UserState ourPlayerUpdates;
+
+  //message::UserStateUpdate ourPlayerUpdates = message::UserStateUpdate();
 
   for (auto e : gamethings) {
     auto currUpdate = e->update(delta);
 
-    if (e->isUser) ourPlayerUpdate = currUpdate;
+    if (e->isUser) ourPlayerUpdates = currUpdate;
   }
 
-  time.Update(delta);
 
   // return ourPlayerUpdates;
 }

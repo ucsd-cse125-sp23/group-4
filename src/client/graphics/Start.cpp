@@ -1,6 +1,6 @@
 #include "client/graphics/Start.h"
 
-void Start::update(float delta, UserState& ourPlayerUpdates) {
+void Start::update(float delta, message::UserStateUpdate& ourPlayerUpdates) {
   Scene::update(delta, ourPlayerUpdates);
   timeElapsed += delta;
   offset += (0.25 * delta);

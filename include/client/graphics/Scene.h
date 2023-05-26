@@ -13,14 +13,11 @@
 #include <GL/glew.h>
 #endif
 #include <GLFW/glfw3.h>
-#include <math.h>
-#include <stdlib.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
 #include <map>
-#include <stack>
 #include <network/message.hpp>
 #include <string>
 #include <utility>
@@ -40,7 +37,6 @@
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
 #include "client/graphics/Timer.h"
-#include "client/graphics/UserState.h"
 #include "client/graphics/shader.h"
 
 class SceneResourceMap {
@@ -171,8 +167,9 @@ class Scene {
   virtual void init(void);
   virtual void init(PlayerModel* player);
   virtual void update(float delta,
-                      UserState& ourPlayerUpdates);  // broadcast to net
-  void updateState(SceneState newState);             // receive from net
+                      message::UserStateUpdate& us);        // broadcast to net
+  void updateState(message::GameStateUpdate newState);  // receive from net
+
   virtual void draw();
 
   void gui();

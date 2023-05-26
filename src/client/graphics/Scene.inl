@@ -458,13 +458,13 @@ void Scene::init(PlayerModel* player_model) {
   // sceneResources->models["mapColsTesting"]->transformMtx = translate(vec3(0,
   // -2, 0));   // needs to be world space
 
-  std::vector<Collider> mapColliders =
-      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
+  // std::vector<Collider> mapColliders =
+  //    ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
 
   node["collision"] = new Node("_colliders");
-  for (auto c : mapColliders) {
+  /*for (auto c : mapColliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
-  }
+  }*/
   // node["collision"]->transformMtx =
   // sceneResources->models["mapColsTesting"]->transformMtx;
 

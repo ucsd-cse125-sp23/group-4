@@ -127,7 +127,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     // draw the player model
     viewport.SetDistance(2.5);
-    viewport.UpdateView(window);
+    viewport.UpdateView();
     glm::mat4 transform =
         glm::translate(glm::mat4(1), glm::vec3(0.0f, -3.5f, 0.0f));
     transform *= glm::rotate(glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));

@@ -37,7 +37,7 @@ class Lobby : public Scene, public InputListener {
   }
 
   void init(void);
-  void update(float delta, UserState& ourPlayerUpdates);
+  void update(float delta, message::UserStateUpdate& ourPlayerUpdates);
 
   void buildSceneTree();
   void draw();

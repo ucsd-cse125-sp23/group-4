@@ -64,10 +64,10 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  // gameScene = new Start(Cam);
-  gameScene = new Scene(Cam);
+  gameScene = new Start(Cam);
+  /*gameScene = new Scene(Cam);
   gameScene->init();
-  hud = new HUD(gameScene);
+  hud = new HUD(gameScene);*/
 
   return true;
 }
@@ -173,10 +173,8 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 // update and draw functions
 message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
                                               float deltaTime) {
-  auto inputChanges = gameScene->update(deltaTime);
 
-
-  UserState inputChanges;
+  message::UserStateUpdate inputChanges = message::UserStateUpdate();
 
   gameScene->update(deltaTime, inputChanges);
   /*
@@ -220,7 +218,7 @@ void Window::displayCallback(GLFWwindow* window) {
 
   // Render the objects.
   gameScene->draw();
-  hud->draw(window);
+  // hud->draw(window);
 
 
   Input::handle(false);
