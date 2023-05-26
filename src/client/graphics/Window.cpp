@@ -64,10 +64,10 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  gameScene = new Start(Cam);
-  /*gameScene = new Scene(Cam);
+  // gameScene = new Start(Cam);
+  gameScene = new Scene(Cam);
   gameScene->init();
-  hud = new HUD(gameScene);*/
+  hud = new HUD(gameScene);
 
   return true;
 }
@@ -216,7 +216,7 @@ void Window::displayCallback(GLFWwindow* window) {
 
   // Render the objects.
   gameScene->draw();
-  // hud->draw(window);
+  hud->draw(window);
 
   Input::handle(false);
   if (_debugmode) {
