@@ -170,7 +170,7 @@ void Scene::draw() {
     // Detect whether the search runs into infinite loop by checking whether the
     // stack is longer than the size of the graph. Note that, at any time, the
     // stack does not contain repeated element.
-    if (dfs_stack.size() > node.size()) {
+    if (dfs_stack.size() > std::max((int)node.size(), 30)) {
       std::cerr << "Error: The scene graph has a closed loop." << std::endl;
       exit(-1);
     }
