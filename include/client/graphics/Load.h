@@ -13,7 +13,7 @@ class Load {
   bool forward;
   double lastTime;
 
-  explicit Load() {
+  Load() {
     index = 0;
     timeOnFrame = 0;
     forward = true;
@@ -32,7 +32,7 @@ class Load {
     double nowTime = glfwGetTime();
     float delta = nowTime - lastTime;
     lastTime = nowTime;
-    
+
     timeOnFrame += delta;
     if (timeOnFrame >= 0.05) {
       if (forward) {

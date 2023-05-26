@@ -173,7 +173,6 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 // update and draw functions
 message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
                                               float deltaTime) {
-
   message::UserStateUpdate inputChanges = message::UserStateUpdate();
 
   gameScene->update(deltaTime, inputChanges);
@@ -215,11 +214,9 @@ void Window::displayCallback(GLFWwindow* window) {
 
   glLoadIdentity();
 
-
   // Render the objects.
   gameScene->draw();
   // hud->draw(window);
-
 
   Input::handle(false);
   if (_debugmode) {

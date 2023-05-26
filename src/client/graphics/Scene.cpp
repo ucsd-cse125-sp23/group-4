@@ -71,14 +71,13 @@ void Scene::setToUserFocus(GameThing* t) {
 void Scene::update(float delta, message::UserStateUpdate& ourPlayerUpdates) {
   // UserState ourPlayerUpdates;
 
-  //message::UserStateUpdate ourPlayerUpdates = message::UserStateUpdate();
+  // message::UserStateUpdate ourPlayerUpdates = message::UserStateUpdate();
 
   for (auto e : gamethings) {
     auto currUpdate = e->update(delta);
 
     if (e->isUser) ourPlayerUpdates = currUpdate;
   }
-
 
   // return ourPlayerUpdates;
 }
