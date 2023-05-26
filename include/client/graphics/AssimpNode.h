@@ -16,7 +16,7 @@ struct AssimpJoint;
 /** The AssimpNode class for a local representation of a scene node. */
 class AssimpNode {
  public:
-  AssimpNode(unsigned int id);
+  explicit AssimpNode(unsigned int id);
 
   /** Numeric identifier that is unique for nodes in an AssimpModel */
   const unsigned int id;

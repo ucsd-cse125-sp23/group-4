@@ -13,20 +13,20 @@ void AssimpChannel::eval(double currentTick) {
     double start = positions[0].first;
     double end   = positions[positions.size()-1].first;
     // before start or after end, extrapolate
-    if(currentTick < start || currentTick > end) {
+    if (currentTick < start || currentTick > end) {
         bool isBefore = currentTick < start;
-        switch(isBefore ? extrapPre : extrapPost) {
+        switch (isBefore ? extrapPre : extrapPost) {
         case ASSIMP_EXTRAP_MODE::CONSTANT:
-            node->animationTransform = 
-                isBefore ? 
+            node->animationTransform =
+                isBefore ?
                 getMatrix(
                     positions[0].second,
                     rotations[0].second,
-                    scalings [0].second) :
+                    scalings[0].second) :
                 getMatrix(
                     positions[positions.size()-1].second,
                     rotations[positions.size()-1].second,
-                    scalings [positions.size()-1].second);
+                    scalings[positions.size()-1].second);
             break;
         case ASSIMP_EXTRAP_MODE::LINEAR:
             // TODO: implement linear extrapolation
@@ -35,7 +35,7 @@ void AssimpChannel::eval(double currentTick) {
         case ASSIMP_EXTRAP_MODE::CYCLE:
         default:
             // TODO: not tested
-            eval(std::fmod((currentTick-start),glm::abs(end-start)));
+            eval(std::fmod((currentTick-start), glm::abs(end-start)));
             break;
         }
         return;
@@ -65,18 +65,18 @@ glm::mat4 AssimpChannel::getMatrixInterpolate(int lastEarlyTickInd,
   glm::vec3 interpPos = positions[lastEarlyTickInd].second +
                         (positions[lastEarlyTickInd + 1].second -
                          positions[lastEarlyTickInd].second) *
-                            (float)((tick - t0) / (t1 - t0));
+                            static_cast<float>((tick - t0) / (t1 - t0));
 
   // spherical interpolation
   glm::vec4 interpRot = quarternionInterpolateSpherical(
       rotations[lastEarlyTickInd].second,
-      rotations[lastEarlyTickInd + 1].second, (float)((tick - t0) / (t1 - t0)));
+      rotations[lastEarlyTickInd + 1].second, static_cast<float>((tick - t0) / (t1 - t0)));
 
   // linear interpolation
   glm::vec3 interpSca = scalings[lastEarlyTickInd].second +
                         (scalings[lastEarlyTickInd + 1].second -
                          scalings[lastEarlyTickInd].second) *
-                            (float)((tick - t0) / (t1 - t0));
+                            static_cast<float>((tick - t0) / (t1 - t0));
   return getMatrix(interpPos, interpRot, interpSca);
 }
 
@@ -135,9 +135,9 @@ void AssimpAnimation::imGui() {
   ImGui::Text("name    : %s", name.c_str());
   ImGui::Text("duration: %f ticks; %f secs", duration, duration / tps);
   ImGui::Text("tps     : %f t/s", tps);
-  if (ImGui::TreeNode((void*)(intptr_t)0, "Channels (%lu)", channels.size())) {
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)0), "Channels (%lu)", channels.size())) {
     for (int i = 0; i < channels.size(); i++) {
-      if (ImGui::TreeNode((void*)(intptr_t)i, "Channel %d", i)) {
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Channel %d", i)) {
         AssimpChannel& channel = channels[i];
         ImGui::Text("name: %s %s", channel.name.c_str(),
                     channel.node->name.c_str());

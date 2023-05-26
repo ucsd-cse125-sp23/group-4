@@ -6,8 +6,8 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-#include "AssimpMath.h"
-#include "shader.h"
+#include "client/graphics/AssimpMath.h"
+#include "client/graphics/shader.h"
 
 AssimpNode::AssimpNode(unsigned int id)
     : id(id), parent(nullptr), localTransform(1.0f) {
@@ -40,9 +40,9 @@ void AssimpNode::draw(const glm::mat4& viewProjMtx) {
     color = glm::vec3(1.0f, 1.0f, 0.0f);
   }
   glUniformMatrix4fv(glGetUniformLocation(*shader, "viewProj"), 1, false,
-                     (float*)&viewProjMtx);
+                     reinterpret_cast<const float*>(&viewProjMtx));
   glUniformMatrix4fv(glGetUniformLocation(*shader, "model"), 1, GL_FALSE,
-                     (float*)&matWorldTransform);
+                     reinterpret_cast<const float*>(&matWorldTransform));
   glUniform3fv(glGetUniformLocation(*shader, "DiffuseColor"), 1, &color[0]);
   geometry.draw();
   for (auto c : children) {
@@ -51,13 +51,13 @@ void AssimpNode::draw(const glm::mat4& viewProjMtx) {
 }
 
 void AssimpNode::imGui() {
-  long numTreeNode = 0;
+  unsigned int numTreeNode = 0;
   ImGui::Text("id    : %u %s", id, name.c_str());
   ImGui::Text("parent: %u %s", parent ? parent->id : 0,
               parent ? parent->name.c_str() : "none");
   ImGui::Text("joints: %lu", joints.size());
   if (meshes.size() > 0) {
-    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Meshes (%lu)",
+    if (ImGui::TreeNode((reinterpret_cast<void*>((intptr_t)numTreeNode++), "Meshes (%lu)",
                         meshes.size())) {
       for (int i = 0; i < meshes.size(); i++) {
         if (ImGui::TreeNode((void*)(intptr_t)i, "Mesh %d", i)) {
@@ -68,7 +68,7 @@ void AssimpNode::imGui() {
     }
   }
   if (children.size() > 0) {
-    if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Children (%lu)",
+    if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Children (%lu)",
                         children.size())) {
       for (int i = 0; i < children.size(); i++) {
         if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i)) {

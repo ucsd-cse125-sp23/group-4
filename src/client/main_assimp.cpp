@@ -1,5 +1,5 @@
-#include "Window.h"
-#include "core.h"
+#include "client/graphics/Window.h"
+#include "client/graphics/core.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -50,13 +50,13 @@ void AssimpMesh::draw(const glm::mat4& viewProjMtx, GLuint shader) {
   glm::mat4 m4(1.0f);
   glm::vec3 color(1.0f, 1.0f, 1.0f);
   glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false,
-                     (float*)&viewProjMtx);
+                     reinterpret_cast<const float*>(&viewProjMtx));
   glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE,
-                     (float*)&m4);
+                     reinterpret_cast<const float*>(&m4));
   glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
 
   glUniformMatrix4fv(glGetUniformLocation(shader, "bones"), joints.size(),
-                     GL_FALSE, (float*)&matBindingInvs);
+                     GL_FALSE, reinterpret_cast<const float*>(&matBindingInvs));
 
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -84,19 +84,19 @@ void AssimpMesh::gl_load() {
 
   // vertex positions
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(0));
   // vertex normals
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void*)offsetof(Vertex, normal));
+                        reinterpret_cast<void*>(offsetof(Vertex, normal)));
   // bone index
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 4, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex),
-                        (void*)offsetof(Vertex, boneInds));
+                        reinterpret_cast<void*>(offsetof(Vertex, boneInds)));
   // bone weights
   glEnableVertexAttribArray(3);
   glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void*)offsetof(Vertex, boneWeights));
+                        reinterpret_cast<void*>(offsetof(Vertex, boneWeights)));
 
   glBindVertexArray(0);
   isLoaded = true;
@@ -111,17 +111,17 @@ void AssimpMesh::gl_delete() {
 }
 
 void AssimpMesh::imGui() {
-  long numTreeNode = 0;
+  unsigned int numTreeNode = 0;
 
   ImGui::Text("nodeId: %u %s", node->id, node->name.c_str());
   ImGui::Text("vertex (%lu)", vertices.size());
   ImGui::SameLine();
   ImGui::Text("index (%lu)", indices.size());
   ImGui::Text("joints (%lu)", joints.size());
-  if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Verticies (%lu)",
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Verticies (%lu)",
                       vertices.size())) {
     for (int i = 0; i < vertices.size(); i++) {
-      if (ImGui::TreeNode((void*)(intptr_t)i, "Vertex %d", i)) {
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Vertex %d", i)) {
         ImGui::Text("Pos (%f,%f,%f)", vertices[i].position.x,
                     vertices[i].position.y, vertices[i].position.z);
         ImGui::Text("Norm(%f,%f,%f)", vertices[i].normal.x,
@@ -137,10 +137,10 @@ void AssimpMesh::imGui() {
     }
     ImGui::TreePop();
   }
-  if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Joints (%lu)",
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Joints (%lu)",
                       joints.size())) {
     for (int i = 0; i < joints.size(); i++) {
-      if (ImGui::TreeNode((void*)(intptr_t)i, "Joint %5d (%5lu) %s", i,
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Joint %5d (%5lu) %s", i,
                           joints[i]->weights.size(),
                           joints[i]->node->name.c_str())) {
         AssimpJoint* joint = joints[i];
@@ -190,15 +190,15 @@ void AssimpMesh::gl_load2() {
 
   // vertex positions
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(0));
   // vertex normals
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void*)offsetof(Vertex, normal));
+                        reinterpret_cast<void*>(offsetof(Vertex, normal)));
   // uvs
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void*)offsetof(Vertex, uv));
+                        reinterpret_cast<void*>(offsetof(Vertex, uv)));
 
   glBindVertexArray(0);
 }

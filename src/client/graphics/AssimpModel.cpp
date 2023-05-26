@@ -329,10 +329,9 @@ void AssimpModel::loadAssimpHelperImgui() {
   for (int i = 0; i < animations.size() + 1; i++) {
     animModes[i] = new char[256];
   }
-  strcpy(animModes[0], "Mesh");
+  snprintf(animModes[0], 256, "Mesh");
   for (int i = 0; i < animations.size(); i++) {
-    strcpy(animModes[1 + i],
-           std::string("Animation ").append(std::to_string(i + 1)).c_str());
+    snprintf(animModes[1 + i], 256, "Animation %d", i + 1);
   }
 
   for (auto& n : nodeMap) {
@@ -344,12 +343,12 @@ void AssimpModel::imGui() {
   ImGui::Begin("Assimp Model Info");
 
   ImGui::Text("File: %s", name.c_str());
-  long numTreeNode = 0;
+  unsigned int numTreeNode = 0;
 
   // Node Tree
   ImGui::SeparatorText("Node Tree");
   ImGui::Checkbox("draw node", &drawNode);
-  if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Node Highlight (%lu)",
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Node Highlight (%lu)",
                       nodeMap.size())) {
     for (auto it = nodeMap.begin(); it != nodeMap.end(); it++) {
       std::string name = it->first;
@@ -357,7 +356,7 @@ void AssimpModel::imGui() {
     }
     ImGui::TreePop();
   }
-  if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Node Tree (%lu)",
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Node Tree (%lu)",
                       nodeMap.size())) {
     rootNode->imGui();
     ImGui::TreePop();
@@ -365,10 +364,10 @@ void AssimpModel::imGui() {
 
   // Meshes
   ImGui::SeparatorText("Meshes");
-  if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Meshes (%lu)",
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Meshes (%lu)",
                       meshes.size())) {
     for (int i = 0; i < meshes.size(); i++) {
-      if (ImGui::TreeNode((void*)(intptr_t)i, "Mesh %d", i)) {
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Mesh %d", i)) {
         bool visibility = meshVisibilities[i];
         ImGui::Checkbox("visible", &visibility);
         meshVisibilities[i] = visibility;
@@ -381,10 +380,10 @@ void AssimpModel::imGui() {
 
   // Animations
   ImGui::SeparatorText("Animations");
-  if (ImGui::TreeNode((void*)(intptr_t)numTreeNode++, "Animations (%lu)",
+  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++), "Animations (%lu)",
                       animations.size())) {
     for (int i = 0; i < animations.size(); i++) {
-      if (ImGui::TreeNode((void*)(intptr_t)i, "Animation %d", i)) {
+      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Animation %d", i)) {
         animations[i].imGui();
         ImGui::TreePop();
       }
