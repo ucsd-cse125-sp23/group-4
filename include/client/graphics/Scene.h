@@ -167,8 +167,9 @@ class Scene {
   virtual void init(void);
   virtual void init(PlayerModel* player);
   virtual void update(float delta,
-                      message::UserStateUpdate& us);    // broadcast to net
-  virtual void updateState(message::GameStateUpdate newState);  // receive from net
+                      message::UserStateUpdate& us);  // broadcast to net
+  virtual void updateState(
+      message::GameStateUpdate newState);  // receive from net
 
   virtual void draw();
 
