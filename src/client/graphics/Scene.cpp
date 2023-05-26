@@ -29,25 +29,41 @@ Player* Scene::createPlayer(int id) {
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
 
   // creating a player to be rendered... TODO call this from state update!
-  std::string playername = "player" + std::to_string(id);
+  std::string playername = "_player" + std::to_string(id);
 
   Player* player = new Player();
+  player->name = playername;
   player->netId = id;
   if (isUser) {
     setToUserFocus(player);
   }
-  // player->pmodel = waspModel;            // updating! TODO fix me
 
-  // copy into a new model object
-  Model* myModel = new Model(*sceneResources->models["playerRef"]);
+  // LOAD PLAYER ASSETS ---
+  // TODO(assimp)
+
+  // copy prefabs into a new model object
+  // player
+  Model* myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
   player->model = myModel;
+  // TODO(matthew) set material here! if needed
   sceneResources->models[playername + ".model"] = myModel;
+
+  // skin/costume
+  if (false) {
+    Model* myCostume =
+        new Model(*sceneResources->models["PREFAB_player.costume1"]);
+    // player->model = myModel; TODO: support multiple models on player
+    sceneResources->models[playername + ".costume"] = myCostume;
+  }
+
+  // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
-  player->name = playername;
-  player->transform.position = vec3(4 + id * 3, 2, 4 + id * 5);
-  player->transform.updateMtx(&(player->transformMtx));
+  // ---
 
+  // position is set by server message
+
+  // Add player object references to scene
   gamethings.push_back(player);
   node["world"]->childnodes.push_back(player);
 

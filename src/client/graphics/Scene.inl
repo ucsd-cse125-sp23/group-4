@@ -14,6 +14,11 @@ using namespace glm;
 void Scene::init(void) {
   // Create mesh palette
 #pragma region Meshes
+  // TODO(eddie) use Assimp here...
+  sceneResources->meshes["playermodel"] = new Obj();
+  sceneResources->meshes["playermodel"]->init(
+      "assets/models/model-skeleton.obj");
+
   sceneResources->meshes["teapot"] = new Obj();
   sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
 
@@ -149,6 +154,15 @@ void Scene::init(void) {
   // sceneResources->models["mapColsTesting"]->transformMtx;
 #pragma endregion
 
+  // Setup player/gameplay prefabs
+#pragma region Prefabs
+  Model* m_prefab = new Model;
+  sceneResources->models["PREFAB_player.model"] = m_prefab;
+  m_prefab->mesh = sceneResources->meshes["playermodel"];
+  // TODO(matthew) copy over mesh too? for animations?
+  m_prefab->material = sceneResources->materials["toon.blue"];
+#pragma endregion
+
   ///////////////////////////////////////////////////////
   printf("\nScene: done loading resources!\n");
   ///////////////////////////////////////////////////////
@@ -169,18 +183,18 @@ void Scene::init(void) {
   node["map"] = new Node("_map-test");
   node["map"]->model = sceneResources->models["mapColsTesting"];
 
-  thing_example->transform.position = vec3(2.0f, 0.0f, 0.0f);  // gamething only
+  thing_example->transform.position = vec3(-2.0f, 2.0f, 5.0f);  // gt only
   node["teapot1"]->model = sceneResources->models["teapot1"];
-  node["teapot1"]->transformMtx = translate(vec3(-2, 2, 5));
 
-  thing_cube->transform.position = vec3(2.0f, 3.0f, -4.0f);
+  thing_cube->transform.position = vec3(2.0f, 2.0f, 5.0f);
   node["cubeTest"]->model = sceneResources->models["cubeTextured"];
-  node["cubeTest"]->transformMtx = translate(vec3(2, 2, 5));
+  node["cubeTest"]->transformMtx = translate(vec3(2, 2, 5));  // node translate
 
   // Push scene nodes to root node
   // ("world" node already created in Scene constructor)
-  node["world"]->childnodes.push_back(node["teapot1"]);
-  node["world"]->childnodes.push_back(node["cubeTest"]);
+
+  // node["world"]->childnodes.push_back(node["teapot1"]);
+  // node["world"]->childnodes.push_back(node["cubeTest"]);
 
   node["world"]->childnodes.push_back(node["collision"]);
 
