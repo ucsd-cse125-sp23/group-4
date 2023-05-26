@@ -17,7 +17,6 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Scene.h"
-#include "UserState.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -174,8 +173,8 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 // update and draw functions
 message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
                                               float deltaTime) {
-  // Perform any updates as necessary.
-  Cam->UpdateView(window);
+  auto inputChanges = gameScene->update(deltaTime);
+
 
   UserState inputChanges;
 
@@ -206,7 +205,7 @@ message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
           hud = new HUD(gameScene);
       }
   }*/
-  return inputChanges.toMessage();  // player input to be written to server
+  return inputChanges;  // player input to be written to server
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -218,9 +217,11 @@ void Window::displayCallback(GLFWwindow* window) {
 
   glLoadIdentity();
 
+
   // Render the objects.
   gameScene->draw();
   hud->draw(window);
+
 
   Input::handle(false);
   if (_debugmode) {
@@ -229,7 +230,7 @@ void Window::displayCallback(GLFWwindow* window) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    gameScene->gui();
+    if (gameScene) gameScene->gui();
 
     // imguiDraw(skeleton, animClip);   // simple helper method
 

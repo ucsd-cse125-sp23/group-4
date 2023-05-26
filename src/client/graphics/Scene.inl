@@ -3,42 +3,14 @@
  * contains the definition of the scene graph
  *****************************************************/
 
-#include "ColliderImporter.h"
-#include "Scene.h"
+#include "client/graphics/Collider.h"
+#include "client/graphics/ColliderImporter.h"
+#include "client/graphics/Scene.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 using namespace glm;
-
-Player* Scene::createPlayer(int id, bool isUser = false) {
-  // temporary helper
-  std::string playername = "player" + std::to_string(id);
-
-  Player* player = new Player();
-  player->netId = id;
-  if (isUser) {
-    player->isUser = true;
-    player->camera = camera;  // give a reference to the game camera
-    player->childnodes.push_back(camera);
-  }
-  // player->pmodel = waspModel;            // updating! TODO fix me
-
-  // copy into a new model object
-  Model* myModel = new Model(*sceneResources->models["playerRef"]);
-  player->model = myModel;
-  sceneResources->models[playername + ".model"] = myModel;
-  // player->pmodel->setAnimation("walk");  // TODO: make this automated
-
-  player->name = playername;
-  player->transform.position = vec3(4 + id * 3, 2, 4 + id * 5);
-  player->transform.updateMtx(&(player->transformMtx));
-
-  gamethings.push_back(player);
-  node["world"]->childnodes.push_back(player);
-
-  return player;
-}
 
 void Scene::init(void) {
   // Create a mesh palette
@@ -186,7 +158,6 @@ void Scene::init(void) {
   sceneResources->models["wasp"]->material =
       sceneResources->materials["marble"];
 
-
   // THE player !!!
   sceneResources->models["playerRef"] = new Model;
   sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
@@ -198,7 +169,6 @@ void Scene::init(void) {
   SoundEffect* sfx = new SoundEffect();
   sceneResources->sounds["test"] = sfx;
   sfx->load("assets/sounds/sound_test.wav");
-
 
   ///// maps:
 
@@ -221,7 +191,7 @@ void Scene::init(void) {
   // sceneResources->models["mapColsTesting"]->transformMtx = translate(vec3(0,
   // -2, 0));   // needs to be world space
 
-  std::vector<Collider> mapColliders =
+  std::vector<ColliderData> mapColliders =
       ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
 
   node["collision"] = new Node("_colliders");
@@ -261,14 +231,6 @@ void Scene::init(void) {
   player->transform.position = vec3(0, 2, 0);
   player->transform.updateMtx(&(player->transformMtx));
   // gamethings.push_back(player);
-
-  // ---
-  // temporary manual spawning 4 players:
-  createPlayer(1, true);
-  createPlayer(2);
-  createPlayer(3);
-  createPlayer(4);
-  // ---
 
   // Build the scene graph
   node["teapot1"] = thing_example;

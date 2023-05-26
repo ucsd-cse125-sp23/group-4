@@ -21,6 +21,7 @@
 #include <glm/gtx/transform.hpp>
 #include <map>
 #include <stack>
+#include <network/message.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,7 +36,6 @@
 #include "client/graphics/Obj.h"
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
-#include "client/graphics/SceneState.h"
 #include "client/graphics/Skeleton.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
@@ -95,6 +95,7 @@ class SceneResourceMap {
 
 class Scene {
  public:
+  static int _myPlayerId;
   static bool _freecam;
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
@@ -102,8 +103,7 @@ class Scene {
   SceneResourceMap* sceneResources;
 
   Camera* camera;
-
-  SceneState gameStateCache;
+  Player* myPlayer = nullptr;
 
   // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
@@ -164,9 +164,10 @@ class Scene {
     node["world"] = new Node("world");
   }
 
-  Player* createPlayer(int id, bool isUser);
+  Player* createPlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
+
   virtual void init(void);
   virtual void init(PlayerModel* player);
   virtual void update(float delta,

@@ -1,42 +1,44 @@
-#include <boost/variant.hpp>
-#include <cstddef>
+#include <boost/asio.hpp>
 #include <iostream>
 #include <memory>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 
-Client::Client(boost::asio::io_context& io_context, Addr& addr,
-               ConnectHandler connect_handler, ReadHandler read_handler,
-               WriteHandler write_handler)
-    : socket_(io_context) {
-  tcp::resolver resolver(io_context);
+Client::Client(Addr& addr, ConnectHandler connect_handler,
+               ReadHandler read_handler, WriteHandler write_handler)
+    : io_context_(boost::asio::io_context()), socket_(io_context_) {
+  tcp::resolver resolver(io_context_);
   auto endpoints = resolver.resolve(addr.host, std::to_string(addr.port));
+  std::cout << "(Client::Client) Attempting to connect to " << addr
+            << std::endl;
   boost::asio::async_connect(
       socket_, endpoints,
-      [=](boost::system::error_code ec, tcp::endpoint endpoint) {
+      [this, connect_handler, read_handler, write_handler](
+          boost::system::error_code ec, tcp::endpoint endpoint) {
         if (ec) {
           std::cerr << "Error: " << ec.message() << std::endl;
           return;
         }
 
-        std::cout << "(Client::connect) Connected to " << endpoint.address()
-                  << ":" << endpoint.port() << std::endl;
+        std::cout << "(Client::async_connect) Connected to "
+                  << endpoint.address() << ":" << endpoint.port() << std::endl;
 
-        auto conn_read_handler = [=](boost::system::error_code ec,
+        auto conn_read_handler = [this, read_handler](
+                                     boost::system::error_code ec,
                                      const message::Message& m) {
           if (ec) return;
 
-          // save player_id assigned by the server
+          // save client_id assigned by the server
           if (const message::Assign* body =
                   boost::get<message::Assign>(&m.body)) {
-            player_id_ = body->player_id;
+            id_ = m.metadata.id;
           }
 
           read_handler(m, *this);
-          read();
         };
 
-        auto conn_write_handler = [=](boost::system::error_code ec,
+        auto conn_write_handler = [this, write_handler](
+                                      boost::system::error_code ec,
                                       std::size_t bytes_transferred,
                                       const message::Message& m) {
           if (ec) return;
@@ -47,16 +49,9 @@ Client::Client(boost::asio::io_context& io_context, Addr& addr,
         connection = std::make_unique<Connection<message::Message>>(
             socket_, conn_read_handler, conn_write_handler);
         connect_handler(endpoint, *this);
-        read();
       });
 }
 
-void Client::read() {
-  // std::cout << "Queueing read handler" << std::endl;
-  connection->read();
-}
+void Client::write(message::Message m) { connection->write(m); }
 
-void Client::write(message::Message m) {
-  // std::cout << "Queueing write to server: " << m << std::endl;
-  connection->write(m);
-}
+void Client::poll() { io_context_.poll(); }

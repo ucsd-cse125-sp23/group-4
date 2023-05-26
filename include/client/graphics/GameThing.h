@@ -16,19 +16,21 @@
 #else
 #include <GL/glew.h>
 #endif
+
 #include <GLFW/glfw3.h>
 #include <math.h>
 
+#include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
+#include <network/message.hpp>
+#include <network/tcp_server.hpp>
 #include <utility>
 #include <vector>
 
 #include "client/graphics/Node.h"
-#include "client/graphics/SceneState.h"
-#include "client/graphics/UserState.h"
 
 struct Transform {
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -56,22 +58,44 @@ class GameThing : public Node {
   bool isUser = false;  // controls whether we want to read input and send it
 
   Transform transform;
+  float azimuth = 0;  // for visuals only (aka heading)
 
-  virtual UserState update(float dt) {
+  virtual message::UserStateUpdate update(float dt) {
     // --- example (spin spin) ---
     transform.rotation += glm::vec3(0, 30 * dt, 0);  // spin on y axis
     transform.updateMtx(&transformMtx);  // needed to update node matrix
 
-    return UserState();
+    return message::UserStateUpdate();
   }
 
-  void updateFromState(SceneGameThingState state) {
+  void updateFromState(message::GameStateUpdateItem state) {
     // update self from server input
-    setPosition(state.position);
+    glm::vec3 pos = glm::vec3(state.posx, state.posy, state.posz);
+    setPositionTarget(pos);
     setHeading(state.heading);
   }
 
   // transform helpers
+  const float t_rate =
+      std::chrono::duration_cast<std::chrono::duration<double>>(
+          Server::TICK_RATE)
+          .count() +
+      0.015f;  // in seconds (50ms tickrate + lag)
+  glm::vec3 position_p;
+  glm::vec3 position_t;
+  float lerp_p = 0.0f;
+  void updateInterpolate(float dt) {
+    lerp_p += dt;
+    transform.position = glm::lerp(position_p, position_t,
+                                   std::clamp(lerp_p / t_rate, 0.0f, 1.0f));
+    transform.updateMtx(&transformMtx);
+  }
+  void setPositionTarget(glm::vec3 pos) {
+    // interpolated!
+    position_p = position_t;
+    position_t = pos;
+    lerp_p = 0.0f;
+  }
 
   void setPosition(glm::vec3 pos) {
     this->transform.position = pos;
@@ -86,10 +110,12 @@ class GameThing : public Node {
     setHeading(heading);
   }
   void setHeading(float heading) {
+    azimuth = heading;
+
     // purely visual, for now (rotation not applied to transform itself)
     if (!model) return;
 
-    model->modelMtx = glm::eulerAngleY(heading);
+    model->modelMtx = glm::eulerAngleY(azimuth);
   }
 
   void move(glm::vec3 movement) {

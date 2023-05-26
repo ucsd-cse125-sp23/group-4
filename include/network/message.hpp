@@ -1,7 +1,7 @@
 #pragma once
 
+#include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/variant.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
@@ -9,31 +9,31 @@
 #include <ctime>
 #include <ostream>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace message {
 
-using PlayerID = boost::uuids::uuid;
+using ClientID = boost::uuids::uuid;
 
 enum class Type { Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate };
 
 struct Metadata {
-  PlayerID player_id;
-  std::time_t time;
+  ClientID id;       // client id
+  std::time_t time;  // time of request being sent
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& player_id& time;
+    ar& id& time;
   }
 };
 
 struct Assign {
-  PlayerID player_id;
+  int pid;
   std::string to_string() const;
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& player_id;
+    ar& pid;
   }
 };
 
@@ -58,7 +58,6 @@ struct Notify {
 };
 
 struct GameStateUpdateItem {
-  friend class boost::serialization::access;
   int id;
   float posx;
   float posy;
@@ -77,7 +76,7 @@ struct GameStateUpdateItem {
 };
 
 struct GameStateUpdate {
-  std::vector<GameStateUpdateItem*> things;
+  std::unordered_map<int, GameStateUpdateItem> things;
   // add global params later
   std::string to_string() const;
 
@@ -88,7 +87,7 @@ struct GameStateUpdate {
 };
 
 struct UserStateUpdate {
-  int id;
+  int id = -1;  // assume -1 IDs invalid
   float movx;
   float movy;
   float movz;

@@ -21,14 +21,27 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 class Camera : public GameThing {
+ private:
+  // interpolation
+  float lerpSpeed = 10.0f;
+  glm::vec3 position_prev;
+  glm::vec3 position_target;
+
  public:
   bool Fixed;
 
   Camera();
 
-  UserState update(float dt);
+  message::UserStateUpdate update(float dt);
 
-  void UpdateView(GLFWwindow* window);
+  void SetPositionTarget(glm::vec3 v) {
+    position_target = v + glm::vec3(0, 4, 0);  // center above player
+  }
+
+  void UpdateView();
+  void UpdateView(Node* parent);
+  void UpdateView(glm::mat4 rootMtx);
+
   void Reset();
 
   // Access functions

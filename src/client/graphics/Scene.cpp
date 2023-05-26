@@ -18,36 +18,63 @@ adapted from CSE 167 - Matthew
 using glm::mat4x4;
 using glm::vec3;
 
+int Scene::_myPlayerId = -1;
+
 bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-void Scene::initFromServer(int myid) {
-  // TODO(matthew) make this better
-  for (auto e : gamethings) {
-    if (e->netId == myid) {
-      setToUserFocus(e);
-      return;
-    }
+Player* Scene::createPlayer(int id) {
+  bool isUser = false;
+  if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
+
+  // creating a player to be rendered... TODO call this from state update!
+  std::string playername = "player" + std::to_string(id);
+
+  Player* player = new Player();
+  player->netId = id;
+  if (isUser) {
+    setToUserFocus(player);
   }
+  // player->pmodel = waspModel;            // updating! TODO fix me
+
+  // copy into a new model object
+  Model* myModel = new Model(*sceneResources->models["playerRef"]);
+  player->model = myModel;
+  sceneResources->models[playername + ".model"] = myModel;
+  // player->pmodel->setAnimation("walk");  // TODO: make this automated
+
+  player->name = playername;
+  player->transform.position = vec3(4 + id * 3, 2, 4 + id * 5);
+  player->transform.updateMtx(&(player->transformMtx));
+
+  gamethings.push_back(player);
+  node["world"]->childnodes.push_back(player);
+
+  return player;
 }
 
+void Scene::initFromServer(int myid) { _myPlayerId = myid; }
+
 void Scene::setToUserFocus(GameThing* t) {
+  myPlayer = nullptr;
+
   t->isUser = true;
   if (dynamic_cast<Player*>(t) != nullptr) {
     Player* player = dynamic_cast<Player*>(t);
     player->camera = camera;  // give a reference to the game camera
+    myPlayer = player;
   }
-  t->childnodes.push_back(camera);
+  t->childnodes.push_back(camera);  // parent camera to player
 }
 
 void Scene::update(float delta, UserState& ourPlayerUpdates) {
   // UserState ourPlayerUpdates;
 
   for (auto e : gamethings) {
-    UserState currUpdate = e->update(delta);
+    auto currUpdate = e->update(delta);
 
-    if (e->isUser) ourPlayerUpdates = currUpdate;
+    if (e->isUser) ourPlayerUpdate = currUpdate;
   }
 
   time.Update(delta);
@@ -55,14 +82,29 @@ void Scene::update(float delta, UserState& ourPlayerUpdates) {
   // return ourPlayerUpdates;
 }
 
-void Scene::updateState(SceneState newState) {
-  // loop through GameThings, send newest state data
+void Scene::updateState(message::GameStateUpdate newState) {
+  // check if new graphical objects need to be created
+  for (auto& t : newState.things) {
+    // TODO(matthew): change gamethings to a map
+    bool exists = false;
+    for (auto e : gamethings) {
+      if (e->netId == t.second.id) {
+        exists = true;
+        break;
+      }
+    }
+
+    // if t isn't in our gamethings yet, add it now
+    if (!exists) createPlayer(t.second.id);
+  }
+
+  // loop through GameThings and update their state
   for (auto e : gamethings) {
     int currId = e->netId;
 
     if (currId == -1) continue;  // skip thing
 
-    SceneGameThingState currState = newState.GetUpdateFor(currId);
+    message::GameStateUpdateItem currState = newState.things.at(currId);
     // please check for non-null too!
     e->updateFromState(currState);
   }
@@ -70,6 +112,9 @@ void Scene::updateState(SceneState newState) {
 
 void Scene::draw() {
   // Pre-draw sequence:
+  if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
+  camera->UpdateView();
+
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
   glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
 
