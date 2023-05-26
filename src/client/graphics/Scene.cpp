@@ -167,11 +167,10 @@ void Scene::draw() {
   matrix_stack.push(cur_MMtx);
 
   while (!dfs_stack.empty()) {
-    // Detect whether the search runs into infinite loop by checking whether the
-    // stack is longer than the size of the graph. Note that, at any time, the
-    // stack does not contain repeated element.
-    if (dfs_stack.size() > std::max((int)node.size(), 30)) {
-      std::cerr << "Error: The scene graph has a closed loop." << std::endl;
+    // Detect whether the search runs into infinite loop
+    if (dfs_stack.size() > std::max(static_cast<int>(node.size()), 100)) {
+      std::cerr << "Error: The scene graph probably has a closed loop."
+                << std::endl;
       exit(-1);
     }
 
