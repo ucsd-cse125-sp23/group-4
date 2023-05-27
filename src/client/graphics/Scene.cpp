@@ -14,6 +14,7 @@ adapted from CSE 167 - Matthew
 #include <stack>
 
 #include "Scene.inl"  // The scene init definition
+#include "client/graphics/Window.h"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -154,6 +155,21 @@ void Scene::drawHUD(GLFWwindow* window) {
     glWindowPos2f(10.0f, static_cast<float>(height) - 25);
     glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
   }
+
+  // draw FPS
+  std::string fps_text = std::to_string(Window::fps) + " FPS";
+  std::string ups_text = std::to_string(Window::ups) + " UPS";
+  const unsigned char* stringFPS =
+      reinterpret_cast<const unsigned char*>(fps_text.c_str());
+  const unsigned char* stringUPS =
+      reinterpret_cast<const unsigned char*>(ups_text.c_str());
+  glColor3f(0.3f, 1.0f, 0.3f);
+  glWindowPos2f(static_cast<float>(width) - 50,
+                static_cast<float>(height) - 25);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringFPS);
+  glWindowPos2f(static_cast<float>(width) - 50,
+                static_cast<float>(height) - 35);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringUPS);
 }
 void Scene::draw() {
   // Pre-draw sequence:

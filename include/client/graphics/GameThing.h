@@ -94,7 +94,7 @@ class GameThing : public Node {
   }
   void setPositionTarget(glm::vec3 pos) {
     // interpolated!
-    position_p = position_t;
+    position_p = transform.position;
     position_t = pos;
     lerp_p = 0.0f;
   }

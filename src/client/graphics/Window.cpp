@@ -20,6 +20,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int Window::fps;
+int Window::ups;
+
 // Window Properties
 int Window::width;
 int Window::height;

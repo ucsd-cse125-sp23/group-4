@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
 
   // Delta time logic (see
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
-  const double limitFPS = 1.0 / 60.0;
+  const double limitTPS = 1.0 / 60.0;
   double lastTime = glfwGetTime();
   double timer = lastTime;
   double deltaTimer = 0;
@@ -158,16 +158,15 @@ int main(int argc, char* argv[]) {
     // - Measure time
     double nowTime = glfwGetTime();
     double deltaTime = nowTime - lastTime;
-    deltaTimer += (nowTime - lastTime) / limitFPS;
+    deltaTimer += (nowTime - lastTime) / limitTPS;  // for network ticks
     lastTime = nowTime;
 
-    // - Only update at 60 frames / s
-    while (deltaTimer >= 1.0) {
-      // POLL FROM SERVER
-      client->poll();
+    // POLL FROM SERVER
+    client->poll();
 
-      // Idle callback. Updating local objects, input, etc.
-      // Get a message back of all updates
+    // - Only update network at X frames / sec
+    while (deltaTimer >= 1.0) {
+      // Get a message back of input state
       message::UserStateUpdate mout = Window::gameScene->pollInput();
 
       // OUTPUT TO SERVER
@@ -187,9 +186,12 @@ int main(int argc, char* argv[]) {
     if (glfwGetTime() - timer > 1.0) {
       timer++;
       Window::fps = frames;
-      Window::tps = updates;
+      Window::ups = updates;
       updates = 0, frames = 0;
     }
+
+    // prevent drawing too fast...
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 
   Window::cleanUp();

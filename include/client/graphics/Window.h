@@ -13,7 +13,7 @@
 class Window {
  public:
   static int fps;
-  static int tps;  // ticks per second
+  static int ups;  // updates from network per second
 
   // Window Properties
   static int width;
