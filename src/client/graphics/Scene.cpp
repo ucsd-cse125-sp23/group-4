@@ -68,19 +68,28 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-message::UserStateUpdate Scene::update(float delta) {
+void Scene::update(float delta) {
+  for (auto e : gamethings) {
+    e->update(delta);
+  }
+}
+
+message::UserStateUpdate Scene::pollInput() {
   message::UserStateUpdate ourPlayerUpdate = message::UserStateUpdate();
 
   for (auto e : gamethings) {
-    auto currUpdate = e->update(delta);
+    auto currUpdate = e->pollInput();
 
-    if (e->isUser) ourPlayerUpdate = currUpdate;
+    if (e->isUser) {
+      ourPlayerUpdate = currUpdate;
+      break;
+    }
   }
 
   return ourPlayerUpdate;
 }
 
-void Scene::updateState(message::GameStateUpdate newState) {
+void Scene::receiveState(message::GameStateUpdate newState) {
   // check if new graphical objects need to be created
   for (auto& t : newState.things) {
     // TODO(matthew): change gamethings to a map
@@ -121,7 +130,8 @@ void Scene::drawHUD(GLFWwindow* window) {
       Player* player = dynamic_cast<Player*>(e);
       std::string name = player->name;
       glm::vec3 position = player->transform.position;
-      player_times[name] = player->time;
+      // player_times[name] = player->time;  // player.time deprecated,
+      // use game state in future
       const unsigned char* cname =
           reinterpret_cast<const unsigned char*>(name.c_str());
       glColor3f(1.0f, 1.0f, 1.0f);

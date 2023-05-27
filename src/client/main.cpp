@@ -83,7 +83,7 @@ std::unique_ptr<Client> network_init() {
       net_assigned = true;
     };
     auto game_state_update_handler = [](const message::GameStateUpdate& body) {
-      Window::gameScene->updateState(body);
+      Window::gameScene->receiveState(body);
     };
     auto any_handler = [](const message::Message::Body&) {};
 
@@ -147,30 +147,49 @@ int main(int argc, char* argv[]) {
 
   // Delta time logic (see
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
+  const double limitFPS = 1.0 / 60.0;
   double lastTime = glfwGetTime();
+  double timer = lastTime;
+  double deltaTimer = 0;
+  int frames = 0, updates = 0;
 
   // Loop while GLFW window should stay open.
   while (!game_exit && !glfwWindowShouldClose(window)) {
     // - Measure time
     double nowTime = glfwGetTime();
     double deltaTime = nowTime - lastTime;
+    deltaTimer += (nowTime - lastTime) / limitFPS;
     lastTime = nowTime;
 
-    // POLL FROM SERVER
-    client->poll();
+    // - Only update at 60 frames / s
+    while (deltaTimer >= 1.0) {
+      // POLL FROM SERVER
+      client->poll();
 
-    // Idle callback. Updating local objects, input, etc.
-    // Get a message back of all updates
-    message::UserStateUpdate mout = Window::idleCallback(window, deltaTime);
+      // Idle callback. Updating local objects, input, etc.
+      // Get a message back of all updates
+      message::UserStateUpdate mout = Window::gameScene->pollInput();
 
-    // OUTPUT TO SERVER
-    if (net_assigned && mout.id >= 0)
-      client->write<message::UserStateUpdate>(mout);
+      // OUTPUT TO SERVER
+      if (net_assigned && mout.id >= 0)
+        client->write<message::UserStateUpdate>(mout);
+
+      updates++;
+      deltaTimer--;
+    }
 
     // Main render display callback. Rendering of objects is done here.
+    Window::idleCallback(window, deltaTime);
     Window::displayCallback(window);
+    frames++;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(16));
+    // - Reset after one second
+    if (glfwGetTime() - timer > 1.0) {
+      timer++;
+      Window::fps = frames;
+      Window::tps = updates;
+      updates = 0, frames = 0;
+    }
   }
 
   Window::cleanUp();

@@ -9,10 +9,14 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
-message::UserStateUpdate Player::update(float dt) {
-  // interpolate states
+void Player::update(float dt) {
+  // interpolate between old to new state
   updateInterpolate(dt);
 
+  if (pmodel) pmodel->update(dt);
+}
+
+message::UserStateUpdate Player::pollInput() {
   if (!isUser) return message::UserStateUpdate();
 
   if (camera && camera->Fixed)
@@ -46,10 +50,7 @@ message::UserStateUpdate Player::update(float dt) {
   vec3 moveWorld = vec3(0);
   if (moving) {
     moveWorld = move(moveLocal);
-    if (pmodel) pmodel->update(dt);
   }
-
-  if (tagged) time += dt;  // move this to server TODO
 
   // Get ready to send a message to the server: ***
   message::UserStateUpdate myInputState;

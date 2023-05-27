@@ -166,11 +166,8 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
-                                              float deltaTime) {
-  auto inputChanges = gameScene->update(deltaTime);
-
-  return inputChanges;  // player input to be written to server
+void Window::idleCallback(GLFWwindow* window, float deltaTime) {
+  gameScene->update(deltaTime);
 }
 
 void Window::displayCallback(GLFWwindow* window) {

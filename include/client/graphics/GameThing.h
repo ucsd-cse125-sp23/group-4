@@ -60,11 +60,13 @@ class GameThing : public Node {
   Transform transform;
   float azimuth = 0;  // for visuals only (aka heading)
 
-  virtual message::UserStateUpdate update(float dt) {
+  virtual void update(float dt) {
     // --- example (spin spin) ---
     transform.rotation += glm::vec3(0, 30 * dt, 0);  // spin on y axis
     transform.updateMtx(&transformMtx);  // needed to update node matrix
+  }
 
+  virtual message::UserStateUpdate pollInput() {
     return message::UserStateUpdate();
   }
 
