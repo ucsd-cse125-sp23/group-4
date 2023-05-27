@@ -18,7 +18,7 @@ void GameThing::update(const message::UserStateUpdate& update) {
   heading = update.heading;
 }
 
-message::GameStateUpdateItem GameThing::to_network() {
+message::GameStateUpdateItem GameThing::to_network() const {
   return {id, player->getPos().x, player->getPos().y, player->getPos().z,
           heading};
 }
@@ -46,12 +46,8 @@ void Game::update(const message::UserStateUpdate& update) {
 void Game::tick() { level->tick(); }
 
 std::unordered_map<int, message::GameStateUpdateItem> Game::to_network() {
-  std::unordered_map<int, message::GameStateUpdateItem> things(
-      game_things_.size());
-  std::transform(game_things_.begin(), game_things_.end(),
-                 std::inserter(things, things.end()), [](auto&& thing) {
-                   return std::pair<int, message::GameStateUpdateItem>(
-                       thing.first, thing.second.to_network());
-                 });
+  std::unordered_map<int, message::GameStateUpdateItem> things;
+  for (const auto& [pid, thing] : game_things_)
+    things.insert({pid, thing.to_network()});
   return things;
 }

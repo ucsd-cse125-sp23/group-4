@@ -15,7 +15,7 @@ struct GameThing {
   GameThing(int, Player*, ControlModifierData*);
   void move(float, float, float);  // NOLINT
   void update(const message::UserStateUpdate& update);
-  message::GameStateUpdateItem to_network();
+  message::GameStateUpdateItem to_network() const;
 };
 
 using GameThingMap = std::unordered_map<int, GameThing>;
