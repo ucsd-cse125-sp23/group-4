@@ -3,7 +3,7 @@
 #include <network/message.hpp>
 #include <server/game.hpp>
 
-GameThing::GameThing(int& id, Player* p, ControlModifierData* c)
+GameThing::GameThing(int id, Player* p, ControlModifierData* c)
     : id(id), player(p), control(c), heading(0) {}
 
 void GameThing::move(float x, float y, float z) {  // NOLINT
@@ -34,15 +34,12 @@ Game::Game() {
 }
 
 int Game::create_player() {
-  auto player_pair = initializePlayer();
-  int new_id = next_pid++;
-  game_things_.insert(
-      {new_id, GameThing(new_id, player_pair.first, player_pair.second)});
-  return new_id;
+  auto [player, control] = initializePlayer();
+  game_things_.insert({player->pid, GameThing(player->pid, player, control)});
+  return player->pid;
 }
 
 void Game::update(const message::UserStateUpdate& update) {
-  // TODO: remove this when proper assignment is implemented
   game_things_.at(update.id).update(update);
 }
 

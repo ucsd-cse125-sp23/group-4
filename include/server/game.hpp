@@ -12,7 +12,7 @@ struct GameThing {
   Player* player;
   ControlModifierData* control;
 
-  GameThing(int&, Player*, ControlModifierData*);
+  GameThing(int, Player*, ControlModifierData*);
   void move(float, float, float);  // NOLINT
   void update(const message::UserStateUpdate& update);
   message::GameStateUpdateItem to_network();
@@ -32,5 +32,4 @@ class Game {
 
  private:
   GameThingMap game_things_;
-  int next_pid = 1;
 };
