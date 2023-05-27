@@ -23,9 +23,7 @@ class Player : public GameThing, InputListener {
 
   PlayerModel* pmodel;  // visual information
 
-  Player() {
-    pmodel = nullptr;
-  }
+  Player() { pmodel = nullptr; }
 
   message::UserStateUpdate pollInput();
 
