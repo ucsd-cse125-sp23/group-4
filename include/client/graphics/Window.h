@@ -6,14 +6,15 @@
 
 #pragma once
 
-#include <network/message.hpp>
-
 #include "Scene.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
 class Window {
  public:
+  static int fps;
+  static int ups;  // updates from network per second
+
   // Window Properties
   static int width;
   static int height;
@@ -34,8 +35,7 @@ class Window {
   static void resizeCallback(GLFWwindow* window, int width, int height);
 
   // update and draw functions
-  static message::UserStateUpdate idleCallback(GLFWwindow* window,
-                                               float deltaTime);
+  static void idleCallback(GLFWwindow* window, float deltaTime);
   static void displayCallback(GLFWwindow*);
 
   // helper to reset the camera

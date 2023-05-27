@@ -14,6 +14,7 @@ adapted from CSE 167 - Matthew
 #include <stack>
 
 #include "Scene.inl"  // The scene init definition
+#include "client/graphics/Window.h"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -75,19 +76,28 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-message::UserStateUpdate Scene::update(float delta) {
+void Scene::update(float delta) {
+  for (auto e : gamethings) {
+    e->update(delta);
+  }
+}
+
+message::UserStateUpdate Scene::pollInput() {
   message::UserStateUpdate ourPlayerUpdate = message::UserStateUpdate();
 
   for (auto e : gamethings) {
-    auto currUpdate = e->update(delta);
+    auto currUpdate = e->pollInput();
 
-    if (e->isUser) ourPlayerUpdate = currUpdate;
+    if (e->isUser) {
+      ourPlayerUpdate = currUpdate;
+      break;
+    }
   }
 
   return ourPlayerUpdate;
 }
 
-void Scene::updateState(message::GameStateUpdate newState) {
+void Scene::receiveState(message::GameStateUpdate newState) {
   // check if new graphical objects need to be created
   for (auto& t : newState.things) {
     // TODO(matthew): change gamethings to a map
@@ -128,7 +138,8 @@ void Scene::drawHUD(GLFWwindow* window) {
       Player* player = dynamic_cast<Player*>(e);
       std::string name = player->name;
       glm::vec3 position = player->transform.position;
-      player_times[name] = player->time;
+      // player_times[name] = player->time;  // player.time deprecated,
+      // use game state in future
       const unsigned char* cname =
           reinterpret_cast<const unsigned char*>(name.c_str());
       glColor3f(1.0f, 1.0f, 1.0f);
@@ -151,6 +162,21 @@ void Scene::drawHUD(GLFWwindow* window) {
     glWindowPos2f(10.0f, static_cast<float>(height) - 25);
     glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
   }
+
+  // draw FPS
+  std::string fps_text = std::to_string(Window::fps) + " FPS";
+  std::string ups_text = std::to_string(Window::ups) + " UPS";
+  const unsigned char* stringFPS =
+      reinterpret_cast<const unsigned char*>(fps_text.c_str());
+  const unsigned char* stringUPS =
+      reinterpret_cast<const unsigned char*>(ups_text.c_str());
+  glColor3f(0.3f, 1.0f, 0.3f);
+  glWindowPos2f(static_cast<float>(width) - 50,
+                static_cast<float>(height) - 25);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringFPS);
+  glWindowPos2f(static_cast<float>(width) - 50,
+                static_cast<float>(height) - 35);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringUPS);
 }
 void Scene::draw() {
   // Pre-draw sequence:
