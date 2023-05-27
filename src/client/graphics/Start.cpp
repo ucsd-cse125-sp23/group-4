@@ -1,4 +1,4 @@
-#include "client/graphics/Start.h"
+#include "Start.h"
 
 void Start::update(float delta, message::UserStateUpdate& ourPlayerUpdates) {
   Scene::update(delta, ourPlayerUpdates);

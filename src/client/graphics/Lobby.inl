@@ -1,4 +1,4 @@
-#include "client/graphics/Lobby.h"
+#include "Lobby.h"
 
 void Lobby::init(void) {
   // Create a mesh palette

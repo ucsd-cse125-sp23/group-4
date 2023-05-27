@@ -1,4 +1,4 @@
-#include "client/graphics/Lobby.h"
+#include "Lobby.h"
 
 #include "Lobby.inl"
 

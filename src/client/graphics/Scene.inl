@@ -3,9 +3,9 @@
  * contains the definition of the scene graph
  *****************************************************/
 
-#include "client/graphics/Collider.h"
-#include "client/graphics/ColliderImporter.h"
-#include "client/graphics/Scene.h"
+#include "Collider.h"
+#include "ColliderImporter.h"
+#include "Scene.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
