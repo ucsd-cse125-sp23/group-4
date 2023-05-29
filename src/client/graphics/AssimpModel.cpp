@@ -522,23 +522,6 @@ void AssimpModel::setAnimation(std::string name) {
   useAnimation(-1);
 }
 
-void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-                       const glm::mat4& transformMtx) {
-  if (!material) {
-    return;
-  }
-
-  GLuint shader = material->shader;
-
-  glUseProgram(shader);
-  material->setUniforms(viewProjMtx, viewMtx,
-                        transformMtx * modelMtx * betterView);
-  for (int i = 0; i < meshes.size(); i++) {
-    meshes[i]->draw();
-  }
-  glUseProgram(0);
-}
-
 // currently in use
 void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
                        const glm::mat4& transformMtx, const bool ignoreDepth) {

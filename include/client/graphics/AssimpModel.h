@@ -46,17 +46,14 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
   void setAnimation(std::string name);
   void update(float deltaTimeInMs);
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-            const glm::mat4& transformMtx);
+            const glm::mat4& transformMtx, const bool ignoreDepth = false);
+
   // SkinnedMesh
   void init(const char* filename) {
     if (!loadAssimp(filename)) {
       exit(EXIT_FAILURE);
     }
   }
-  // Model
-  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-            const glm::mat4& transformMtx, const bool ignoreDepth = false);
-
   void draw();
 
  private:
