@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <glm/glm.hpp>
+#include <string>
 
 #include "client/graphics/Texture.h"
 

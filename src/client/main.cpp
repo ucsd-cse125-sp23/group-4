@@ -137,8 +137,8 @@ int main(int argc, char* argv[]) {
       break;
     }
 
-    //std::cout << "(net_assigned: " << net_assigned << ") ";
-    //std::cout << "Waiting for server to assign pid..." << std::endl;
+    std::cout << "(net_assigned: " << net_assigned << ") ";
+    std::cout << "Waiting for server to assign pid..." << std::endl;
     client->poll();
 
     Window::displayCallback(window);  // TODO: this should be lobby draw

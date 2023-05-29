@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "client/graphics/Mesh.h"
 #include "client/graphics/core.h"
 
