@@ -59,7 +59,6 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
   AssimpNode* rootNode;
   unsigned int numNode;
   std::map<std::string, AssimpNode*> nodeMap;
-  std::map<std::string, AssimpJoint*> jointMap;
   std::vector<bool> meshVisibilities;
   std::vector<AssimpMesh*> meshes;
   bool isAnimated, isPaused;
@@ -78,25 +77,14 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
 
   std::map<std::string, ControlInfo> nodeControlMap;
 
-  /** Prepare a new AssimpNode node
-   * accTransform: accumulative transform from parent node
-   * aiNode: aiNode from the importer corresponded to this node
-   * scene: the scene created by the importer
-   */
-  void loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
-                            aiNode* aiNode, const aiScene* scene);
-  /** Prepare a new AssimpMesh mesh
-   * aiMesh: aiMesh from the importer corresponded to this mesh
-   * scene: the scene created by the importer
-   */
-  void loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
-                            const aiScene* scene);
-  /** Adds skeleton/joints to a new AssimpMesh mesh
-   * aiMesh: aiMesh from the importer corresponded to this mesh
-   * scene: the scene created by the importer
-   */
-  void loadAssimpHelperSkel(AssimpMesh* mesh, aiMesh* aiMesh,
-                            const aiScene* scene);
+  void prepareNodes(const aiScene* const scene);
+  bool populateNode(const aiScene* const scene, const aiNode* const aiNode,
+                    const glm::mat4 accTransform,
+                    std::vector<std::pair<aiMesh*, AssimpMesh*>>& meshQueue);
+  bool populateMesh(const aiScene* const scene, const aiMesh* const aiMesh,
+                    AssimpMesh* const mesh);
+  bool bindJoint(AssimpMesh* const mesh, const aiBone* const aiBone);
+
   /** Add animations to this model
    * scene: the scene created by the importer
    */

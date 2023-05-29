@@ -11,48 +11,50 @@
 #include "client/graphics/core.h"
 
 class AssimpNode;
+class AssimpMesh;
 
 struct VertexWeight {
   unsigned int vertexInd;
   float weight;
 };
 
-struct AssimpJoint {
-  unsigned int ind;
-  std::string name;
-  glm::mat4 matBindingInv;
-  glm::mat4 matWorldTransform;
-  std::vector<VertexWeight> weights;
-  AssimpNode *node, *meshNode;
+struct NodeJoint {
+  NodeJoint(AssimpMesh* const mesh, const glm::mat4 invBindMat)
+      : mesh(mesh), invBindMat(invBindMat) {}
 
+  /** apply the contribution of this joint to its related mesh */
   glm::mat4 update();
-};
 
-struct Vertex {
-  glm::vec3 position;
-  glm::vec3 normal;
-  glm::uvec4 boneInds = glm::vec4(0, 0, 0, 0);
-  glm::vec4 boneWeights = glm::vec4(1, 0, 0, 0);
-  glm::vec2 uv = glm::vec2(0, 0);
+  /** the mesh that this joint relates to */
+  AssimpMesh* const mesh;
+  /** transform from mesh space to joint space */
+  const glm::mat4 invBindMat;
+  /** the weights of each vertex affected by this joint */
+  std::vector<VertexWeight> vertexWeights;
 };
 
 /** The AssimpMesh class for storing a mesh with a binded skeleton. */
 class AssimpMesh {
  public:
-  static const int MAX_BONES = 200;
   AssimpMesh();
 
   std::string name;
-  AssimpNode* node;
-  /** vertex relative to world space (default pose) */
-  std::vector<Vertex> vertices;
-  /** vertex relative to world space (current pose) */
-  std::vector<Vertex> worldVerticies;
-  std::vector<unsigned int> indices;
-  std::vector<AssimpJoint*> joints;
-  glm::mat4 matBindingInvs[MAX_BONES];
 
-  // Material & Texture props
+  // Rendering - Basics
+  /** indicates whether vertex data needs to be renewed to GL */
+  bool isUpdated;
+  std::vector<unsigned int> indices;
+  std::vector<glm::vec3> outPos;
+  std::vector<glm::vec3> outNorm;
+  std::vector<glm::vec2> uvs;
+  /** vertex relative to world space (default pose) */
+  std::vector<glm::vec4> pos;
+  std::vector<glm::vec4> norm;
+  /** temporary vertex info */
+  std::vector<glm::vec4> animPos;
+  std::vector<glm::vec4> animNorm;
+
+  // Rendering - Material & Texture
   /** holds texture of the mesh */
   Texture* texture = nullptr;
   // store them as RGBA colors to avoid conversion,
@@ -61,7 +63,6 @@ class AssimpMesh {
   /** exponent of phong specular equation */
   float shininess;
 
-  void update();
   void draw(const glm::mat4& viewProjMtx, GLuint shader);
   void gl_load();
   void gl_delete();
@@ -73,6 +74,6 @@ class AssimpMesh {
 
  private:
   unsigned int VAO, VBO, EBO;
-  unsigned int VAO2, VBO2, EBO2;
+  unsigned int VAO2, VBO2P, VBO2N, VBO2UV, EBO2;
   bool isLoaded, isLoaded2;
 };
