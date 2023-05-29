@@ -326,7 +326,8 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
   glUseProgram(shader);
 
   if (ignoreDepth) glDisable(GL_DEPTH_TEST);
-
+  material->setUniforms(viewProjMtx, viewMtx,
+                        transformMtx * modelMtx * betterView);
   for (int i = 0; i < meshes.size(); i++) {
     material->diffuse = meshes[i]->diffuse;
     material->specular = meshes[i]->specular;
