@@ -30,8 +30,6 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
    */
   bool loadAssimp(const char* path);
 
-  void loadShader(GLuint shader);
-
   /** Set model to use default pose */
   void useMesh();
   /** Set model to use specified animation (-1 = use default pose)
@@ -64,7 +62,7 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
   std::map<std::string, AssimpJoint*> jointMap;
   std::vector<bool> meshVisibilities;
   std::vector<AssimpMesh*> meshes;
-  bool isAnimated, isPaused, useShader;
+  bool isAnimated, isPaused;
   int currentAnimation;
   std::vector<AssimpAnimation> animations;
   glm::mat4 betterView = glm::mat4(1.0);

@@ -154,8 +154,7 @@ void Scene::init(void) {
 
   sceneResources->models["assimp"] = assimpModel;
   sceneResources->models["assimp"]->mesh = sceneResources->meshes["assimp"];
-  sceneResources->models["assimp"]->material = sceneResources->materials["toon.blue"];
-  am->loadShader(sceneResources->shaderPrograms["basic"]);
+  sceneResources->models["assimp"]->material = sceneResources->materials["wood"];
 
   ///// maps:
 

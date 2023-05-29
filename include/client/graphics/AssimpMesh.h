@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "client/graphics/AssimpNode.h"
-#include "client/graphics/Material.h"
+#include "client/graphics/Texture.h"
 #include "client/graphics/core.h"
 
 class AssimpNode;
@@ -51,8 +51,15 @@ class AssimpMesh {
   std::vector<unsigned int> indices;
   std::vector<AssimpJoint*> joints;
   glm::mat4 matBindingInvs[MAX_BONES];
-  /** holds shader specified when  */
-  Material* material;
+
+  // Material & Texture props
+  /** holds texture of the mesh */
+  Texture* texture = nullptr;
+  // store them as RGBA colors to avoid conversion,
+  //   even though assimp reads RGB colors
+  glm::vec4 diffuse, specular, ambient, emissive;
+  /** exponent of phong specular equation */
+  float shininess;
 
   void update();
   void draw(const glm::mat4& viewProjMtx, GLuint shader);

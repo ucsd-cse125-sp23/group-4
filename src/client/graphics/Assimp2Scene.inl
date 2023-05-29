@@ -139,13 +139,11 @@ void Scene::init(void) {
   if (!am->loadAssimp("assets/animation/Animation -Bee.fbx")) {
     exit(EXIT_FAILURE);
   }
-  am->loadShader(sceneResources->shaderPrograms["basic"]);
   am->setAnimation("walk");
   sceneResources->models["playerRef"] = am;
   sceneResources->models["playerRef"]->mesh = am;
-  // TODO(matthew) copy over mesh too?
   sceneResources->models["playerRef"]->material =
-      sceneResources->materials["toon.blue"];
+      sceneResources->materials["wood"];
 
   // Sound palette
   SoundEffect* sfx = new SoundEffect();

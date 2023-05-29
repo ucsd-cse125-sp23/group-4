@@ -16,7 +16,6 @@ AssimpModel::AssimpModel()
       numNode(0),
       isAnimated(false),
       isPaused(true),
-      useShader(false),
       currentAnimation(-1),
       animModes(nullptr) {}
 
@@ -47,15 +46,6 @@ bool AssimpModel::loadAssimp(const char* path) {
   betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)),
                               glm::vec3(0, -120, 0));
   return true;
-}
-
-void AssimpModel::loadShader(GLuint shader) {
-  useShader = true;
-  for (int i = 0; i < meshes.size(); i++) {
-    if (meshes[i]->material) {
-      meshes[i]->material->shader = shader;
-    }
-  }
 }
 
 void AssimpModel::loadAssimpHelperNode(AssimpNode* node, glm::mat4 accTransform,
@@ -131,21 +121,19 @@ void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
   }
 
   // load material
-  mesh->material = new Material();
-  aiMaterial* aiMaterial = scene->mMaterials[aiMesh->mMaterialIndex];
-
   aiColor3D color(0.f, 0.f, 0.f);
+  float f = 0.0f;
+  aiMaterial* aiMaterial = scene->mMaterials[aiMesh->mMaterialIndex];
   aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-  mesh->material->diffuse = glm::vec4(color.r, color.g, color.b, 1.0f);
+  mesh->diffuse = glm::vec4(color.r, color.g, color.b, 1.0f);
   aiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
-  mesh->material->specular = glm::vec4(color.r, color.g, color.b, 1.0f);
+  mesh->specular = glm::vec4(color.r, color.g, color.b, 1.0f);
   aiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
-  mesh->material->ambient = glm::vec4(color.r, color.g, color.b, 1.0f);
+  mesh->ambient = glm::vec4(color.r, color.g, color.b, 1.0f);
   aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color);
-  mesh->material->emission = glm::vec4(color.r, color.g, color.b, 1.0f);
-  // float f = mesh->material->shininess;
-  // aiMaterial->Get(AI_MATKEY_SHININESS, f);
-  // mesh->material->shininess = f;
+  mesh->emissive = glm::vec4(color.r, color.g, color.b, 1.0f);
+  aiMaterial->Get(AI_MATKEY_SHININESS, f);
+  mesh->shininess = f;
 
   // load UV texture
   if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
@@ -165,6 +153,7 @@ void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
              aiMaterial->GetName().C_Str(), aiTexture->mWidth,
              aiTexture->mHeight);
       if (aiTexture->mHeight == 0) {
+        // compressed file
         printf("        (Compressed: %s file)\n", aiTexture->achFormatHint);
         int ok, width, height, numOfChannels;
         ok = stbi_info_from_memory(
@@ -182,18 +171,19 @@ void AssimpModel::loadAssimpHelperMesh(AssimpMesh* mesh, aiMesh* aiMesh,
           printf("Assimp: Loading \"%s\" texture successed - W:H = %d:%d[%d]\n",
                  aiMaterial->GetName().C_Str(), width, height, numOfChannels);
 
-          mesh->material->texture = new Texture();
-          mesh->material->texture->init(
+          mesh->texture = new Texture();
+          mesh->texture->init(
               reinterpret_cast<const unsigned char*>(aiTexture->pcData),
               aiTexture->mWidth);
         }
       } else {
+        // uncompressed file
         printf(
             "        (Not compressed, not implemented so nothing will "
             "happen)\n");
       }
     } else {
-      // compressed file
+      // external file
       printf("Assimp: Loading \"%s\" texture - external.\n",
              aiMaterial->GetName().C_Str());
       printf("        (Not implemented so nothing will happen)\n");
@@ -533,15 +523,20 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
   glUseProgram(shader);
 
   if (ignoreDepth) glDisable(GL_DEPTH_TEST);
-  material->setUniforms(viewProjMtx, viewMtx,
-                        transformMtx * modelMtx * betterView);
+  
   for (int i = 0; i < meshes.size(); i++) {
-    if (useShader && meshes[i]->material) {
-      GLuint shaderM = meshes[i]->material->shader;
-      glUseProgram(shaderM);
-      meshes[i]->material->setUniforms(viewProjMtx, viewMtx,
-                                       transformMtx * modelMtx * betterView);
+    material->diffuse = meshes[i]->diffuse;
+    material->specular = meshes[i]->specular;
+    material->ambient = meshes[i]->ambient;
+    material->emission = meshes[i]->emissive;
+    // material->shininess = meshes[i]->shininess;
+    material->setUniforms(viewProjMtx, viewMtx,
+                          transformMtx * modelMtx * betterView);
+    if (meshes[i]->texture) {
+      meshes[i]->texture->bindgl();
+      glUniform1i(glGetUniformLocation(shader, "gSampler"), 0);
     }
+
     meshes[i]->draw();
   }
   if (ignoreDepth) glEnable(GL_DEPTH_TEST);
