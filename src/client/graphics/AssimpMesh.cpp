@@ -9,7 +9,7 @@
 glm::mat4 AssimpJoint::update() { return matWorldTransform * matBindingInv; }
 
 AssimpMesh::AssimpMesh()
-    : node(nullptr), isLoaded(false), isLoaded2(false), material(nullptr) {
+    : node(nullptr), isLoaded(false), isLoaded2(false) {
   for (int i = 0; i < MAX_BONES; i++) {
     matBindingInvs[i] = glm::mat4(1.0f);
   }

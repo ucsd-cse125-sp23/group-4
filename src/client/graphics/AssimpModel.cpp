@@ -529,12 +529,15 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
     material->specular = meshes[i]->specular;
     material->ambient = meshes[i]->ambient;
     material->emission = meshes[i]->emissive;
-    // material->shininess = meshes[i]->shininess;
+     material->shininess = meshes[i]->shininess;
     material->setUniforms(viewProjMtx, viewMtx,
                           transformMtx * modelMtx * betterView);
     if (meshes[i]->texture) {
       meshes[i]->texture->bindgl();
       glUniform1i(glGetUniformLocation(shader, "gSampler"), 0);
+      glUniform1i(glGetUniformLocation(shader, "renderMode"), 1);
+    } else {
+      glUniform1i(glGetUniformLocation(shader, "renderMode"), 0);
     }
 
     meshes[i]->draw();
