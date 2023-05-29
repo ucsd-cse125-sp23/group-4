@@ -21,11 +21,11 @@ class SkinnedMesh : public Mesh {
   SkinnedMesh() { creategl(); }
   ~SkinnedMesh() { cleargl(); }
 
-  void init(const char* filename);
+  virtual void init(const char* filename);
 
   void updateSkin(Skeleton* skel);
 
-  void draw(void) {
+  virtual void draw(void) {
     // special skin behavior: always rebind vertices(?)
     bindgl(vertices_curr, normals, indices);
 

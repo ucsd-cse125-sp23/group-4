@@ -31,6 +31,7 @@ class Texture {
   GLenum format = GL_RGBA;
 
   void init(const char* filename);
+  void init(const unsigned char* rawImgData, int dataLen);
 
   void bindgl();
 };
