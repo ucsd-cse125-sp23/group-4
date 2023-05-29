@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include "Camera.h"
 #include "Input.h"
@@ -28,6 +29,7 @@ bool Window::inGame;
 
 // Game stuff to render
 Scene* Window::gameScene;
+Load* Window::loadScreen;
 HUD* Window::hud;
 
 Camera* Cam;
@@ -64,10 +66,15 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  // gameScene = new Start(Cam);
-  // gameScene->init();
   gameScene = new Scene(Cam);
+  loadScreen = new Load();
+
+  std::thread x(&Load::load, loadScreen, glfwGetCurrentContext());
   gameScene->init();
+  x.join();
+
+  glfwShowWindow(glfwGetCurrentContext());
+
   hud = new HUD(gameScene);
 
   return true;
@@ -111,7 +118,8 @@ GLFWwindow* Window::createWindow(int width, int height) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
+  
+  glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
   GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
 
@@ -174,39 +182,16 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 // update and draw functions
 message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
                                               float deltaTime) {
+
   message::UserStateUpdate inputChanges;
 
   gameScene->update(deltaTime, inputChanges);
-  /*
-  Lobby* lobby;
-  if (dynamic_cast<Start*>(gameScene) != nullptr) {
-      Start* startScreen = dynamic_cast<Start*>(gameScene);
-      if (startScreen->gameStart) {
-          gameScene = new Lobby(Cam);
-          gameScene->init();
-      }
-  }
-  else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
-      Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
-      if (lobby->gameStart) {
-          gameScene = new Load(Cam);
-          gameScene->init(lobby->selectedModel);
-          //hud = new HUD(gameScene);
-      }
-  }
-  else if (dynamic_cast<Load*>(gameScene) != nullptr) {
-      Load* load = dynamic_cast<Load*>(gameScene);
-      inGame = load->gameStart;
-      if (inGame) {
-          gameScene = new Scene(Cam);
-          gameScene->init(load->selectedModel);
-          hud = new HUD(gameScene);
-      }
-  }*/
+
   return inputChanges;  // player input to be written to server
 }
 
 void Window::displayCallback(GLFWwindow* window) {
+  
   // Gets events, including input such as keyboard and mouse or window resizing.
   glfwPollEvents();
 

@@ -165,7 +165,6 @@ class Scene {
   void setToUserFocus(GameThing* t);
 
   virtual void init(void);
-  virtual void init(PlayerModel* player);
   virtual void update(float delta,
                       message::UserStateUpdate& us);  // broadcast to net
   virtual void updateState(

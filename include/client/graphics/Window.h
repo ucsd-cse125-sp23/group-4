@@ -5,7 +5,7 @@
  *****************************************************/
 
 #pragma once
-
+#include <atomic>
 #include <network/message.hpp>
 
 #include "client/graphics/Camera.h"
@@ -28,6 +28,7 @@ class Window {
 
   // Objects to render
   static Scene* gameScene;
+  static Load* loadScreen;
   static HUD* hud;
 
   // Act as Constructors and desctructors
