@@ -14,6 +14,8 @@ struct Model {
   Mesh* mesh;
   Material* material;
 
+  GLenum depthFunction = GL_LESS;
+
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
             const glm::mat4& transformMtx, const bool ignoreDepth = false) {
     if (!material || !mesh) return;
@@ -25,11 +27,11 @@ struct Model {
 
     material->setUniforms(viewProjMtx, viewMtx, transformMtx * modelMtx);
 
-    if (ignoreDepth) glDisable(GL_DEPTH_TEST);
+    glDepthFunc(depthFunction);
 
     mesh->draw();
 
-    if (ignoreDepth) glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     // deactivate the shader program    ---
     glUseProgram(0);

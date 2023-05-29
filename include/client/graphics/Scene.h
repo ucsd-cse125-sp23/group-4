@@ -34,8 +34,10 @@
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/Skeleton.h"
+#include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
+#include "client/graphics/TextureCube.h"
 #include "client/graphics/shader.h"
 
 struct Character {

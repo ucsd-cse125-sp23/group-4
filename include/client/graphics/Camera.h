@@ -61,7 +61,9 @@ class Camera : public GameThing {
     return glm::eulerAngleY(glm::radians(-Azimuth));
   }
   const glm::mat4& GetViewMtx() { return ViewMtx; }
-  const glm::mat4& GetViewProjectMtx() { return ViewProjectMtx; }
+  const glm::mat4& GetViewProjectMtx(bool origin = false) {
+    return origin ? ViewProjectOriginMtx : ViewProjectMtx;
+  }
 
  private:
   // Perspective controls
@@ -80,6 +82,7 @@ class Camera : public GameThing {
   // Computed data
   glm::mat4 ViewMtx;
   glm::mat4 ViewProjectMtx;
+  glm::mat4 ViewProjectOriginMtx;  // for skybox
 };
 
 ////////////////////////////////////////////////////////////////////////////////

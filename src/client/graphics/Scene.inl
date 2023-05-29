@@ -120,6 +120,30 @@ void Scene::init(void) {
   sfx->load("assets/sounds/sound_test.wav");
 #pragma endregion
 
+  // Skybox setup
+#pragma region Skybox
+  sceneResources->shaderPrograms["skybox"] =
+      LoadShaders("assets/shaders/skybox.vert", "assets/shaders/skybox.frag");
+
+  sceneResources->meshes["skybox"] = new Skybox();
+  sceneResources->meshes["skybox"]->init();
+
+  TextureCube* skyboxCubemapTexture = new TextureCube();
+  skyboxCubemapTexture->init();
+  sceneResources->textures["skyboxCubemap"] = skyboxCubemapTexture;
+
+  sceneResources->materials["skybox"] = new Material;
+  sceneResources->materials["skybox"]->shader =
+      sceneResources->shaderPrograms["skybox"];
+  sceneResources->materials["skybox"]->texture = skyboxCubemapTexture;
+
+  sceneResources->models["skybox"] = new Model;
+  sceneResources->models["skybox"]->mesh = sceneResources->meshes["skybox"];
+  sceneResources->models["skybox"]->material =
+      sceneResources->materials["skybox"];
+  sceneResources->models["skybox"]->depthFunction = GL_LEQUAL;
+#pragma endregion
+
   // Initialize map data
 #pragma region MapImport
   ///// maps:
@@ -176,7 +200,7 @@ void Scene::init(void) {
   thing_cube->name = "GT_cube";
   gamethings.push_back(thing_cube);
 
-  // Build the scene graph
+  // Build nodes of the scene graph
   node["teapot1"] = thing_example;
   node["cubeTest"] = thing_cube;
 
@@ -190,11 +214,17 @@ void Scene::init(void) {
   node["cubeTest"]->model = sceneResources->models["cubeTextured"];
   node["cubeTest"]->transformMtx = translate(vec3(2, 2, 5));  // node translate
 
+  node["skybox"] = new Node("_skybox");
+  node["skybox"]->model = sceneResources->models["skybox"];
+  node["skybox"]->skybox = true;
+
   // Push scene nodes to root node
   // ("world" node already created in Scene constructor)
 
+  node["world"]->childnodes.push_back(node["skybox"]);
+
   // node["world"]->childnodes.push_back(node["teapot1"]);
-  // node["world"]->childnodes.push_back(node["cubeTest"]);
+  node["world"]->childnodes.push_back(node["cubeTest"]);
 
   node["world"]->childnodes.push_back(node["collision"]);
 

@@ -193,6 +193,7 @@ void Scene::draw() {
   camera->UpdateView();
 
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
+  glm::mat4 viewProjOriginMtx = camera->GetViewProjectMtx(true);
   glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
 
   // Define stacks for depth-first search (DFS)
@@ -223,7 +224,9 @@ void Scene::draw() {
     matrix_stack.pop();
 
     // draw the visuals of our current node
-    cur->draw(viewProjMtx, viewMtx, cur_MMtx);
+    glm::mat4 vp = viewProjMtx;
+    if (cur->skybox) vp = viewProjOriginMtx;  // not pretty oh well
+    cur->draw(vp, viewMtx, cur_MMtx);
 
     cur->draw_debug(viewProjMtx, cur_MMtx, Scene::_gizmos,
                     _globalSceneResources.models["_gz-xyz"],
