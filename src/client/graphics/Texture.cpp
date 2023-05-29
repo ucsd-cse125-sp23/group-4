@@ -18,8 +18,8 @@ void Texture::init(const char* filename) {
   int width, height, nrChannels;
   unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
   if (data) {
-    glTexImage2D(targetImage, 0, GL_RGB, width, height, 0,
-                 format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(targetImage, 0, GL_RGB, width, height, 0, format,
+                 GL_UNSIGNED_BYTE, data);
     // glGenerateMipmap(GL_TEXTURE_2D); // no mipmaps rn
   } else {
     std::cerr << "Cannot open file: " << filename << std::endl;
