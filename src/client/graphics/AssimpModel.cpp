@@ -589,9 +589,9 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
   for (int i = 0; i < meshes.size(); i++) {
     material->diffuse = meshes[i]->diffuse;
     material->specular = meshes[i]->specular;
-    material->ambient = meshes[i]->ambient;
-    material->emission = meshes[i]->emissive;
-    material->shininess = meshes[i]->shininess;
+    //material->ambient = meshes[i]->ambient;
+    //material->emission = meshes[i]->emissive;
+    //material->shininess = meshes[i]->shininess;
     material->setUniforms(viewProjMtx, viewMtx,
                           transformMtx * modelMtx * betterView);
     if (meshes[i]->texture) {
