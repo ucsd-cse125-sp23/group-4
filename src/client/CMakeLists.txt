@@ -1,9 +1,12 @@
 project(client DESCRIPTION "tagguys client executable")
 
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+set(ASSIMP_BUILD_ZLIB OFF)
 set(IMGUI_ENABLE_STDLIB_SUPPORT ON)
 set(IMGUI_EXAMPLES OFF)
-set(SFML_USE_STATIC_STD_LIBS TRUE)
+set(CMAKE_POLICY_DEFAULT_CMP0074 NEW)
+set(SFML_USE_STATIC_STD_LIBS FALSE)
 set(SFML_BUILD_AUDIO ON)
 set(SFML_BUILD_EXAMPLES OFF)
 set(SFML_BUILD_GRAPHICS OFF)
@@ -26,6 +29,11 @@ FetchContent_Declare(
   GIT_TAG 0.9.8.5
   GIT_PROGRESS TRUE)
 FetchContent_Declare(
+  zlib
+  GIT_REPOSITORY https://github.com/madler/zlib
+  GIT_TAG v1.2.13
+  GIT_PROGRESS TRUE)
+FetchContent_Declare(
   freetype
   GIT_REPOSITORY https://github.com/freetype/freetype
   GIT_TAG VER-2-13-0
@@ -38,13 +46,36 @@ FetchContent_Declare(
 FetchContent_Declare(
   assimp
   GIT_REPOSITORY https://github.com/assimp/assimp
-  GIT_TAG v5.2.5
+  GIT_TAG 18b6cff
   GIT_PROGRESS TRUE)
 FetchContent_Declare(
   freeglut
   GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
   GIT_TAG v3.4.0
   GIT_PROGRESS TRUE)
+
+# override find_package(zlib)
+FetchContent_MakeAvailable(
+  zlib
+)
+file(RENAME ${zlib_SOURCE_DIR}/zconf.h.included ${zlib_SOURCE_DIR}/zconf.h)
+set(ZLIB_ROOT ${zlib_SOURCE_DIR})
+set(ZLIB_LIBRARY zlibstatic)
+
+# turn off install for freetype and assimp
+set(_disable_install TRUE)
+function(install)
+  if (NOT _disable_install)
+    _install(${ARGV})
+  endif()
+endfunction(install)
+
+FetchContent_MakeAvailable(
+    freetype
+    assimp)
+set(_disable_install FALSE)
+
+
 FetchContent_Declare(
   SFML
   GIT_REPOSITORY https://github.com/SFML/SFML
@@ -55,9 +86,7 @@ FetchContent_MakeAvailable(
   glfw
   glm
   freeglut
-  freetype
   imgui
-  assimp
   SFML)
 
 set(SOURCES
@@ -76,7 +105,11 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/TextureCube.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Player.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Window.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/imported/Tokenizer.cpp)
+    ${PROJECT_SOURCE_DIR}/graphics/imported/Tokenizer.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpAnimation.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpMesh.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpModel.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpNode.cpp)
 
 add_executable(client ${SOURCES})
 target_include_directories(

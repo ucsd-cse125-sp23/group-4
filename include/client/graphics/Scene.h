@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include "client/graphics/AssimpModel.h"
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"

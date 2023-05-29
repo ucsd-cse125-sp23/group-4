@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include "Camera.h"
-#include "GL/glew.h"
 #include "Joint.h"
 #include "Pose.h"
 #include "imported/Tokenizer.h"

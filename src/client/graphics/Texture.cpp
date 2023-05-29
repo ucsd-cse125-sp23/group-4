@@ -29,6 +29,31 @@ void Texture::init(const char* filename) {
   glBindTexture(target, 0);
 }
 
+void Texture::init(const unsigned char* rawImgData, int dataLen) {
+  glGenTextures(1, &textureID);
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  // set the texture wrapping/filtering options (on the currently bound
+  // texture object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  // load and generate the texture from memory
+  int width, height, numOfChannels;
+  unsigned char* read = stbi_load_from_memory(rawImgData, dataLen, &width,
+                                              &height, &numOfChannels, 3);
+  if (!read) {
+    std::cerr << "Cannot read from data buffer" << std::endl;
+  } else {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, read);
+  }
+
+  stbi_image_free(read);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Texture::bindgl() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(target, textureID);
