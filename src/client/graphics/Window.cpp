@@ -69,12 +69,14 @@ bool Window::initializeObjects() {
   gameScene = new Scene(Cam);
   loadScreen = new Load();
 
-  std::thread x(&Load::load, loadScreen, glfwGetCurrentContext());
+  GLFWwindow* window = glfwGetCurrentContext();
+  std::thread x(&Load::load, loadScreen, window);
   gameScene->init();
   x.join();
 
-  glfwShowWindow(glfwGetCurrentContext());
-
+  glfwMakeContextCurrent(window);
+  glfwShowWindow(window);
+  glfwFocusWindow(window);
   hud = new HUD(gameScene);
 
   return true;
@@ -118,7 +120,7 @@ GLFWwindow* Window::createWindow(int width, int height) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-  
+
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
   GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);

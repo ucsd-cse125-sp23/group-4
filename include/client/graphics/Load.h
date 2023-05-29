@@ -116,5 +116,6 @@ class Load {
 
       glfwSwapBuffers(window);
     }
+
   }
 };
