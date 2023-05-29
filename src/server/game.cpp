@@ -39,6 +39,8 @@ int Game::create_player() {
   return player->pid;
 }
 
+void Game::remove_player(int pid) { game_things_.erase(pid); }
+
 void Game::update(const message::UserStateUpdate& update) {
   game_things_.at(update.id).update(update);
 }

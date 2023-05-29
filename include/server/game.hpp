@@ -18,18 +18,17 @@ struct GameThing {
   message::GameStateUpdateItem to_network() const;
 };
 
-using GameThingMap = std::unordered_map<int, GameThing>;
-
 // stored in server
 class Game {
  public:
   Game();
 
   int create_player();
+  void remove_player(int);
   void update(const message::UserStateUpdate&);
   void tick();
   std::unordered_map<int, message::GameStateUpdateItem> to_network();
 
  private:
-  GameThingMap game_things_;
+  std::unordered_map<int, GameThing> game_things_;
 };
