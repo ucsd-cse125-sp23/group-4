@@ -2,26 +2,28 @@
  * Scene.inl
  * contains the definition of the scene graph
  *****************************************************/
-#include "client/graphics/Collider.h"
 #include "client/graphics/ColliderImporter.h"
 #include "client/graphics/Scene.h"
+#include "client/graphics/AssimpModel.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 using namespace glm;
-
 void Scene::init(void) {
+  AssimpModel* am = new AssimpModel();
+  if (!am->loadAssimp(
+          "assets/animation/Animation -Bee.fbx")) {
+    exit(EXIT_FAILURE);
+  }
+
   // Create a mesh palette
   sceneResources->meshes["cube"] = new Cube();
   sceneResources->meshes["teapot"] = new Obj();
   sceneResources->meshes["bunny"] = new Obj();
   sceneResources->meshes["player"] = new Obj();
 
-  sceneResources->meshes["wasp"] =
-      new SkinnedMesh();  // can only be tied to one object? (not a static
-                          // resource)
-  sceneResources->meshes["wasp"]->init("assets/models/wasp.skin");
+  sceneResources->meshes["assimp"] = am;
 
   sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
   sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
@@ -104,6 +106,7 @@ void Scene::init(void) {
       vec4(0.9f, 0.9f, 0.9f, 1.0f);
   sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
+
   // Create a model palette
   sceneResources->models["teapot1"] = new Model;
   sceneResources->models["teapot1"]->mesh = sceneResources->meshes["teapot"];
@@ -147,27 +150,12 @@ void Scene::init(void) {
   sceneResources->models["cubeTextured"]->material =
       sceneResources->materials["grid"];
 
-  PlayerModel* waspModel = new PlayerModel;
-  waspModel->skel = sceneResources->skeletons["wasp"];
-  waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel->anims = sceneResources->animations["wasp"];
+  PlayerModel* assimpModel = am;
 
-  sceneResources->models["wasp"] = waspModel;
-  sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
-
-
-  // THE player !!!
-  sceneResources->models["playerRef"] = new Model;
-  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
-  // TODO(matthew) copy over mesh too?
-  sceneResources->models["playerRef"]->material =
-      sceneResources->materials["toon.blue"];
-
-  // Sound palette
-  SoundEffect* sfx = new SoundEffect();
-  sceneResources->sounds["test"] = sfx;
-  sfx->load("assets/sounds/sound_test.wav");
+  sceneResources->models["assimp"] = assimpModel;
+  sceneResources->models["assimp"]->mesh = sceneResources->meshes["assimp"];
+  sceneResources->models["assimp"]->material = sceneResources->materials["toon.blue"];
+  am->loadShader(sceneResources->shaderPrograms["basic"]);
 
   ///// maps:
 
@@ -190,7 +178,7 @@ void Scene::init(void) {
   // sceneResources->models["mapColsTesting"]->transformMtx = translate(vec3(0,
   // -2, 0));   // needs to be world space
 
-  std::vector<ColliderData> mapColliders =
+  std::vector<Collider> mapColliders =
       ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
 
   node["collision"] = new Node("_colliders");
@@ -223,13 +211,13 @@ void Scene::init(void) {
 
   Player* player = new Player();
   player->camera = camera;               // give a reference to the game camera
-  player->pmodel = waspModel;            // updating!
-  player->model = waspModel;             // drawing!
+  player->pmodel = assimpModel;            // updating!
+  player->model = assimpModel;           // drawing!
   player->pmodel->setAnimation("walk");  // TODO: make this automated
   player->name = "Player 1";
   player->transform.position = vec3(0, 2, 0);
   player->transform.updateMtx(&(player->transformMtx));
-  // gamethings.push_back(player);
+  gamethings.push_back(player);
 
   // Build the scene graph
   node["teapot1"] = thing_example;
@@ -239,7 +227,7 @@ void Scene::init(void) {
   node["playerA"] = thing_modeltest;
   node["playerB"] = thing_modeltestB;
   node["ground"] = new Node("ground");
-  node["wasp"] = player;  // deprecated node
+  node["assimp"] = player;
 
   node["map"] = new Node("_map");
   node["map"]->model = sceneResources->models["map1"];
@@ -264,7 +252,7 @@ void Scene::init(void) {
   node["bunny"]->transformMtx = translate(vec3(-4.0f, 2.0f, 0.0f));
   node["bunny"]->model = sceneResources->models["bunny1"];
 
-  node["wasp"]->model = sceneResources->models["wasp"];
+  node["assimp"]->model = sceneResources->models["assimp"];
 
   node["ground"]->transformMtx = translate(vec3(-10, 1.0f, -10));
   int checkers = 16;
@@ -284,6 +272,8 @@ void Scene::init(void) {
     }
   }
 
+  player->childnodes.push_back(camera);
+
   // "world" node already exists
   node["world"]->childnodes.push_back(node["playerA"]);
   node["world"]->childnodes.push_back(node["playerB"]);
@@ -291,6 +281,7 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["cubeT"]);
   node["teapot1"]->childnodes.push_back(node["teapot2"]);
   node["world"]->childnodes.push_back(node["bunny"]);
+  node["world"]->childnodes.push_back(node["assimp"]);  // test player
 
   node["world"]->childnodes.push_back(node["ground"]);
   node["world"]->childnodes.push_back(node["collision"]);

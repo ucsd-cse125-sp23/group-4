@@ -23,6 +23,7 @@ class Texture {
   GLuint textureID;
 
   void init(const char* filename);
+  void init(const unsigned char* rawImgData, int dataLen);
 
   void bindgl();
 };

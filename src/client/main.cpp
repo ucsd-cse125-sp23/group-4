@@ -1,5 +1,10 @@
 // clang-format off
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
 #include <GL/glew.h>
+#endif
 // clang-format on
 #include <GL/freeglut_std.h>
 #include <GLFW/glfw3.h>
@@ -202,3 +207,5 @@ int main(int argc, char* argv[]) {
 
   exit(EXIT_SUCCESS);
 }
+
+////////////////////////////////////////////////////////////////////////////////
