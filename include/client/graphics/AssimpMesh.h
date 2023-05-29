@@ -71,6 +71,7 @@ class AssimpMesh {
   void draw();
   void gl_load2();
   void gl_update2();
+  void gl_delete2();
 
  private:
   unsigned int VAO, VBO, EBO;
