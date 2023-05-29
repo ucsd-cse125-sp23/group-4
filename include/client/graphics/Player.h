@@ -31,8 +31,9 @@ class Player : public GameThing, InputListener {
     pmodel = nullptr;
     tagged = true;
   }
+  message::UserStateUpdate pollInput();
 
-  message::UserStateUpdate update(float dt);
+  void update(float dt);
   glm::vec3 move(glm::vec3 movement);
 
   void faceDirection(glm::vec3 direction);

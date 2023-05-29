@@ -3,7 +3,7 @@
 #include <network/message.hpp>
 #include <server/game.hpp>
 
-GameThing::GameThing(int& id, Player* p, ControlModifierData* c)
+GameThing::GameThing(int id, Player* p, ControlModifierData* c)
     : id(id), player(p), control(c), heading(0) {}
 
 void GameThing::move(float x, float y, float z) {  // NOLINT
@@ -18,7 +18,7 @@ void GameThing::update(const message::UserStateUpdate& update) {
   heading = update.heading;
 }
 
-message::GameStateUpdateItem GameThing::to_network() {
+message::GameStateUpdateItem GameThing::to_network() const {
   return {id, player->getPos().x, player->getPos().y, player->getPos().z,
           heading};
 }
@@ -34,27 +34,20 @@ Game::Game() {
 }
 
 int Game::create_player() {
-  auto player_pair = initializePlayer();
-  int new_id = next_pid++;
-  game_things_.insert(
-      {new_id, GameThing(new_id, player_pair.first, player_pair.second)});
-  return new_id;
+  auto [player, control] = initializePlayer();
+  game_things_.insert({player->pid, GameThing(player->pid, player, control)});
+  return player->pid;
 }
 
 void Game::update(const message::UserStateUpdate& update) {
-  // TODO: remove this when proper assignment is implemented
   game_things_.at(update.id).update(update);
 }
 
 void Game::tick() { level->tick(); }
 
 std::unordered_map<int, message::GameStateUpdateItem> Game::to_network() {
-  std::unordered_map<int, message::GameStateUpdateItem> things(
-      game_things_.size());
-  std::transform(game_things_.begin(), game_things_.end(),
-                 std::inserter(things, things.end()), [](auto&& thing) {
-                   return std::pair<int, message::GameStateUpdateItem>(
-                       thing.first, thing.second.to_network());
-                 });
+  std::unordered_map<int, message::GameStateUpdateItem> things;
+  for (const auto& [pid, thing] : game_things_)
+    things.insert({pid, thing.to_network()});
   return things;
 }

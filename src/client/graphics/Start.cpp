@@ -1,7 +1,6 @@
 #include "Start.h"
 
-void Start::update(float delta, message::UserStateUpdate& ourPlayerUpdates) {
-  Scene::update(delta, ourPlayerUpdates);
+void Start::update(float delta) {
   timeElapsed += delta;
   offset += (0.25 * delta);
   if (timeElapsed >= 1.0 && renderText) {

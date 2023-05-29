@@ -2,7 +2,7 @@
 
 #include "Lobby.inl"
 
-void Lobby::update(float delta, message::UserStateUpdate& ourPlayerUpdates) {
+void Lobby::update(float delta) {
   GameThing* display = gamethings[index];
   display->update(delta);
   if (ready) {

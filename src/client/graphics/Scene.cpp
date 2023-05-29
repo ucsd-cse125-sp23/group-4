@@ -13,7 +13,8 @@ adapted from CSE 167 - Matthew
 #include <iostream>
 #include <stack>
 
-#include "Scene.inl"
+#include "Scene.inl"  // The scene init definition
+#include "client/graphics/Window.h"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -68,23 +69,30 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-void Scene::update(float delta, message::UserStateUpdate& ourPlayerUpdates) {
-  // UserState ourPlayerUpdates;
-
-  ourPlayerUpdates = message::UserStateUpdate();
-
+void Scene::update(float delta) {
   for (auto e : gamethings) {
-    auto currUpdate = e->update(delta);
-
-    if (e->isUser) ourPlayerUpdates = currUpdate;
+    e->update(delta);
   }
 
   time.Update(delta);
-
-  // return ourPlayerUpdates;
 }
 
-void Scene::updateState(message::GameStateUpdate newState) {
+message::UserStateUpdate Scene::pollInput() {
+  message::UserStateUpdate ourPlayerUpdate = message::UserStateUpdate();
+
+  for (auto e : gamethings) {
+    auto currUpdate = e->pollInput();
+
+    if (e->isUser) {
+      ourPlayerUpdate = currUpdate;
+      break;
+    }
+  }
+
+  return ourPlayerUpdate;
+}
+
+void Scene::receiveState(message::GameStateUpdate newState) {
   // check if new graphical objects need to be created
   for (auto& t : newState.things) {
     // TODO(matthew): change gamethings to a map

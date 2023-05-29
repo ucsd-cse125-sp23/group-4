@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include "client/graphics/AssimpModel.h"
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
@@ -163,12 +164,12 @@ class Scene {
   Player* createPlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
-
   virtual void init(void);
-  virtual void update(float delta,
-                      message::UserStateUpdate& us);  // broadcast to net
-  virtual void updateState(
-      message::GameStateUpdate newState);  // receive from net
+
+  message::UserStateUpdate pollInput();                  // broadcast to net
+  void receiveState(message::GameStateUpdate newState);  // receive from net
+
+  virtual void update(float delta);
 
   virtual void draw();
 

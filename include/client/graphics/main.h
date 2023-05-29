@@ -22,4 +22,4 @@
 #include <string>
 #include <vector>
 
-#include "client/graphics/Window.h"
+#include "Window.h"

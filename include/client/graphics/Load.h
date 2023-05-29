@@ -112,7 +112,6 @@ class Load {
     while (timeElapsed <= 5) {
       update();
       draw();
-      std::cout << timeElapsed << std::endl;
 
       glfwSwapBuffers(window);
     }
