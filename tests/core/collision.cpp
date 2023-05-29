@@ -220,3 +220,65 @@ TEST_CASE("Simple Raycast", "[raycast]") {
              WithinAbs(4, 0.01f));
   delete aab;
 }
+
+#include "core/lib.hpp"
+
+TEST_CASE("Basic CCD", "[ccd]") {
+  PLAYER_BASE_SHAPE = new CylinderShape(1.0, 1.3);
+  PLAYER_BOUNDING_SHAPE =
+      new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, 0.5f, 0.0f));
+
+  Environment* environment = new Environment();
+  environment->addBox(vec3f(-2000, -2, -2000), vec3f(2000, 0, 2000));
+  REQUIRE_NOTHROW(initializeLevel(environment));
+  std::pair<Player*, ControlModifierData*> pair;
+  REQUIRE_NOTHROW(pair = initializePlayer());
+
+  pair.first->setPos(vec3f(0, 1, 0));
+
+  /*CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(0, -4, 0)),
+             WithinAbs(0.25f, 0.01f));
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 0)),
+             WithinAbs(0.25f, 0.01f));
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 2)),
+             WithinAbs(0.25f, 0.01f));
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(500, -4, 0)),
+             WithinAbs(0.25f, 0.01f));*/
+
+
+  REQUIRE_NOTHROW(terminateLevel());
+}
+void checkCCD(PObject* obj, vec3f dPos) {
+  float t = level->getEnvironment()->ccd(obj, dPos);
+  std::cout << t << std::endl;
+  obj->addPos((dPos - normalize(dPos) * 0.001f) * t);
+  CHECK(level->getEnvironment()->collides(obj).empty());
+}
+TEST_CASE("Multi Obsticle CCD", "[ccd]") {
+  PLAYER_BOUNDING_SHAPE =
+      new OffsetShape(new SphereShape(1.0), vec3f(0.0f, 0.0f, 0.0f));
+
+  Environment* environment = new Environment();
+  environment->addBox(vec3f(-200, -2, -200), vec3f(200, 0, 200));
+  environment->addBox(vec3f(-2, -200, -200), vec3f(0, 200, 200));
+  REQUIRE_NOTHROW(initializeLevel(environment));
+  std::pair<Player*, ControlModifierData*> pair;
+  REQUIRE_NOTHROW(pair = initializePlayer());
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  checkCCD(pair.first, vec3f(0, -4, 0));
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  //checkCCD(pair.first, vec3f(-4, -4, 0));
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  //checkCCD(pair.first, vec3f(-8, 0, 0));
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  //CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(-10, -1, 0)), WithinAbs(0,0));
+
+
+  REQUIRE_NOTHROW(terminateLevel());
+}

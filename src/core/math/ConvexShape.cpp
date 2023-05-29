@@ -10,8 +10,14 @@
 #include "core/math/shape/PointShape.h"
 #include "core/math/shape/Simplex.h"
 
-#define MAX_ITERATIONS 100
-#define TOLERANCE 0.001
+
+
+std::ostream& operator<<(std::ostream& os, Simplex& simplex) {
+  os << "{";
+  for (int i = 0; i < simplex.size(); i++) os << simplex[i] << ", ";
+  os << "}";
+  return os;
+}
 
 // https://blog.winter.dev/2020/gjk-algorithm/
 // https://blog.winter.dev/2020/epa-algorithm/
@@ -167,87 +173,107 @@ bool ConvexShape::collides(const BoundingShape* other, const mat4f& thisMtx,
   return false;
 }
 
-float distanceToOrigin(vec3f a, vec3f b) {
+vec3f vecToOrigin(vec3f a, vec3f b) {
   vec3f d = b - a;
-  float t = dot(a, d) / length_squared(d);
-  if (t < 0) return length(a);
-  if (t > 1) return length(b);
-  return length(a + t * d);
+  float t = -dot(a, d) / length_squared(d);
+  if (t < 0) a;
+  if (t > 1) b;
+  return a + t * d;
 }
-float distanceToOrigin(vec3f a, vec3f b, vec3f c) {
+vec3f vecToOrigin(vec3f a, vec3f b, vec3f c) {
   vec3f v0 = b - a;
   vec3f v1 = c - a;
-  vec3f n = cross(v0, v1);
+  vec3f n = normalize(cross(v0, v1));
   vec3f l = dot(a, n) * n;
-  // |a b| |u| = |x|
-  // |c d| |v| = |y|
-  // |e f| |w| = |z|
-  // u = (by-dx)/(bc-ad)
-  // v = (ay-cx)/(ad-bc)
-  float det = v0.x * v1.y - v0.y * v1.x;
-  float u = -(v1.x * l.y - v1.y * l.x) / det;
-  float v = (v0.x * l.y - v0.y * l.x) / det;
+  mat3f M = mat3f(a,v0,v1);
+  vec3f s = inverse(M) * l;
+  float u = s.y / s.x, v = s.z / s.x;
   if (u < 0) {
     if (v < 0)
-      return length(a);
+      return a;
     else
-      return distanceToOrigin(a, c);
+      return vecToOrigin(a, c);
   } else {
     if (v < 0)
-      return distanceToOrigin(a, b);
+      return vecToOrigin(a, b);
     else {
       if (u + v < 1) {
-        length(u * v0 + v * v1);
+        return l;
       } else {
         if (u > 1) {
           if (v < 1)
-            return length(b);
+            return b;
           else
-            return distanceToOrigin(b, c);
+            return vecToOrigin(b, c);
         }
-        return length(c);
+        return c;
       }
     }
   }
 }
-float distanceToOrigin(Simplex pts) {
+vec3f vecToOrigin(Simplex pts) {
+  std::cout << "final:" << pts << std::endl;
   switch (pts.size()) {
     case 1:
-      return length(pts[0]);
+      return pts[0];
     case 2:
-      return distanceToOrigin(pts[0], pts[1]);
+      return vecToOrigin(pts[0], pts[1]);
     case 3:
-      return distanceToOrigin(pts[0], pts[1], pts[2]);
+      return vecToOrigin(pts[0], pts[1], pts[2]);
     case 4:
-      float d = distanceToOrigin(pts[0], pts[1], pts[2]);
-      d = std::min(d, distanceToOrigin(pts[0], pts[1], pts[3]));
-      d = std::min(d, distanceToOrigin(pts[0], pts[2], pts[3]));
-      d = std::min(d, distanceToOrigin(pts[1], pts[2], pts[3]));
-      return d;
+      vec3f m = vecToOrigin(pts[0], pts[1], pts[2]);
+      vec3f n = vecToOrigin(pts[0], pts[2], pts[3]);
+      if (length_squared(n) < length_squared(m)) m = n;
+      n = vecToOrigin(pts[0], pts[1], pts[3]);
+      if (length_squared(n) < length_squared(m)) m = n;
+      n = vecToOrigin(pts[1], pts[2], pts[3]);
+      if (length_squared(n) < length_squared(m)) m = n;
+      return m;
   }
 }
-float ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
+bool degenrate(Simplex pts, vec3f support) {
+  switch (pts.size()) {
+    case 1:
+      return distance_squared(pts[0], support) <= TOLERANCE * TOLERANCE;
+    case 2:
+      return length_squared(cross(pts[1] - pts[0], support - pts[0])) <=
+             TOLERANCE * TOLERANCE;
+    case 3:
+      return dot(cross(pts[1] - pts[0], pts[2] - pts[0]), support - pts[0]) <=
+             TOLERANCE * TOLERANCE;
+    case 4:
+      return true;
+  }
+}
+vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
                              const mat3f& thisIMtx, const mat4f& otherMtx,
                              const mat3f& otherIMtx) const {
   vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                        otherIMtx, {1, 0, 0});
-  if (length_squared(support) == 0) return 0;
+  if (length_squared(support) == 0) return vec3f(0,0,0);
   Simplex pts;
   pts.push(support);
 
   size_t ite = 0;
   vec3f dir = -support;
-  while (ite++ < MAX_ITERATIONS) {
+  while (ite++ < MAX_ITERATIONS*10+2) {
     support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                    otherIMtx, dir);
-    if (dot(support, dir) <= TOLERANCE) return distanceToOrigin(pts);
+    //std::cout << pts.size() << "::" << dot(support, dir) << " " << support << " " << dir << std::endl;
+    //std::cout << support << std::endl;
+    if (abs(dot(support, dir)) <= TOLERANCE) return vecToOrigin(pts);
+    if (degenrate(pts,support)) return vecToOrigin(pts);
     pts.push(support);
-    if (nextSimplex(pts, dir)) return 0;
+    if(ite > 950) std::cout << pts.size() << " " << pts << std::endl;
+    if (nextSimplex(pts, dir)) return vec3f(0, 0, 0);
+    //std::cout << pts << std::endl << std::endl;
+    dir = normalize(dir);
   }
+  return vecToOrigin(pts);
 }
-float ConvexShape::distance(const ConvexShape* other,
-                             const mat4f& thisMtx = mat4f::identity(),
-                             const mat4f& otherMtx = mat4f::identity()) const {
+vec3f ConvexShape::distance(const ConvexShape* other,
+                             const mat4f& thisMtx,
+                             const mat4f& otherMtx) const {
   mat3f thisIMtx = mat3f(thisMtx);
   if (thisIMtx != mat3f::identity()) thisIMtx = inverse(thisIMtx);
   mat3f otherIMtx = mat3f(otherMtx);
@@ -256,22 +282,26 @@ float ConvexShape::distance(const ConvexShape* other,
   return this->distance(other, thisMtx, thisIMtx, otherMtx, otherIMtx);
 }
 
-float ConvexShape::distance(const BoundingShape* other,
-                             const mat4f& thisMtx = mat4f::identity(),
-                             const mat4f& otherMtx = mat4f::identity()) const {
+vec3f ConvexShape::distance(const BoundingShape* other,
+                             const mat4f& thisMtx,
+                             const mat4f& otherMtx) const {
   mat3f thisIMtx = mat3f(thisMtx);
   if (thisIMtx != mat3f::identity()) thisIMtx = inverse(thisIMtx);
   mat3f otherIMtx = mat3f(otherMtx);
   if (otherIMtx != mat3f::identity()) otherIMtx = inverse(otherIMtx);
 
-  float minDist = FLT_MAX;
   const ConvexShape** ptr = other->seperate();
-  for (int i = 0; i < other->count(); i++) {
-    minDist =
-        std::min(ptr[i]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx),
-                 minDist);
+  vec3f minVec = ptr[0]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
+  float minDist = length_squared(minVec);
+  for (int i = 1; i < other->count(); i++) {
+    vec3f vec = ptr[i]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
+    float dist = length_squared(vec);
+    if (dist < minDist) {
+      minDist = dist;
+      minVec = vec;
+    }
   }
-  return minDist;
+  return minVec;
 }
 
 size_t computeMinNormal(const std::vector<vec3f>& polytope,

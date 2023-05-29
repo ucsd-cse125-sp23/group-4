@@ -195,10 +195,42 @@ float Environment::ccd(PObject* self, vec3f dPos) {
   std::vector<PObject*> collisions = this->collides(moveShape);
   if (collisions.empty()) return 1;
 
-  float dist = FLT_MAX;
+  float maxDistSqr = length_squared(dPos);
+  if (maxDistSqr == 0) return 0;
+
+  size_t ite = 0;
+  //vec3f dir = normalize(dPos);
+  vec3f movement = vec3f(0,0,0);
   do {
+    float minT = 1;
     for (PObject* obj : collisions) {
-      dist = std::min(dist, );
+      const CollisionBounds* bounds = obj->getBounds();
+      vec3f distV = offsetShape->distance(
+          bounds->shape, translate(movement),
+          translate_scale(bounds->getPos(), bounds->getScale()));
+      //std::cout << distV << ":" << dot(distV, distV) / dot(dPos, distV)
+      //          << std::endl;
+      if (length_squared(distV) == 0) {
+        minT = 0;
+        break;
+      }
+      minT = std::min(minT, dot(distV, distV) / dot(dPos, distV));
     }
-  } while (false);
+    /*movement += dir * std::sqrt(minDistSqr);*/
+
+    /*float dist = dot(normalize(minDistV), dir);
+    movement += dir * dist;*/
+
+    vec3f diff = minT * dPos;
+    movement += diff;
+    dPos -= diff;
+
+    //std::cout << "movement:" << movement << std::endl;
+    //std::cout << "diff:" << diff << std::endl;
+
+    if (length_squared(diff) < TOLERANCE * TOLERANCE) break;
+  } while (maxDistSqr - length_squared(movement) > TOLERANCE * TOLERANCE &&
+           ++ite < MAX_ITERATIONS);
+  //std::cout << ite << std::endl;
+  return std::min(1.0f, sqrt(dot(movement, movement) / maxDistSqr));
 }

@@ -2,6 +2,10 @@
 
 #include "core/math/shape/BoundingShape.h"
 
+#define MAX_ITERATIONS 100
+#define TOLERANCE 0.001
+
+
 // https://blog.winter.dev/2020/gjk-algorithm/
 class ConvexShape : public BoundingShape {
  private:
@@ -18,7 +22,7 @@ class ConvexShape : public BoundingShape {
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx,
             const mat3f& thisIMtx, const mat4f& otherMtx,
             const mat3f& otherIMtx) const;
-  float distance(const ConvexShape* other, const mat4f& thisMtx,
+  vec3f distance(const ConvexShape* other, const mat4f& thisMtx,
             const mat3f& thisIMtx, const mat4f& otherMtx,
             const mat3f& otherIMtx) const;
 
@@ -39,10 +43,10 @@ class ConvexShape : public BoundingShape {
             const mat4f& otherMtx = mat4f::identity()) const override;
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(),
             const mat4f& otherMtx = mat4f::identity()) const override;
-  float distance(const BoundingShape* other,
+  vec3f distance(const BoundingShape* other,
                 const mat4f& thisMtx = mat4f::identity(),
                 const mat4f& otherMtx = mat4f::identity()) const override;
-  float distance(const ConvexShape* other,
+  vec3f distance(const ConvexShape* other,
                 const mat4f& thisMtx = mat4f::identity(),
                 const mat4f& otherMtx = mat4f::identity()) const override;
   bool contains(const vec3f& point, const mat4f& thisMtx = mat4f::identity(),

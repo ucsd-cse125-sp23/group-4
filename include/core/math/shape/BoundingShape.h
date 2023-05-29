@@ -21,10 +21,10 @@ class BoundingShape {
   virtual vec4f mtv(const ConvexShape* other,
                     const mat4f& thisMtx = mat4f::identity(),
                     const mat4f& otherMtx = mat4f::identity()) const = 0;
-  virtual float distance(const BoundingShape* other,
+  virtual vec3f distance(const BoundingShape* other,
                 const mat4f& thisMtx = mat4f::identity(),
                 const mat4f& otherMtx = mat4f::identity()) const = 0;
-  virtual float distance(const ConvexShape* other,
+  virtual vec3f distance(const ConvexShape* other,
                 const mat4f& thisMtx = mat4f::identity(),
                 const mat4f& otherMtx = mat4f::identity()) const = 0;
 
