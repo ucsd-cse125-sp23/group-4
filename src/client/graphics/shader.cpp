@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "client/graphics/shader.h"
 
 enum ShaderType { vertex, fragment };
 

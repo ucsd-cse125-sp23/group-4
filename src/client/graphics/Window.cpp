@@ -190,7 +190,6 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
 }
 
 void Window::displayCallback(GLFWwindow* window) {
-  
   // Gets events, including input such as keyboard and mouse or window resizing.
   glfwPollEvents();
 

@@ -20,7 +20,6 @@ class Load {
     forward = true;
     lastTime = glfwGetTime();
     timeElapsed = 0;
-
   }
 
   void update() {
@@ -103,7 +102,8 @@ class Load {
     int width, height;
     glfwGetWindowSize(win, &width, &height);
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "loading...", NULL, NULL);
+    GLFWwindow* window =
+        glfwCreateWindow(width, height, "loading...", NULL, NULL);
     glfwMakeContextCurrent(window);
 
     loadFrames();
@@ -115,6 +115,5 @@ class Load {
 
       glfwSwapBuffers(window);
     }
-
   }
 };
