@@ -18,6 +18,7 @@ class Environment {
   std::vector<PObject*> collides(BoundingShape* shape);
   std::vector<PObject*> collides(PObject* self);
   std::pair<PObject*, vec4f> mtv(PObject* self);
+  float ccd(PObject* self, vec3f dPos);
 
   
   struct BVHNode {

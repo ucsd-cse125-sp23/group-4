@@ -3,6 +3,7 @@
 #include <stack>
 
 #include "core/util/global.h"
+#include "core/math/shape/MovementShape.h"
 #include "core/math/shape/ConvexMeshShape.h"
 
 void Environment::addPObject(PObject* obj) {
@@ -118,6 +119,7 @@ std::vector<PObject*> Environment::collides(BoundingShape* shape) {
     while (!stack.empty()) {
       BVHNode* curr = stack.top();
       stack.pop();
+      //curr->bound has no position offset
       if (shape->collides(curr->bound)) {
         if (curr->obj == nullptr) {
           stack.push(curr->left);
@@ -184,4 +186,19 @@ std::pair<PObject*, vec4f> Environment::mtv(PObject* self) {
     }
   }
   return std::make_pair(minObj, minMTV);
+}
+
+float Environment::ccd(PObject* self, vec3f dPos) {
+  CollisionBounds* bounds = self->getBounds();
+  OffsetShape* offsetShape = new OffsetShape(dynamic_cast<const ConvexShape*>(bounds->shape), bounds->getPos());
+  MovementShape* moveShape = new MovementShape(offsetShape, dPos);
+  std::vector<PObject*> collisions = this->collides(moveShape);
+  if (collisions.empty()) return 1;
+
+  float dist = FLT_MAX;
+  do {
+    for (PObject* obj : collisions) {
+      dist = std::min(dist, );
+    }
+  } while (false);
 }

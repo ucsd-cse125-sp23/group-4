@@ -41,4 +41,4 @@ bool PObject::markedRemove() { return toRemove; }
 void PObject::markRemove() { toRemove = true; }
 
 bool PObject::isStatic() { return this->static_; }
-const CollisionBounds* PObject::getBounds() { return this->bounds; }
+CollisionBounds* PObject::getBounds() { return this->bounds; }

@@ -33,7 +33,7 @@ class PObject : public Modifiable {
   bool markedRemove();
   void markRemove();
   bool isStatic();
-  const CollisionBounds* getBounds();
+  CollisionBounds* getBounds();
   virtual void tick();
   virtual void onCollision(PObject* other) {}
   virtual void onTrigger(PObject* other) {}
