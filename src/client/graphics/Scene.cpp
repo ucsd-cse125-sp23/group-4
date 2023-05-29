@@ -39,7 +39,14 @@ Player* Scene::createPlayer(int id) {
   // player->pmodel = waspModel;            // updating! TODO fix me
 
   // copy into a new model object
-  Model* myModel = new Model(*sceneResources->models["playerRef"]);
+  Model* myModel;
+  if (dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"])) {
+    myModel = sceneResources->models["playerRef"];
+    player->pmodel =
+        dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"]);
+  } else {
+    myModel = new Model(*sceneResources->models["playerRef"]);
+  }
   player->model = myModel;
   sceneResources->models[playername + ".model"] = myModel;
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
