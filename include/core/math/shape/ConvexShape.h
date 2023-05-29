@@ -18,6 +18,9 @@ class ConvexShape : public BoundingShape {
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx,
             const mat3f& thisIMtx, const mat4f& otherMtx,
             const mat3f& otherIMtx) const;
+  float distance(const ConvexShape* other, const mat4f& thisMtx,
+            const mat3f& thisIMtx, const mat4f& otherMtx,
+            const mat3f& otherIMtx) const;
 
  public:
   ConvexShape() {
@@ -36,6 +39,12 @@ class ConvexShape : public BoundingShape {
             const mat4f& otherMtx = mat4f::identity()) const override;
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(),
             const mat4f& otherMtx = mat4f::identity()) const override;
+  float distance(const BoundingShape* other,
+                const mat4f& thisMtx = mat4f::identity(),
+                const mat4f& otherMtx = mat4f::identity()) const override;
+  float distance(const ConvexShape* other,
+                const mat4f& thisMtx = mat4f::identity(),
+                const mat4f& otherMtx = mat4f::identity()) const override;
   bool contains(const vec3f& point, const mat4f& thisMtx = mat4f::identity(),
                 const mat4f& otherMtx = mat4f::identity()) const override;
   float intersects(const Ray& ray,
