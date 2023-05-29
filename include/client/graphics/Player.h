@@ -23,16 +23,11 @@ class Player : public GameThing, InputListener {
 
   PlayerModel* pmodel;  // visual information
 
-  float time;  // how long we've been tagged
-  bool tagged;
+  Player() { pmodel = nullptr; }
 
-  Player() {
-    time = 0;
-    pmodel = nullptr;
-    tagged = true;
-  }
+  message::UserStateUpdate pollInput();
 
-  message::UserStateUpdate update(float dt);
+  void update(float dt);
   glm::vec3 move(glm::vec3 movement);
 
   void faceDirection(glm::vec3 direction);
