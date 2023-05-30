@@ -1,8 +1,11 @@
 #pragma once
 
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
+#include <assimp/Importer.hpp>
 #include <map>
 #include <string>
-#include <utility>  // pair
 #include <vector>
 
 #include "client/graphics/AssimpNode.h"
@@ -10,20 +13,43 @@
 
 enum ASSIMP_EXTRAP_MODE { DEFAULT, CONSTANT, LINEAR, CYCLE };
 
+struct AssimpKeyframe {
+  float time, val;
+
+  float invT;
+  float tangent = 0.0f;
+  float a, b, c, d;
+};
+
 struct AssimpChannel {
+ public:
+  ASSIMP_EXTRAP_MODE extrapIn, extrapOut;
+  std::vector<AssimpKeyframe> keyframes;
+
+  void prep();
+  float eval(float t) const;
+
+ private:
+  enum ASSIMP_TANGENT_MODE { FLAT, LINEAR, SMOOTH };
+  static const ASSIMP_TANGENT_MODE TANGENT_MODE = ASSIMP_TANGENT_MODE::LINEAR;
+
+  float timeStart, timeEnd;
+};
+
+struct AssimpAnimNode {
+ public:
+  AssimpAnimNode(const aiNodeAnim* const aiNodeAnim);
+  void update(double currentTick);
+
   std::string name;
-  AssimpNode* node;
+  glm::vec3 pos, sca;
+  glm::vec4 rot;
 
-  ASSIMP_EXTRAP_MODE extrapPre, extrapPost;
-  std::vector<std::pair<double, glm::vec3>> positions;
-  std::vector<std::pair<double, glm::vec4>> rotations;
-  std::vector<std::pair<double, glm::vec3>> scalings;
-
-  void eval(double currentTick);
-  glm::mat4 getMatrixInterpolate(int lastEarlyTickInd, double tick);
-  static glm::mat4 getMatrix(glm::vec3& pos, glm::vec4& rot, glm::vec3& sca);
-  static ASSIMP_EXTRAP_MODE loadExtrapMode(const aiAnimBehaviour& b);
-  static std::string extraModeToString(ASSIMP_EXTRAP_MODE mode);
+ private:
+  AssimpChannel posX, posY, posZ, scaX, scaY, scaZ;
+  std::vector<double> rotT;
+  std::vector<glm::vec4> rotQ;
+  ASSIMP_EXTRAP_MODE extrapIn, extrapOut;
 };
 
 /** The AssimpAnimation class for storing and evaluating an animation. */
@@ -37,12 +63,12 @@ class AssimpAnimation {
   double duration;
   /** ticks per second of the animation */
   double tps;
-  std::vector<AssimpChannel> channels;
+  std::vector<AssimpAnimNode> nodes;
 
   /** Update the state of the animation
    * deltaTimeInMs: time elapsed since last rendering in miliseconds
    */
-  void update(double deltaTimeInMs);
+  void update(double deltaTimeInMs, std::map<std::string, AssimpNode*> nodeMap);
   /** Reset the animation */
   void restart();
   void imGui();

@@ -9,6 +9,7 @@
 
 // #define STB_IMAGE_IMPLEMENTATION
 #include "client/graphics/AssimpMath.h"
+#include "client/graphics/imported/parallel.h"
 #include "client/graphics/imported/stb_image.h"
 
 AssimpModel::AssimpModel()
@@ -297,28 +298,8 @@ void AssimpModel::loadAssimpHelperAnim(const aiScene* scene) {
     animation.duration = aiAnimation->mDuration;
     animation.tps = aiAnimation->mTicksPerSecond;
     for (int j = 0; j < aiAnimation->mNumChannels; j++) {
-      aiNodeAnim* aiChannel = aiAnimation->mChannels[j];
-      AssimpChannel channel;
-      channel.name = aiChannel->mNodeName.C_Str();
-      channel.node = nodeMap[channel.name];
-      for (int k = 0; k < aiChannel->mNumPositionKeys; k++) {
-        channel.positions.push_back(
-            std::make_pair(aiChannel->mPositionKeys[k].mTime,
-                           aiVecToVec3(aiChannel->mPositionKeys[k].mValue)));
-      }
-      for (int k = 0; k < aiChannel->mNumRotationKeys; k++) {
-        channel.rotations.push_back(std::make_pair(
-            aiChannel->mRotationKeys[k].mTime,
-            aiQuaternionToVec4(aiChannel->mRotationKeys[k].mValue)));
-      }
-      for (int k = 0; k < aiChannel->mNumScalingKeys; k++) {
-        channel.scalings.push_back(
-            std::make_pair(aiChannel->mScalingKeys[k].mTime,
-                           aiVecToVec3(aiChannel->mScalingKeys[k].mValue)));
-      }
-      channel.extrapPre = AssimpChannel::loadExtrapMode(aiChannel->mPreState);
-      channel.extrapPost = AssimpChannel::loadExtrapMode(aiChannel->mPostState);
-      animation.channels.push_back(channel);
+      AssimpAnimNode animNode(aiAnimation->mChannels[j]);
+      animation.nodes.push_back(animNode);
     }
     animations.push_back(animation);
   }
@@ -362,86 +343,88 @@ void AssimpModel::loadAssimpHelperImgui() {
 }
 
 void AssimpModel::imGui() {
-  ImGui::Begin("Assimp Model Info");
+  // ImGui::Begin("Assimp Model Info");
 
-  ImGui::Text("File: %s", name.c_str());
-  unsigned int numTreeNode = 0;
+  // ImGui::Text("File: %s", name.c_str());
+  // unsigned int numTreeNode = 0;
 
-  // Node Tree
-  ImGui::SeparatorText("Node Tree");
-  ImGui::Checkbox("draw node", &drawNode);
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-                      "Node Highlight (%lu)", nodeMap.size())) {
-    for (auto it = nodeMap.begin(); it != nodeMap.end(); it++) {
-      std::string name = it->first;
-      ImGui::Checkbox(name.c_str(), &it->second->isMarked);
-    }
-    ImGui::TreePop();
-  }
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-                      "Node Tree (%lu)", nodeMap.size())) {
-    rootNode->imGui();
-    ImGui::TreePop();
-  }
+  //// Node Tree
+  // ImGui::SeparatorText("Node Tree");
+  // ImGui::Checkbox("draw node", &drawNode);
+  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+  //                     "Node Highlight (%lu)", nodeMap.size())) {
+  //   for (auto it = nodeMap.begin(); it != nodeMap.end(); it++) {
+  //     std::string name = it->first;
+  //     ImGui::Checkbox(name.c_str(), &it->second->isMarked);
+  //   }
+  //   ImGui::TreePop();
+  // }
+  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+  //                     "Node Tree (%lu)", nodeMap.size())) {
+  //   rootNode->imGui();
+  //   ImGui::TreePop();
+  // }
 
-  // Meshes
-  ImGui::SeparatorText("Meshes");
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-                      "Meshes (%lu)", meshes.size())) {
-    for (int i = 0; i < meshes.size(); i++) {
-      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Mesh %d", i)) {
-        bool visibility = meshVisibilities[i];
-        ImGui::Checkbox("visible", &visibility);
-        meshVisibilities[i] = visibility;
-        meshes[i]->imGui();
-        ImGui::TreePop();
-      }
-    }
-    ImGui::TreePop();
-  }
+  //// Meshes
+  // ImGui::SeparatorText("Meshes");
+  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+  //                     "Meshes (%lu)", meshes.size())) {
+  //   for (int i = 0; i < meshes.size(); i++) {
+  //     if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Mesh %d",
+  //     i)) {
+  //       bool visibility = meshVisibilities[i];
+  //       ImGui::Checkbox("visible", &visibility);
+  //       meshVisibilities[i] = visibility;
+  //       meshes[i]->imGui();
+  //       ImGui::TreePop();
+  //     }
+  //   }
+  //   ImGui::TreePop();
+  // }
 
-  // Animations
-  ImGui::SeparatorText("Animations");
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-                      "Animations (%lu)", animations.size())) {
-    for (int i = 0; i < animations.size(); i++) {
-      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Animation %d",
-                          i)) {
-        animations[i].imGui();
-        ImGui::TreePop();
-      }
-    }
-    ImGui::TreePop();
-  }
-  ImGui::SeparatorText("Current Animation");
-  if (ImGui::Button(isPaused ? "Start" : "Pause")) {
-    if (isAnimated) {
-      isPaused = !isPaused;
-    }
-  }
-  ImGui::Text("Animation: %lu", animations.size());
-  if (ImGui::BeginListBox("Current Anim")) {
-    for (int i = 0; i < animations.size() + 1; i++) {
-      const bool isSelected = (currentAnimation + 1 == i);
-      if (ImGui::Selectable(animModes[i], isSelected)) {
-        if (i == 0) {
-          useMesh();
-        } else {
-          useAnimation(i - 1);
-        }
-      }
-      if (isSelected) {
-        ImGui::SetItemDefaultFocus();
-      }
-    }
-    ImGui::EndListBox();
-  }
+  //// Animations
+  // ImGui::SeparatorText("Animations");
+  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
+  //                     "Animations (%lu)", animations.size())) {
+  //   for (int i = 0; i < animations.size(); i++) {
+  //     if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Animation
+  //     %d",
+  //                         i)) {
+  //       animations[i].imGui();
+  //       ImGui::TreePop();
+  //     }
+  //   }
+  //   ImGui::TreePop();
+  // }
+  // ImGui::SeparatorText("Current Animation");
+  // if (ImGui::Button(isPaused ? "Start" : "Pause")) {
+  //   if (isAnimated) {
+  //     isPaused = !isPaused;
+  //   }
+  // }
+  // ImGui::Text("Animation: %lu", animations.size());
+  // if (ImGui::BeginListBox("Current Anim")) {
+  //   for (int i = 0; i < animations.size() + 1; i++) {
+  //     const bool isSelected = (currentAnimation + 1 == i);
+  //     if (ImGui::Selectable(animModes[i], isSelected)) {
+  //       if (i == 0) {
+  //         useMesh();
+  //       } else {
+  //         useAnimation(i - 1);
+  //       }
+  //     }
+  //     if (isSelected) {
+  //       ImGui::SetItemDefaultFocus();
+  //     }
+  //   }
+  //   ImGui::EndListBox();
+  // }
 
-  // Joint control
-  ImGui::SeparatorText("Joint Control");
-  imGuiJointMenu();
+  //// Joint control
+  // ImGui::SeparatorText("Joint Control");
+  // imGuiJointMenu();
 
-  ImGui::End();
+  // ImGui::End();
 }
 
 void AssimpModel::useMesh() { useAnimation(-1); }
@@ -466,6 +449,22 @@ bool AssimpModel::useAnimation(int animationInd) {
       }
     }
     rootNode->update(glm::mat4(1.0f));
+
+    /*for (unsigned int i = 0; i < meshes.size(); i++) {
+      parallel_for(
+          [&](const int& v) {
+            meshes[i]->animPos[v] /= meshes[i]->animPos[v].w;
+            meshes[i]->animNorm[v] = glm::normalize(meshes[i]->animNorm[v]);
+            meshes[i]->outPos[v] =
+                glm::vec3(meshes[i]->animPos[v].x, meshes[i]->animPos[v].y,
+                          meshes[i]->animPos[v].z);
+            meshes[i]->outNorm[v] =
+                glm::vec3(meshes[i]->animNorm[v].x, meshes[i]->animNorm[v].y,
+                          meshes[i]->animNorm[v].z);
+          },
+          meshes[i]->pos.size(), 256);
+    }*/
+
     for (unsigned int i = 0; i < meshes.size(); i++) {
       for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {
         meshes[i]->animPos[v] /= meshes[i]->animPos[v].w;
@@ -499,7 +498,7 @@ void AssimpModel::update(float deltaTimeInMs) {
     return;
   }
 
-  animations[currentAnimation].update(deltaTimeInMs);
+  animations[currentAnimation].update(deltaTimeInMs, nodeMap);
 
   for (unsigned int i = 0; i < meshes.size(); i++) {
     for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {
@@ -589,9 +588,9 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
   for (int i = 0; i < meshes.size(); i++) {
     material->diffuse = meshes[i]->diffuse;
     material->specular = meshes[i]->specular;
-    //material->ambient = meshes[i]->ambient;
-    //material->emission = meshes[i]->emissive;
-    //material->shininess = meshes[i]->shininess;
+    // material->ambient = meshes[i]->ambient;
+    // material->emission = meshes[i]->emissive;
+    // material->shininess = meshes[i]->shininess;
     material->setUniforms(viewProjMtx, viewMtx,
                           transformMtx * modelMtx * betterView);
     if (meshes[i]->texture) {
