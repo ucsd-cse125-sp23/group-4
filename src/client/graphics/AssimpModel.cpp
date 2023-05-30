@@ -298,7 +298,8 @@ void AssimpModel::loadAssimpHelperAnim(const aiScene* scene) {
     animation.duration = aiAnimation->mDuration;
     animation.tps = aiAnimation->mTicksPerSecond;
     for (int j = 0; j < aiAnimation->mNumChannels; j++) {
-      AssimpAnimNode animNode(aiAnimation->mChannels[j]);
+      bool ok = false;  // TODO(eddie): handle anim load failure
+      AssimpAnimNode animNode(aiAnimation->mChannels[j], ok);
       animation.nodes.push_back(animNode);
     }
     animations.push_back(animation);

@@ -81,12 +81,9 @@ inline glm::mat4 getMatrixFromDOFs(const glm::vec3& pos, const glm::vec4& rot,
   return result;
 }
 
-inline ASSIMP_EXTRAP_MODE extrapModeOf(const aiAnimBehaviour& b) {
-  return b & aiAnimBehaviour::aiAnimBehaviour_CONSTANT
-             ? ASSIMP_EXTRAP_MODE::CONSTANT
-         : b & aiAnimBehaviour::aiAnimBehaviour_LINEAR
-             ? ASSIMP_EXTRAP_MODE::LINEAR
-         : b & aiAnimBehaviour::aiAnimBehaviour_REPEAT
-             ? ASSIMP_EXTRAP_MODE::CYCLE
-             : ASSIMP_EXTRAP_MODE::DEFAULT;
+inline A_ANIM_EXTRAP extrapModeOf(const aiAnimBehaviour& b) {
+  return b & aiAnimBehaviour::aiAnimBehaviour_CONSTANT ? A_ANIM_EXTRAP::CONSTANT
+         : b & aiAnimBehaviour::aiAnimBehaviour_LINEAR ? A_ANIM_EXTRAP::LINEAR
+         : b & aiAnimBehaviour::aiAnimBehaviour_REPEAT ? A_ANIM_EXTRAP::CYCLE
+                                                       : A_ANIM_EXTRAP::DEFAULT;
 }

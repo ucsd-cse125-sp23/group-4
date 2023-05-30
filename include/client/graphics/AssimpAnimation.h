@@ -11,7 +11,9 @@
 #include "client/graphics/AssimpNode.h"
 #include "client/graphics/core.h"
 
-enum ASSIMP_EXTRAP_MODE { DEFAULT, CONSTANT, LINEAR, CYCLE };
+enum class A_ANIM_EXTRAP { DEFAULT, CONSTANT, LINEAR, CYCLE };
+enum class A_ANIM_TANGENT { FLAT, LINEAR, SMOOTH };
+enum class A_ANIM_QUART_INTERP { NONE, LERP, SLERP };
 
 struct AssimpKeyframe {
   float time, val;
@@ -23,33 +25,67 @@ struct AssimpKeyframe {
 
 struct AssimpChannel {
  public:
-  ASSIMP_EXTRAP_MODE extrapIn, extrapOut;
+  A_ANIM_EXTRAP extrapIn, extrapOut;
   std::vector<AssimpKeyframe> keyframes;
 
   void prep();
-  float eval(float t) const;
+  float eval(float t, const A_ANIM_EXTRAP& extrapIn,
+             const A_ANIM_EXTRAP& extrapOut) const;
 
  private:
-  enum ASSIMP_TANGENT_MODE { FLAT, LINEAR, SMOOTH };
-  static const ASSIMP_TANGENT_MODE TANGENT_MODE = ASSIMP_TANGENT_MODE::LINEAR;
+  static const A_ANIM_TANGENT TANGENT_MODE = A_ANIM_TANGENT::LINEAR;
+
+  float timeStart, timeEnd;
+};
+
+struct AssimpRotKeyframe {
+  float time;
+  glm::vec4 val;
+
+  // u = (t - t_a) / (t_b - t_a) in [0,1]
+  float invT;
+
+  // Lerp(u,a,b) = a + u(b-a)
+  glm::vec4 diffVal;
+
+  // Slerp(u,a,b) = 1/sin(theta) * (sin((1-u) * theta) * a + sin(t * theta) * b)
+  //   where theta = acos(a,b)
+  //   flip b if dot(a,b) < 0
+  bool useLerp = true;
+  glm::vec4 nextVal;
+  float invTheta, theta;
+};
+
+struct AssimpRotChannel {
+ public:
+  std::vector<AssimpRotKeyframe> keyframes;
+
+  void prep();
+  glm::vec4 eval(float t, const A_ANIM_EXTRAP& extrapIn,
+                 const A_ANIM_EXTRAP& extrapOut) const;
+
+ private:
+  static const A_ANIM_QUART_INTERP INTERP_MODE = A_ANIM_QUART_INTERP::SLERP;
 
   float timeStart, timeEnd;
 };
 
 struct AssimpAnimNode {
  public:
-  AssimpAnimNode(const aiNodeAnim* const aiNodeAnim);
+  AssimpAnimNode(const aiNodeAnim* const aiNodeAnim, bool& ok);
+
   void update(double currentTick);
 
   std::string name;
+
+  /** output of update result */
   glm::vec3 pos, sca;
   glm::vec4 rot;
 
  private:
   AssimpChannel posX, posY, posZ, scaX, scaY, scaZ;
-  std::vector<double> rotT;
-  std::vector<glm::vec4> rotQ;
-  ASSIMP_EXTRAP_MODE extrapIn, extrapOut;
+  AssimpRotChannel rotQ;
+  A_ANIM_EXTRAP extrapIn, extrapOut;
 };
 
 /** The AssimpAnimation class for storing and evaluating an animation. */
