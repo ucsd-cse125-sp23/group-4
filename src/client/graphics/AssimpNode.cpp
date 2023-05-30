@@ -6,6 +6,7 @@
 
 #include <glm/gtx/string_cast.hpp>
 
+#include "client/graphics/imported/parallel.h"
 #include "client/graphics/AssimpMath.h"
 #include "client/graphics/imported/parallel.h"
 #include "client/graphics/shader.h"
