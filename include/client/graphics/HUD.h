@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "client/graphics/FontRenderer.h"
 #include "client/graphics/Player.h"
@@ -29,8 +30,8 @@ class HUD {
 
     for (int i = 0; i < 40; i++) {
       Texture frame;
-      std::string filename = "assets/image/countdown/frame_" + std::to_string(i) +
-                             "_delay-0.1s.png";
+      std::string filename = "assets/image/countdown/frame_" +
+                             std::to_string(i) + "_delay-0.1s.png";
       frame.init(filename.c_str());
       frames.push_back(frame);
     }
