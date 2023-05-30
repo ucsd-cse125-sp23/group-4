@@ -123,10 +123,17 @@ void Scene::receiveState(message::GameStateUpdate newState) {
   }
 
   // loop through GameThings and update their state
-  for (auto e : gamethings) {
+  for (auto& e : gamethings) {
     int currId = e->netId;
 
     if (currId == -1) continue;  // skip thing
+
+    if (newState.things.find(currId) == newState.things.end()) {
+      // gamething doesn't exist in server message...
+      // delete e;
+      // e = nullptr;  // test this soon
+      continue;
+    }
 
     message::GameStateUpdateItem currState = newState.things.at(currId);
     // please check for non-null too!
