@@ -110,6 +110,7 @@ class Scene {
   std::vector<GameThing*> gamethings;
 
   Timer time;
+  bool gameStart;
 
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
@@ -119,6 +120,7 @@ class Scene {
     gamethings.push_back(camera);
     time.time = 300.0f;
     time.countdown = true;
+    gameStart = false;
 
     sceneResources = new SceneResourceMap();
 

@@ -74,7 +74,9 @@ void Scene::update(float delta) {
     e->update(delta);
   }
 
-  time.Update(delta);
+  if (gameStart) {
+    time.Update(delta);
+  }
 }
 
 message::UserStateUpdate Scene::pollInput() {

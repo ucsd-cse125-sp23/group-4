@@ -91,6 +91,8 @@ void HUD::draw(GLFWwindow* window) {
 
   glViewport(0, 0, width, height);
 
+  drawCountdown();
+
   gameOver();
 
   glDisable(GL_CULL_FACE);
@@ -103,8 +105,8 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
   glfwGetWindowSize(window, &width, &height);
 
   int size = (width / 10 > 250) ? 250 : width / 10;
-  int x = size * 3 - (25 * scale);
-  int y = height - size - 10;
+  int x = 10;
+  int y = 10;
 
   Player* player;
   std::string str;
@@ -190,6 +192,53 @@ void HUD::drawMinimap() {
   glDisable(GL_TEXTURE_2D);
 
   glDisable(GL_BLEND);
+}
+
+void HUD::update() {
+  double nowTime = glfwGetTime();
+  float delta = nowTime - lastTime;
+  lastTime = nowTime;
+
+  timeOnFrame += delta;
+  if (timeOnFrame >= 0.08) {
+    index++;
+    timeOnFrame = 0;
+  }
+
+  if (index == frames.size()) {
+    scene->gameStart = true;
+  }
+}
+
+void HUD::drawCountdown() {
+  if (!scene->gameStart) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    Texture curFrame = frames[index];
+    curFrame.bindgl();
+    glEnable(GL_TEXTURE_2D);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(1, 0);
+    glVertex3f(1.0f, 1.0f, 0.0f);
+    glTexCoord2f(0, 0);
+    glVertex3f(-1.0f, 1.0f, 0.0f);
+    glTexCoord2f(0, 1);
+    glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1, 1);
+    glVertex3f(1.0f, -1.0f, 0.0f);
+
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+
+    glDisable(GL_BLEND);
+
+    update();
+  }
 }
 
 void HUD::gameOver() {

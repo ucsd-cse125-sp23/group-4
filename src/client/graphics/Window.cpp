@@ -75,12 +75,12 @@ bool Window::initializeObjects() {
   GLFWwindow* window = glfwGetCurrentContext();
   std::thread x(&Load::load, loadScreen, window);
   gameScene->init();
+  hud = new HUD(gameScene);
   x.join();
 
   glfwMakeContextCurrent(window);
   glfwShowWindow(window);
   glfwFocusWindow(window);
-  hud = new HUD(gameScene);
 
   return true;
 }
