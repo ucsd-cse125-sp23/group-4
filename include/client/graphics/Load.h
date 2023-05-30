@@ -109,7 +109,7 @@ class Load {
     loadFrames();
 
     glfwShowWindow(window);
-    while (timeElapsed <= 5) {
+    while (timeElapsed <= 10) {
       update();
       draw();
 

@@ -18,7 +18,7 @@ void Start::update(float delta) {
   }
 
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-    gameStart = true;
+    joinGame = true;
   }
 }
 

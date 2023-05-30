@@ -106,7 +106,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
   int size = (width / 10 > 250) ? 250 : width / 10;
   int x = 10;
-  int y = 10;
+  int y = 50;
 
   Player* player;
   std::string str;
