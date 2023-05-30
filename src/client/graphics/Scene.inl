@@ -162,6 +162,15 @@ void Scene::init(void) {
       sceneResources->materials["marble"];
   sceneResources->models["mapA"]->modelMtx = translate(vec3(0, -2, 0));
 
+  sceneResources->meshes["map9"] = new Obj();
+  sceneResources->meshes["map9"]->init(
+      "assets/model/map/map.obj");  // multiple objects in one file
+  sceneResources->models["map9"] = new Model;
+  sceneResources->models["map9"]->mesh =
+      sceneResources->meshes["map9"];
+  sceneResources->models["map9"]->material =
+      sceneResources->materials["marble"];
+
   sceneResources->meshes["mapColsTesting"] = new Obj();
   sceneResources->meshes["mapColsTesting"]->init(
       "assets/models/test_colliders.obj");  // multiple objects in one file
@@ -213,6 +222,7 @@ void Scene::init(void) {
 
   node["map"] = new Node("_map-test");
   node["map"]->model = sceneResources->models["mapColsTesting"];
+  //node["map"]->model = sceneResources->models["map9"];
 
   thing_example->transform.position = vec3(-2.0f, 2.0f, 5.0f);  // gt only
   node["teapot1"]->model = sceneResources->models["teapot1"];
