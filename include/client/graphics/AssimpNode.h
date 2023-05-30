@@ -36,13 +36,4 @@ class AssimpNode {
   glm::mat4 animationTransform;
   /** transformation matrix relative to world space (current pose) */
   glm::mat4 matWorldTransform;
-
-  // Debug
-  bool isMarked = false;
-  void imGui();
-
- private:
-  // Debug
-  static GLuint* shader;
-  Cube geometry = Cube(glm::vec3(-0.1, -0.1, -0.1), glm::vec3(0.1, 0.1, 0.1));
 };

@@ -269,12 +269,13 @@ void AssimpAnimNode::update(double currentTick) {
   rot = rotQ.eval(currentTick, extrapIn, extrapOut);
 }
 
-AssimpAnimation::AssimpAnimation() : duration(0), tps(0), currentTimeInMs(0) {}
+AssimpAnimationClip::AssimpAnimationClip()
+    : duration(0), tps(0), currentTimeInMs(0) {}
 
-void AssimpAnimation::restart() { currentTimeInMs = 0; }
+void AssimpAnimationClip::restart() { currentTimeInMs = 0; }
 
-void AssimpAnimation::update(double deltaTimeInMs,
-                             std::map<std::string, AssimpNode*> nodeMap) {
+void AssimpAnimationClip::update(double deltaTimeInMs,
+                                 std::map<std::string, AssimpNode*> nodeMap) {
   if (tps == 0) {
     return;
   }
@@ -286,4 +287,87 @@ void AssimpAnimation::update(double deltaTimeInMs,
     nodeMap[nodes[i].name]->animationTransform =
         getMatrixFromDOFs(nodes[i].pos, nodes[i].rot, nodes[i].sca);
   }
+}
+
+const std::map<AssimpAnimation::PLAYER_AC, std::string>
+    AssimpAnimation::PLAYER_AC_MAP = {
+        {AssimpAnimation::PLAYER_AC::IDLE, "idle"},
+        {AssimpAnimation::PLAYER_AC::WALK, "walk"},
+        {AssimpAnimation::PLAYER_AC::JUMP, "jump"},
+        {AssimpAnimation::PLAYER_AC::TAG, "tag"}};
+const float AssimpAnimation::MS_IDLE_WALK = 500.0f;
+
+bool AssimpAnimation::init(const aiScene* const scene,
+                           const std::map<std::string, AssimpNode*> nodeMap,
+                           bool& isPlayer) {
+  isPlayer = false;
+  this->isPlayer = false;
+
+  for (int i = 0; i < scene->mNumAnimations; i++) {
+    aiAnimation* aiAnimation = scene->mAnimations[i];
+
+    AssimpAnimationClip animation;
+    animation.name = aiAnimation->mName.C_Str();
+    animation.duration = aiAnimation->mDuration;
+    animation.tps = aiAnimation->mTicksPerSecond;
+    printf("Assimp: [LOG] loading animation clip: %s\n",
+           aiAnimation->mName.C_Str());
+    for (int j = 0; j < aiAnimation->mNumChannels; j++) {
+      bool okNode = true;
+      AssimpAnimNode animNode(aiAnimation->mChannels[j], okNode);
+      if (!okNode) {
+        printf("Assimp: [ERROR] loading animation clip %s failed, aborting\n",
+               aiAnimation->mName.C_Str());
+        return false;
+      }
+      animation.nodes.push_back(animNode);
+    }
+
+    if (animMap.find(aiAnimation->mName.C_Str()) != animMap.end()) {
+      printf("Assimp: [ERROR] duplicate animation name '%s', aborting\n",
+             aiAnimation->mName.C_Str());
+      return false;
+    }
+
+    animMap[aiAnimation->mName.C_Str()] = animation;
+  }
+
+  isPlayer = true;
+  this->isPlayer = true;
+  for (auto& kv : PLAYER_AC_MAP) {
+    if (animMap.find(kv.second) == animMap.end()) {
+      printf("Assimp: [LOG] cannot find animation for player action %s\n",
+             kv.second.c_str());
+      isPlayer = false;
+      this->isPlayer = false;
+    }
+  }
+
+  this->nodeMap = nodeMap;
+}
+
+void AssimpAnimation::update(float deltaTimeInMs) {
+  currTimeInMs += deltaTimeInMs;
+
+  if (!isDissolve && !isReplace) {
+    AssimpAnimationClip& currAnim = animMap[currAnimName];
+    float currentTick = currTimeInMs * currAnim.tps;
+    for (AssimpAnimNode& animNode : currAnim.nodes) {
+      AssimpNode* node = nodeMap[animNode.name];
+      animNode.update(currentTick);
+      node->animationTransform =
+          getMatrixFromDOFs(animNode.pos, animNode.rot, animNode.sca);
+    }
+  }
+}
+
+void AssimpAnimation::useAnimation(std::string animName) {
+  if (animMap.find(animName) == animMap.end()) {
+    return;
+  }
+
+  isDissolve = false;
+  isReplace = false;
+  currTimeInMs = 0.0f;
+  currAnimName = animName;
 }

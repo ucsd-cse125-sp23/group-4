@@ -30,18 +30,8 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
    */
   bool loadAssimp(const char* path);
 
-  /** Set model to use default pose */
-  void useMesh();
-  /** Set model to use specified animation (-1 = use default pose)
-   * returns false if animationInd is invalid
-   */
-  bool useAnimation(int animationInd);
-
-  void draw(const glm::mat4& viewProjMtx, GLuint shader);
-  void imGui();
-
   // PlayerModel
-  void setAnimation(std::string name);
+  void setAnimation(std::string animName);
   void update(float deltaTimeInMs);
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
             const glm::mat4& transformMtx, const bool ignoreDepth = false);
@@ -56,26 +46,14 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
 
  private:
   std::string name;
-  AssimpNode* rootNode;
+
   unsigned int numNode;
+  AssimpNode* rootNode;
   std::map<std::string, AssimpNode*> nodeMap;
-  std::vector<bool> meshVisibilities;
   std::vector<AssimpMesh*> meshes;
-  bool isAnimated, isPaused;
-  int currentAnimation;
-  std::vector<AssimpAnimation> animations;
+
+  AssimpAnimation animation;
   glm::mat4 betterView = glm::mat4(1.0);
-  char** animModes;
-  bool drawNode = false;
-
-  struct ControlInfo {
-    bool useControl = false;
-    glm::vec3 pose = glm::vec3(1);
-    glm::vec3 scale = glm::vec3(1);
-    glm::vec3 offset = glm::vec3(1);
-  };
-
-  std::map<std::string, ControlInfo> nodeControlMap;
 
   void prepareNodes(const aiScene* const scene);
   bool populateNode(const aiScene* const scene, const aiNode* const aiNode,
@@ -84,12 +62,4 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
   bool populateMesh(const aiScene* const scene, const aiMesh* const aiMesh,
                     AssimpMesh* const mesh);
   bool bindJoint(AssimpMesh* const mesh, const aiBone* const aiBone);
-
-  /** Add animations to this model
-   * scene: the scene created by the importer
-   */
-  void loadAssimpHelperAnim(const aiScene* scene);
-  /** Prepare ImGui information for this model */
-  void loadAssimpHelperImgui();
-  void imGuiJointMenu();
 };

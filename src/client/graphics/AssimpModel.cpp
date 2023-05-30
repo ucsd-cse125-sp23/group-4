@@ -12,14 +12,7 @@
 #include "client/graphics/imported/parallel.h"
 #include "client/graphics/imported/stb_image.h"
 
-AssimpModel::AssimpModel()
-    : name("N/A"),
-      rootNode(nullptr),
-      numNode(0),
-      isAnimated(false),
-      isPaused(true),
-      currentAnimation(-1),
-      animModes(nullptr) {}
+AssimpModel::AssimpModel() : name("N/A"), rootNode(nullptr), numNode(0) {}
 
 bool AssimpModel::loadAssimp(const char* path) {
   if (rootNode) {
@@ -45,13 +38,13 @@ bool AssimpModel::loadAssimp(const char* path) {
         "Assimp: [ERROR] duplicate node: processed %u nodes, has %u unique "
         "name nodes\n",
         numNode, nodeMap.size());
-    printf("Assimp: Aborting loading %s\n", name);
+    printf("Assimp: Aborting loading %s\n", name.c_str());
     return false;
   }
 
   std::vector<std::pair<aiMesh*, AssimpMesh*>> meshQueue;
   if (!populateNode(scene, scene->mRootNode, glm::mat4(1.0f), meshQueue)) {
-    printf("Assimp: Aborting loading %s\n", name);
+    printf("Assimp: Aborting loading %s\n", name.c_str());
     return false;
   }
   if (scene->mNumMeshes != meshQueue.size()) {
@@ -59,19 +52,24 @@ bool AssimpModel::loadAssimp(const char* path) {
         "Assimp: [ERROR] unmatched mesh count: should have %u meshes, "
         "processed %u meshes\n",
         scene->mNumMeshes, meshQueue.size());
-    printf("Assimp: Aborting loading %s\n", name);
+    printf("Assimp: Aborting loading %s\n", name.c_str());
     return false;
   }
   for (unsigned int i = 0; i < meshQueue.size(); i++) {
     if (!populateMesh(scene, meshQueue[i].first, meshQueue[i].second)) {
-      printf("Assimp: Aborting loading %s\n", name);
+      printf("Assimp: Aborting loading %s\n", name.c_str());
       return false;
     }
   }
 
-  loadAssimpHelperAnim(scene);
-  loadAssimpHelperImgui();
-  useMesh();
+  bool animIsPlayer = false;
+  if (!animation.init(scene, nodeMap, animIsPlayer)) {
+    printf("Assimp: Aborting loading %s\n", name);
+    return false;
+  }
+  printf("Assimp: %s\n", animIsPlayer ? "does not match a player model"
+                                      : "mathes a player model");
+
   betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)),
                               glm::vec3(0, 0, 0));
   return true;
@@ -290,216 +288,12 @@ bool AssimpModel::bindJoint(AssimpMesh* const mesh,
   return true;
 }
 
-void AssimpModel::loadAssimpHelperAnim(const aiScene* scene) {
-  for (int i = 0; i < scene->mNumAnimations; i++) {
-    aiAnimation* aiAnimation = scene->mAnimations[i];
-    AssimpAnimation animation;
-    animation.name = aiAnimation->mName.C_Str();
-    animation.duration = aiAnimation->mDuration;
-    animation.tps = aiAnimation->mTicksPerSecond;
-    for (int j = 0; j < aiAnimation->mNumChannels; j++) {
-      bool ok = false;  // TODO(eddie): handle anim load failure
-      AssimpAnimNode animNode(aiAnimation->mChannels[j], ok);
-      animation.nodes.push_back(animNode);
-    }
-    animations.push_back(animation);
-  }
-}
-
-void AssimpModel::draw(const glm::mat4& viewProjMtx, GLuint shader) {
-  if (!rootNode) {
-    return;
-  }
-
-  glUseProgram(shader);
-  // TODO: remove this matrix when done with integration
-  glm::mat4 betterViewMat = glm::scale(
-      glm::translate(glm::mat4(1.0f), glm::vec3(0, -2, -0)), glm::vec3(0.025f));
-  for (int i = 0; i < meshes.size(); i++) {
-    if (meshVisibilities[i]) {
-      meshes[i]->draw(viewProjMtx, shader);
-    }
-  }
-
-  if (drawNode) {
-    glDepthFunc(GL_ALWAYS);
-    rootNode->draw(viewProjMtx);
-    glDepthFunc(GL_LEQUAL);
-  }
-}
-
-void AssimpModel::loadAssimpHelperImgui() {
-  animModes = new char*[1 + animations.size()];
-  for (int i = 0; i < animations.size() + 1; i++) {
-    animModes[i] = new char[256];
-  }
-  snprintf(animModes[0], sizeof(animModes[0]), "Mesh");
-  for (int i = 0; i < animations.size(); i++) {
-    snprintf(animModes[1 + i], sizeof(animModes[1 + i]), "Animation %d", i + 1);
-  }
-
-  for (auto& n : nodeMap) {
-    nodeControlMap[n.first] = ControlInfo();
-  }
-}
-
-void AssimpModel::imGui() {
-  // ImGui::Begin("Assimp Model Info");
-
-  // ImGui::Text("File: %s", name.c_str());
-  // unsigned int numTreeNode = 0;
-
-  //// Node Tree
-  // ImGui::SeparatorText("Node Tree");
-  // ImGui::Checkbox("draw node", &drawNode);
-  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-  //                     "Node Highlight (%lu)", nodeMap.size())) {
-  //   for (auto it = nodeMap.begin(); it != nodeMap.end(); it++) {
-  //     std::string name = it->first;
-  //     ImGui::Checkbox(name.c_str(), &it->second->isMarked);
-  //   }
-  //   ImGui::TreePop();
-  // }
-  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-  //                     "Node Tree (%lu)", nodeMap.size())) {
-  //   rootNode->imGui();
-  //   ImGui::TreePop();
-  // }
-
-  //// Meshes
-  // ImGui::SeparatorText("Meshes");
-  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-  //                     "Meshes (%lu)", meshes.size())) {
-  //   for (int i = 0; i < meshes.size(); i++) {
-  //     if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Mesh %d",
-  //     i)) {
-  //       bool visibility = meshVisibilities[i];
-  //       ImGui::Checkbox("visible", &visibility);
-  //       meshVisibilities[i] = visibility;
-  //       meshes[i]->imGui();
-  //       ImGui::TreePop();
-  //     }
-  //   }
-  //   ImGui::TreePop();
-  // }
-
-  //// Animations
-  // ImGui::SeparatorText("Animations");
-  // if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)numTreeNode++),
-  //                     "Animations (%lu)", animations.size())) {
-  //   for (int i = 0; i < animations.size(); i++) {
-  //     if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Animation
-  //     %d",
-  //                         i)) {
-  //       animations[i].imGui();
-  //       ImGui::TreePop();
-  //     }
-  //   }
-  //   ImGui::TreePop();
-  // }
-  // ImGui::SeparatorText("Current Animation");
-  // if (ImGui::Button(isPaused ? "Start" : "Pause")) {
-  //   if (isAnimated) {
-  //     isPaused = !isPaused;
-  //   }
-  // }
-  // ImGui::Text("Animation: %lu", animations.size());
-  // if (ImGui::BeginListBox("Current Anim")) {
-  //   for (int i = 0; i < animations.size() + 1; i++) {
-  //     const bool isSelected = (currentAnimation + 1 == i);
-  //     if (ImGui::Selectable(animModes[i], isSelected)) {
-  //       if (i == 0) {
-  //         useMesh();
-  //       } else {
-  //         useAnimation(i - 1);
-  //       }
-  //     }
-  //     if (isSelected) {
-  //       ImGui::SetItemDefaultFocus();
-  //     }
-  //   }
-  //   ImGui::EndListBox();
-  // }
-
-  //// Joint control
-  // ImGui::SeparatorText("Joint Control");
-  // imGuiJointMenu();
-
-  // ImGui::End();
-}
-
-void AssimpModel::useMesh() { useAnimation(-1); }
-
-bool AssimpModel::useAnimation(int animationInd) {
-  printf("Assimp: Animation - Using %d\t: %s\n", animationInd,
-         animationInd < 0 || animationInd >= animations.size()
-             ? "Mesh | Unknown"
-             : animations[animationInd].name.c_str());
-
-  if (animationInd < 0) {
-    currentAnimation = -1;
-    isAnimated = false;
-    isPaused = true;
-    for (auto const& x : nodeMap) {
-      x.second->animationTransform = x.second->localTransform;
-    }
-    for (unsigned int i = 0; i < meshes.size(); i++) {
-      for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {
-        meshes[i]->animPos[v] = glm::vec4(0.0f);
-        meshes[i]->animNorm[v] = glm::vec4(0.0f);
-      }
-    }
-    rootNode->update(glm::mat4(1.0f));
-
-    /*for (unsigned int i = 0; i < meshes.size(); i++) {
-      parallel_for(
-          [&](const int& v) {
-            meshes[i]->animPos[v] /= meshes[i]->animPos[v].w;
-            meshes[i]->animNorm[v] = glm::normalize(meshes[i]->animNorm[v]);
-            meshes[i]->outPos[v] =
-                glm::vec3(meshes[i]->animPos[v].x, meshes[i]->animPos[v].y,
-                          meshes[i]->animPos[v].z);
-            meshes[i]->outNorm[v] =
-                glm::vec3(meshes[i]->animNorm[v].x, meshes[i]->animNorm[v].y,
-                          meshes[i]->animNorm[v].z);
-          },
-          meshes[i]->pos.size(), 256);
-    }*/
-
-    for (unsigned int i = 0; i < meshes.size(); i++) {
-      for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {
-        meshes[i]->animPos[v] /= meshes[i]->animPos[v].w;
-        meshes[i]->animNorm[v] = glm::normalize(meshes[i]->animNorm[v]);
-        meshes[i]->outPos[v] =
-            glm::vec3(meshes[i]->animPos[v].x, meshes[i]->animPos[v].y,
-                      meshes[i]->animPos[v].z);
-        meshes[i]->outNorm[v] =
-            glm::vec3(meshes[i]->animNorm[v].x, meshes[i]->animNorm[v].y,
-                      meshes[i]->animNorm[v].z);
-      }
-    }
-    return true;
-  }
-  if (animationInd >= animations.size()) {
-    return false;
-  }
-
-  isAnimated = true;
-  isPaused = true;
-  for (auto const& x : nodeMap) {
-    x.second->animationTransform = glm::mat4(1.0f);
-  }
-  currentAnimation = animationInd;
-  animations[animationInd].restart();
-  return true;
+void AssimpModel::setAnimation(std::string animName) {
+  animation.useAnimation(animName);
 }
 
 void AssimpModel::update(float deltaTimeInMs) {
-  if (!isAnimated || isPaused) {
-    return;
-  }
-
-  animations[currentAnimation].update(deltaTimeInMs, nodeMap);
+  animation.update(deltaTimeInMs);
 
   for (unsigned int i = 0; i < meshes.size(); i++) {
     for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {
@@ -520,59 +314,6 @@ void AssimpModel::update(float deltaTimeInMs) {
                     meshes[i]->animNorm[v].z);
     }
   }
-}
-
-void AssimpModel::imGuiJointMenu() {
-  // for (auto& x : nodeMap) {
-  //   AssimpNode* node = x.second;
-  //   const std::string name = node->name;
-  //   if (ImGui::TreeNode(name.c_str())) {
-  //     bool& isControlled = nodeControlMap[x.first].useControl;
-  //     glm::vec3& pose = nodeControlMap[x.first].pose;
-  //     glm::vec3& scale = nodeControlMap[x.first].scale;
-  //     glm::vec3& offset = nodeControlMap[x.first].offset;
-  //     ImGui::Checkbox("Control", &isControlled);
-  //     ImGui::SliderFloat("Pos X", &offset.x, -5.0f, 5.0f, "%.2f");
-  //     ImGui::SliderFloat("Pos Y", &offset.y, -5.0f, 5.0f, "%.2f");
-  //     ImGui::SliderFloat("Pos Z", &offset.z, -5.0f, 5.0f, "%.2f");
-  //     ImGui::SliderFloat("Rot X", &pose.x, -360.0f, 360.0f, "%.2f");
-  //     ImGui::SliderFloat("Rot Y", &pose.y, -360.0f, 360.0f, "%.2f");
-  //     ImGui::SliderFloat("Rot Z", &pose.z, -360.0f, 360.0f, "%.2f");
-  //     ImGui::SliderFloat("Sca X", &scale.x, 0.1f, 2.0f, "%.2f");
-  //     ImGui::SliderFloat("Sca Y", &scale.y, 0.1f, 2.0f, "%.2f");
-  //     ImGui::SliderFloat("Sca Z", &scale.z, 0.1f, 2.0f, "%.2f");
-  //     ImGui::TreePop();
-  //     if (isControlled) {
-  //       glm::vec3 poseR = glm::radians(pose);
-  //       glm::mat4 result(1.0f);
-  //       result = glm::translate(result, offset);
-  //       result = glm::rotate(result, poseR.x, glm::vec3(1.0f, 0.0f, 0.0f));
-  //       result = glm::rotate(result, poseR.y, glm::vec3(0.0f, 1.0f, 0.0f));
-  //       result = glm::rotate(result, poseR.z, glm::vec3(0.0f, 0.0f, 1.0f));
-  //       result = glm::scale(result, scale);
-  //       node->animationTransform = result;
-  //       rootNode->update(glm::mat4(1.0f));
-  //       for (int i = 0; i < meshes.size(); i++) {
-  //         meshes[i]->update();
-  //       }
-  //     }
-  //   }
-  // }
-}
-
-void AssimpModel::setAnimation(std::string name) {
-  for (int i = 0; i < animations.size(); i++) {
-    if (animations[i].name.compare(name) == 0) {
-      useAnimation(i);
-      isPaused = false;
-      return;
-    }
-  }
-
-  // use default pose
-  std::cout << "Assimp: Animation - cannot find " << name.c_str()
-            << " using Mesh instead" << std::endl;
-  useAnimation(-1);
 }
 
 void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
@@ -610,10 +351,6 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
 }
 
 void AssimpModel::draw() {
-  // if (!isAnimated) {
-  //   useMesh();
-  // }
-
   for (int i = 0; i < meshes.size(); i++) {
     meshes[i]->draw();
   }

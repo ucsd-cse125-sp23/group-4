@@ -88,10 +88,10 @@ struct AssimpAnimNode {
   A_ANIM_EXTRAP extrapIn, extrapOut;
 };
 
-/** The AssimpAnimation class for storing and evaluating an animation. */
-class AssimpAnimation {
+/** The AssimpAnimationClip class for storing and evaluating an animation. */
+class AssimpAnimationClip {
  public:
-  AssimpAnimation();
+  AssimpAnimationClip();
 
   /** name of the animation */
   std::string name;
@@ -111,4 +111,39 @@ class AssimpAnimation {
 
  private:
   double currentTimeInMs;
+};
+
+class AssimpAnimation {
+ public:
+  enum class PLAYER_AC { IDLE, WALK, JUMP, TAG };
+
+  /** Bind animation player to a AssimpModel through passing nodeMap;
+   *   returns false if binding fails;
+   *   isPlayer is set to whether this AssimpModel supports player actions.
+   * IMPORTANT:
+   *   DO NOT modify AssimpModel after binding the animation player.
+   */
+  bool init(const aiScene* const scene,
+            const std::map<std::string, AssimpNode*> nodeMap, bool& isPlayer);
+  void update(float deltaTimeInMs);
+
+  void useAnimation(std::string animName);
+  void blendAnimation(PLAYER_AC ac, bool isBlend = false);
+
+ private:
+  static const std::map<PLAYER_AC, std::string> PLAYER_AC_MAP;
+  static const float MS_IDLE_WALK;
+
+  bool isPlayer = false;
+  std::map<std::string, AssimpAnimationClip> animMap;
+
+  // Playback props
+  float currTimeInMs;
+  std::string currAnimName;
+
+  // Blending props
+  bool isDissolve;  // dissolve: idle, walk, jump
+  bool isReplace;   // replace: tag
+
+  std::map<std::string, AssimpNode*> nodeMap;
 };

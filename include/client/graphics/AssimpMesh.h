@@ -63,10 +63,8 @@ class AssimpMesh {
   /** exponent of phong specular equation */
   float shininess;
 
-  void draw(const glm::mat4& viewProjMtx, GLuint shader);
   void gl_load();
   void gl_delete();
-  void imGui();
 
   void draw();
   void gl_load2();
