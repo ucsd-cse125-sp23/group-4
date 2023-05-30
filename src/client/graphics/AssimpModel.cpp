@@ -73,7 +73,7 @@ bool AssimpModel::loadAssimp(const char* path) {
   loadAssimpHelperImgui();
   useMesh();
   betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)),
-                              glm::vec3(0, -120, 0));
+                              glm::vec3(0, 0, 0));
   return true;
 }
 
