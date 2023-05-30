@@ -1,13 +1,20 @@
 /**************************************************
- * ColliderImporter.h
+ * MapDataImporter.h
  * Static class
- * Processes collider data from an obj file.
- * Uses ONLY core math and no rendering code.
- * Used for static map geometry.
- * Supports multiple separate CONVEX objects.
- *   usage:
- *   std::vector<Collider> mapColliders =
- *       ColliderImporter::ImportCollisionData("assets/models/file.obj");
+ * Processes data from an obj file:
+ *  - convex collider data
+ *  - spawn points
+ *  - item spawn points
+ *  - kill plane
+ *  - generic data for gameplay/visuals usage
+ *    * lights
+ *    * physics force hitbox
+ *    * effects (sound, particles)
+ * Intended for static map geometry and points.
+ * 
+ * usage:
+ *   MapData mapData =
+ *       MapDataImporter::Import("assets/model/map-data.obj");
  *****************************************************/
 
 #pragma once
@@ -17,28 +24,37 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "client/graphics/ColliderData.h"
 #include "core/math/vector.h"
 
-class ColliderImporter {
+struct MapData {
+  std::vector<ColliderData> colliders;
+  std::vector<PointData> spawnPoints;
+  std::vector<PointData> itemPoints;
+
+  std::map<std::string, ColliderData> groups;
+};
+
+class MapDataImporter {
  public:
-  static std::vector<ColliderData> ImportCollisionData(const char* filename) {
-    std::vector<ColliderData> result;
+  static std::vector<ColliderData> Import(const char* filename) {
+    std::vector<ColliderData> resultColliders;
 
     std::vector<vec3f> temp_vertices, vertices;
     // std::vector< glm::vec3 > temp_normals, normals;
     // std::vector< unsigned int > temp_vertexIndices, indices;
     // std::vector< unsigned int > temp_normalIndices;
 
-    std::cout << "ColliderImporter: Importing " << filename << "..."
+    std::cout << "MapDataImporter: Importing " << filename << "..."
               << std::endl;
     // load obj file
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
       perror("fopen() failed");
       std::cerr << "Cannot open file: " << filename << std::endl;
-      return result;
+      return resultColliders;
     }
     std::cout << "\tLoading collider vertex data...";
 
@@ -51,12 +67,12 @@ class ColliderImporter {
 
       // else : parse lineHeader
       if (strcmp(lineHeader, "o") == 0) {
-        // separate object. for collision we need to separate these
+        // separate object. this line is the beginning of a new object
 
         if (temp_vertices.size() > 0) {
           ColliderData c = ColliderData(temp_vertices);
           c.name = std::string(currColName);
-          result.push_back(c);
+          resultColliders.push_back(c);
 
           temp_vertices.clear();
         }
@@ -93,7 +109,7 @@ class ColliderImporter {
 
     fclose(file);
 
-    std::cout << "Collider geometry " << filename << " loaded successfully."
+    std::cout << "Map Data " << filename << " loaded successfully."
               << std::endl;
 
     return result;
