@@ -77,12 +77,12 @@ class MapDataImporter {
           // place in correct container...!
           if (currPrefix.length() == 0) {
             result.colliders.push_back(c);
-          } else if (strcmp(currPrefix.c_str(), "plyr")) {
+          } else if (strcmp(currPrefix.c_str(), "plyr") == 0) {
             result.spawnPoints.push_back(c);
-          } else if (strcmp(currPrefix.c_str(), "item")) {
+          } else if (strcmp(currPrefix.c_str(), "item") == 0) {
             result.itemPoints.push_back(c);
           } else {
-            result.groups[currPrefix.c_str()].push_back(c);
+            result.groups[currPrefix].push_back(c);
           }
           count++;
 
@@ -102,8 +102,8 @@ class MapDataImporter {
             currObjectName.at(0) == '_') {  // check first char
           size_t found = currObjectName.find('_', 1);
           if (found != std::string::npos) {
-            currPrefix = currObjectName.substr(1, found);
-            currName = currObjectName.substr(found);
+            currPrefix = currObjectName.substr(1, found - 1);
+            currName = currObjectName.substr(found + 1);
             if (currName.length() == 0) currName = "unnamed";
           }
         }
