@@ -13,12 +13,11 @@ struct GameThing {
   ControlModifierData* control;
 
   GameThing(int, Player*, ControlModifierData*);
+
   void move(float, float, float);  // NOLINT
   void update(const message::UserStateUpdate& update);
   message::GameStateUpdateItem to_network() const;
 };
-
-using GameThingMap = std::unordered_map<int, GameThing>;
 
 // stored in server
 class Game {
@@ -26,10 +25,11 @@ class Game {
   Game();
 
   int create_player();
+  void remove_player(int);
   void update(const message::UserStateUpdate&);
   void tick();
   std::unordered_map<int, message::GameStateUpdateItem> to_network();
 
  private:
-  GameThingMap game_things_;
+  std::unordered_map<int, GameThing> game_things_;
 };

@@ -20,7 +20,7 @@ class Start : public Scene, public InputListener {
   bool renderText;
 
   explicit Start(Camera* camFromWindow) : Scene(camFromWindow) {
-    gamethings.clear();
+    localGameThings.clear();
     timeElapsed = 0.0f;
     offset = 0.0f;
     background.init("assets/image/clouds.png");

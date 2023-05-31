@@ -1,3 +1,4 @@
+#include <boost/container_hash/hash.hpp>
 #include <boost/functional/overloaded_function.hpp>
 #include <config/lib.hpp>
 #include <network/tcp_server.hpp>
@@ -5,17 +6,24 @@
 
 int main(int argc, char* argv[]) {
   auto game = Game();
+  std::unordered_map<ClientID, int, boost::hash<ClientID>> pids;
 
-  auto accept_handler = [&game](ClientID client_id, Server& server) {
+  auto accept_handler = [&game, &pids](ClientID client_id, Server& server) {
     // assign client their player_id
-    int new_player_id = game.create_player();
-    server.write<message::Assign>(client_id, new_player_id);
+    int pid = game.create_player();
+    pids[client_id] = pid;
+    server.write<message::Assign>(client_id, pid);
 
     // notify everyone a new player has joined
     // TODO: don't notify newly joined client
     std::string notification =
         "Client " + boost::uuids::to_string(client_id) + " has joined";
     server.write_all<message::Notify>(notification);
+  };
+
+  auto close_handler = [&game, &pids](ClientID client_id, Server& server) {
+    int pid = pids.at(client_id);
+    game.remove_player(pid);
   };
 
   auto read_handler = [&game](const message::Message& m, Server& server) {
@@ -49,8 +57,8 @@ int main(int argc, char* argv[]) {
   };
 
   auto config = get_config();
-  Server server(config["server_port"], accept_handler, read_handler,
-                write_handler, tick_handler);
+  Server server(config["server_port"], accept_handler, close_handler,
+                read_handler, write_handler, tick_handler);
 
   return 0;
 }

@@ -33,7 +33,7 @@ Player* Scene::createPlayer(int id) {
   std::string playername = "player" + std::to_string(id);
 
   Player* player = new Player();
-  player->netId = id;
+  player->id = id;
   if (isUser) {
     setToUserFocus(player);
   }
@@ -49,10 +49,22 @@ Player* Scene::createPlayer(int id) {
   player->transform.position = vec3(4 + id * 3, 2, 4 + id * 5);
   player->transform.updateMtx(&(player->transformMtx));
 
-  gamethings.push_back(player);
+  networkGameThings.insert({id, player});
   node["world"]->childnodes.push_back(player);
 
   return player;
+}
+
+void Scene::removePlayer(int id) {
+  auto player = networkGameThings.at(id);
+
+  // remove player from world
+  auto& nodes = node["world"]->childnodes;
+  auto it = std::find(nodes.begin(), nodes.end(), player);
+  nodes.erase(it);
+
+  networkGameThings.erase(id);
+  delete player;
 }
 
 void Scene::initFromServer(int myid) { _myPlayerId = myid; }
@@ -70,56 +82,35 @@ void Scene::setToUserFocus(GameThing* t) {
 }
 
 void Scene::update(float delta) {
-  for (auto e : gamethings) {
-    e->update(delta);
-  }
-
+  for (auto& thing : localGameThings) thing->update(delta);
+  for (auto& [_, thing] : networkGameThings) thing->update(delta);
   if (gameStart) {
     time.Update(delta);
   }
 }
 
-message::UserStateUpdate Scene::pollInput() {
-  message::UserStateUpdate ourPlayerUpdate = message::UserStateUpdate();
+message::UserStateUpdate Scene::pollUpdate() {
+  if (!networkGameThings.count(_myPlayerId)) return {};
 
-  for (auto e : gamethings) {
-    auto currUpdate = e->pollInput();
-
-    if (e->isUser) {
-      ourPlayerUpdate = currUpdate;
-      break;
-    }
-  }
-
-  return ourPlayerUpdate;
+  return networkGameThings.at(_myPlayerId)->pollInput();
 }
 
 void Scene::receiveState(message::GameStateUpdate newState) {
-  // check if new graphical objects need to be created
-  for (auto& t : newState.things) {
-    // TODO(matthew): change gamethings to a map
-    bool exists = false;
-    for (auto e : gamethings) {
-      if (e->netId == t.second.id) {
-        exists = true;
-        break;
-      }
-    }
+  // update existing items, create new item if it doesn't exist
+  for (auto& [id, state] : newState.things) {
+    // TODO: handle items besides Player as well
+    if (!networkGameThings.count(id)) createPlayer(id);
 
-    // if t isn't in our gamethings yet, add it now
-    if (!exists) createPlayer(t.second.id);
+    auto thing = networkGameThings.at(id);
+    thing->updateFromState(state);
   }
 
-  // loop through GameThings and update their state
-  for (auto e : gamethings) {
-    int currId = e->netId;
+  // remove items that don't exist on the server anymore
+  std::vector<int> removedIds;
+  for (auto& [id, _] : networkGameThings)
+    if (!newState.things.count(id)) removedIds.push_back(id);
 
-    if (currId == -1) continue;  // skip thing
-
-    message::GameStateUpdateItem currState = newState.things.at(currId);
-    // please check for non-null too!
-    e->updateFromState(currState);
-  }
+  for (int id : removedIds) removePlayer(id);
 }
 
 void Scene::draw() {
