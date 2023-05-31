@@ -35,8 +35,8 @@ class Window {
   static void resizeCallback(GLFWwindow* window, int width, int height);
 
   // update and draw functions
-  static void idleCallback(GLFWwindow* window, float deltaTime);
-  static void displayCallback(GLFWwindow*);
+  static void update(GLFWwindow* window, float deltaTime);
+  static void draw(GLFWwindow*);
 
   // helper to reset the camera
   static void resetCamera();

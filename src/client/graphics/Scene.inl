@@ -156,7 +156,6 @@ void Scene::init(void) {
   sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
   sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
 
-
   // THE player !!!
   sceneResources->models["playerRef"] = new Model;
   sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
@@ -207,19 +206,19 @@ void Scene::init(void) {
   // Add stuff to game updateables
   GameThing* thing_example = new GameThing;
   thing_example->name = "GT_teapot";
-  gamethings.push_back(thing_example);
+  localGameThings.push_back(thing_example);
 
   GameThing* thing_cube = new GameThing;
   thing_cube->name = "GT_cube";
-  gamethings.push_back(thing_cube);
+  localGameThings.push_back(thing_cube);
 
   GameThing* thing_modeltest = new GameThing;
   thing_modeltest->name = "GT_playerTest";
-  gamethings.push_back(thing_modeltest);
+  localGameThings.push_back(thing_modeltest);
 
   GameThing* thing_modeltestB = new GameThing;
   thing_modeltestB->name = "GT_playerTestB";
-  gamethings.push_back(thing_modeltestB);
+  localGameThings.push_back(thing_modeltestB);
 
   Player* player = new Player();
   player->camera = camera;               // give a reference to the game camera

@@ -169,11 +169,11 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::idleCallback(GLFWwindow* window, float deltaTime) {
+void Window::update(GLFWwindow* window, float deltaTime) {
   gameScene->update(deltaTime);
 }
 
-void Window::displayCallback(GLFWwindow* window) {
+void Window::draw(GLFWwindow* window) {
   // Gets events, including input such as keyboard and mouse or window resizing.
   glfwPollEvents();
 

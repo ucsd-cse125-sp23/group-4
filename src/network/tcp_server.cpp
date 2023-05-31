@@ -9,12 +9,14 @@
 #include <numeric>
 #include <string>
 
-Server::Server(int port, AcceptHandler accept_handler, ReadHandler read_handler,
+Server::Server(int port, AcceptHandler accept_handler,
+               CloseHandler close_handler, ReadHandler read_handler,
                WriteHandler write_handler, TickHandler tick_handler)
     : io_context_(boost::asio::io_context()),
       acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)),
       timer_(boost::asio::steady_timer(io_context_)),
       accept_handler_(accept_handler),
+      close_handler_(close_handler),
       read_handler_(read_handler),
       write_handler_(write_handler),
       tick_handler_(tick_handler) {
@@ -58,20 +60,22 @@ void Server::do_accept() {
     do_accept();  // start accepting new connections
 
     // generate id for new client
-    ClientID new_client_id = boost::uuids::random_generator()();
+    ClientID client_id = boost::uuids::random_generator()();
     std::cout << "(Server::accept) Accepted new client, assigning client_id: "
-              << new_client_id << std::endl;
+              << client_id << std::endl;
 
-    auto conn_read_handler = [this, new_client_id](boost::system::error_code ec,
-                                                   const message::Message& m) {
+    auto conn_read_handler = [this, client_id](boost::system::error_code ec,
+                                               const message::Message& m) {
       if (ec) {
-        if (ec == boost::asio::error::eof) {
-          std::cout << "(Server::read) Player " << new_client_id
+        if (ec == boost::asio::error::eof ||
+            ec == boost::asio::error::connection_reset) {
+          std::cout << "(Server::read) Player " << client_id
                     << " disconnected, closing connection" << std::endl;
+          close_handler_(client_id, *this);
           // save value of this, since read_handler closure is destroyed when
           // connection is destroyed
           auto saved_this = this;
-          connections_.erase(new_client_id);
+          connections_.erase(client_id);
           std::cout << saved_this << std::endl;
         }
         return;
@@ -90,9 +94,9 @@ void Server::do_accept() {
 
     // store new connection
     connections_.insert(
-        {new_client_id, std::make_unique<Connection<message::Message>>(
-                            socket, conn_read_handler, conn_write_handler)});
-    accept_handler_(new_client_id, *this);
+        {client_id, std::make_unique<Connection<message::Message>>(
+                        socket, conn_read_handler, conn_write_handler)});
+    accept_handler_(client_id, *this);
     std::cout << this << std::endl;  // print Server status
   };
 
