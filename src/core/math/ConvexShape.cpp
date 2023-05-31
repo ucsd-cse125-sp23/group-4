@@ -39,7 +39,7 @@ bool line(Simplex& pts, vec3f& dir) {
 
   if (sameDir(ab, ao)) {
     dir = cross(cross(ab, ao), ab);
-    if (length_squared(dir) == 0) return true;
+    //if (length_squared(dir) == 0) return true;
   } else {
     pts = {a};
     dir = ao;
@@ -134,13 +134,13 @@ bool ConvexShape::collides(const ConvexShape* other, const mat4f& thisMtx,
                            const mat3f& otherIMtx) const {
   vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                        otherIMtx, {1, 0, 0});
-  if (length_squared(support) == 0) return true;
   Simplex pts;
   pts.push(support);
 
   size_t ite = 0;
   vec3f dir = -support;
   while (ite++ < MAX_ITERATIONS) {
+    if (length_squared(dir) == 0) return true;
     support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                    otherIMtx, dir);
     if (dot(support, dir) <= 0) return false;
@@ -212,7 +212,6 @@ vec3f vecToOrigin(vec3f a, vec3f b, vec3f c) {
   }
 }
 vec3f vecToOrigin(Simplex pts) {
-  std::cout << "final:" << pts << std::endl;
   switch (pts.size()) {
     case 1:
       return pts[0];
@@ -247,19 +246,22 @@ bool degenrate(Simplex pts, vec3f support) {
 }
 vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
                              const mat3f& thisIMtx, const mat4f& otherMtx,
-                             const mat3f& otherIMtx) const {
+                            const mat3f& otherIMtx) const {
   vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                        otherIMtx, {1, 0, 0});
-  if (length_squared(support) == 0) return vec3f(0,0,0);
   Simplex pts;
   pts.push(support);
 
   size_t ite = 0;
-  vec3f dir = -support;
-  while (ite++ < MAX_ITERATIONS*10+2) {
+  vec3f dir = length_squared(support) == 0 ? vec3f(0, 1, 0) : -support;
+  vec3f dist = vecToOrigin(pts);
+  vec3f prevDist = dist;
+  while (ite++ < MAX_ITERATIONS) {
     support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                    otherIMtx, dir);
-    //std::cout << pts.size() << "::" << dot(support, dir) << " " << support << " " << dir << std::endl;
+    /*
+    //std::cout << pts.size() << "::" << dot(support, dir) << " " << support <<
+    " " << dir << std::endl;
     //std::cout << support << std::endl;
     if (abs(dot(support, dir)) <= TOLERANCE) return vecToOrigin(pts);
     if (degenrate(pts,support)) return vecToOrigin(pts);
@@ -267,6 +269,18 @@ vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
     if(ite > 950) std::cout << pts.size() << " " << pts << std::endl;
     if (nextSimplex(pts, dir)) return vec3f(0, 0, 0);
     //std::cout << pts << std::endl << std::endl;
+    dir = normalize(dir);
+    */
+    if (degenrate(pts, support)) return dist;
+    pts.push(support);
+    // std::cout << pts << std::endl;
+    prevDist = dist;
+    dist = vecToOrigin(pts);
+    if (length_squared(prevDist) - length_squared(dist) <=
+        TOLERANCE * TOLERANCE)
+      return prevDist;
+    if (nextSimplex(pts, dir)) return vec3f(0, 0, 0);
+    // std::cout << pts << std::endl << std::endl;
     dir = normalize(dir);
   }
   return vecToOrigin(pts);
@@ -385,6 +399,7 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx,
     if (length_squared(support) != 0) {
       vec3f dir = -support;
       while (ite++ < MAX_ITERATIONS) {
+        if (length_squared(dir) == 0) break;
         support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                        otherIMtx, dir);
         if (dot(support, dir) <= TOLERANCE) return vec4f(0, 0, 0, 0);
@@ -394,6 +409,10 @@ vec4f ConvexShape::mtv(const ConvexShape* other, const mat4f& thisMtx,
     }
 
     // Fix simplex
+    if (pts.size() == 1) {
+      pts.push(ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
+                                    otherIMtx, vec3f(0, 1, 0)));
+    }
     if (pts.size() == 2) {
       vec3f l = normalize(pts[0] - pts[1]);
       vec3f p = vec3f(-l.y, l.x, l.z);
