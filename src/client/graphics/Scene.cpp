@@ -33,7 +33,7 @@ Player* Scene::createPlayer(int id) {
   std::string playername = "player" + std::to_string(id);
 
   Player* player = new Player();
-  player->netId = id;
+  player->id = id;
   if (isUser) {
     setToUserFocus(player);
   }
