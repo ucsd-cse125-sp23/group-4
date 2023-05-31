@@ -20,6 +20,7 @@
 #include <map>
 #include <network/message.hpp>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -112,7 +113,8 @@ class Scene {
   // by setting the child_nodes.
   std::map<std::string, Node*> node;
 
-  std::vector<GameThing*> gamethings;
+  std::vector<GameThing*> localGameThings;
+  std::unordered_map<int, GameThing*> networkGameThings;
 
   std::map<char, Character> Characters;
 
@@ -120,7 +122,7 @@ class Scene {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
-    gamethings.push_back(camera);
+    localGameThings.push_back(camera);
 
     sceneResources = new SceneResourceMap();
 
@@ -161,6 +163,7 @@ class Scene {
   }
 
   Player* createPlayer(int id);
+  void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
   void init(void);
