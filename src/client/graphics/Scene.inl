@@ -21,14 +21,15 @@ void Scene::init(void) {
   // TODO(eddie) use Assimp here...
   sceneResources->meshes["playermodel"] = new Obj();
   sceneResources->meshes["playermodel"]->init(
-      "assets/models/model-skeleton.obj");
+      "assets/model/dev/model-skeleton.obj");
 
   sceneResources->meshes["teapot"] = new Obj();
-  sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
+  sceneResources->meshes["teapot"]->init(
+      "assets/model/dev/imported/teapot.obj");
 
   sceneResources->meshes["cubeUV"] = new Obj();
   sceneResources->meshes["cubeUV"]->init(
-      "assets/models/bevel_cube.obj");  // includes UV data
+      "assets/model/dev/bevel_cube.obj");  // includes UV data
 #pragma endregion
 
   // Create shader palette

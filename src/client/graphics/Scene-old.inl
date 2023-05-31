@@ -21,21 +21,21 @@ void Scene::init(void) {
   sceneResources->meshes["wasp"] =
       new SkinnedMesh();  // can only be tied to one object? (not a static
                           // resource)
-  sceneResources->meshes["wasp"]->init("assets/models/wasp.skin");
+  sceneResources->meshes["wasp"]->init("assets/model/dev/imported/wasp.skin");
 
-  sceneResources->meshes["teapot"]->init("assets/models/teapot.obj");
-  sceneResources->meshes["bunny"]->init("assets/models/bunny.obj");
-  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
+  sceneResources->meshes["teapot"]->init("assets/model/dev/imported/teapot.obj");
+  sceneResources->meshes["bunny"]->init("assets/model/dev/imported/bunny.obj");
+  sceneResources->meshes["player"]->init("assets/model/dev/model-skeleton.obj");
 
   sceneResources->meshes["cubeUV"] = new Obj();
   sceneResources->meshes["cubeUV"]->init(
-      "assets/models/bevel_cube.obj");  // includes UV data
+      "assets/model/dev/bevel_cube.obj");  // includes UV data
 
   sceneResources->skeletons["wasp"] = new Skeleton();
-  sceneResources->skeletons["wasp"]->Load("assets/models/wasp.skel");
+  sceneResources->skeletons["wasp"]->Load("assets/model/dev/imported/wasp.skel");
 
   AnimationClip* animClip = new AnimationClip();
-  animClip->Load("assets/models/wasp_walk.anim");
+  animClip->Load("assets/model/dev/imported/wasp_walk.anim");
   sceneResources->animations["wasp"]["walk"] = new AnimationPlayer();
   sceneResources->animations["wasp"]["walk"]->SetClip(animClip);
   sceneResources->animations["wasp"]["walk"]->speed = 4.0f;  // walk faster
@@ -171,7 +171,7 @@ void Scene::init(void) {
   ///// maps:
 
   sceneResources->meshes["map1"] = new Obj();
-  sceneResources->meshes["map1"]->init("assets/models/map_testing.obj");
+  sceneResources->meshes["map1"]->init("assets/model/dev/map_testing.obj");
   sceneResources->models["map1"] = new Model;
   sceneResources->models["map1"]->mesh = sceneResources->meshes["map1"];
   sceneResources->models["map1"]->material =
@@ -180,7 +180,7 @@ void Scene::init(void) {
 
   sceneResources->meshes["mapColsTesting"] = new Obj();
   sceneResources->meshes["mapColsTesting"]->init(
-      "assets/models/test_colliders.obj");  // multiple objects in one file
+      "assets/model/dev/test_colliders.obj");  // multiple objects in one file
   sceneResources->models["mapColsTesting"] = new Model;
   sceneResources->models["mapColsTesting"]->mesh =
       sceneResources->meshes["mapColsTesting"];
@@ -190,7 +190,7 @@ void Scene::init(void) {
   // -2, 0));   // needs to be world space
 
   std::vector<ColliderData> mapColliders =
-      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
+      ColliderImporter::ImportCollisionData("assets/model/dev/test_colliders.obj");
 
   node["collision"] = new Node("_colliders");
   for (auto c : mapColliders) {
