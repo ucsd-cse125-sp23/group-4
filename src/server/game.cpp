@@ -18,6 +18,8 @@ void GameThing::update(const message::UserStateUpdate& update) {
   heading = update.heading;
 }
 
+void GameThing::remove() { player->markRemove(); }
+
 message::GameStateUpdateItem GameThing::to_network() const {
   return {id, player->getPos().x, player->getPos().y, player->getPos().z,
           heading};
@@ -40,7 +42,7 @@ int Game::add_player() {
 }
 
 void Game::remove_player(int pid) {
-  game_things_.at(pid).player->markRemove();
+  game_things_.at(pid).remove();
   game_things_.erase(pid);
 }
 

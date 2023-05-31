@@ -6,17 +6,23 @@
 
 #include "client/graphics/ColliderImporter.h"
 
-struct GameThing {
+// represents a new Player right now
+// TODO: figure out how to support items later on
+class GameThing {
+ public:
+  GameThing(int, Player*, ControlModifierData*);
+
+  void update(const message::UserStateUpdate& update);
+  void remove();
+  message::GameStateUpdateItem to_network() const;
+
+ private:
+  void move(float, float, float);  // NOLINT
+
   int id;
   float heading;
   Player* player;
   ControlModifierData* control;
-
-  GameThing(int, Player*, ControlModifierData*);
-
-  void move(float, float, float);  // NOLINT
-  void update(const message::UserStateUpdate& update);
-  message::GameStateUpdateItem to_network() const;
 };
 
 // stored in server
