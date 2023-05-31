@@ -33,7 +33,7 @@ Game::Game() {
   initializeLevel(environment);
 }
 
-int Game::create_player() {
+int Game::add_player() {
   auto [player, control] = initializePlayer();
   game_things_.insert({player->pid, GameThing(player->pid, player, control)});
   return player->pid;

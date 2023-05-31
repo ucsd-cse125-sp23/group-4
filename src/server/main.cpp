@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
   auto accept_handler = [&game, &pids](ClientID client_id, Server& server) {
     // assign client their player_id
-    int pid = game.create_player();
+    int pid = game.add_player();
     pids[client_id] = pid;
     server.write<message::Assign>(client_id, pid);
 

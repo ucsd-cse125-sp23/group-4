@@ -24,7 +24,7 @@ class Game {
  public:
   Game();
 
-  int create_player();
+  int add_player();
   void remove_player(int);
   void update(const message::UserStateUpdate&);
   void tick();
