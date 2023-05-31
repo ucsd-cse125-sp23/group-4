@@ -198,11 +198,11 @@ void Scene::init(void) {
   // Add local game things
   GameThing* thing_example = new GameThing;
   thing_example->name = "GT_teapot";
-  gamethings.push_back(thing_example);
+  localGameThings.push_back(thing_example);
 
   GameThing* thing_cube = new GameThing;
   thing_cube->name = "GT_cube";
-  gamethings.push_back(thing_cube);
+  localGameThings.push_back(thing_cube);
 
   // Build nodes of the scene graph
   node["teapot1"] = thing_example;

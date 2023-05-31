@@ -52,16 +52,7 @@ message::UserStateUpdate Player::pollInput() {
     moveWorld = move(moveLocal);
   }
 
-  // Get ready to send a message to the server: ***
-  message::UserStateUpdate myInputState;
-  myInputState.id = netId;
-  myInputState.movx = moveWorld.x;
-  myInputState.movy = 0;
-  myInputState.movz = moveWorld.z;
-  myInputState.heading = azimuth;
-  myInputState.jump = jumping;
-
-  return myInputState;
+  return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
 }
 
 vec3 Player::move(vec3 movement) {

@@ -15,12 +15,14 @@ using message::ClientID;
 class Server {
  public:
   using AcceptHandler = std::function<void(ClientID, Server&)>;
+  using CloseHandler = std::function<void(ClientID, Server&)>;
   using ReadHandler = std::function<void(const message::Message&, Server&)>;
   using WriteHandler =
       std::function<void(std::size_t, const message::Message&, Server&)>;
   using TickHandler = std::function<void(Server&)>;
 
-  Server(int port, AcceptHandler, ReadHandler, WriteHandler, TickHandler);
+  Server(int port, AcceptHandler, CloseHandler, ReadHandler, WriteHandler,
+         TickHandler);
 
   void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);
@@ -39,6 +41,7 @@ class Server {
 
   boost::asio::io_context io_context_;
   AcceptHandler accept_handler_;
+  CloseHandler close_handler_;
   ReadHandler read_handler_;
   WriteHandler write_handler_;
   TickHandler tick_handler_;
