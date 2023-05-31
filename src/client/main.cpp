@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Waiting for server to assign pid..." << std::endl;
     client->poll();
 
-    Window::displayCallback(window);  // TODO: this should be lobby draw
+    Window::draw(window);  // TODO: this should be lobby draw
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
@@ -182,9 +182,6 @@ int main(int argc, char* argv[]) {
       deltaTimer--;
     }
 
-    // Main render display callback. Rendering of objects is done here.
-    Window::idleCallback(window, deltaTime);
-    Window::displayCallback(window);
     frames++;
 
     // - Reset after one second
@@ -194,6 +191,9 @@ int main(int argc, char* argv[]) {
       Window::ups = updates;
       updates = 0, frames = 0;
     }
+    // update and render scene
+    Window::update(window, time_since_prev_frame);
+    Window::draw(window);
 
     // prevent drawing too fast...
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
