@@ -74,7 +74,7 @@ class MapDataImporter {
           c.name = std::string(currName);
 
           // place in correct container...!
-          if (strcmp(currPrefix.c_str(), "")) {
+          if (currPrefix.length() == 0) {
             result.colliders.push_back(c);
           } else if (strcmp(currPrefix.c_str(), "plyr")) {
             result.spawnPoints.push_back(c);

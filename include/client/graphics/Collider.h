@@ -24,21 +24,17 @@ class Collider : public Node {
 
   explicit Collider(MapPointData data) {
     name = data.name;
-    // TODO(matthew)
+
+    for (auto v : data.vertices) {
+      vertices.push_back(glm::vec3(v.x, v.y, v.z));
+    }
   }
 
   explicit Collider(std::vector<glm::vec3> v) { vertices = v; }
 
   Collider(std::vector<glm::vec3> v, Mesh* displayMesh) : Collider(v) {
+    // TODO(matthew) support drawing collider as mesh?
     vertices = v;
-  }
-
-  std::vector<vec3f> GetVerticesCore() {
-    std::vector<vec3f> vfs;
-    for (auto v : vertices) {
-      vfs.push_back(vec3f(v.x, v.y, v.z));
-    }
-    return vfs;
   }
 
   void draw_debug(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx,
