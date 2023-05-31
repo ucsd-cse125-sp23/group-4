@@ -13,6 +13,7 @@ struct GameThing {
   ControlModifierData* control;
 
   GameThing(int, Player*, ControlModifierData*);
+
   void move(float, float, float);  // NOLINT
   void update(const message::UserStateUpdate& update);
   message::GameStateUpdateItem to_network() const;
