@@ -9,9 +9,13 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <config/lib.hpp>
+
 using namespace glm;
 
 void Scene::init(void) {
+  auto config = get_config();
+
   // Create mesh palette
 #pragma region Meshes
   // TODO(eddie) use Assimp here...
@@ -154,33 +158,22 @@ void Scene::init(void) {
   // Initialize map data
 #pragma region MapImport
   ///// maps:
-  sceneResources->meshes["mapA"] = new Obj();
-  sceneResources->meshes["mapA"]->init("assets/models/map_testing.obj");
-  sceneResources->models["mapA"] = new Model;
-  sceneResources->models["mapA"]->mesh = sceneResources->meshes["mapA"];
-  sceneResources->models["mapA"]->material =
-      sceneResources->materials["marble"];
-  sceneResources->models["mapA"]->modelMtx = translate(vec3(0, -2, 0));
+  sceneResources->meshes["map"] = new Obj();
+  sceneResources->meshes["map"]->init(config["map_draw_file"]);
+  sceneResources->models["map"] = new Model;
+  sceneResources->models["map"]->mesh = sceneResources->meshes["map"];
+  sceneResources->models["map"]->material = sceneResources->materials["marble"];
 
   sceneResources->meshes["map9"] = new Obj();
   sceneResources->meshes["map9"]->init(
-      "assets/model/map/map.obj");  // multiple objects in one file
+      "assets/model/map/map.obj");  // TODO(matthew) many materials here
   sceneResources->models["map9"] = new Model;
   sceneResources->models["map9"]->mesh = sceneResources->meshes["map9"];
   sceneResources->models["map9"]->material =
       sceneResources->materials["marble"];
 
-  sceneResources->meshes["mapColsTesting"] = new Obj();
-  sceneResources->meshes["mapColsTesting"]->init(
-      "assets/models/test_colliders.obj");  // multiple objects in one file
-  sceneResources->models["mapColsTesting"] = new Model;
-  sceneResources->models["mapColsTesting"]->mesh =
-      sceneResources->meshes["mapColsTesting"];
-  sceneResources->models["mapColsTesting"]->material =
-      sceneResources->materials["marble"];
-
   ///// map data (collisions, fx, etc.):
-  MapData mapData = MapDataImporter::Import("assets/models/test_colliders.obj");
+  MapData mapData = MapDataImporter::Import(config["map_data_file"]);
 
   node["collision"] = new Node("_colliders");
   for (auto c : mapData.colliders) {
@@ -214,9 +207,8 @@ void Scene::init(void) {
   node["teapot1"] = thing_example;
   node["cubeTest"] = thing_cube;
 
-  node["map"] = new Node("_map-test");
-  node["map"]->model = sceneResources->models["mapColsTesting"];
-  // node["map"]->model = sceneResources->models["map9"];
+  node["map"] = new Node("_map");
+  node["map"]->model = sceneResources->models["map"];
 
   thing_example->transform.position = vec3(-2.0f, 2.0f, 5.0f);  // gt only
   node["teapot1"]->model = sceneResources->models["teapot1"];

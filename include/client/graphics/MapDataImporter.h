@@ -40,6 +40,7 @@ struct MapData {
 
 class MapDataImporter {
  public:
+  static MapData Import(std::string fn) { return Import(fn.c_str()); }
   static MapData Import(const char* filename) {
     MapData result = MapData();
     unsigned int count = 0;

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <config/lib.hpp>
 #include <core/lib.hpp>
 #include <network/message.hpp>
 #include <server/game.hpp>
@@ -24,8 +25,10 @@ message::GameStateUpdateItem GameThing::to_network() const {
 }
 
 Game::Game() {
+  auto config = get_config();
+
   Environment* environment = new Environment();
-  MapData mapData = MapDataImporter::Import("assets/models/test_colliders.obj");
+  MapData mapData = MapDataImporter::Import(config["map_data_file"]);
   for (auto collider : mapData.colliders) {
     environment->addConvex(collider.vertices, 0.2f);
   }
