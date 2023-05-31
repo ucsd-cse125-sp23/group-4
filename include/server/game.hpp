@@ -4,7 +4,7 @@
 #include <network/message.hpp>
 #include <unordered_map>
 
-#include "client/graphics/ColliderImporter.h"
+#include "client/graphics/MapDataImporter.h"
 
 struct GameThing {
   int id;

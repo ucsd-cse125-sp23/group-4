@@ -25,9 +25,8 @@ message::GameStateUpdateItem GameThing::to_network() const {
 
 Game::Game() {
   Environment* environment = new Environment();
-  std::vector<ColliderData> mapColliders =
-      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
-  for (auto collider : mapColliders) {
+  MapData mapData = MapDataImporter::Import("assets/models/test_colliders.obj");
+  for (auto collider : mapData.colliders) {
     environment->addConvex(collider.vertices, 0.2f);
   }
   initializeLevel(environment);
