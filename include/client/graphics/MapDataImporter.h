@@ -34,6 +34,7 @@ struct MapData {
   std::vector<MapPointData> colliders;
   std::vector<MapPointData> spawnPoints;
   std::vector<MapPointData> itemPoints;
+  float fallBoundY = -100;
 
   std::map<std::string, std::vector<MapPointData>> groups;
 };
@@ -81,6 +82,8 @@ class MapDataImporter {
             result.spawnPoints.push_back(c);
           } else if (strcmp(currPrefix.c_str(), "item") == 0) {
             result.itemPoints.push_back(c);
+          } else if (strcmp(currPrefix.c_str(), "fall") == 0) {
+            result.fallBoundY = c.point.y;
           } else {
             result.groups[currPrefix].push_back(c);
           }
