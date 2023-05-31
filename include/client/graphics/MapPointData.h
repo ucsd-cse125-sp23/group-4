@@ -19,11 +19,11 @@ class MapPointData {
   vec3f point;                  // used for spawn points
 
   explicit MapPointData(std::vector<vec3f> v) {
-	  if (v.size() <= 0) {
-		  return;
-	  }
+    if (v.size() <= 0) {
+      return;
+    }
 
-	  point = v[0];
-	  vertices = v;
+    point = v[0];
+    vertices = v;
   }
 };
