@@ -18,5 +18,12 @@ class MapPointData {
   std::vector<vec3f> vertices;  // passed in as world space
   vec3f point;                  // used for spawn points
 
-  explicit MapPointData(std::vector<vec3f> v) { point = v[0]; }
+  explicit MapPointData(std::vector<vec3f> v) {
+	  if (v.size() <= 0) {
+		  return;
+	  }
+
+	  point = v[0];
+	  vertices = v;
+  }
 };

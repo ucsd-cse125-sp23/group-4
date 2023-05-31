@@ -3,7 +3,7 @@
  * contains the definition of the scene graph
  *****************************************************/
 #include "client/graphics/Collider.h"
-#include "client/graphics/ColliderImporter.h"
+#include "client/graphics/MapDataImporter.h"
 #include "client/graphics/Scene.h"
 
 #define _USE_MATH_DEFINES
@@ -166,8 +166,7 @@ void Scene::init(void) {
   sceneResources->meshes["map9"]->init(
       "assets/model/map/map.obj");  // multiple objects in one file
   sceneResources->models["map9"] = new Model;
-  sceneResources->models["map9"]->mesh =
-      sceneResources->meshes["map9"];
+  sceneResources->models["map9"]->mesh = sceneResources->meshes["map9"];
   sceneResources->models["map9"]->material =
       sceneResources->materials["marble"];
 
@@ -179,19 +178,14 @@ void Scene::init(void) {
       sceneResources->meshes["mapColsTesting"];
   sceneResources->models["mapColsTesting"]->material =
       sceneResources->materials["marble"];
-  // sceneResources->models["mapColsTesting"]->transformMtx = translate(vec3(0,
-  // -2, 0));   // needs to be world space
 
-  ///// collisions:
-  std::vector<ColliderData> mapColliders =
-      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
+  ///// map data (collisions, fx, etc.):
+  MapData mapData = MapDataImporter::Import("assets/models/test_colliders.obj");
 
   node["collision"] = new Node("_colliders");
-  for (auto c : mapColliders) {
+  for (auto c : mapData.colliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
   }
-  // node["collision"]->transformMtx =
-  // sceneResources->models["mapColsTesting"]->transformMtx;
 #pragma endregion
 
   // Setup player/gameplay prefabs
@@ -222,7 +216,7 @@ void Scene::init(void) {
 
   node["map"] = new Node("_map-test");
   node["map"]->model = sceneResources->models["mapColsTesting"];
-  //node["map"]->model = sceneResources->models["map9"];
+  // node["map"]->model = sceneResources->models["map9"];
 
   thing_example->transform.position = vec3(-2.0f, 2.0f, 5.0f);  // gt only
   node["teapot1"]->model = sceneResources->models["teapot1"];
