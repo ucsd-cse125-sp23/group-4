@@ -4,159 +4,370 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "AssimpMath.h"
 
-void AssimpChannel::eval(double currentTick) {
-  // IMPORTANT: assuming that pos,rot,sca has the same ticks
-  double start = positions[0].first;
-  double end = positions[positions.size() - 1].first;
-  // before start or after end, extrapolate
-  if (currentTick < start || currentTick > end) {
-    bool isBefore = currentTick < start;
-    switch (isBefore ? extrapPre : extrapPost) {
-      case ASSIMP_EXTRAP_MODE::CONSTANT:
-        node->animationTransform =
-            isBefore ? getMatrix(positions[0].second, rotations[0].second,
-                                 scalings[0].second)
-                     : getMatrix(positions[positions.size() - 1].second,
-                                 rotations[positions.size() - 1].second,
-                                 scalings[positions.size() - 1].second);
-        break;
-      case ASSIMP_EXTRAP_MODE::LINEAR:
-        // TODO: implement linear extrapolation
-        printf("LINEAR NOT SUPPORTED\n");
-        break;
-      case ASSIMP_EXTRAP_MODE::CYCLE:
-      default:
-        // TODO: not tested
-        eval(std::fmod((currentTick - start), glm::abs(end - start)));
-        break;
-    }
+void AssimpChannel::prep() {
+  if (keyframes.empty()) {
+    return;
+  }
+  const glm::mat4 INV_MAT(2.0, -3.0, 0.0, 1.0, -2.0, 3.0, 0.0, 0.0, 1.0, -2.0,
+                          1.0, 0.0, 1.0, -1.0, 0.0, 0.0);
+  glm::vec4 ABCD(0.0f);
+  glm::vec4 goal(0.0f);
+
+  timeStart = keyframes[0].time;
+  timeEnd = keyframes[1].time;
+  if (keyframes.size() == 1) {
+    AssimpKeyframe& kf = keyframes[0];
+    kf.invT = 1.0f;
+    goal = glm::vec4(kf.val, kf.val, 0.0f, 0.0f);
+    ABCD = INV_MAT * goal;
+    kf.a = ABCD.x;
+    kf.b = ABCD.y;
+    kf.c = ABCD.z;
+    kf.d = ABCD.w;
     return;
   }
 
-  int lastEarlyTickInd = -1;
-  for (int i = 0; i < positions.size(); i++) {
-    if (currentTick == positions[i].first) {
-      node->animationTransform = getMatrix(
-          positions[i].second, rotations[i].second, scalings[i].second);
-      return;
-    }
-    if (currentTick > positions[i].first) {
-      lastEarlyTickInd = i;
+  for (size_t i = 1; i < keyframes.size() - 1; i++) {
+    AssimpKeyframe& kf = keyframes[i];
+    switch (TANGENT_MODE) {
+      case A_ANIM_TANGENT::SMOOTH:
+        kf.tangent = (keyframes[i + 1].val - keyframes[i - 1].val) /
+                     (keyframes[i + 1].time - keyframes[i - 1].time);
+        break;
+      case A_ANIM_TANGENT::LINEAR:
+        kf.tangent =
+            (keyframes[i + 1].val - kf.val) / (keyframes[i + 1].time - kf.time);
+        break;
+      case A_ANIM_TANGENT::FLAT:
+      default:
+        return;
     }
   }
+  if (TANGENT_MODE != A_ANIM_TANGENT::FLAT) {
+    keyframes[0].tangent = (keyframes[1].val - keyframes[0].val) /
+                           (keyframes[1].time - keyframes[0].time);
+    const size_t kfSize = keyframes.size();
+    keyframes[kfSize - 1].tangent =
+        (keyframes[kfSize - 1].val - keyframes[kfSize - 2].val) /
+        (keyframes[kfSize - 1].time - keyframes[kfSize - 2].time);
+  }
 
-  node->animationTransform =
-      getMatrixInterpolate(lastEarlyTickInd, currentTick);
-}
-
-glm::mat4 AssimpChannel::getMatrixInterpolate(int lastEarlyTickInd,
-                                              double tick) {
-  // linear interpolation
-  double t0 = positions[lastEarlyTickInd].first;
-  double t1 = positions[lastEarlyTickInd + 1].first;
-  glm::vec3 interpPos = positions[lastEarlyTickInd].second +
-                        (positions[lastEarlyTickInd + 1].second -
-                         positions[lastEarlyTickInd].second) *
-                            static_cast<float>((tick - t0) / (t1 - t0));
-
-  // spherical interpolation
-  glm::vec4 interpRot = quarternionInterpolateSpherical(
-      rotations[lastEarlyTickInd].second,
-      rotations[lastEarlyTickInd + 1].second,
-      static_cast<float>((tick - t0) / (t1 - t0)));
-
-  // linear interpolation
-  glm::vec3 interpSca = scalings[lastEarlyTickInd].second +
-                        (scalings[lastEarlyTickInd + 1].second -
-                         scalings[lastEarlyTickInd].second) *
-                            static_cast<float>((tick - t0) / (t1 - t0));
-  return getMatrix(interpPos, interpRot, interpSca);
-}
-
-// TODO: we can have unit test for this function
-glm::mat4 AssimpChannel::getMatrix(glm::vec3& pos, glm::vec4& rot,
-                                   glm::vec3& sca) {
-  glm::mat4 result(1.0f);
-  result = glm::translate(result, pos);
-  result = result * quarternionToRotationMat4x4(rot);
-  result = glm::scale(result, sca);
-  return result;
-}
-
-ASSIMP_EXTRAP_MODE AssimpChannel::loadExtrapMode(const aiAnimBehaviour& b) {
-  return b & aiAnimBehaviour::aiAnimBehaviour_CONSTANT
-             ? ASSIMP_EXTRAP_MODE::CONSTANT
-         : b & aiAnimBehaviour::aiAnimBehaviour_LINEAR
-             ? ASSIMP_EXTRAP_MODE::LINEAR
-         : b & aiAnimBehaviour::aiAnimBehaviour_REPEAT
-             ? ASSIMP_EXTRAP_MODE::CYCLE
-             : ASSIMP_EXTRAP_MODE::DEFAULT;
-}
-
-std::string AssimpChannel::extraModeToString(ASSIMP_EXTRAP_MODE mode) {
-  switch (mode) {
-    case ASSIMP_EXTRAP_MODE::DEFAULT:
-      return "Default";
-    case ASSIMP_EXTRAP_MODE::CONSTANT:
-      return "Constant";
-    case ASSIMP_EXTRAP_MODE::LINEAR:
-      return "Linear";
-    case ASSIMP_EXTRAP_MODE::CYCLE:
-      return "Cycle";
-    default:
-      return "Unknown";
+  for (size_t i = 0; i < keyframes.size() - 1; i++) {
+    AssimpKeyframe& kf = keyframes[i];
+    AssimpKeyframe& kfNext = keyframes[i + 1];
+    kf.invT = 1.0 / (kfNext.time - kf.time);
+    goal = glm::vec4(kf.val, kfNext.val, (kfNext.time - kf.time) * kf.tangent,
+                     (kfNext.time - kf.time) * kfNext.tangent);
+    ABCD = INV_MAT * goal;
+    kf.a = ABCD.x;
+    kf.b = ABCD.y;
+    kf.c = ABCD.z;
+    kf.d = ABCD.w;
   }
 }
 
-AssimpAnimation::AssimpAnimation() : duration(0), tps(0), currentTimeInMs(0) {}
+float AssimpChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
+                          const A_ANIM_EXTRAP& extrapOut) const {
+  if (keyframes.size() == 1) {
+    return keyframes[0].val;
+  }
 
-void AssimpAnimation::restart() { currentTimeInMs = 0; }
+  if (t < timeStart) {
+    switch (extrapIn) {
+      case A_ANIM_EXTRAP::CONSTANT:
+        return eval(t + timeEnd - timeStart, extrapIn,
+                    extrapOut);  // TODO(eddie): remove this line
+        return keyframes[0].val;
+      case A_ANIM_EXTRAP::LINEAR:
+        return keyframes[0].val + keyframes[0].tangent * (timeStart - t);
+      case A_ANIM_EXTRAP::CYCLE:
+      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      default:
+        return eval(t + timeEnd - timeStart, extrapIn, extrapOut);
+    }
+  } else if (t > timeEnd) {
+    switch (extrapOut) {
+      case A_ANIM_EXTRAP::CONSTANT:
+        return eval(t - timeEnd + timeStart, extrapIn,
+                    extrapOut);  // TODO(eddie): remove this line
+        return keyframes[keyframes.size() - 1].val;
+      case A_ANIM_EXTRAP::LINEAR:
+        return keyframes[keyframes.size() - 1].val +
+               keyframes[keyframes.size() - 1].tangent *
+                   (t - keyframes[keyframes.size() - 1].time);
+      case A_ANIM_EXTRAP::CYCLE:
+      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      default:
+        return eval(t - timeEnd + timeStart, extrapIn, extrapOut);
+    }
+  }
 
-void AssimpAnimation::update(double deltaTimeInMs) {
+  size_t ind = 0;
+  for (; ind < keyframes.size(); ind++) {
+    if (t < keyframes[ind].time) {
+      ind--;
+      break;
+    }
+  }
+
+  const AssimpKeyframe& kf = keyframes[ind];
+  float uTime = (t - kf.time) * kf.invT;
+  return uTime * (uTime * (uTime * kf.a + kf.b) + kf.c) + kf.d;
+}
+
+void AssimpRotChannel::prep() {
+  if (keyframes.empty()) {
+    return;
+  }
+
+  timeStart = keyframes[0].time;
+  timeEnd = keyframes[keyframes.size() - 1].time;
+  if (keyframes.size() == 1) {
+    AssimpRotKeyframe& rkf = keyframes[0];
+    rkf.invT = 1.0f;
+    rkf.diffVal = glm::vec4(0.0f);
+    return;
+  }
+
+  // LERP optimization
+  for (size_t i = 0; i < keyframes.size() - 1; i++) {
+    AssimpRotKeyframe& rkf = keyframes[i];
+    rkf.diffVal = keyframes[i + 1].val - rkf.val;
+  }
+
+  // SLERP optimization
+  for (size_t i = 0; i < keyframes.size() - 1; i++) {
+    AssimpRotKeyframe& rkf = keyframes[i];
+    float dot = glm::dot(rkf.val, keyframes[i + 1].val);
+    if (glm::abs(dot) < SLERP_THRESHOLD) {
+      rkf.nextVal = dot >= 0 ? keyframes[i + 1].val : -keyframes[i + 1].val;
+      rkf.theta = glm::acos(glm::dot(rkf.val, rkf.nextVal));
+      rkf.invTheta = 1.0f / rkf.theta;
+      rkf.useLerp = false;
+    }
+  }
+
+  // Time optimization
+  for (size_t i = 0; i < keyframes.size() - 1; i++) {
+    AssimpRotKeyframe& rkf = keyframes[i];
+    AssimpRotKeyframe& rkfNext = keyframes[i + 1];
+    rkf.invT = 1.0 / (rkfNext.time - rkf.time);
+  }
+}
+
+glm::vec4 AssimpRotChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
+                                 const A_ANIM_EXTRAP& extrapOut) const {
+  if (keyframes.size() == 1) {
+    return keyframes[0].val;
+  }
+
+  if (t < timeStart) {
+    switch (extrapIn) {
+      case A_ANIM_EXTRAP::CONSTANT:
+        return eval(t + timeEnd - timeStart, extrapIn,
+                    extrapOut);  // TODO(eddie): remove this line
+        return keyframes[0].val;
+      case A_ANIM_EXTRAP::CYCLE:
+      case A_ANIM_EXTRAP::LINEAR:   // not supported
+      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      default:
+        return eval(t + timeEnd - timeStart, extrapIn, extrapOut);
+    }
+  } else if (t > timeEnd) {
+    switch (extrapOut) {
+      case A_ANIM_EXTRAP::CONSTANT:
+        return eval(t - timeEnd + timeStart, extrapIn,
+                    extrapOut);  // TODO(eddie): remove this line
+        return keyframes[keyframes.size() - 1].val;
+      case A_ANIM_EXTRAP::LINEAR:  // not supported
+      case A_ANIM_EXTRAP::CYCLE:
+      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      default:
+        return eval(t - timeEnd + timeStart, extrapIn, extrapOut);
+    }
+  }
+
+  size_t ind = 0;
+  for (; ind < keyframes.size(); ind++) {
+    if (t < keyframes[ind].time) {
+      ind--;
+      break;
+    }
+  }
+
+  const AssimpRotKeyframe& rkf = keyframes[ind];
+  float uTime = uTime = (t - rkf.time) * rkf.invT;
+  switch (INTERP_MODE) {
+    case A_ANIM_QUART_INTERP::NONE:
+      return rkf.val;
+    case A_ANIM_QUART_INTERP::LERP:
+      return rkf.val + uTime * rkf.diffVal;
+    case A_ANIM_QUART_INTERP::SLERP:
+      if (rkf.useLerp) {
+        return rkf.val + uTime * rkf.diffVal;
+      }
+      return rkf.invTheta * (glm::sin((1.0f - uTime) * rkf.theta) * rkf.val +
+                             glm::sin(uTime * rkf.theta) * rkf.nextVal);
+  }
+}
+
+// TODO(eddie): return valid ok val
+AssimpAnimNode::AssimpAnimNode(const aiNodeAnim* const aiNodeAnim, bool& ok) {
+  name = aiNodeAnim->mNodeName.C_Str();
+
+  for (int k = 0; k < aiNodeAnim->mNumPositionKeys; k++) {
+    float t = aiNodeAnim->mPositionKeys[k].mTime;
+    glm::vec3 pos = aiVecToVec3(aiNodeAnim->mPositionKeys[k].mValue);
+    posX.keyframes.push_back(AssimpKeyframe{t, pos.x});
+    posY.keyframes.push_back(AssimpKeyframe{t, pos.y});
+    posZ.keyframes.push_back(AssimpKeyframe{t, pos.z});
+  }
+
+  for (int k = 0; k < aiNodeAnim->mNumRotationKeys; k++) {
+    rotQ.keyframes.push_back(AssimpRotKeyframe{
+        static_cast<float>(aiNodeAnim->mRotationKeys[k].mTime),
+        aiQuaternionToVec4(aiNodeAnim->mRotationKeys[k].mValue)});
+  }
+
+  for (int k = 0; k < aiNodeAnim->mNumScalingKeys; k++) {
+    float t = aiNodeAnim->mScalingKeys[k].mTime;
+    glm::vec3 sca = aiVecToVec3(aiNodeAnim->mScalingKeys[k].mValue);
+    scaX.keyframes.push_back(AssimpKeyframe{t, sca.x});
+    scaY.keyframes.push_back(AssimpKeyframe{t, sca.y});
+    scaZ.keyframes.push_back(AssimpKeyframe{t, sca.z});
+  }
+
+  extrapIn = extrapModeOf(aiNodeAnim->mPreState);
+  extrapOut = extrapModeOf(aiNodeAnim->mPostState);
+
+  posX.prep();
+  posY.prep();
+  posZ.prep();
+  scaX.prep();
+  scaY.prep();
+  scaZ.prep();
+  rotQ.prep();
+
+  pos = glm::vec3(posX.eval(0, extrapIn, extrapOut),
+                  posY.eval(0, extrapIn, extrapOut),
+                  posZ.eval(0, extrapIn, extrapOut));
+  sca = glm::vec3(scaX.eval(0, extrapIn, extrapOut),
+                  scaY.eval(0, extrapIn, extrapOut),
+                  scaZ.eval(0, extrapIn, extrapOut));
+  rot = rotQ.eval(0, extrapIn, extrapOut);
+}
+
+void AssimpAnimNode::update(double currentTick) {
+  pos = glm::vec3(posX.eval(currentTick, extrapIn, extrapOut),
+                  posY.eval(currentTick, extrapIn, extrapOut),
+                  posZ.eval(currentTick, extrapIn, extrapOut));
+  sca = glm::vec3(scaX.eval(currentTick, extrapIn, extrapOut),
+                  scaY.eval(currentTick, extrapIn, extrapOut),
+                  scaZ.eval(currentTick, extrapIn, extrapOut));
+  rot = rotQ.eval(currentTick, extrapIn, extrapOut);
+}
+
+AssimpAnimationClip::AssimpAnimationClip()
+    : duration(0), tps(0), currentTimeInMs(0) {}
+
+void AssimpAnimationClip::restart() { currentTimeInMs = 0; }
+
+void AssimpAnimationClip::update(double deltaTimeInMs,
+                                 std::map<std::string, AssimpNode*> nodeMap) {
   if (tps == 0) {
     return;
   }
 
   currentTimeInMs += deltaTimeInMs;
   double currentTick = currentTimeInMs * tps;
-  for (int i = 0; i < channels.size(); i++) {
-    channels[i].eval(currentTick);
+  for (int i = 0; i < nodes.size(); i++) {
+    nodes[i].update(currentTick);
+    nodeMap[nodes[i].name]->animationTransform =
+        getMatrixFromDOFs(nodes[i].pos, nodes[i].rot, nodes[i].sca);
   }
 }
 
-void AssimpAnimation::imGui() {
-  ImGui::Text("name    : %s", name.c_str());
-  ImGui::Text("duration: %f ticks; %f secs", duration, duration / tps);
-  ImGui::Text("tps     : %f t/s", tps);
-  if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)0), "Channels (%lu)",
-                      channels.size())) {
-    for (int i = 0; i < channels.size(); i++) {
-      if (ImGui::TreeNode(reinterpret_cast<void*>((intptr_t)i), "Channel %d",
-                          i)) {
-        AssimpChannel& channel = channels[i];
-        ImGui::Text("name: %s %s", channel.name.c_str(),
-                    channel.node->name.c_str());
-        ImGui::Text(
-            "extrapIn : %s",
-            AssimpChannel::extraModeToString(channel.extrapPre).c_str());
-        ImGui::Text(
-            "extrapOut: %s",
-            AssimpChannel::extraModeToString(channel.extrapPost).c_str());
-        ImGui::Text("Pos(%lu) Rot(%lu) Sca(%lu)", channel.positions.size(),
-                    channel.rotations.size(), channel.scalings.size());
-        ImGui::Text("Start (%f,%f,%f)", channel.positions[0].first,
-                    channel.rotations[0].first, channel.scalings[0].first);
-        ImGui::Text("End   (%f,%f,%f)",
-                    channel.positions[channel.positions.size() - 1].first,
-                    channel.rotations[channel.rotations.size() - 1].first,
-                    channel.scalings[channel.scalings.size() - 1].first);
-        ImGui::TreePop();
+const std::map<AssimpAnimation::PLAYER_AC, std::string>
+    AssimpAnimation::PLAYER_AC_MAP = {
+        {AssimpAnimation::PLAYER_AC::IDLE, "idle"},
+        {AssimpAnimation::PLAYER_AC::WALK, "walk"},
+        {AssimpAnimation::PLAYER_AC::JUMP, "jump"},
+        {AssimpAnimation::PLAYER_AC::TAG, "tag"}};
+const float AssimpAnimation::MS_IDLE_WALK = 500.0f;
+
+bool AssimpAnimation::init(const aiScene* const scene,
+                           const std::map<std::string, AssimpNode*> nodeMap,
+                           bool& isPlayer) {
+  isPlayer = false;
+  this->isPlayer = false;
+
+  for (int i = 0; i < scene->mNumAnimations; i++) {
+    aiAnimation* aiAnimation = scene->mAnimations[i];
+
+    AssimpAnimationClip animation;
+    animation.name = aiAnimation->mName.C_Str();
+    animation.duration = aiAnimation->mDuration;
+    animation.tps = aiAnimation->mTicksPerSecond;
+    printf("Assimp: [LOG] loading animation clip: %s\n",
+           aiAnimation->mName.C_Str());
+    for (int j = 0; j < aiAnimation->mNumChannels; j++) {
+      bool okNode = true;
+      AssimpAnimNode animNode(aiAnimation->mChannels[j], okNode);
+      if (!okNode) {
+        printf("Assimp: [ERROR] loading animation clip %s failed, aborting\n",
+               aiAnimation->mName.C_Str());
+        return false;
       }
+      animation.nodes.push_back(animNode);
     }
-    ImGui::TreePop();
+
+    if (animMap.find(aiAnimation->mName.C_Str()) != animMap.end()) {
+      printf("Assimp: [ERROR] duplicate animation name '%s', aborting\n",
+             aiAnimation->mName.C_Str());
+      return false;
+    }
+
+    animMap[aiAnimation->mName.C_Str()] = animation;
   }
+
+  isPlayer = true;
+  this->isPlayer = true;
+  for (auto& kv : PLAYER_AC_MAP) {
+    if (animMap.find(kv.second) == animMap.end()) {
+      printf("Assimp: [LOG] cannot find animation for player action %s\n",
+             kv.second.c_str());
+      isPlayer = false;
+      this->isPlayer = false;
+    }
+  }
+
+  this->nodeMap = nodeMap;
+}
+
+void AssimpAnimation::update(float deltaTimeInMs) {
+  currTimeInMs += deltaTimeInMs;
+
+  if (!isDissolve && !isReplace) {
+    AssimpAnimationClip& currAnim = animMap[currAnimName];
+    float currentTick = currTimeInMs * currAnim.tps;
+    for (AssimpAnimNode& animNode : currAnim.nodes) {
+      AssimpNode* node = nodeMap[animNode.name];
+      animNode.update(currentTick);
+      node->animationTransform =
+          getMatrixFromDOFs(animNode.pos, animNode.rot, animNode.sca);
+    }
+  }
+}
+
+void AssimpAnimation::useAnimation(std::string animName) {
+  if (animMap.find(animName) == animMap.end()) {
+    return;
+  }
+
+  isDissolve = false;
+  isReplace = false;
+  currTimeInMs = 0.0f;
+  currAnimName = animName;
 }
