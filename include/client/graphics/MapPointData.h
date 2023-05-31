@@ -23,7 +23,12 @@ class MapPointData {
       return;
     }
 
-    point = v[0];
+    vec3f lowest = v[0];
+    for (auto p : v) {
+      if (p.y < lowest.y) lowest = p;
+    }
+    point = lowest;
+
     vertices = v;
   }
 };
