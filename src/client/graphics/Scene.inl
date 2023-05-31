@@ -158,7 +158,6 @@ void Scene::init(void) {
   sceneResources->models["wasp"]->material =
       sceneResources->materials["marble"];
 
-
   // THE player !!!
   sceneResources->models["playerRef"] = new Model;
   sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];

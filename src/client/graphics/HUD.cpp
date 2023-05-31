@@ -118,7 +118,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     glViewport(x, y, size, size);
 
-    Camera viewport;
+    // Camera viewport;
 
     glBegin(GL_TRIANGLES);
     glColor4f(0.0, 0.0, 0.0, 0.5);
@@ -127,14 +127,9 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     glVertex2f(0, 1);
     glEnd();
 
-    // draw the player model
-    viewport.SetDistance(2.5);
-    viewport.UpdateView();
-    glm::mat4 transform =
-        glm::translate(glm::mat4(1), glm::vec3(0.0f, -3.5f, 0.0f));
-    transform *= glm::rotate(glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    scene->sceneResources->models["player"]->draw(
-        viewport.GetViewProjectMtx(), viewport.GetViewMtx(), transform, true);
+    glViewport(x - (2 * scale), y - (10 * scale), size, size);
+    drawIcon("neutral");
+    
     glViewport(0, 0, width, height);
 
     // Draw highlight
@@ -167,6 +162,30 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     x += (size + (25 * scale));
   }
+}
+
+void HUD::drawIcon(std::string icon) {
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  icons[icon].bindgl();
+  glEnable(GL_TEXTURE_2D);
+
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBegin(GL_QUADS);
+
+  glTexCoord2f(1, 0);
+  glVertex3f(1.0f, 1.0f, 0.0f);
+  glTexCoord2f(0, 0);
+  glVertex3f(-1.0f, 1.0f, 0.0f);
+  glTexCoord2f(0, 1);
+  glVertex3f(-1.0f, -1.0f, 0.0f);
+  glTexCoord2f(1, 1);
+  glVertex3f(1.0f, -1.0f, 0.0f);
+
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
+
 }
 
 void HUD::drawMinimap() {

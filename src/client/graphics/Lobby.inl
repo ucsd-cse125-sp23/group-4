@@ -7,6 +7,12 @@ void Lobby::init(void) {
                   // resource)
   sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
 
+  sceneResources->models["playerRef"] = new Model;
+  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
+  // TODO(matthew) copy over mesh too?
+  sceneResources->models["playerRef"]->material =
+      sceneResources->materials["toon.blue"];
+
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
@@ -102,19 +108,19 @@ void Lobby::init(void) {
 
   GameThing* thing_player = new GameThing;
   thing_player->name = "player1";
-  gamethings.push_back(thing_player);
+  models.push_back(thing_player);
 
   GameThing* thing_player2 = new GameThing;
   thing_player2->name = "player2";
-  gamethings.push_back(thing_player2);
+  models.push_back(thing_player2);
 
   GameThing* thing_player3 = new GameThing;
   thing_player3->name = "player3";
-  gamethings.push_back(thing_player3);
+  models.push_back(thing_player3);
 
   GameThing* thing_player4 = new GameThing;
   thing_player4->name = "player4";
-  gamethings.push_back(thing_player4);
+  models.push_back(thing_player4);
 
   // Build the scene graph
   node["player1"] = thing_player;

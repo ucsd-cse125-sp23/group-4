@@ -73,10 +73,7 @@ bool Window::initializeObjects() {
   loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
-  // std::thread x(&Load::load, loadScreen, window);
   gameScene->init();
-  // hud = new HUD(gameScene);
-  // x.join();
 
   glfwMakeContextCurrent(window);
   glfwShowWindow(window);
@@ -191,8 +188,13 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
   if (dynamic_cast<Start*>(gameScene) != nullptr) {
     Start* startScreen = dynamic_cast<Start*>(gameScene);
     if (startScreen->joinGame) {
+      gameScene = new Lobby(Cam);
+      gameScene->init();
+    }
+  } else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
+    Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
+    if (lobby->gameStart) {
       gameScene = new Scene(Cam);
-
       glfwHideWindow(window);
       std::thread x(&Load::load, loadScreen, window);
       gameScene->init();

@@ -3,7 +3,7 @@
 #include "Lobby.inl"
 
 void Lobby::update(float delta) {
-  GameThing* display = gamethings[index];
+  GameThing* display = models[index];
   display->update(delta);
   if (ready) {
     wait.Update(delta);
@@ -18,19 +18,19 @@ void Lobby::update(float delta) {
     }
     if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
       index++;
-      if (index >= gamethings.size()) index = 0;
+      if (index >= models.size()) index = 0;
       buildSceneTree();
     }
     if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
       index--;
-      if (index < 0) index = gamethings.size() - 1;
+      if (index < 0) index = models.size() - 1;
       buildSceneTree();
     }
   }
 }
 
 void Lobby::buildSceneTree() {
-  GameThing* display = gamethings[index];
+  GameThing* display = models[index];
   node["world"]->childnodes.clear();
   node["world"]->childnodes.push_back(node[display->name]);
 }
@@ -172,6 +172,27 @@ void Lobby::drawPlayers() {
     glVertex2f(0, -1);
     glVertex2f(-1, 0);
     glEnd();
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    icons["blushing"].bindgl();
+    glEnable(GL_TEXTURE_2D);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(1, 0);
+    glVertex3f(1.0f, 1.0f, 0.0f);
+    glTexCoord2f(0, 0);
+    glVertex3f(-1.0f, 1.0f, 0.0f);
+    glTexCoord2f(0, 1);
+    glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1, 1);
+    glVertex3f(1.0f, -1.0f, 0.0f);
+
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
 
     x += (size + (30 * scale));
   }

@@ -14,6 +14,7 @@ class HUD {
   Scene* scene;
   Texture map;
   std::vector<Texture> frames;
+  std::map<std::string, Texture> icons;
   int index;
   float offset;
   float timeOnFrame;
@@ -35,12 +36,21 @@ class HUD {
       frame.init(filename.c_str());
       frames.push_back(frame);
     }
+
+    icons["neutral"].init("assets/icons/neutral.png");
+    icons["angry"].init("assets/icons/angry.png");
+    icons["blushing"].init("assets/icons/blushing.png");
+    icons["crying"].init("assets/icons/crying.png");
+    icons["heart"].init("assets/icons/heart.png");
+    icons["side_eye"].init("assets/icons/side_eye.png");
   }
 
   void draw(GLFWwindow* window);
 
   void drawLeaderboard(GLFWwindow* window, float scale,
                        std::map<std::string, Player*> players);
+
+  void drawIcon(std::string icon);
 
   void drawMinimap();
 
