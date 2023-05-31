@@ -86,7 +86,7 @@ void Scene::update(float delta) {
   for (auto& [_, thing] : networkGameThings) thing->update(delta);
 }
 
-message::UserStateUpdate Scene::pollInput() {
+message::UserStateUpdate Scene::pollUpdate() {
   if (!networkGameThings.count(_myPlayerId)) return {};
 
   return networkGameThings.at(_myPlayerId)->pollInput();

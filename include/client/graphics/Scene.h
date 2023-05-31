@@ -168,7 +168,7 @@ class Scene {
   void setToUserFocus(GameThing* t);
   void init(void);
 
-  message::UserStateUpdate pollInput();                  // broadcast to net
+  message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
 
   void update(float delta);

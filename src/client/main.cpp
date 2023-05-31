@@ -150,47 +150,53 @@ int main(int argc, char* argv[]) {
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
-  // Delta time logic (see
-  // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
-  const double limitTPS = 1.0 / 60.0;
-  double lastTime = glfwGetTime();
-  double timer = lastTime;
-  double deltaTimer = 0;
-  int frames = 0, updates = 0;
+  // rate limit sending updates to network, credit:
+  // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step
+  const double min_time_between_updates = 1.0 / 60;
+  double prev_time = glfwGetTime();
+  double num_updates_to_send = 0;
+
+  double time_elapsed = 0;
+  int frame_count = 0;
+  int update_count = 0;
 
   // Loop while GLFW window should stay open.
   while (!game_exit && !glfwWindowShouldClose(window)) {
-    // - Measure time
-    double nowTime = glfwGetTime();
-    double deltaTime = nowTime - lastTime;
-    deltaTimer += (nowTime - lastTime) / limitTPS;  // for network ticks
-    lastTime = nowTime;
-
-    // POLL FROM SERVER
+    // check for updates from server
     client->poll();
 
-    // - Only update network at X frames / sec
-    while (deltaTimer >= 1.0) {
-      // Get a message back of input state
-      message::UserStateUpdate mout = Window::gameScene->pollInput();
+    // update stats
+    frame_count++;
+    double curr_time = glfwGetTime();
+    double time_since_prev_frame = curr_time - prev_time;
+    prev_time = curr_time;
 
-      // OUTPUT TO SERVER
-      if (net_assigned && mout.id >= 0)
-        client->write<message::UserStateUpdate>(mout);
+    // handle updates to server
+    num_updates_to_send += time_since_prev_frame / min_time_between_updates;
+    while (num_updates_to_send >= 1.0) {
+      message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
 
-      updates++;
-      deltaTimer--;
+      // check if update if valid
+      // TODO: in the future, remove this check since the player will definitely
+      // be initialized once we enter the game render loop
+      if (user_update.id == Window::gameScene->_myPlayerId)
+        client->write<message::UserStateUpdate>(user_update);
+
+      update_count++;
+      num_updates_to_send--;
     }
 
-    frames++;
+    // calculate fps/ups
+    time_elapsed += time_since_prev_frame;
+    if (time_elapsed > 1.0) {
+      Window::fps = frame_count / time_elapsed;
+      Window::ups = update_count / time_elapsed;
 
-    // - Reset after one second
-    if (glfwGetTime() - timer > 1.0) {
-      timer++;
-      Window::fps = frames;
-      Window::ups = updates;
-      updates = 0, frames = 0;
+      time_elapsed = 0;
+      update_count = 0;
+      frame_count = 0;
     }
+
     // update and render scene
     Window::update(window, time_since_prev_frame);
     Window::draw(window);
@@ -200,12 +206,6 @@ int main(int argc, char* argv[]) {
   }
 
   Window::cleanUp();
-  // Destroy the window.
   glfwDestroyWindow(window);
-  // Terminate GLFW.
   glfwTerminate();
-
-  exit(EXIT_SUCCESS);
 }
-
-////////////////////////////////////////////////////////////////////////////////
