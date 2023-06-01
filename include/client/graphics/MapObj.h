@@ -13,6 +13,7 @@ that organizes several Meshes with several Materials.
 #include <cstring>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
