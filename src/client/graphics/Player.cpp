@@ -52,10 +52,15 @@ message::UserStateUpdate Player::pollInput() {
 
   if (moving) {
     moveWorld = move(moveLocal);
-    pmodel->setAnimation(AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+    }
   } else {
-    pmodel->setAnimation(
-        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+    }
   }
 
   // Get ready to send a message to the server: ***
