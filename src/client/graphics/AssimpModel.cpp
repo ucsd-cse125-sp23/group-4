@@ -76,11 +76,12 @@ bool AssimpModel::loadAssimp(const char* path) {
 
   bool animIsPlayer = false;
   if (!animation.init(scene, nodeMap, animIsPlayer)) {
-    printf("Assimp: Aborting loading %s\n", name);
+    printf("Assimp: Aborting loading %s\n", name.c_str());
     return false;
   }
-  printf("Assimp: %s\n", animIsPlayer ? "matches a player model"
-                                      : "does not match a player model");
+  printf("Assimp: [LOG] %s %s\n", name.c_str(),
+         animIsPlayer ? "matches a player model"
+                      : "does not match a player model");
 
   betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)),
                               glm::vec3(0, 0, 0));
