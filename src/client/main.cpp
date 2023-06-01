@@ -8,7 +8,6 @@
 // clang-format on
 #include <GL/freeglut_std.h>
 #include <GLFW/glfw3.h>
-#include <conio.h>
 #include <stdlib.h>
 
 #include <boost/asio.hpp>
