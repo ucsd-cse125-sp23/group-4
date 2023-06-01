@@ -20,7 +20,18 @@
  */
 class AssimpModel : public PlayerModel, public SkinnedMesh {
  public:
+  /** Empty constructor
+   *    initialize model by calling loadAssimp()
+   */
   AssimpModel();
+  /** Construct a model using a reference model
+   *    by calling loadAssimp() with stored path of reference model
+   *    DO NOT call loadAssimp() again
+   * IMPORTANT:
+   *   Points to the same Material as the reference model
+   *   Current animation is not inherited
+   */
+  AssimpModel(const AssimpModel& am);
   // TODO
   // ~AssimpModel();
 
@@ -46,6 +57,7 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
 
  private:
   std::string name;
+  std::string path;
 
   unsigned int numNode;
   AssimpNode* rootNode;

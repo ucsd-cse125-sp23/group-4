@@ -12,7 +12,19 @@
 #include "client/graphics/imported/parallel.h"
 #include "client/graphics/imported/stb_image.h"
 
-AssimpModel::AssimpModel() : name("N/A"), rootNode(nullptr), numNode(0) {}
+AssimpModel::AssimpModel() : name("N/A"), path(""), rootNode(nullptr), numNode(0) {}
+
+AssimpModel::AssimpModel(const AssimpModel& am)
+    : numNode(0) {
+  if (!loadAssimp(am.path.c_str())) {
+    printf(
+        "Assimp: [ERROR] loading from reference model failed: cannot find path "
+        "%s\n",
+        am.path.c_str());
+  }
+
+  material = am.material;
+}
 
 bool AssimpModel::loadAssimp(const char* path) {
   if (rootNode) {
@@ -31,6 +43,7 @@ bool AssimpModel::loadAssimp(const char* path) {
 
   name = std::string(path);
   name = name.substr(name.find_last_of('/') + 1);
+  this->path = std::string(path);
 
   prepareNodes(scene);
   if (numNode != nodeMap.size()) {

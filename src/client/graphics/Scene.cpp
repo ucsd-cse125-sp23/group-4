@@ -42,9 +42,12 @@ Player* Scene::createPlayer(int id) {
   // copy into a new model object
   Model* myModel;
   if (dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"])) {
-    myModel = sceneResources->models["playerRef"];
-    player->pmodel =
+    AssimpModel* amRef =
         dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"]);
+    AssimpModel* am = new AssimpModel(*amRef);
+    am->setAnimation("Armature|walk");
+    myModel = am;
+    player->pmodel = am;
   } else {
     myModel = new Model(*sceneResources->models["playerRef"]);
   }
