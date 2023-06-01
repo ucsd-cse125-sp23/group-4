@@ -160,22 +160,36 @@ int main(int argc, char* argv[]) {
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
+  // Check for user ready
   if (!game_exit) {
     std::cout << "Press Enter when you are ready to start..." << std::endl;
 
     while (!Window::readyInput) {  // press enter check
-      Window::draw(window);        // TODO: this should be lobby draw
+      if (glfwWindowShouldClose(window)) {
+        game_exit = true;
+        break;
+      }
+
+      Window::draw(window);  // TODO: this should be lobby draw
       std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
 
-    client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId,
-                                              "", true);
-    std::cout << "Ready!" << std::endl;
+    if (!game_exit) {
+      client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId,
+                                                "", true);
+      std::cout << "Ready!" << std::endl;
+    }
   }
 
+  // After ready, wait until server GameReady message
   while (!game_exit && !is_game_ready) {
+    if (glfwWindowShouldClose(window)) {
+      game_exit = true;
+      break;
+    }
+
     client->poll();
-    Window::draw(window);
+    Window::draw(window);  // TODO: this should be lobby draw
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
@@ -189,7 +203,7 @@ int main(int argc, char* argv[]) {
   int frame_count = 0;
   int update_count = 0;
 
-  // Loop while GLFW window should stay open.
+  // Main game loop
   while (!game_exit && !glfwWindowShouldClose(window)) {
     // check for updates from server
     client->poll();
