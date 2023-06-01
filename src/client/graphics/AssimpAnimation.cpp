@@ -431,7 +431,7 @@ void AssimpAnimation::useAnimation(std::string animName) {
     return;
   }
 
-  if (true) {
+  if (!isPlayer || NAME_TO_AC.find(animName) == NAME_TO_AC.end()) {
     if (currAnimName.compare(animName) != 0) {
       currTimeInMs = 0.0f;
       currAnimName = animName;
