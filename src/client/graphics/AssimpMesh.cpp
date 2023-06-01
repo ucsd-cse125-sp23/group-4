@@ -1,7 +1,6 @@
 #include "AssimpMesh.h"
 
-AssimpMesh::AssimpMesh()
-    : isUpdated(false), isLoaded(false) {}
+AssimpMesh::AssimpMesh() : isUpdated(false), isLoaded(false) {}
 
 void AssimpMesh::draw() {
   if (!isLoaded) {

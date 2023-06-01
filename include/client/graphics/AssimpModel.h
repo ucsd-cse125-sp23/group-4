@@ -6,8 +6,8 @@
 #include <assimp/Importer.hpp>
 #include <map>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "client/graphics/AssimpAnimation.h"
 #include "client/graphics/PlayerModel.h"
