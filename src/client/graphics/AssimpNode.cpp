@@ -1,11 +1,5 @@
 #include "AssimpNode.h"
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
-#include <glm/gtx/string_cast.hpp>
-
 #include "client/graphics/AssimpMath.h"
 #include "client/graphics/imported/parallel.h"
 #include "client/graphics/shader.h"

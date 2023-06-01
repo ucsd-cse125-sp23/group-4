@@ -1,11 +1,5 @@
 #include "AssimpMesh.h"
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
-#include <glm/gtx/string_cast.hpp>
-
 AssimpMesh::AssimpMesh()
     : isUpdated(false), isLoaded(false), isLoaded2(false) {}
 

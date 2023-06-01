@@ -1,9 +1,5 @@
 #include "AssimpAnimation.h"
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
 #include "AssimpMath.h"
 
 void AssimpChannel::prep() {

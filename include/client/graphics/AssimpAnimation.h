@@ -114,7 +114,6 @@ class AssimpAnimationClip {
               std::map<std::string, AssimpNode*> nodeMap);
   void update(double currentTimeInMs,
               std::map<std::string, DissolvePose>& poseMap, bool isBase);
-  void imGui();
 };
 
 class AssimpAnimation {
