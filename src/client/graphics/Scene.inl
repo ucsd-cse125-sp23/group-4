@@ -4,6 +4,7 @@
  *****************************************************/
 #include "client/graphics/Collider.h"
 #include "client/graphics/MapDataImporter.h"
+#include "client/graphics/MapObj.h"
 #include "client/graphics/Scene.h"
 
 #define _USE_MATH_DEFINES
@@ -159,11 +160,10 @@ void Scene::init(void) {
   // Initialize map data
 #pragma region MapImport
   ///// maps:
-  sceneResources->meshes["map"] = new Obj();
-  sceneResources->meshes["map"]->init(config["map_draw_file"]);
-  sceneResources->models["map"] = new Model;
-  sceneResources->models["map"]->mesh = sceneResources->meshes["map"];
-  sceneResources->models["map"]->material = sceneResources->materials["marble"];
+  MapObj* mapVisuals = new MapObj();
+  sceneResources->models["map"] = mapVisuals;
+  mapVisuals->init(config["map_draw_file"]);
+  mapVisuals->material = sceneResources->materials["marble"];
 
   sceneResources->meshes["map9"] = new Obj();
   sceneResources->meshes["map9"]->init(
