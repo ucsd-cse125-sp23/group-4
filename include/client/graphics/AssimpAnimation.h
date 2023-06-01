@@ -134,11 +134,14 @@ class AssimpAnimation {
   void useAnimation(std::string animName);
 
  private:
-  void blendAnimation(const PLAYER_AC& ac);
   static const float MS_DISSOLVE, MS_JUMP;
+  static const std::vector<std::string> NODES_TAG;
+
+  void blendAnimation(const PLAYER_AC& ac);
 
   bool isPlayer = false;
   std::map<std::string, AssimpAnimationClip> animMap;
+  std::map<std::string, AssimpNode*> nodeMap;
 
   // Playback props
   float currTimeInMs = 0.0f;
@@ -146,6 +149,7 @@ class AssimpAnimation {
 
   // Blending props - dissolve (idle, walk, jump)
   PLAYER_AC baseAnim, dissolveAnim;
+  std::map<std::string, DissolvePose> poseMap;
   bool isDissolve = false;
   bool isDissolveReversed = false;
   float timeDissolve = 0.0f;
@@ -154,8 +158,9 @@ class AssimpAnimation {
   bool isJump = false;
   float timeJump = 0.0f;
 
-  // Blending props - replace (jump)
-  bool isReplace = false;
-
-  std::map<std::string, AssimpNode*> nodeMap;
+  // Blending props - replace (tag)
+  // tag takes tag animatio duration amount of time (no blending for now)
+  bool isTag = false, isTagReversed = false;
+  float timeTag = 0.0f;
+  std::vector<size_t> ind_tag;
 };

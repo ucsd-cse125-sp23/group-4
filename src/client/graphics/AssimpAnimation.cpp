@@ -320,6 +320,9 @@ const std::map<std::string, AssimpAnimation::PLAYER_AC>
         {"Armature|tag", AssimpAnimation::PLAYER_AC::TAG}};
 const float AssimpAnimation::MS_DISSOLVE = 0.5f;
 const float AssimpAnimation::MS_JUMP = 0.25f;
+const std::vector<std::string> AssimpAnimation::NODES_TAG(
+    {"R.shoulder", "R.arm", "R.finger", "R.hand", "Body", "neck", "head",
+     "eye"});
 
 bool AssimpAnimation::init(const aiScene* const scene,
                            const std::map<std::string, AssimpNode*> nodeMap,
@@ -371,6 +374,18 @@ bool AssimpAnimation::init(const aiScene* const scene,
   if (isPlayer) {
     baseAnim = PLAYER_AC::IDLE;
     currAnimName = AC_TO_NAME.at(PLAYER_AC::IDLE);
+
+    // prepare tag
+    const AssimpAnimationClip& tag = animMap.at(AC_TO_NAME.at(PLAYER_AC::TAG));
+    for (size_t i = 0; i < tag.nodes.size(); i++) {
+      const AssimpAnimNode& node = tag.nodes[i];
+      for (size_t j = 0; j < NODES_TAG.size(); j++) {
+        if (node.name.find(NODES_TAG[j]) != std::string::npos) {
+          ind_tag.push_back(i);
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -416,7 +431,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       printf("DISSOLVE DEBUG: dissolving\n");
       AssimpAnimationClip& clip0 = animMap.at(AC_TO_NAME.at(baseAnim));
       AssimpAnimationClip& clip1 = animMap.at(AC_TO_NAME.at(dissolveAnim));
-      std::map<std::string, DissolvePose> poseMap;
+      poseMap.clear();
 
       if (baseAnim == PLAYER_AC::JUMP) {
         clip0.update(timeJump, poseMap, true);
@@ -438,7 +453,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
     }
   }
 
-  if (!isDissolve && !isReplace) {
+  if (!isDissolve) {
     animMap[currAnimName].update(currTimeInMs, nodeMap);
   }
 }
@@ -515,5 +530,11 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
       printf("DISSOLVE DEBUG: forwards dissolve\n");
       isDissolveReversed = false;
     }
+  }
+
+  if (ac == PLAYER_AC::TAG && !isTag) {
+    isTag = true;
+    isTagReversed = false;
+    timeTag = 0.0f;
   }
 }
