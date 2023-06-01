@@ -35,6 +35,7 @@ class PObject : public Modifiable {
   bool isStatic();
   CollisionBounds* getBounds();
   virtual void tick();
+  virtual void move(vec3f dPos);
   virtual void onCollision(PObject* other) {}
   virtual void onTrigger(PObject* other) {}
 };

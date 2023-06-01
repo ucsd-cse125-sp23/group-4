@@ -22,11 +22,11 @@ class BoundingShape {
                     const mat4f& thisMtx = mat4f::identity(),
                     const mat4f& otherMtx = mat4f::identity()) const = 0;
   virtual vec3f distance(const BoundingShape* other,
-                const mat4f& thisMtx = mat4f::identity(),
-                const mat4f& otherMtx = mat4f::identity()) const = 0;
+                         const mat4f& thisMtx = mat4f::identity(),
+                         const mat4f& otherMtx = mat4f::identity()) const = 0;
   virtual vec3f distance(const ConvexShape* other,
-                const mat4f& thisMtx = mat4f::identity(),
-                const mat4f& otherMtx = mat4f::identity()) const = 0;
+                         const mat4f& thisMtx = mat4f::identity(),
+                         const mat4f& otherMtx = mat4f::identity()) const = 0;
 
   virtual bool contains(const vec3f& point,
                         const mat4f& thisMtx = mat4f::identity(),

@@ -6,7 +6,7 @@
 #include "core/game/effect/AttractEffects.h"
 
 int TAG_COOLDOWN = 40;
-float JUMP_VELOCITY = 1.2f;
+float JUMP_VELOCITY = 1.2f * 2;
 float GRAVITY_STRENGTH = 0.2f;
 
 int PLAYER_LAYER = 0;

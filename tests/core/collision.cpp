@@ -236,21 +236,21 @@ TEST_CASE("Basic CCD", "[ccd]") {
 
   pair.first->setPos(vec3f(0, 1, 0));
 
-  /*CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(0, -4, 0)),
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(0, -4, 0)).second.w,
              WithinAbs(0.25f, 0.01f));
-  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 0)),
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 0)).second.w,
              WithinAbs(0.25f, 0.01f));
-  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 2)),
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 2)).second.w,
              WithinAbs(0.25f, 0.01f));
-  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(500, -4, 0)),
-             WithinAbs(0.25f, 0.01f));*/
+  CHECK_THAT(
+      level->getEnvironment()->ccd(pair.first, vec3f(50, -4, 0)).second.w,
+             WithinAbs(0.25f, 0.01f));
 
 
   REQUIRE_NOTHROW(terminateLevel());
 }
 void checkCCD(PObject* obj, vec3f dPos) {
-  float t = level->getEnvironment()->ccd(obj, dPos);
-  std::cout << t << std::endl;
+  float t = level->getEnvironment()->ccd(obj, dPos).second.w;
   obj->addPos((dPos - normalize(dPos) * 0.001f) * t);
   CHECK(level->getEnvironment()->collides(obj).empty());
 }
@@ -266,19 +266,16 @@ TEST_CASE("Multi Obsticle CCD", "[ccd]") {
   REQUIRE_NOTHROW(pair = initializePlayer());
 
   pair.first->setPos(vec3f(2.0, 2.0, 0.0));
-
-  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
   checkCCD(pair.first, vec3f(0, -4, 0));
 
   pair.first->setPos(vec3f(2.0, 2.0, 0.0));
-  //checkCCD(pair.first, vec3f(-4, -4, 0));
+  checkCCD(pair.first, vec3f(-4, -4, 0));
 
   pair.first->setPos(vec3f(2.0, 2.0, 0.0));
-  //checkCCD(pair.first, vec3f(-8, 0, 0));
+  checkCCD(pair.first, vec3f(-8, 0, 0));
 
   pair.first->setPos(vec3f(2.0, 2.0, 0.0));
-  //CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(-10, -1, 0)), WithinAbs(0,0));
-
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(0, -2, 50)).second.w, WithinAbs(0.5,0.001));
 
   REQUIRE_NOTHROW(terminateLevel());
 }

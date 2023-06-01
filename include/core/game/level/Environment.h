@@ -4,6 +4,7 @@
 
 #include "core/game/physics/PObject.h"
 #include "core/math/shape/AABShape.h"
+#include <set>
 
 class Environment {
  public:
@@ -18,7 +19,8 @@ class Environment {
   std::vector<PObject*> collides(BoundingShape* shape);
   std::vector<PObject*> collides(PObject* self);
   std::pair<PObject*, vec4f> mtv(PObject* self);
-  float ccd(PObject* self, vec3f dPos);
+  std::pair<PObject*, vec4f> ccd(PObject* self, vec3f dPos,
+                                 std::set<PObject*> ignore = {});
 
   
   struct BVHNode {

@@ -4,6 +4,7 @@
 
 #include "core/util/global.h"
 #include "core/math/shape/MovementShape.h"
+#include "core/math/shape/ExpandedShape.h"
 #include "core/math/shape/ConvexMeshShape.h"
 
 void Environment::addPObject(PObject* obj) {
@@ -188,49 +189,76 @@ std::pair<PObject*, vec4f> Environment::mtv(PObject* self) {
   return std::make_pair(minObj, minMTV);
 }
 
-float Environment::ccd(PObject* self, vec3f dPos) {
+std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos, std::set<PObject*> ignore) {
   CollisionBounds* bounds = self->getBounds();
-  OffsetShape* offsetShape = new OffsetShape(dynamic_cast<const ConvexShape*>(bounds->shape), bounds->getPos());
-  MovementShape* moveShape = new MovementShape(offsetShape, dPos);
+  OffsetShape* offsetShape = new OffsetShape(
+      dynamic_cast<const ConvexShape*>(bounds->shape), bounds->getPos());
+  ExpandedShape* expandedShape = new ExpandedShape(offsetShape, 1.0f);
+  //OffsetShape* startShape = new OffsetShape(expandedShape, normalize(dPos) * 0.05f);
+  MovementShape* moveShape = new MovementShape(expandedShape, dPos);
   std::vector<PObject*> collisions = this->collides(moveShape);
-  if (collisions.empty()) return 1;
+  if (collisions.empty()) return std::make_pair(nullptr, vec4f(0, 0, 0, 1));
+  for (int i = 0; i < collisions.size(); i++) {
+    if (ignore.find(collisions[i]) != ignore.end()) {
+      collisions[i--] = collisions.back();
+      collisions.pop_back();
+    }
+  }
 
   float maxDistSqr = length_squared(dPos);
-  if (maxDistSqr == 0) return 0;
+  if (maxDistSqr == 0) return std::make_pair(nullptr, vec4f(0, 0, 0, 0));
+
+  PObject* lastHit = nullptr;
 
   size_t ite = 0;
-  //vec3f dir = normalize(dPos);
-  vec3f movement = vec3f(0,0,0);
+  vec3f movement = vec3f(0, 0, 0);
   do {
     float minT = 1;
-    for (PObject* obj : collisions) {
-      const CollisionBounds* bounds = obj->getBounds();
-      vec3f distV = offsetShape->distance(
-          bounds->shape, translate(movement),
-          translate_scale(bounds->getPos(), bounds->getScale()));
-      //std::cout << distV << ":" << dot(distV, distV) / dot(dPos, distV)
-      //          << std::endl;
+    for (int i = 0; i < collisions.size(); i++) {
+      const CollisionBounds* objBounds = collisions[i]->getBounds();
+      vec3f distV = expandedShape->distance(
+          objBounds->shape, translate(movement),
+          translate_scale(objBounds->getPos(), objBounds->getScale()));
       if (length_squared(distV) == 0) {
-        minT = 0;
-        break;
+        vec3f trueDist = offsetShape->distance(
+            objBounds->shape, translate(movement),
+            translate_scale(objBounds->getPos(), objBounds->getScale()));
+        if (dot(trueDist, dPos) > 0) {
+          minT = 0;
+          lastHit = collisions[i];
+          break;
+        } else {
+          collisions[i--] = collisions.back();
+          collisions.pop_back();
+          if (i < 0) break;
+        }
       }
-      minT = std::min(minT, dot(distV, distV) / dot(dPos, distV));
+      float t = dot(distV, distV) / dot(dPos, distV);
+      if (0 <= t) {
+        if (t < minT) {
+          minT = t;
+          lastHit = collisions[i];
+        }
+      } else {
+        collisions[i--] = collisions.back();
+        collisions.pop_back();
+      }
     }
-    /*movement += dir * std::sqrt(minDistSqr);*/
-
-    /*float dist = dot(normalize(minDistV), dir);
-    movement += dir * dist;*/
 
     vec3f diff = minT * dPos;
     movement += diff;
     dPos -= diff;
 
-    //std::cout << "movement:" << movement << std::endl;
-    //std::cout << "diff:" << diff << std::endl;
-
     if (length_squared(diff) < TOLERANCE * TOLERANCE) break;
   } while (maxDistSqr - length_squared(movement) > TOLERANCE * TOLERANCE &&
            ++ite < MAX_ITERATIONS);
-  //std::cout << ite << std::endl;
-  return std::min(1.0f, sqrt(dot(movement, movement) / maxDistSqr));
+  float t = std::min(1.0f, sqrt(dot(movement, movement) / maxDistSqr));
+  vec3f norm = vec3f(0, 0, 0);
+  if (lastHit != nullptr) {
+    CollisionBounds* objBounds = lastHit->getBounds();
+    norm = -normalize(offsetShape->distance(
+        objBounds->shape, translate(movement),
+        translate_scale(objBounds->getPos(), objBounds->getScale())));
+  }
+  return std::make_pair(lastHit, vec4f(norm, t));
 }

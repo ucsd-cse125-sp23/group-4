@@ -1,6 +1,7 @@
 #include "core/game/level/Level.h"
 
 #include "core/util/global.h"
+#include "core/game/level/Environment.h"
 
 
 void response(PObject* self, PObject* other, vec4f mtv) {
@@ -48,6 +49,7 @@ void Level::tick() {
     }
   }
 
+  /*
   allIds = this->objects.getAllIds();
   std::vector<PObject*> collisions;
   for (size_t id : allIds) {
@@ -122,6 +124,7 @@ void Level::tick() {
         this->eventManager->fireTriggerEvent(self, obj);
       }
   }
+  */
 
   this->age++;
 }

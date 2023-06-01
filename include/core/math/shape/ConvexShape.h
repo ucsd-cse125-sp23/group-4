@@ -2,7 +2,7 @@
 
 #include "core/math/shape/BoundingShape.h"
 
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 40
 #define TOLERANCE 0.001
 
 
@@ -22,9 +22,10 @@ class ConvexShape : public BoundingShape {
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx,
             const mat3f& thisIMtx, const mat4f& otherMtx,
             const mat3f& otherIMtx) const;
-  vec3f distance(const ConvexShape* other, const mat4f& thisMtx,
+  vec3f distance(const ConvexShape* other,
+                                   const mat4f& thisMtx,
             const mat3f& thisIMtx, const mat4f& otherMtx,
-            const mat3f& otherIMtx) const;
+                 const mat3f& otherIMtx) const;
 
  public:
   ConvexShape() {
@@ -44,11 +45,11 @@ class ConvexShape : public BoundingShape {
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(),
             const mat4f& otherMtx = mat4f::identity()) const override;
   vec3f distance(const BoundingShape* other,
-                const mat4f& thisMtx = mat4f::identity(),
-                const mat4f& otherMtx = mat4f::identity()) const override;
+                 const mat4f& thisMtx = mat4f::identity(),
+                 const mat4f& otherMtx = mat4f::identity()) const override;
   vec3f distance(const ConvexShape* other,
-                const mat4f& thisMtx = mat4f::identity(),
-                const mat4f& otherMtx = mat4f::identity()) const override;
+                 const mat4f& thisMtx = mat4f::identity(),
+                 const mat4f& otherMtx = mat4f::identity()) const override;
   bool contains(const vec3f& point, const mat4f& thisMtx = mat4f::identity(),
                 const mat4f& otherMtx = mat4f::identity()) const override;
   float intersects(const Ray& ray,

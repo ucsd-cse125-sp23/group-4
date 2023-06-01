@@ -244,6 +244,52 @@ bool degenrate(Simplex pts, vec3f support) {
       return true;
   }
 }
+vec3f originPointingNormal(Simplex pts) {
+  //std::cout << "n:" << pts.size() << std::endl;
+  vec3f norm;
+  switch (pts.size()) {
+    case 1:
+      return -pts[0];
+    case 2:
+      return normalize(cross(cross(pts[1] - pts[0], -pts[0]), pts[1] - pts[0]));
+    case 3:
+      norm = normalize(cross(pts[1] - pts[0], pts[2] - pts[0]));
+      if (dot(norm, pts[0]) < 0) return norm;
+      return -norm;
+    case 4:
+      vec3f avg = (pts[0] + pts[1] + pts[2] + pts[3]) / 4.0f;
+      vec3f avg_n = normalize(avg);
+      norm = normalize(cross(pts[1] - pts[0], pts[2] - pts[0]));
+      if (dot(norm, pts[0] - avg) < 0) norm = -norm; // Outward facing normal
+      float d = dot(avg_n, norm);
+
+      vec3f normt = normalize(cross(pts[2] - pts[0], pts[3] - pts[0]));
+      if (dot(norm, pts[0] - avg) < 0) norm = -norm;  // Outward facing normal
+      float dt = dot(avg_n, norm);
+      if (dt < d) {
+        d = dt;
+        norm = normt;
+      }
+
+      normt = normalize(cross(pts[1] - pts[0], pts[3] - pts[0]));
+      if (dot(norm, pts[0] - avg) < 0) norm = -norm;  // Outward facing normal
+      dt = dot(avg_n, norm);
+      if (dt < d) {
+        d = dt;
+        norm = normt;
+      }
+
+      normt = normalize(cross(pts[2] - pts[1], pts[3] - pts[1]));
+      if (dot(norm, pts[1] - avg) < 0) norm = -norm;  // Outward facing normal
+      dt = dot(avg_n, norm);
+      if (dt < d) {
+        d = dt;
+        norm = normt;
+      }
+
+      return norm;
+  }
+}
 vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
                              const mat3f& thisIMtx, const mat4f& otherMtx,
                             const mat3f& otherIMtx) const {
@@ -259,18 +305,6 @@ vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
   while (ite++ < MAX_ITERATIONS) {
     support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                    otherIMtx, dir);
-    /*
-    //std::cout << pts.size() << "::" << dot(support, dir) << " " << support <<
-    " " << dir << std::endl;
-    //std::cout << support << std::endl;
-    if (abs(dot(support, dir)) <= TOLERANCE) return vecToOrigin(pts);
-    if (degenrate(pts,support)) return vecToOrigin(pts);
-    pts.push(support);
-    if(ite > 950) std::cout << pts.size() << " " << pts << std::endl;
-    if (nextSimplex(pts, dir)) return vec3f(0, 0, 0);
-    //std::cout << pts << std::endl << std::endl;
-    dir = normalize(dir);
-    */
     if (degenrate(pts, support)) return dist;
     pts.push(support);
     // std::cout << pts << std::endl;
@@ -305,10 +339,12 @@ vec3f ConvexShape::distance(const BoundingShape* other,
   if (otherIMtx != mat3f::identity()) otherIMtx = inverse(otherIMtx);
 
   const ConvexShape** ptr = other->seperate();
-  vec3f minVec = ptr[0]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
+  vec3f minVec =
+      ptr[0]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
   float minDist = length_squared(minVec);
   for (int i = 1; i < other->count(); i++) {
-    vec3f vec = ptr[i]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
+    vec3f vec =
+        ptr[i]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
     float dist = length_squared(vec);
     if (dist < minDist) {
       minDist = dist;
