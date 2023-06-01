@@ -22,9 +22,10 @@ Server::Server(int port, AcceptHandler accept_handler,
       tick_handler_(tick_handler) {
   std::cout << "(Server::Server) Server running on port " << port << std::endl;
   do_accept();
-  tick();
   io_context_.run();
 }
+
+void Server::start_tick() { tick(); }
 
 void Server::tick() {
   auto prev_time = std::chrono::steady_clock::now();

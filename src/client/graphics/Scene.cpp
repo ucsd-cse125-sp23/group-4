@@ -40,11 +40,18 @@ Player* Scene::createPlayer(int id) {
   }
 
   // LOAD PLAYER ASSETS ---
-  // TODO(assimp)
-
-  // copy prefabs into a new model object
-  // player
-  Model* myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
+  //Model* myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
+  // copy into a new model object
+  Model* myModel;
+  if (dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"])) {
+    AssimpModel* amRef =
+        dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"]);
+    AssimpModel* am = new AssimpModel(*amRef);
+    myModel = am;
+    player->pmodel = am;
+  } else {
+    myModel = new Model(*sceneResources->models["playerRef"]);
+  }
   player->model = myModel;
   // TODO(matthew) set material here! if needed
   sceneResources->models[playername + ".model"] = myModel;

@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(FETCHCONTENT_QUIET FALSE)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+add_compile_definitions(
+  BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX=20)
 
 add_subdirectory(src/config)
 add_subdirectory(src/core)

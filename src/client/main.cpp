@@ -17,6 +17,7 @@
 #include <config/lib.hpp>
 #include <cstdio>
 #include <ctime>
+#include <ios>
 #include <iostream>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
@@ -26,7 +27,7 @@
 #include "Window.h"
 
 bool net_assigned = false;
-
+bool is_game_ready = false;
 bool game_exit = false;
 
 void error_callback(int error, const char* description) {
@@ -87,13 +88,22 @@ std::unique_ptr<Client> network_init() {
 
       net_assigned = true;
     };
+
     auto game_state_update_handler = [](const message::GameStateUpdate& body) {
       Window::gameScene->receiveState(body);
     };
+
+    auto lobby_update_handler = [](const message::LobbyUpdate& body) {};
+
+    auto game_ready_handler = [](const message::GameStart& body) {
+      is_game_ready = true;
+    };
+
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
-        assign_handler, game_state_update_handler, any_handler);
+        assign_handler, game_state_update_handler, lobby_update_handler,
+        game_ready_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
@@ -147,6 +157,18 @@ int main(int argc, char* argv[]) {
     client->poll();
 
     Window::draw(window);  // TODO: this should be lobby draw
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
+  }
+
+  // TODO: replace with lobby UI
+  std::cout << "Press Enter when you are ready to start..." << std::endl;
+  std::cin.get();
+  client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId, "",
+                                            true);
+
+  while (!is_game_ready) {
+    client->poll();
+    Window::draw(window);
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 

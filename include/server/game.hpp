@@ -6,25 +6,30 @@
 
 #include "client/graphics/MapDataImporter.h"
 
-struct GameThing {
-  int id;
-  float heading;
-  Player* player;
-  ControlModifierData* control;
-
+// represents a new Player right now
+// TODO: figure out how to support items later on
+class GameThing {
+ public:
   GameThing(int, Player*, ControlModifierData*);
 
-  void move(float, float, float);  // NOLINT
   void update(const message::UserStateUpdate& update);
+  void remove();
   message::GameStateUpdateItem to_network() const;
+
+ private:
+  void move(float, float, float);  // NOLINT
+
+  int id_;
+  float heading_;
+  Player* player_;
+  ControlModifierData* control_;
 };
 
-// stored in server
 class Game {
  public:
   Game();
 
-  int create_player();
+  int add_player();
   void remove_player(int);
   void update(const message::UserStateUpdate&);
   void tick();
