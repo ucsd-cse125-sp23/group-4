@@ -110,7 +110,7 @@ class AssimpAnimationClip {
   void imGui();
 
  private:
-  double currentTimeInMs;
+  double currentTimeInMs = 0.0f;
 };
 
 class AssimpAnimation {
@@ -138,12 +138,12 @@ class AssimpAnimation {
   std::map<std::string, AssimpAnimationClip> animMap;
 
   // Playback props
-  float currTimeInMs;
+  float currTimeInMs = 0.0f;
   std::string currAnimName;
 
   // Blending props
-  bool isDissolve;  // dissolve: idle, walk, jump
-  bool isReplace;   // replace: tag
+  bool isDissolve = false;  // dissolve: idle, walk, jump
+  bool isReplace = false;   // replace: tag
 
   std::map<std::string, AssimpNode*> nodeMap;
 };

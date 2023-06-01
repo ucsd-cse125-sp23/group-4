@@ -42,7 +42,7 @@ class AssimpMesh {
 
   // Rendering - Basics
   /** indicates whether vertex data needs to be renewed to GL */
-  bool isUpdated;
+  bool isUpdated = false;
   std::vector<unsigned int> indices;
   std::vector<glm::vec3> outPos;
   std::vector<glm::vec3> outNorm;
