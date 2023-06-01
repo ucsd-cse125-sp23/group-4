@@ -63,16 +63,12 @@ class AssimpMesh {
   /** exponent of phong specular equation */
   float shininess;
 
+  void draw();
   void gl_load();
+  void gl_update();
   void gl_delete();
 
-  void draw();
-  void gl_load2();
-  void gl_update2();
-  void gl_delete2();
-
  private:
-  unsigned int VAO, VBO, EBO;
-  unsigned int VAO2, VBO2P, VBO2N, VBO2UV, EBO2;
-  bool isLoaded, isLoaded2;
+  unsigned int VAO, VBOP, VBON, VBOUV, EBO;
+  bool isLoaded;
 };
