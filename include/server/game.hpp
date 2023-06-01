@@ -37,4 +37,7 @@ class Game {
 
  private:
   std::unordered_map<int, GameThing> game_things_;
+
+  std::vector<vec3f> map_spawn_points;
+  // TODO: add other map things here...
 };

@@ -34,12 +34,16 @@ Game::Game() {
   for (auto collider : mapData.colliders) {
     environment->addConvex(collider.vertices, 0.2f);
   }
+  for (auto spawn : mapData.spawnPoints) {
+    map_spawn_points.push_back(spawn.point);
+  }
   initializeLevel(environment);
 }
 
 int Game::add_player() {
   auto [player, control] = initializePlayer();
   game_things_.insert({player->pid, GameThing(player->pid, player, control)});
+  if (map_spawn_points.size() > 0) player->setPos(map_spawn_points[0]);
   return player->pid;
 }
 
