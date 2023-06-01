@@ -17,9 +17,9 @@ class Manager {
 
   int add_player();
   void remove_player(int);
-  message::LobbyUpdate handle_lobby_update(message::LobbyPlayerUpdate&);
+  message::LobbyUpdate handle_lobby_update(const message::LobbyPlayerUpdate&);
   bool check_ready();
-  void handle_game_update(message::UserStateUpdate&);
+  void handle_game_update(const message::UserStateUpdate&);
   void tick_game();
   message::GameStateUpdate get_game_update();
 

@@ -2,15 +2,15 @@
 #include <boost/functional/overloaded_function.hpp>
 #include <config/lib.hpp>
 #include <network/tcp_server.hpp>
-#include <server/game.hpp>
+#include <server/manager.hpp>
 
 int main(int argc, char* argv[]) {
-  auto game = Game();
+  auto manager = Manager();
   std::unordered_map<ClientID, int, boost::hash<ClientID>> pids;
 
-  auto accept_handler = [&game, &pids](ClientID client_id, Server& server) {
+  auto accept_handler = [&manager, &pids](ClientID client_id, Server& server) {
     // assign client their player_id
-    int pid = game.add_player();
+    int pid = manager.add_player();
     pids[client_id] = pid;
     server.write<message::Assign>(client_id, pid);
 
@@ -21,12 +21,12 @@ int main(int argc, char* argv[]) {
     server.write_all<message::Notify>(notification);
   };
 
-  auto close_handler = [&game, &pids](ClientID client_id, Server& server) {
+  auto close_handler = [&manager, &pids](ClientID client_id, Server& server) {
     int pid = pids.at(client_id);
-    game.remove_player(pid);
+    manager.remove_player(pid);
   };
 
-  auto read_handler = [&game](const message::Message& m, Server& server) {
+  auto read_handler = [&manager](const message::Message& m, Server& server) {
     ClientID client_id = m.metadata.id;
 
     auto greeting_handler = [&server,
@@ -37,7 +37,9 @@ int main(int argc, char* argv[]) {
     };
 
     auto user_state_update_handler =
-        [&game](const message::UserStateUpdate& body) { game.update(body); };
+        [&manager](const message::UserStateUpdate& body) {
+          manager.handle_game_update(body);
+        };
 
     auto any_handler = [](const message::Message::Body&) {};
 
@@ -49,11 +51,11 @@ int main(int argc, char* argv[]) {
   auto write_handler = [](std::size_t bytes_transferred,
                           const message::Message& m, Server& server) {};
 
-  auto tick_handler = [&game](Server& server) {
+  auto tick_handler = [&manager](Server& server) {
     // advance game, send update to client
-    game.tick();
-    auto things = game.to_network();
-    server.write_all<message::GameStateUpdate>(things);
+    manager.tick_game();
+    auto update = manager.get_game_update();
+    server.write_all<message::GameStateUpdate>(update);
   };
 
   auto config = get_config();

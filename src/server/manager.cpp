@@ -15,10 +15,8 @@ void Manager::remove_player(int pid) {
 }
 
 message::LobbyUpdate Manager::handle_lobby_update(
-    message::LobbyPlayerUpdate& update) {
-  if (update.is_ready) {
-    players_.at(update.id).is_ready = true;
-  }
+    const message::LobbyPlayerUpdate& update) {
+  if (update.is_ready) players_.at(update.id).is_ready = true;
 
   return get_lobby_update();
 }
@@ -36,10 +34,13 @@ bool Manager::check_ready() {
   for (auto& [_, player] : players_)
     if (player.is_ready) ready_count++;
 
-  return ready_count == MAX_PLAYERS;
+  bool is_ready = ready_count == MAX_PLAYERS;
+  if (is_ready) status_ = Status::InGame;
+
+  return is_ready;
 }
 
-void Manager::handle_game_update(message::UserStateUpdate& update) {
+void Manager::handle_game_update(const message::UserStateUpdate& update) {
   game.update(update);
 }
 
