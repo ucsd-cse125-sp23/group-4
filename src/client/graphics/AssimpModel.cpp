@@ -306,6 +306,8 @@ void AssimpModel::setAnimation(std::string animName) {
 }
 
 void AssimpModel::update(float deltaTimeInMs) {
+  if (!rootNode) return;
+
   animation.update(deltaTimeInMs);
 
   for (unsigned int i = 0; i < meshes.size(); i++) {

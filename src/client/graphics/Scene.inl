@@ -228,10 +228,19 @@ void Scene::init(void) {
   // Setup player/gameplay prefabs
 #pragma region Prefabs
   Model* m_prefab = new Model;
-  sceneResources->models["PREFAB_player.model"] = m_prefab;
+  sceneResources->models["PREFAB_player.model-old"] = m_prefab;
   m_prefab->mesh = sceneResources->meshes["playermodel"];
   // TODO(matthew) copy over mesh too? for animations?
   m_prefab->material = sceneResources->materials["toon.blue"];
+
+
+  AssimpModel* am = new AssimpModel();
+  am->loadAssimp("assets/animation/Animation - Testing.fbx");
+  am->setAnimation("walk");
+  sceneResources->models["PREFAB_player.model"] = am;
+  sceneResources->models["PREFAB_player.model"]->mesh = am;
+  sceneResources->models["PREFAB_player.model"]->material =
+      sceneResources->materials["wood"];
 #pragma endregion
 
   ///////////////////////////////////////////////////////
