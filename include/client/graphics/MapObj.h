@@ -18,18 +18,37 @@ that organizes several Meshes with several Materials.
 
 #include "client/graphics/Model.h"
 
+struct MapObjSubmesh {
+  std::string name;
+  Mesh mesh;
+
+  Material* material = nullptr;
+
+  void trySetMaterial(std::string tag,
+                      std::map<std::string, Material*> resources) {
+    if (tag.length() == 0) return;
+
+    if (resources.count(tag) == 0) return;
+
+    material = resources[tag];
+  }
+};
+
 class MapObj : public Model {
  public:
-  std::vector<Mesh> meshes;
+  std::vector<MapObjSubmesh> meshes;
 
   ~MapObj() {
-    for (auto mesh : meshes) {
-      mesh.cleargl();
+    for (auto mapmesh : meshes) {
+      mapmesh.mesh.cleargl();
     }
   }
 
-  void init(std::string str) { init(str.c_str()); }
-  void init(const char* filename) {
+  void init(std::string str, std::map<std::string, Material*> mr) {
+    init(str.c_str(), mr);
+  }
+  void init(const char* filename,
+            std::map<std::string, Material*> materialResources) {
     unsigned int count = 0;
 
     std::vector<glm::vec3> temp_vertices, vertices;
@@ -57,6 +76,7 @@ class MapObj : public Model {
     std::cout << "\tLoading map obj visuals...";
 
     std::string currObjectName = "";
+    std::string currMaterial = "None";
     while (!feof(file)) {
       char lineHeader[128];
       // read the first word of the line
@@ -91,7 +111,12 @@ class MapObj : public Model {
             submesh.bindgl(vertices, normals, indices);
 
           // place in mesh container
-          meshes.push_back(submesh);
+          MapObjSubmesh sm = MapObjSubmesh();
+          sm.name = currObjectName;
+          sm.mesh = submesh;
+          sm.trySetMaterial(currMaterial, materialResources);
+
+          meshes.push_back(sm);
 
           std::cout << "done." << std::endl;
           count++;
@@ -117,6 +142,11 @@ class MapObj : public Model {
         fscanf(file, "%s", temp_str);
         currObjectName = std::string(temp_str);
 
+      } else if (strcmp(lineHeader, "usemtl") == 0) {
+        currMaterial = "";
+        char temp_str[60];
+        fscanf(file, "%s", temp_str);
+        currMaterial = std::string(temp_str);
       } else if (strcmp(lineHeader, "v") == 0) {
         glm::vec3 vertex;
         fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
@@ -166,15 +196,21 @@ class MapObj : public Model {
             const glm::mat4& transformMtx, const bool ignoreDepth = false) {
     if (!material) return;
 
-    for (auto mesh : meshes) {
-      // actiavte the shader program      ---
-      glUseProgram(material->shader);
+    for (auto mapmesh : meshes) {
+      Material currMat = *material;
 
-      material->setUniforms(viewProjMtx, viewMtx, transformMtx * modelMtx);
+      if (mapmesh.material) {
+        currMat = *(mapmesh.material);
+      }
+
+      // actiavte the shader program      ---
+      glUseProgram(currMat.shader);
+
+      currMat.setUniforms(viewProjMtx, viewMtx, transformMtx * modelMtx);
 
       glDepthFunc(depthFunction);
 
-      mesh.draw();
+      mapmesh.mesh.draw();
 
       glDepthFunc(GL_LESS);
 

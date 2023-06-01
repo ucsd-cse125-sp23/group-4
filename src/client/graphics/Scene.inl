@@ -74,6 +74,14 @@ void Scene::init(void) {
   sceneResources->materials["silver"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
   sceneResources->materials["silver"]->shininess = 50.0f;
 
+  sceneResources->materials["pyramid"] = new Material;
+  sceneResources->materials["pyramid"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["pyramid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["pyramid"]->diffuse = vec4(0.7f, 0.7f, 0.2f, 1.0f);
+  sceneResources->materials["pyramid"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["pyramid"]->shininess = 50.0f;
+
   sceneResources->materials["marble"] = new Material;
   sceneResources->materials["marble"]->shader =
       sceneResources->shaderPrograms["basic"];
@@ -88,7 +96,7 @@ void Scene::init(void) {
       sceneResources->shaderPrograms["basic"];
   sceneResources->materials["grid"]->texture = sceneResources->textures["grid"];
   sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  sceneResources->materials["grid"]->diffuse = vec4(0.3f, 0.3f, 0.3f, 1.0f);
+  sceneResources->materials["grid"]->diffuse = vec4(0.7f, 0.7f, 0.7f, 1.0f);
 
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
@@ -162,7 +170,7 @@ void Scene::init(void) {
   ///// maps:
   MapObj* mapVisuals = new MapObj();
   sceneResources->models["map"] = mapVisuals;
-  mapVisuals->init(config["map_draw_file"]);
+  mapVisuals->init(config["map_draw_file"], sceneResources->materials);
   mapVisuals->material = sceneResources->materials["marble"];
 
   sceneResources->meshes["map9"] = new Obj();
