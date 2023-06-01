@@ -1,6 +1,7 @@
 #include <boost/container_hash/hash.hpp>
 #include <boost/functional/overloaded_function.hpp>
 #include <config/lib.hpp>
+#include <network/message.hpp>
 #include <network/tcp_server.hpp>
 #include <server/manager.hpp>
 
@@ -19,6 +20,9 @@ int main(int argc, char* argv[]) {
     std::string notification =
         "Client " + boost::uuids::to_string(client_id) + " has joined";
     server.write_all<message::Notify>(notification);
+
+    auto update = manager.get_lobby_update();
+    server.write_all<message::LobbyUpdate>(update);
   };
 
   auto close_handler = [&manager, &pids](ClientID client_id, Server& server) {
@@ -41,10 +45,23 @@ int main(int argc, char* argv[]) {
           manager.handle_game_update(body);
         };
 
+    auto lobby_player_update_handler =
+        [&manager, &server](const message::LobbyPlayerUpdate& body) {
+          auto lobby_update = manager.handle_lobby_update(body);
+          server.write_all<message::LobbyUpdate>(lobby_update);
+
+          // if all clients are ready, start the game
+          if (manager.check_ready()) {
+            server.write_all<message::GameStart>();
+            server.start_tick();
+          }
+        };
+
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
-        greeting_handler, user_state_update_handler, any_handler);
+        greeting_handler, user_state_update_handler,
+        lobby_player_update_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 

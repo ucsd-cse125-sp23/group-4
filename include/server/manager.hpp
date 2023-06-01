@@ -18,6 +18,7 @@ class Manager {
   int add_player();
   void remove_player(int);
   message::LobbyUpdate handle_lobby_update(const message::LobbyPlayerUpdate&);
+  message::LobbyUpdate get_lobby_update();
   bool check_ready();
   void handle_game_update(const message::UserStateUpdate&);
   void tick_game();
@@ -31,8 +32,6 @@ class Manager {
     std::string skin;
     bool is_ready;
   };
-
-  message::LobbyUpdate get_lobby_update();
 
   Game game;
   std::unordered_map<int, Player> players_;
