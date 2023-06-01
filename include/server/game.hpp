@@ -3,6 +3,7 @@
 #include <core/lib.hpp>
 #include <network/message.hpp>
 #include <unordered_map>
+#include <vector>
 
 #include "client/graphics/MapDataImporter.h"
 
