@@ -127,13 +127,6 @@ void Scene::init(void) {
       sceneResources->materials["grid"];
 #pragma endregion
 
-  // THE player !!!
-  sceneResources->models["playerRef"] = new Model;
-  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
-  // TODO(matthew) copy over mesh too?
-  sceneResources->models["playerRef"]->material =
-      sceneResources->materials["toon.blue"];
-
   // Import sound palette
 #pragma region Sounds
   SoundEffect* sfx = new SoundEffect();
