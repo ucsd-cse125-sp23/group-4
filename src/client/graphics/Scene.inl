@@ -173,14 +173,6 @@ void Scene::init(void) {
   mapVisuals->init(config["map_draw_file"], sceneResources->materials);
   mapVisuals->material = sceneResources->materials["marble"];
 
-  sceneResources->meshes["map9"] = new Obj();
-  sceneResources->meshes["map9"]->init(
-      "assets/model/map/map.obj");  // TODO(matthew) many materials here
-  sceneResources->models["map9"] = new Model;
-  sceneResources->models["map9"]->mesh = sceneResources->meshes["map9"];
-  sceneResources->models["map9"]->material =
-      sceneResources->materials["marble"];
-
   ///// map data (collisions, fx, etc.):
   MapData mapData = MapDataImporter::Import(config["map_data_file"]);
 

@@ -2,5 +2,5 @@
   "server_address": "localhost",
   "server_port": 2400,
   "map_draw_file": "assets/model/dev/test_colliders_mtl.obj",
-  "map_data_file": "assets/model/dev/test_colliders.obj"
+  "map_data_file": "assets/model/dev/test_colliders_mtl.data.obj"
 }
