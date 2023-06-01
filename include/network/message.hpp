@@ -15,7 +15,16 @@ namespace message {
 
 using ClientID = boost::uuids::uuid;
 
-enum class Type { Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate };
+enum class Type {
+  Assign,
+  Greeting,
+  Notify,
+  GameStateUpdate,
+  UserStateUpdate,
+  LobbyUpdate,
+  LobbyPlayerUpdate,
+  GameStart,
+};
 
 struct Metadata {
   ClientID id;       // client id
@@ -29,8 +38,8 @@ struct Metadata {
 
 struct Assign {
   int pid;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& pid;
@@ -39,8 +48,8 @@ struct Assign {
 
 struct Greeting {
   std::string greeting;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& greeting;
@@ -49,8 +58,8 @@ struct Greeting {
 
 struct Notify {
   std::string message;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& message;
@@ -63,23 +72,19 @@ struct GameStateUpdateItem {
   float posy;
   float posz;
   float heading;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id;
-    ar& posx;
-    ar& posy;
-    ar& posz;
-    ar& heading;
+    ar& id& posx& posy& posz& heading;
   }
 };
 
 struct GameStateUpdate {
   std::unordered_map<int, GameStateUpdateItem> things;
   // add global params later
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& things;
@@ -93,22 +98,51 @@ struct UserStateUpdate {
   float movz;
   bool jump;
   float heading;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id;
-    ar& movx;
-    ar& movy;
-    ar& movz;
-    ar& jump;
-    ar& heading;
+    ar& id& movx& movy& movz& jump& heading;
+  }
+};
+
+struct LobbyPlayer {
+  int id;
+  std::string skin;
+  bool is_ready;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id& skin& is_ready;
+  }
+};
+using LobbyPlayerUpdate = LobbyPlayer;  // type alias for client usage
+
+struct LobbyUpdate {
+  std::unordered_map<int, LobbyPlayer> players;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& players;
+  }
+};
+
+struct GameStart {
+  std::unordered_map<int, bool> client_states;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& client_states;
   }
 };
 
 struct Message {
-  using Body = boost::variant<Assign, Greeting, Notify, GameStateUpdate,
-                              UserStateUpdate>;
+  using Body =
+      boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate,
+                     LobbyUpdate, LobbyPlayerUpdate, GameStart>;
   Type type;
   Metadata metadata;
   Body body;

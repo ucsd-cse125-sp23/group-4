@@ -40,10 +40,20 @@ Type get_type(const Message::Body& body) {
   auto assign = [](const Assign&) { return Type::Assign; };
   auto greeting = [](const Greeting&) { return Type::Greeting; };
   auto notify = [](const Notify&) { return Type::Notify; };
-  auto gamestate = [](const GameStateUpdate&) { return Type::GameStateUpdate; };
-  auto userstate = [](const UserStateUpdate&) { return Type::UserStateUpdate; };
-  auto overload = boost::make_overloaded_function(assign, greeting, notify,
-                                                  gamestate, userstate);
+  auto game_state = [](const GameStateUpdate&) {
+    return Type::GameStateUpdate;
+  };
+  auto user_state = [](const UserStateUpdate&) {
+    return Type::UserStateUpdate;
+  };
+  auto lobby_update = [](const LobbyUpdate&) { return Type::LobbyUpdate; };
+  auto lobby_player_update = [](const LobbyPlayerUpdate&) {
+    return Type::LobbyPlayerUpdate;
+  };
+  auto game_start = [](const GameStart&) { return Type::GameStart; };
+  auto overload = boost::make_overloaded_function(
+      assign, greeting, notify, game_state, user_state, lobby_update,
+      lobby_player_update, game_start);
   return boost::apply_visitor(overload, body);
 }
 
@@ -73,7 +83,7 @@ std::string GameStateUpdateItem::to_string() const {
 
 std::string GameStateUpdate::to_string() const {
   std::string str = "    game_things: [\n";
-  for (auto& [id, thing] : things) {
+  for (auto& [_, thing] : things) {
     str += thing.to_string();
   }
   str += "    ]";
@@ -95,5 +105,29 @@ std::string UserStateUpdate::to_string() const {
   // clang-format on
   return str;
 }
+
+std::string LobbyPlayerUpdate::to_string() const {
+  // clang-format off
+    std::string str = std::string("") +
+      "      {"                                       "\n"
+      "        id: " + std::to_string(id) + "," +       "\n"
+      "        skin: " + skin +                         "\n"
+      "        is_ready: " + std::to_string(is_ready) + "\n"
+      "      },"                                       "\n";
+  // clang-format on
+  return str;
+}
+
+std::string LobbyUpdate::to_string() const {
+  std::string str = "    players: [\n";
+  for (auto& [_, player] : players) {
+    str += player.to_string();
+  }
+  str += "    ]";
+
+  return str;
+}
+
+std::string GameStart::to_string() const { return "    game_start: true"; }
 
 }  // namespace message

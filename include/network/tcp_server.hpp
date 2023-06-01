@@ -24,6 +24,7 @@ class Server {
   Server(int port, AcceptHandler, CloseHandler, ReadHandler, WriteHandler,
          TickHandler);
 
+  void start_tick();
   void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);
   template <typename T, typename... Args>
@@ -31,7 +32,7 @@ class Server {
   template <typename T, typename... Args>
   void write_all(Args&&...);
 
-  constexpr static std::chrono::milliseconds TICK_RATE{50};
+  static constexpr std::chrono::milliseconds TICK_RATE{50};
 
  private:
   void do_accept();
