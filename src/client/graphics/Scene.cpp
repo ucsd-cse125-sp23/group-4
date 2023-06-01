@@ -30,33 +30,46 @@ Player* Scene::createPlayer(int id) {
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
 
   // creating a player to be rendered... TODO call this from state update!
-  std::string playername = "player" + std::to_string(id);
+  std::string playername = "_player" + std::to_string(id);
 
   Player* player = new Player();
+  player->name = playername;
   player->id = id;
   if (isUser) {
     setToUserFocus(player);
   }
-  // player->pmodel = waspModel;            // updating! TODO fix me
 
+  // LOAD PLAYER ASSETS ---
   // copy into a new model object
   Model* myModel;
-  if (dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"])) {
-    AssimpModel* amRef =
-        dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"]);
+  if (dynamic_cast<AssimpModel*>(
+          sceneResources->models["PREFAB_player.model"])) {
+    AssimpModel* amRef = dynamic_cast<AssimpModel*>(
+        sceneResources->models["PREFAB_player.model"]);
     AssimpModel* am = new AssimpModel(*amRef);
     myModel = am;
     player->pmodel = am;
   } else {
-    myModel = new Model(*sceneResources->models["playerRef"]);
+    myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
   }
   player->model = myModel;
+  // TODO(matthew) set material here! if needed
   sceneResources->models[playername + ".model"] = myModel;
+
+  // skin/costume
+  if (false) {
+    Model* myCostume =
+        new Model(*sceneResources->models["PREFAB_player.costume1"]);
+    // player->model = myModel; TODO: support multiple models on player
+    sceneResources->models[playername + ".costume"] = myCostume;
+  }
+
+  // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
-  player->name = playername;
-  player->transform.position = vec3(4 + id * 3, 2, 4 + id * 5);
-  player->transform.updateMtx(&(player->transformMtx));
+  // ---
+
+  // position is set by server message
 
   networkGameThings.insert({id, player});
   node["world"]->childnodes.push_back(player);
@@ -178,6 +191,7 @@ void Scene::draw() {
   camera->UpdateView();
 
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
+  glm::mat4 viewProjOriginMtx = camera->GetViewProjectMtx(true);
   glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
 
   // Define stacks for depth-first search (DFS)
@@ -194,11 +208,10 @@ void Scene::draw() {
   matrix_stack.push(cur_MMtx);
 
   while (!dfs_stack.empty()) {
-    // Detect whether the search runs into infinite loop by checking whether the
-    // stack is longer than the size of the graph. Note that, at any time, the
-    // stack does not contain repeated element.
-    if (dfs_stack.size() > node.size()) {
-      std::cerr << "Error: The scene graph has a closed loop." << std::endl;
+    // Detect whether the search runs into infinite loop
+    if (dfs_stack.size() > std::max(static_cast<int>(node.size()), 100)) {
+      std::cerr << "Error: The scene graph probably has a closed loop."
+                << std::endl;
       exit(-1);
     }
 
@@ -209,7 +222,9 @@ void Scene::draw() {
     matrix_stack.pop();
 
     // draw the visuals of our current node
-    cur->draw(viewProjMtx, viewMtx, cur_MMtx);
+    glm::mat4 vp = viewProjMtx;
+    if (cur->skybox) vp = viewProjOriginMtx;  // not pretty oh well
+    cur->draw(vp, viewMtx, cur_MMtx);
 
     cur->draw_debug(viewProjMtx, cur_MMtx, Scene::_gizmos,
                     _globalSceneResources.models["_gz-xyz"],

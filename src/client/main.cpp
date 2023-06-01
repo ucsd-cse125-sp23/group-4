@@ -8,6 +8,7 @@
 // clang-format on
 #include <GL/freeglut_std.h>
 #include <GLFW/glfw3.h>
+#include <conio.h>
 #include <stdlib.h>
 
 #include <boost/asio.hpp>
@@ -160,13 +161,20 @@ int main(int argc, char* argv[]) {
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
-  // TODO: replace with lobby UI
-  std::cout << "Press Enter when you are ready to start..." << std::endl;
-  std::cin.get();
-  client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId, "",
-                                            true);
+  if (!game_exit) {
+    std::cout << "Press Enter when you are ready to start..." << std::endl;
 
-  while (!is_game_ready) {
+    while (!Window::readyInput) {  // press enter check
+      Window::draw(window);        // TODO: this should be lobby draw
+      std::this_thread::sleep_for(std::chrono::milliseconds(16));
+    }
+
+    client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId,
+                                              "", true);
+    std::cout << "Ready!" << std::endl;
+  }
+
+  while (!game_exit && !is_game_ready) {
     client->poll();
     Window::draw(window);
     std::this_thread::sleep_for(std::chrono::milliseconds(16));

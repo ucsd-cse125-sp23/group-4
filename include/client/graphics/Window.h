@@ -15,6 +15,8 @@ class Window {
   static int fps;
   static int ups;  // updates from network per second
 
+  static bool readyInput;
+
   // Window Properties
   static int width;
   static int height;

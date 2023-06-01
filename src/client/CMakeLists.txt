@@ -102,6 +102,7 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/Skin.cpp
     ${PROJECT_SOURCE_DIR}/graphics/SkinnedMesh.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Texture.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/TextureCube.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Player.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Window.cpp
     ${PROJECT_SOURCE_DIR}/graphics/imported/Tokenizer.cpp

@@ -23,6 +23,8 @@
 int Window::fps;
 int Window::ups;
 
+bool Window::readyInput;
+
 // Window Properties
 int Window::width;
 int Window::height;
@@ -234,6 +236,10 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_ESCAPE:
         // Close the window. This causes the program to also terminate.
         glfwSetWindowShouldClose(window, GL_TRUE);
+        break;
+
+      case GLFW_KEY_ENTER:
+        readyInput = true;
         break;
 
       case GLFW_KEY_R:

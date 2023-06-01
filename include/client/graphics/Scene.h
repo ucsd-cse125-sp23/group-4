@@ -36,8 +36,10 @@
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/Skeleton.h"
+#include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
+#include "client/graphics/TextureCube.h"
 #include "client/graphics/shader.h"
 
 struct Character {
@@ -130,7 +132,8 @@ class Scene {
     _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
     _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-    _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+    _globalSceneResources.meshes["_gz-xyz"]->init(
+        "assets/model/dev/_gizmo.obj");
 
     _globalSceneResources.shaderPrograms["unlit"] =
         LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");

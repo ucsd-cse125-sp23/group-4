@@ -22,6 +22,14 @@ class Texture {
  public:
   GLuint textureID;
 
+  GLenum target = GL_TEXTURE_2D;
+  GLenum targetImage = GL_TEXTURE_2D;
+
+  GLint filtering = GL_NEAREST;
+  GLint wrapping = GL_REPEAT;
+
+  GLenum format = GL_RGBA;
+
   void init(const char* filename);
   void init(const unsigned char* rawImgData, int dataLen);
 
