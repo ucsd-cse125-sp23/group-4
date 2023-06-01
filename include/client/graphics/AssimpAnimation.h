@@ -120,6 +120,8 @@ class AssimpAnimationClip {
 class AssimpAnimation {
  public:
   enum class PLAYER_AC { IDLE, WALK, JUMP, TAG };
+  static const std::map<PLAYER_AC, std::string> AC_TO_NAME;
+  static const std::map<std::string, PLAYER_AC> NAME_TO_AC;
 
   /** Bind animation player to a AssimpModel through passing nodeMap;
    *   returns false if binding fails;
@@ -134,9 +136,6 @@ class AssimpAnimation {
 
  private:
   void blendAnimation(const PLAYER_AC& ac);
-
-  static const std::map<PLAYER_AC, std::string> AC_TO_NAME;
-  static const std::map<std::string, PLAYER_AC> NAME_TO_AC;
   static const float MS_DISSOLVE;
 
   bool isPlayer = false;

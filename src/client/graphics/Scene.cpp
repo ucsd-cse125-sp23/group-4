@@ -45,7 +45,6 @@ Player* Scene::createPlayer(int id) {
     AssimpModel* amRef =
         dynamic_cast<AssimpModel*>(sceneResources->models["playerRef"]);
     AssimpModel* am = new AssimpModel(*amRef);
-    am->setAnimation("Armature|walk");
     myModel = am;
     player->pmodel = am;
   } else {
