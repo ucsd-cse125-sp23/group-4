@@ -417,18 +417,14 @@ void AssimpAnimation::update(float deltaTimeInMs) {
   if (isDissolve) {
     timeDissolve += !isDissolveReversed ? deltaTimeInMs / msCurrent
                                         : -deltaTimeInMs / msCurrent;
-    printf("ASSIMP: ==== %f\n", timeDissolve);
     if (timeDissolve >= 1.0f) {
-      printf("DISSOLVE DEBUG: dissolve done\n");
       isDissolve = false;
       baseAnim = dissolveAnim;
       currAnimName = AC_TO_NAME.at(baseAnim);
     } else if (timeDissolve <= 0.0f) {
-      printf("DISSOLVE DEBUG: dissolve done - case 2\n");
       isDissolve = false;
     } else {
       // blend two output
-      printf("DISSOLVE DEBUG: dissolving\n");
       AssimpAnimationClip& clip0 = animMap.at(AC_TO_NAME.at(baseAnim));
       AssimpAnimationClip& clip1 = animMap.at(AC_TO_NAME.at(dissolveAnim));
       poseMap.clear();
