@@ -63,6 +63,13 @@ message::UserStateUpdate Player::pollInput() {
     }
   }
 
+  if (jumping) {
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
+    }
+  }
+
   // Get ready to send a message to the server: ***
   message::UserStateUpdate myInputState;
   myInputState.id = netId;
