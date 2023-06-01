@@ -161,12 +161,10 @@ int main(int argc, char* argv[]) {
   }
 
   // TODO: replace with lobby UI
-  std::ios_base::sync_with_stdio(false);
   std::cout << "Press Enter when you are ready to start..." << std::endl;
   std::cin.get();
   client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId, "",
                                             true);
-  std::ios_base::sync_with_stdio(true);
 
   while (!is_game_ready) {
     client->poll();
