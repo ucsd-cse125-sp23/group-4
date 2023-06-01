@@ -73,7 +73,7 @@ std::string GameStateUpdateItem::to_string() const {
 
 std::string GameStateUpdate::to_string() const {
   std::string str = "    game_things: [\n";
-  for (auto& [id, thing] : things) {
+  for (auto& [_, thing] : things) {
     str += thing.to_string();
   }
   str += "    ]";

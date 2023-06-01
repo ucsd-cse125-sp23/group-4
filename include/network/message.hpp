@@ -29,8 +29,8 @@ struct Metadata {
 
 struct Assign {
   int pid;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& pid;
@@ -39,8 +39,8 @@ struct Assign {
 
 struct Greeting {
   std::string greeting;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& greeting;
@@ -49,8 +49,8 @@ struct Greeting {
 
 struct Notify {
   std::string message;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& message;
@@ -63,23 +63,19 @@ struct GameStateUpdateItem {
   float posy;
   float posz;
   float heading;
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id;
-    ar& posx;
-    ar& posy;
-    ar& posz;
-    ar& heading;
+    ar& id& posx& posy& posz& heading;
   }
 };
 
 struct GameStateUpdate {
   std::unordered_map<int, GameStateUpdateItem> things;
   // add global params later
-  std::string to_string() const;
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& things;
@@ -93,16 +89,12 @@ struct UserStateUpdate {
   float movz;
   bool jump;
   float heading;
+
   std::string to_string() const;
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id;
-    ar& movx;
-    ar& movy;
-    ar& movz;
-    ar& jump;
-    ar& heading;
+    ar& players;
   }
 };
 
