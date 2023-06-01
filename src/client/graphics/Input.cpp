@@ -14,7 +14,8 @@ std::map<int, InputAction> Input::inputmap = {
     {GLFW_KEY_UP, InputAction::MoveForward},
     {GLFW_KEY_DOWN, InputAction::MoveBack},
     {GLFW_KEY_LEFT, InputAction::MoveLeft},
-    {GLFW_KEY_RIGHT, InputAction::MoveRight}};
+    {GLFW_KEY_RIGHT, InputAction::MoveRight},
+    {GLFW_KEY_E, InputAction::Tag}};
 
 std::pair<bool, bool> Input::pressed[400];
 

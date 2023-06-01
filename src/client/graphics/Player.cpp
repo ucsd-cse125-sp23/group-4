@@ -25,6 +25,7 @@ message::UserStateUpdate Player::pollInput() {
 
   vec3 moveLocal = vec3(0);  // relative to... keyboard
   bool jumping = false;
+  bool tagging = false;
 
   // read inputs
   if (Input::GetInputState(InputAction::MoveForward) != InputState::None) {
@@ -42,6 +43,10 @@ message::UserStateUpdate Player::pollInput() {
 
   if (Input::GetInputState(InputAction::MoveJump) != InputState::None) {
     jumping = true;
+  }
+
+  if (Input::GetInputState(InputAction::Tag) != InputState::None) {
+    tagging = true;
   }
 
   moveLocal = normalize(moveLocal);
@@ -67,6 +72,13 @@ message::UserStateUpdate Player::pollInput() {
     if (pmodel) {
       pmodel->setAnimation(
           AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
+    }
+  }
+
+  if (tagging) {
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TAG));
     }
   }
 
