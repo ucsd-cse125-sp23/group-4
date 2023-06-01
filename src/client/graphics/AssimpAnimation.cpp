@@ -399,7 +399,8 @@ void AssimpAnimation::update(float deltaTimeInMs) {
   }
 
   // hmmm, it's a player!
-  bool donePhase1 = false;
+  bool doneDissolve = false;
+  poseMap.clear();
   if (isJump) {
     AssimpAnimationClip& cJump = animMap.at(AC_TO_NAME.at(PLAYER_AC::JUMP));
     if ((timeJump + deltaTimeInMs) * cJump.tps > cJump.duration) {
@@ -410,12 +411,12 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       msCurrent = MS_JUMP;
     } else {
       timeJump += deltaTimeInMs;
-      cJump.update(timeJump, nodeMap);
-      return;
+      cJump.update(timeJump, poseMap, true);
+      doneDissolve = true;
     }
   }
 
-  if (isDissolve) {
+  if (!doneDissolve && isDissolve) {
     timeDissolve += !isDissolveReversed ? deltaTimeInMs / msCurrent
                                         : -deltaTimeInMs / msCurrent;
     if (timeDissolve >= 1.0f) {
@@ -428,7 +429,6 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       // blend two output
       AssimpAnimationClip& clip0 = animMap.at(AC_TO_NAME.at(baseAnim));
       AssimpAnimationClip& clip1 = animMap.at(AC_TO_NAME.at(dissolveAnim));
-      poseMap.clear();
 
       if (baseAnim == PLAYER_AC::JUMP) {
         clip0.update(timeJump, poseMap, true);
@@ -438,20 +438,49 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       clip1.update(currTimeInMs, poseMap, false);
       for (auto& kv : poseMap) {
         BlendPose& bp = kv.second;
-        glm::vec3 pos, sca;
-        glm::vec4 rot;
-        pos = timeDissolve * bp.pos1 + (1.0f - timeDissolve) * bp.pos2;
-        rot = quarternionInterpolateSpherical(bp.rot1, bp.rot2, timeDissolve);
-        sca = timeDissolve * bp.sca1 + (1.0f - timeDissolve) * bp.sca2;
-        nodeMap[kv.first]->animationTransform =
-            getMatrixFromDOFs(pos, rot, sca);
+        bp.pos1 = timeDissolve * bp.pos1 + (1.0f - timeDissolve) * bp.pos2;
+        bp.rot1 =
+            quarternionInterpolateSpherical(bp.rot1, bp.rot2, timeDissolve);
+        bp.sca1 = timeDissolve * bp.sca1 + (1.0f - timeDissolve) * bp.sca2;
       }
-      return;
+      doneDissolve = true;
     }
   }
 
-  if (!isDissolve) {
-    animMap[currAnimName].update(currTimeInMs, nodeMap);
+  if (!doneDissolve) {
+    animMap[currAnimName].update(currTimeInMs, poseMap, true);
+    doneDissolve = true;
+  }
+
+  if (!isTag) {
+    for (auto& kv : poseMap) {
+      BlendPose& bp = kv.second;
+      nodeMap[kv.first]->animationTransform =
+          getMatrixFromDOFs(bp.pos1, bp.rot1, bp.sca1);
+    }
+  } else {
+    AssimpAnimationClip& tag = animMap.at(AC_TO_NAME.at(PLAYER_AC::TAG));
+    if (timeTag + deltaTimeInMs > tag.duration / tag.tps) {
+      isTag = false;
+      for (auto& kv : poseMap) {
+        BlendPose& bp = kv.second;
+        nodeMap[kv.first]->animationTransform =
+            getMatrixFromDOFs(bp.pos1, bp.rot1, bp.sca1);
+      }
+    } else {
+      timeTag += deltaTimeInMs;
+      for (auto& kv : poseMap) {
+        BlendPose& bp = kv.second;
+        nodeMap[kv.first]->animationTransform =
+            getMatrixFromDOFs(bp.pos1, bp.rot1, bp.sca1);
+      }
+      for (size_t i = 0; i < ind_tag.size(); i++) {
+        AssimpAnimNode& animNode = tag.nodes[ind_tag[i]];
+        animNode.update(timeTag * tag.tps);
+        nodeMap[animNode.name]->animationTransform =
+            getMatrixFromDOFs(animNode.pos, animNode.rot, animNode.sca);
+      }
+    }
   }
 }
 
