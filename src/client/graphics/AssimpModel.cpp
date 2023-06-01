@@ -12,10 +12,11 @@
 #include "client/graphics/imported/parallel.h"
 #include "client/graphics/imported/stb_image.h"
 
-AssimpModel::AssimpModel() : name("N/A"), path(""), rootNode(nullptr), numNode(0) {}
+AssimpModel::AssimpModel()
+    : name("N/A"), path(""), rootNode(nullptr), numNode(0) {}
 
 AssimpModel::AssimpModel(const AssimpModel& am)
-    : numNode(0) {
+    : rootNode(nullptr), numNode(0) {
   if (!loadAssimp(am.path.c_str())) {
     printf(
         "Assimp: [ERROR] loading from reference model failed: cannot find path "
@@ -30,6 +31,7 @@ bool AssimpModel::loadAssimp(const char* path) {
   if (rootNode) {
     return false;
   }
+  printf("Assimp: [LOG] loading file: %s\n", path);
 
   /* Load with assimp importer, check if loading failed */
   Assimp::Importer import;
@@ -37,7 +39,8 @@ bool AssimpModel::loadAssimp(const char* path) {
       import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
       !scene->mRootNode) {
-    printf("ERR::ASSIMP::%s\n", import.GetErrorString());
+    printf("Assimp: [ERROR] assimp loader err msg: %s\n",
+           import.GetErrorString());
     return false;
   }
 
@@ -80,8 +83,8 @@ bool AssimpModel::loadAssimp(const char* path) {
     printf("Assimp: Aborting loading %s\n", name);
     return false;
   }
-  printf("Assimp: %s\n", animIsPlayer ? "does not match a player model"
-                                      : "mathes a player model");
+  printf("Assimp: %s\n", animIsPlayer ? "matches a player model"
+                                      : "does not match a player model");
 
   betterView = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.01f)),
                               glm::vec3(0, 0, 0));

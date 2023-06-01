@@ -70,6 +70,12 @@ struct AssimpRotChannel {
   float timeStart, timeEnd;
 };
 
+struct DissolvePose {
+  glm::vec3 pos1, pos2;
+  glm::vec4 rot1, rot2;
+  glm::vec3 sca1, sca2;
+};
+
 struct AssimpAnimNode {
  public:
   AssimpAnimNode(const aiNodeAnim* const aiNodeAnim, bool& ok);
@@ -104,13 +110,11 @@ class AssimpAnimationClip {
   /** Update the state of the animation
    * deltaTimeInMs: time elapsed since last rendering in miliseconds
    */
-  void update(double deltaTimeInMs, std::map<std::string, AssimpNode*> nodeMap);
-  /** Reset the animation */
-  void restart();
+  void update(double currentTimeInMs,
+              std::map<std::string, AssimpNode*> nodeMap);
+  void update(double currentTimeInMs,
+              std::map<std::string, DissolvePose>& poseMap, bool isBase);
   void imGui();
-
- private:
-  double currentTimeInMs = 0.0f;
 };
 
 class AssimpAnimation {
@@ -126,13 +130,14 @@ class AssimpAnimation {
   bool init(const aiScene* const scene,
             const std::map<std::string, AssimpNode*> nodeMap, bool& isPlayer);
   void update(float deltaTimeInMs);
-
   void useAnimation(std::string animName);
-  void blendAnimation(PLAYER_AC ac, bool isBlend = false);
 
  private:
-  static const std::map<PLAYER_AC, std::string> PLAYER_AC_MAP;
-  static const float MS_IDLE_WALK;
+  void blendAnimation(const PLAYER_AC& ac);
+
+  static const std::map<PLAYER_AC, std::string> AC_TO_NAME;
+  static const std::map<std::string, PLAYER_AC> NAME_TO_AC;
+  static const float MS_DISSOLVE;
 
   bool isPlayer = false;
   std::map<std::string, AssimpAnimationClip> animMap;
@@ -142,8 +147,11 @@ class AssimpAnimation {
   std::string currAnimName;
 
   // Blending props
-  bool isDissolve = false;  // dissolve: idle, walk, jump
-  bool isReplace = false;   // replace: tag
+  PLAYER_AC baseAnim, dissolveAnim;
+  bool isDissolve = false;  // dissolve: idle, walk
+  bool isDissolveReversed = false;
+  float timeDissolve = 0.0f;
+  bool isReplace = false;  // replace: tag
 
   std::map<std::string, AssimpNode*> nodeMap;
 };

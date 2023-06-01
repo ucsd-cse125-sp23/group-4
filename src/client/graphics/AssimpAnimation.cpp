@@ -270,17 +270,39 @@ void AssimpAnimNode::update(double currentTick) {
 }
 
 AssimpAnimationClip::AssimpAnimationClip()
-    : duration(0), tps(0), currentTimeInMs(0) {}
+    : duration(0), tps(0) {}
 
-void AssimpAnimationClip::restart() { currentTimeInMs = 0; }
+void AssimpAnimationClip::update(double currentTimeInMs,
+                                 std::map<std::string, DissolvePose>& poseMap,
+                                 bool isBase) {
+  if (tps == 0) {
+    return;
+  }
 
-void AssimpAnimationClip::update(double deltaTimeInMs,
+  double currentTick = currentTimeInMs * tps;
+  for (int i = 0; i < nodes.size(); i++) {
+    nodes[i].update(currentTick);
+    if (isBase) {
+      DissolvePose dp;
+      dp.pos1 = nodes[i].pos;
+      dp.rot1 = nodes[i].rot;
+      dp.sca1 = nodes[i].sca;
+      poseMap[nodes[i].name] = dp;
+    } else {
+      DissolvePose& dp = poseMap[nodes[i].name];
+      dp.pos2 = nodes[i].pos;
+      dp.rot2 = nodes[i].rot;
+      dp.sca2 = nodes[i].sca;
+    }
+  }
+}
+
+void AssimpAnimationClip::update(double currentTimeInMs,
                                  std::map<std::string, AssimpNode*> nodeMap) {
   if (tps == 0) {
     return;
   }
 
-  currentTimeInMs += deltaTimeInMs;
   double currentTick = currentTimeInMs * tps;
   for (int i = 0; i < nodes.size(); i++) {
     nodes[i].update(currentTick);
@@ -290,12 +312,18 @@ void AssimpAnimationClip::update(double deltaTimeInMs,
 }
 
 const std::map<AssimpAnimation::PLAYER_AC, std::string>
-    AssimpAnimation::PLAYER_AC_MAP = {
-        {AssimpAnimation::PLAYER_AC::IDLE, "idle"},
-        {AssimpAnimation::PLAYER_AC::WALK, "walk"},
-        {AssimpAnimation::PLAYER_AC::JUMP, "jump"},
-        {AssimpAnimation::PLAYER_AC::TAG, "tag"}};
-const float AssimpAnimation::MS_IDLE_WALK = 500.0f;
+    AssimpAnimation::AC_TO_NAME = {
+        {AssimpAnimation::PLAYER_AC::IDLE, "Armature|idel"},
+        {AssimpAnimation::PLAYER_AC::WALK, "Armature|walk"},
+        {AssimpAnimation::PLAYER_AC::JUMP, "Armature|jump"},
+        {AssimpAnimation::PLAYER_AC::TAG, "Armature|tag"}};
+const std::map<std::string, AssimpAnimation::PLAYER_AC>
+    AssimpAnimation::NAME_TO_AC = {
+        {"Armature|idel", AssimpAnimation::PLAYER_AC::IDLE},
+        {"Armature|walk", AssimpAnimation::PLAYER_AC::WALK},
+        {"Armature|jump", AssimpAnimation::PLAYER_AC::JUMP},
+        {"Armature|tag", AssimpAnimation::PLAYER_AC::TAG}};
+const float AssimpAnimation::MS_DISSOLVE = 0.5f;
 
 bool AssimpAnimation::init(const aiScene* const scene,
                            const std::map<std::string, AssimpNode*> nodeMap,
@@ -334,40 +362,121 @@ bool AssimpAnimation::init(const aiScene* const scene,
 
   isPlayer = true;
   this->isPlayer = true;
-  for (auto& kv : PLAYER_AC_MAP) {
-    if (animMap.find(kv.second) == animMap.end()) {
+  for (auto& kv : NAME_TO_AC) {
+    if (animMap.find(kv.first) == animMap.end()) {
       printf("Assimp: [LOG] cannot find animation for player action %s\n",
-             kv.second.c_str());
+             kv.first.c_str());
       isPlayer = false;
       this->isPlayer = false;
     }
   }
 
   this->nodeMap = nodeMap;
+  if (isPlayer) {
+    baseAnim = PLAYER_AC::IDLE;
+    currAnimName = AC_TO_NAME.at(PLAYER_AC::IDLE);
+  }
 }
 
 void AssimpAnimation::update(float deltaTimeInMs) {
   currTimeInMs += deltaTimeInMs;
 
-  if (!isDissolve && !isReplace) {
-    AssimpAnimationClip& currAnim = animMap[currAnimName];
-    float currentTick = currTimeInMs * currAnim.tps;
-    for (AssimpAnimNode& animNode : currAnim.nodes) {
-      AssimpNode* node = nodeMap[animNode.name];
-      animNode.update(currentTick);
-      node->animationTransform =
-          getMatrixFromDOFs(animNode.pos, animNode.rot, animNode.sca);
+  // not a player, just render single animation
+  if (!isPlayer) {
+    animMap[currAnimName].update(currTimeInMs, nodeMap);
+    return;
+  }
+
+  // hmmm, it's a player!
+  if (isDissolve) {
+    timeDissolve += !isDissolveReversed ? deltaTimeInMs / MS_DISSOLVE
+                                        : -deltaTimeInMs / MS_DISSOLVE;
+    printf("ASSIMP: ==== %f\n", timeDissolve);
+    if (timeDissolve >= 1.0f) {
+      printf("DISSOLVE DEBUG: dissolve done\n");
+      isDissolve = false;
+      baseAnim =
+          baseAnim == PLAYER_AC::IDLE ? PLAYER_AC::WALK : PLAYER_AC::IDLE;
+      currAnimName = AC_TO_NAME.at(baseAnim);
+    } else if (timeDissolve <= 0.0f) {
+      printf("DISSOLVE DEBUG: dissolve done - case 2\n");
+      isDissolve = false;
+    } else {
+      // blend two output
+      printf("DISSOLVE DEBUG: dissolving\n");
+      AssimpAnimationClip& clip0 = animMap.at(AC_TO_NAME.at(baseAnim));
+      AssimpAnimationClip& clip1 = animMap.at(AC_TO_NAME.at(dissolveAnim));
+      std::map<std::string, DissolvePose> poseMap;
+      clip0.update(currTimeInMs, poseMap, true);
+      clip1.update(currTimeInMs, poseMap, false);
+      for (auto& kv : poseMap) {
+        DissolvePose& dp = kv.second;
+        glm::vec3 pos, sca;
+        glm::vec4 rot;
+        pos = timeDissolve * dp.pos1 + (1.0f - timeDissolve) * dp.pos2;
+        rot = quarternionInterpolateSpherical(dp.rot1, dp.rot2, timeDissolve);
+        sca = timeDissolve * dp.sca1 + (1.0f - timeDissolve) * dp.sca2;
+        nodeMap[kv.first]->animationTransform =
+            getMatrixFromDOFs(pos, rot, sca);
+      }
+      return;
     }
+  }
+
+  if (!isDissolve && !isReplace) {
+    animMap[currAnimName].update(currTimeInMs, nodeMap);
   }
 }
 
 void AssimpAnimation::useAnimation(std::string animName) {
   if (animMap.find(animName) == animMap.end()) {
+    printf("Assimp: [WARNING] setting animation ignored, %s not found\n",
+           animName.c_str());
     return;
   }
 
-  isDissolve = false;
-  isReplace = false;
-  currTimeInMs = 0.0f;
-  currAnimName = animName;
+  if (true) {
+    if (currAnimName.compare(animName) != 0) {
+      currTimeInMs = 0.0f;
+      currAnimName = animName;
+    }
+    return;
+  }
+
+  PLAYER_AC ac = NAME_TO_AC.at(animName);
+  blendAnimation(ac);
+}
+
+void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
+  if (!isPlayer) {
+    printf("Assimp: [WARNING] ignored blending on non-player model\n");
+    return;
+  }
+
+  if (ac == PLAYER_AC::IDLE || ac == PLAYER_AC::WALK) {
+    printf("DISSOLVE DEBUG: base %s input %s\n",
+           AC_TO_NAME.at(baseAnim).c_str(), AC_TO_NAME.at(ac).c_str());
+    if (ac == baseAnim) {
+      if (isDissolve && !isDissolveReversed) {
+        // backward dissolve
+        printf("DISSOLVE DEBUG: reverse dissolve\n");
+        isDissolveReversed = true;
+      }
+      return;
+    }
+
+    if (!isDissolve) {
+      // start dissolve blending to the other animation
+      printf("DISSOLVE DEBUG: start dissolve\n");
+      isDissolve = true;
+      isDissolveReversed = false;
+      timeDissolve = 0.0f;
+      dissolveAnim =
+          baseAnim == PLAYER_AC::IDLE ? PLAYER_AC::WALK : PLAYER_AC::IDLE;
+    } else {
+      // forward dissolve
+      printf("DISSOLVE DEBUG: forwards dissolve\n");
+      isDissolveReversed = false;
+    }
+  }
 }
