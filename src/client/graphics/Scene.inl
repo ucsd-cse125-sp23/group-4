@@ -49,6 +49,8 @@ void Scene::init(void) {
 
   // Create material palette
 #pragma region Materials
+  Material* mat;
+
   sceneResources->materials["wood"] = new Material;
   sceneResources->materials["wood"]->shader =
       sceneResources->shaderPrograms["basic"];
@@ -56,6 +58,54 @@ void Scene::init(void) {
   sceneResources->materials["wood"]->diffuse = vec4(0.4f, 0.15f, 0.1f, 1.0f);
   sceneResources->materials["wood"]->specular = vec4(0.3f, 0.15f, 0.1f, 1.0f);
   sceneResources->materials["wood"]->shininess = 100.0f;
+
+  mat = new Material;  // leaf
+  mat->shader = sceneResources->shaderPrograms["basic"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.3f, 0.6f, 0.3f, 1.0f);
+  mat->specular = vec4(0.15f, 0.15f, 0.1f, 1.0f);
+  mat->shininess = 100.0f;
+  sceneResources->materials["l"] = mat;
+
+  mat = new Material;  // stem
+  mat->shader = sceneResources->shaderPrograms["basic"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.66f, 0.77f, 0.6f, 1.0f);
+  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->shininess = 100.0f;
+  sceneResources->materials["stem"] = mat;
+
+  mat = new Material;  // tree trunk wood
+  mat->shader = sceneResources->shaderPrograms["basic"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.46f, 0.15f, 0.1f, 1.0f);
+  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->shininess = 100.0f;
+  sceneResources->materials["treetrunk"] = mat;
+
+  mat = new Material;  // river water
+  mat->shader = sceneResources->shaderPrograms["basic"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.16f, 0.15f, 0.9f, 1.0f);
+  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->shininess = 100.0f;
+  sceneResources->materials["river"] = mat;
+
+  mat = new Material;  // cloud
+  mat->shader = sceneResources->shaderPrograms["basic"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.99f, 0.9f, 0.9f, 1.0f);
+  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->shininess = 200.0f;
+  sceneResources->materials["Cloud"] = mat;
+
+  mat = new Material;  // ground
+  mat->shader = sceneResources->shaderPrograms["basic"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.99f, 0.6f, 0.3f, 1.0f);
+  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->shininess = 100.0f;
+  sceneResources->materials["ground"] = mat;
 
   sceneResources->materials["ceramic"] = new Material;
   sceneResources->materials["ceramic"]->shader =

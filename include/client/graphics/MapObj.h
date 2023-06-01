@@ -29,6 +29,12 @@ struct MapObjSubmesh {
                       std::map<std::string, Material*> resources) {
     if (tag.length() == 0) return;
 
+    // process material string a bit
+    size_t found = tag.find('.', 1);
+    if (found != std::string::npos) {
+      tag = tag.substr(0, found);
+    }
+
     if (resources.count(tag) == 0) return;
 
     material = resources[tag];
