@@ -268,7 +268,7 @@ void AssimpAnimNode::update(double currentTick) {
 AssimpAnimationClip::AssimpAnimationClip() : duration(0), tps(0) {}
 
 void AssimpAnimationClip::update(double currentTimeInMs,
-                                 std::map<std::string, DissolvePose>& poseMap,
+                                 std::map<std::string, BlendPose>& poseMap,
                                  bool isBase) {
   if (tps == 0) {
     return;
@@ -278,16 +278,16 @@ void AssimpAnimationClip::update(double currentTimeInMs,
   for (int i = 0; i < nodes.size(); i++) {
     nodes[i].update(currentTick);
     if (isBase) {
-      DissolvePose dp;
-      dp.pos1 = nodes[i].pos;
-      dp.rot1 = nodes[i].rot;
-      dp.sca1 = nodes[i].sca;
-      poseMap[nodes[i].name] = dp;
+      BlendPose bp;
+      bp.pos1 = nodes[i].pos;
+      bp.rot1 = nodes[i].rot;
+      bp.sca1 = nodes[i].sca;
+      poseMap[nodes[i].name] = bp;
     } else {
-      DissolvePose& dp = poseMap[nodes[i].name];
-      dp.pos2 = nodes[i].pos;
-      dp.rot2 = nodes[i].rot;
-      dp.sca2 = nodes[i].sca;
+      BlendPose& bp = poseMap[nodes[i].name];
+      bp.pos2 = nodes[i].pos;
+      bp.rot2 = nodes[i].rot;
+      bp.sca2 = nodes[i].sca;
     }
   }
 }
@@ -399,6 +399,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
   }
 
   // hmmm, it's a player!
+  bool donePhase1 = false;
   if (isJump) {
     AssimpAnimationClip& cJump = animMap.at(AC_TO_NAME.at(PLAYER_AC::JUMP));
     if ((timeJump + deltaTimeInMs) * cJump.tps > cJump.duration) {
@@ -436,12 +437,12 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       }
       clip1.update(currTimeInMs, poseMap, false);
       for (auto& kv : poseMap) {
-        DissolvePose& dp = kv.second;
+        BlendPose& bp = kv.second;
         glm::vec3 pos, sca;
         glm::vec4 rot;
-        pos = timeDissolve * dp.pos1 + (1.0f - timeDissolve) * dp.pos2;
-        rot = quarternionInterpolateSpherical(dp.rot1, dp.rot2, timeDissolve);
-        sca = timeDissolve * dp.sca1 + (1.0f - timeDissolve) * dp.sca2;
+        pos = timeDissolve * bp.pos1 + (1.0f - timeDissolve) * bp.pos2;
+        rot = quarternionInterpolateSpherical(bp.rot1, bp.rot2, timeDissolve);
+        sca = timeDissolve * bp.sca1 + (1.0f - timeDissolve) * bp.sca2;
         nodeMap[kv.first]->animationTransform =
             getMatrixFromDOFs(pos, rot, sca);
       }

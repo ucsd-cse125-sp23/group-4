@@ -70,7 +70,7 @@ struct AssimpRotChannel {
   float timeStart, timeEnd;
 };
 
-struct DissolvePose {
+struct BlendPose {
   glm::vec3 pos1, pos2;
   glm::vec4 rot1, rot2;
   glm::vec3 sca1, sca2;
@@ -112,8 +112,8 @@ class AssimpAnimationClip {
    */
   void update(double currentTimeInMs,
               std::map<std::string, AssimpNode*> nodeMap);
-  void update(double currentTimeInMs,
-              std::map<std::string, DissolvePose>& poseMap, bool isBase);
+  void update(double currentTimeInMs, std::map<std::string, BlendPose>& poseMap,
+              bool isBase);
 };
 
 class AssimpAnimation {
@@ -149,7 +149,7 @@ class AssimpAnimation {
 
   // Blending props - dissolve (idle, walk, jump)
   PLAYER_AC baseAnim, dissolveAnim;
-  std::map<std::string, DissolvePose> poseMap;
+  std::map<std::string, BlendPose> poseMap;
   bool isDissolve = false;
   bool isDissolveReversed = false;
   float timeDissolve = 0.0f;
