@@ -8,6 +8,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 17)
 set(FETCHCONTENT_QUIET FALSE)
 
+add_compile_definitions(
+  BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX=20)
+
 add_subdirectory(src/config)
 add_subdirectory(src/core)
 add_subdirectory(src/network)

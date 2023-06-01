@@ -15,7 +15,15 @@ namespace message {
 
 using ClientID = boost::uuids::uuid;
 
-enum class Type { Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate };
+enum class Type {
+  Assign,
+  Greeting,
+  Notify,
+  GameStateUpdate,
+  UserStateUpdate,
+  LobbyUpdate,
+  LobbyPlayerUpdate
+};
 
 struct Metadata {
   ClientID id;       // client id
@@ -91,7 +99,29 @@ struct UserStateUpdate {
   float heading;
 
   std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id& movx& movy& movz& jump& heading;
+  }
+};
 
+struct LobbyPlayer {
+  int id;
+  std::string skin;
+  bool is_ready;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id& skin& is_ready;
+  }
+};
+using LobbyPlayerUpdate = LobbyPlayer;  // type alias for client usage
+
+struct LobbyUpdate {
+  std::unordered_map<int, LobbyPlayer> players;
+
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& players;
@@ -100,7 +130,7 @@ struct UserStateUpdate {
 
 struct Message {
   using Body = boost::variant<Assign, Greeting, Notify, GameStateUpdate,
-                              UserStateUpdate>;
+                              UserStateUpdate, LobbyUpdate, LobbyPlayerUpdate>;
   Type type;
   Metadata metadata;
   Body body;
