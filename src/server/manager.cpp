@@ -30,7 +30,7 @@ message::LobbyUpdate Manager::get_lobby_update() {
 }
 
 bool Manager::check_ready() {
-  int ready_count;
+  int ready_count = 0;
   for (auto& [_, player] : players_)
     if (player.is_ready) ready_count++;
 
