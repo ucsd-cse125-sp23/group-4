@@ -3,14 +3,14 @@
 #include <unordered_map>
 
 int Manager::add_player() {
-  int pid = game.add_player();
+  int pid = game_.add_player();
   players_.insert({pid, {pid, "", false}});
 
   return pid;
 }
 
 void Manager::remove_player(int pid) {
-  game.remove_player(pid);
+  game_.remove_player(pid);
   players_.erase(pid);
 }
 
@@ -41,11 +41,11 @@ bool Manager::check_ready() {
 }
 
 void Manager::handle_game_update(const message::UserStateUpdate& update) {
-  game.update(update);
+  game_.update(update);
 }
 
-void Manager::tick_game() { game.tick(); }
+void Manager::tick_game() { game_.tick(); }
 
 message::GameStateUpdate Manager::get_game_update() {
-  return {game.to_network()};
+  return {game_.to_network()};
 }

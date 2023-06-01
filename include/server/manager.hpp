@@ -33,6 +33,6 @@ class Manager {
     bool is_ready;
   };
 
-  Game game;
+  Game game_;
   std::unordered_map<int, Player> players_;
 };

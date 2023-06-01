@@ -19,10 +19,10 @@ class GameThing {
  private:
   void move(float, float, float);  // NOLINT
 
-  int id;
-  float heading;
-  Player* player;
-  ControlModifierData* control;
+  int id_;
+  float heading_;
+  Player* player_;
+  ControlModifierData* control_;
 };
 
 class Game {
