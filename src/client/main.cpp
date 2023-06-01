@@ -1,5 +1,4 @@
 // clang-format off
-#include <ios>
 #ifdef __APPLE__
 #define GLFW_INCLUDE_GLCOREARB
 #include <OpenGL/gl3.h>
@@ -18,6 +17,7 @@
 #include <config/lib.hpp>
 #include <cstdio>
 #include <ctime>
+#include <ios>
 #include <iostream>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
