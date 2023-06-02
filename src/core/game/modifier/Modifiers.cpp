@@ -1,39 +1,29 @@
 #include "core/game/modifier/AttractModifier.h"
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/modifier/FreezeModifier.h"
-#include "core/game/modifier/GravityModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
-#include "core/game/modifier/TimedModifier.h"
+#include "core/game/modifier/NumberModifier.h"
 #include "core/util/global.h"
 
-Modifier::Modifier() : Modifier(true) {}
-Modifier::Modifier(bool serverOnly) : serverOnly(serverOnly) {}
 
-TimedModifierData::TimedModifierData(unsigned long long duration) {
+ModifierData::ModifierData(unsigned long long duration)
+    : markedRemove(false) {
   expire = duration == 0 ? 0 : level->getAge() + duration;
 }
-TimedModifier::TimedModifier() : Modifier() {}
-TimedModifier::TimedModifier(bool serverOnly) : Modifier(serverOnly) {}
-void TimedModifier::modify(Modifiable* obj, ModifierData* data) {
-  TimedModifierData* cData = static_cast<TimedModifierData*>(data);
-  if (level->getAge() >= cData->expire && cData->expire > 0)
-    cData->markedRemove = true;
-  timedModify(obj, data);
+void ModifierData::markExpired() {
+  if (level->getAge() >= this->expire && this->expire > 0)
+    this->markedRemove = true;
 }
+Modifier::Modifier() {}
 
-SpeedBoostModifier::SpeedBoostModifier() : TimedModifier(false) {}
-void SpeedBoostModifier::timedModify(Modifiable* obj, ModifierData* data) {
+
+SpeedBoostModifier::SpeedBoostModifier() {}
+void SpeedBoostModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     SpeedBoostModifierData* cData = static_cast<SpeedBoostModifierData*>(data);
     pObj->addPos(cData->factorIncrease * pObj->vel * vec3f(1, 0, 1));
   }
-}
-
-void GravityModifier::timedModify(Modifiable* obj, ModifierData* data) {
-  if (PObject* pObj = dynamic_cast<PObject*>(obj))
-    pObj->vel +=
-        vec3f(0.0f, -static_cast<GravityModifierData*>(data)->gravity, 0.0f);
 }
 
 ControlModifierData::ControlModifierData()
@@ -43,10 +33,13 @@ ControlModifierData::ControlModifierData(float jumpVel)
 void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     ControlModifierData* cData = static_cast<ControlModifierData*>(data);
-    vec3f dv = (cData->horizontalVel - pObj->vel) * 0.6f;
+    vec3f dv = (cData->horizontalVel * MOVE_VELOCITY - pObj->vel) * 0.6f;
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
-    if (!pObj->onGround) dv *= 0.4f;
+    dv *= pObj->onGround ? pObj->modifyValue(1, GRAVITY_MODIFIER) *
+                               sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
+                               pObj->lastSurfaceFriction * 25
+                         : 0.3f;
     pObj->vel.x += dv.x;
     pObj->vel.z += dv.z;
     if (pObj->onGround && cData->doJump) {
@@ -71,7 +64,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
   }
 }
 
-TaggedStatusModifier::TaggedStatusModifier() : Modifier(false) {}
+TaggedStatusModifier::TaggedStatusModifier() {}
 void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     TaggedStatusModifierData* cData =
@@ -86,8 +79,8 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
   }
 }
 
-AttractModifier::AttractModifier() : TimedModifier(false) {}
-void AttractModifier::timedModify(Modifiable* obj, ModifierData* data) {
+AttractModifier::AttractModifier() {}
+void AttractModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     AttractModifierData* cData = static_cast<AttractModifierData*>(data);
     pObj->addPos(cData->factor *
@@ -95,9 +88,32 @@ void AttractModifier::timedModify(Modifiable* obj, ModifierData* data) {
   }
 }
 
-FreezeModifier::FreezeModifier() : TimedModifier(false) {}
-void FreezeModifier::timedModify(Modifiable* obj, ModifierData* data) {
+FreezeModifier::FreezeModifier() {}
+void FreezeModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     pObj->freeze = true;
   }
+}
+
+
+NumberModifier::NumberModifier() {}
+void NumberModifier::modify(Modifiable* obj, ModifierData* data) {}
+float NumberModifier::evaluate(
+    float base, const std::vector<ModifierInstance*>& numberModifiers) {
+  float add = 0, mul = 1;
+  for (auto inst : numberModifiers) {
+    auto* cData = static_cast<NumberModifierData*>(inst->get());
+    switch (cData->op) {
+      case ADD:
+        add += cData->val;
+        break;
+      case ADDMULTIPLY:
+        mul += cData->val;
+        break;
+      case MULTIPLY:
+        base *= cData->val;
+        break;
+    }
+  }
+  return base * mul + add;
 }

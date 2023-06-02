@@ -61,8 +61,10 @@ class Modifiable {
   }
   void tick() {
     for (auto pair : modifiers) {
-      for (auto instance : pair.second)
+      for (auto instance : pair.second) {
         pair.first->modify(this, instance->get());
+        instance->get()->markExpired();
+      }
     }
     removeMarkedModifier();
   }

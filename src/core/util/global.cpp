@@ -6,6 +6,7 @@
 #include "core/game/effect/AttractEffects.h"
 
 int TAG_COOLDOWN = 40;
+float MOVE_VELOCITY = 1.5f;
 float JUMP_VELOCITY = 1.2f;
 float GRAVITY_STRENGTH = 0.2f;
 
@@ -23,10 +24,12 @@ Level* level = nullptr;
 ControlModifier* CONTROL_MODIFIER = new ControlModifier();
 TaggedStatusModifier* TAGGED_STATUS_MODIFIER = new TaggedStatusModifier();
 
-GravityModifier* GRAVITY_MODIFIER = new GravityModifier();
+NumberModifier* GRAVITY_MODIFIER = new NumberModifier();
 SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
 AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
 FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
+
+NumberModifier* FRICTION_MODIFIER = new NumberModifier();
 
 GlobalEffect* SPEEDBOOST_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
@@ -64,13 +67,21 @@ GlobalEffect* SLOW_FALL_EFFECT =
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
             GRAVITY_MODIFIER,
-            new GravityModifierData(-GRAVITY_STRENGTH / 2, 200)));
+            new NumberModifierData(Operation::MULTIPLY, 0.5, 200)));
     });
 GlobalEffect* FAST_FALL_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
-            GRAVITY_MODIFIER, new GravityModifierData(GRAVITY_STRENGTH, 200)));
+            GRAVITY_MODIFIER,
+            new NumberModifierData(Operation::MULTIPLY, 2, 200)));
+    });
+extern GlobalEffect* SLIPPERY_EFFECT =
+    new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
+      for (auto target : targets)
+        target->addModifierInstance(new ModifierInstance(
+            FRICTION_MODIFIER,
+            new NumberModifierData(Operation::MULTIPLY, 0.01, 400)));
     });
 
 int swaptable2[1][2] = {{1, 0}};
@@ -117,6 +128,8 @@ extern GlobalEffect* SLOWDOWN_OTHER_EFFECT = new ContextAwareGlobalEffect(
     SLOWDOWN_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
 extern GlobalEffect* REVERSE_OTHER_EFFECT = new ContextAwareGlobalEffect(
     REVERSE_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
+extern GlobalEffect* SLIPPERY_OTHER_EFFECT = new ContextAwareGlobalEffect(
+    SLIPPERY_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
 
 extern GlobalEffect* SPEEDBOOST_SELF_TAG_STATUS_EFFECT =
     new ContextAwareGlobalEffect(

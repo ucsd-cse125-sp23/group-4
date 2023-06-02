@@ -1,6 +1,8 @@
 #include "core/game/physics/PObject.h"
 
 #include "core/game/level/Level.h"
+#include "core/game/modifier/NumberModifier.h"
+#include "core/util/global.h"
 #include <set>
 
 uint32_t PObject::maxId = 0;
@@ -14,7 +16,9 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   if (other->isStatic()) {
     self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
     self->vel = tangent(self->vel, norm);
-    self->vel -= self->vel * mtv.w * other->getBounds()->friction;
+    self->vel -=
+        self->vel * mtv.w *
+        self->modifyValue(other->getBounds()->friction, FRICTION_MODIFIER);
 
     self->lastSurfaceNormal = norm;
     self->lastSurfaceFriction = other->getBounds()->friction;
@@ -25,10 +29,16 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
 
     self->addPos(vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
     self->vel = tangent(self->vel, norm);
-    self->vel -= self->vel * mtv.w * other->getBounds()->friction * 0.5f;
+    self->vel -=
+        self->vel * mtv.w *
+        self->modifyValue(other->getBounds()->friction, FRICTION_MODIFIER) *
+        0.5f;
     other->addPos(-vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
     other->vel = tangent(other->vel, /* - */ norm);
-    other->vel -= other->vel * mtv.w * self->getBounds()->friction * 0.5f;
+    other->vel -=
+        other->vel * mtv.w *
+        other->modifyValue(self->getBounds()->friction, FRICTION_MODIFIER) *
+        0.5f;
 
     self->lastSurfaceNormal = norm;
     self->lastSurfaceFriction = other->getBounds()->friction * 0.5f;
@@ -58,7 +68,10 @@ PObject::PObject(BoundingShape* shape, unsigned int layer, float friction,
 PObject::~PObject() { delete bounds; }
 void PObject::tick() {
   Modifiable::tick();
+  this->vel.y -= std::max(
+      0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
+  lastSurfaceNormal = vec3f(0, 0, 0);
   lastSurfaceFriction = 0;
   
   move(this->vel);
@@ -97,11 +110,13 @@ void PObject::move(vec3f dPos) {
       float w = length(rDPos - v);
       rDPos = v;
       this->vel = tangent(this->vel, norm);
-      this->vel -= this->vel * w * this->getBounds()->friction;
-      rDPos -= rDPos * w * hit.first->getBounds()->friction;
+      float baseMu = hit.first->getBounds()->friction;
+      float modifiedMu = this->modifyValue(baseMu, FRICTION_MODIFIER);
+      this->vel -= this->vel * w * modifiedMu;
+      rDPos -= rDPos * w * modifiedMu;
 
       this->lastSurfaceNormal = norm;
-      this->lastSurfaceFriction = hit.first->getBounds()->friction;
+      this->lastSurfaceFriction = baseMu;
 
       collided.insert(hit.first);
     }
@@ -142,6 +157,10 @@ void PObject::setPos(vec3f pos) {
 void PObject::addPos(vec3f dPos) { this->setPos(pos + dPos); }
 bool PObject::markedRemove() { return toRemove; }
 void PObject::markRemove() { toRemove = true; }
+
+float PObject::modifyValue(float value, NumberModifier* modifier) {
+  return NumberModifier::evaluate(value, this->getModifiers(modifier));
+}
 
 bool PObject::isStatic() { return this->static_; }
 CollisionBounds* PObject::getBounds() { return this->bounds; }

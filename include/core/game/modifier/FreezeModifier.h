@@ -1,15 +1,14 @@
 #pragma once
 
-#include "core/game/modifier/TimedModifier.h"
+#include "core/game/modifier/Modifier.h"
 #include "core/game/physics/PObject.h"
 #include "core/math/vector.h"
 
-struct FreezeModifierData : TimedModifierData {
-  FreezeModifierData(unsigned long long duration)
-      : TimedModifierData(duration) {}
+struct FreezeModifierData : ModifierData {
+  FreezeModifierData(unsigned long long duration) : ModifierData(duration) {}
 };
-class FreezeModifier : public TimedModifier {
+class FreezeModifier : public Modifier {
  public:
   FreezeModifier();
-  void timedModify(Modifiable* obj, ModifierData* data) override;
+  void modify(Modifiable* obj, ModifierData* data) override;
 };

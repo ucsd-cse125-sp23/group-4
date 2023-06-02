@@ -1,17 +1,17 @@
 #pragma once
 
-#include "core/game/modifier/TimedModifier.h"
+#include "core/game/modifier/Modifier.h"
 #include "core/game/physics/PObject.h"
 #include "core/math/vector.h"
 
-struct AttractModifierData : TimedModifierData {
+struct AttractModifierData : ModifierData {
   PObject* sink;
   float factor;
   AttractModifierData(unsigned long long duration, PObject* sink, float factor)
-      : TimedModifierData(duration), sink(sink), factor(factor) {}
+      : ModifierData(duration), sink(sink), factor(factor) {}
 };
-class AttractModifier : public TimedModifier {
+class AttractModifier : public Modifier {
  public:
   AttractModifier();
-  void timedModify(Modifiable* obj, ModifierData* data) override;
+  void modify(Modifiable* obj, ModifierData* data) override;
 };

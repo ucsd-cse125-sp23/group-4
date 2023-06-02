@@ -7,6 +7,7 @@
 #include "core/game/physics/CollisionBounds.h"
 #include "core/math/vector.h"
 
+class NumberModifier;
 class Level;
 class PObject : public Modifiable {
  private:
@@ -38,6 +39,8 @@ class PObject : public Modifiable {
   virtual void move(vec3f dPos);
   virtual void onCollision(PObject* other) {}
   virtual void onTrigger(PObject* other) {}
+
+  float modifyValue(float value, NumberModifier* modifier);
 
   static void response(PObject* self, PObject* other, vec4f mtv);
 };
