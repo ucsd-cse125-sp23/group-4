@@ -193,8 +193,7 @@ std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos, std::set<
   CollisionBounds* bounds = self->getBounds();
   OffsetShape* offsetShape = new OffsetShape(
       dynamic_cast<const ConvexShape*>(bounds->shape), bounds->getPos());
-  ExpandedShape* expandedShape = new ExpandedShape(offsetShape, 1.0f);
-  //OffsetShape* startShape = new OffsetShape(expandedShape, normalize(dPos) * 0.05f);
+  ExpandedShape* expandedShape = new ExpandedShape(offsetShape, 0.03f);
   MovementShape* moveShape = new MovementShape(expandedShape, dPos);
   std::vector<PObject*> collisions = this->collides(moveShape);
   if (collisions.empty()) return std::make_pair(nullptr, vec4f(0, 0, 0, 1));
@@ -259,6 +258,12 @@ std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos, std::set<
     norm = -normalize(offsetShape->distance(
         objBounds->shape, translate(movement),
         translate_scale(objBounds->getPos(), objBounds->getScale())));
+    if (norm == vec3f(0, 0, 0)) {
+      norm = normalize(vec3f(offsetShape->mtv(
+          objBounds->shape, translate(movement),
+          translate_scale(objBounds->getPos(), objBounds->getScale()))));
+      //std::cout << "deep" << std::endl;
+    } //else std::cout << "shallow" << std::endl;
   }
   return std::make_pair(lastHit, vec4f(norm, t));
 }

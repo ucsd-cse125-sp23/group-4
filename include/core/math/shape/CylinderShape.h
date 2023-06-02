@@ -14,11 +14,18 @@ class CylinderShape : public ConvexShape {
   float halfheight, radius;
 
  protected:
-  vec4f furthestPoint(vec3f dir) const override {
+  vec4f furthestPoint(vec3f dir) const override { /*
     float d = dot(vec3f(0, 1, 0), dir);
     vec3f rad = dir - d * vec3f(0, 1, 0);
     return vec4f(
         normalize(rad) * radius + vec3f(0, 1, 0) * (sign(d) * halfheight),
+        1.0f);*/
+    if (dir.y > 0)
+      return vec4f(
+          vec3f(0.0f, halfheight - radius, 0.0f) + normalize(dir) * radius,
+                   1.0f);
+    return vec4f(
+        vec3f(0.0f, -halfheight + radius, 0.0f) + normalize(dir) * radius,
         1.0f);
   };
 

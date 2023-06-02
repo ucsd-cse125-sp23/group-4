@@ -4,10 +4,9 @@
 #include "core/game/level/Environment.h"
 
 
-void response(PObject* self, PObject* other, vec4f mtv) {
+/*void response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
-  /*If object is falling and mtv is atleast a little up, the we determine the object to
-   * be onGround*/
+  If object is falling and mtv is atleast a little up, the we determine the object to be onGround
   if (self->vel.y < 0 && norm.y / (std::abs(norm.x) + std::abs(norm.z)) > 0.05)
     self->onGround = true;
   if (other->isStatic()) {
@@ -27,7 +26,7 @@ void response(PObject* self, PObject* other, vec4f mtv) {
     self->vel -=
         self->vel * mtv.w * other->getBounds()->friction * 0.5f;
     other->addPos(-vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
-    other->vel = tangent(other->vel, /* - */norm);
+    other->vel = tangent(other->vel, norm);
     other->vel -= other->vel * mtv.w * self->getBounds()->friction * 0.5f;
 
     self->lastSurfaceNormal = norm;
@@ -38,7 +37,7 @@ void response(PObject* self, PObject* other, vec4f mtv) {
 
   other->onCollision(self);
   self->onCollision(other);
-}
+}*/
 void Level::tick() {
   std::vector<size_t> allIds = this->objects.getAllIds();
   for (size_t id : allIds) {

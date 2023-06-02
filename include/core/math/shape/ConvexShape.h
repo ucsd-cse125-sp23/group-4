@@ -2,7 +2,7 @@
 
 #include "core/math/shape/BoundingShape.h"
 
-#define MAX_ITERATIONS 40
+#define MAX_ITERATIONS 60
 #define TOLERANCE 0.001
 
 

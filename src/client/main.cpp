@@ -79,7 +79,7 @@ std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
               << endpoint.port() << std::endl;
   };
   auto read_handler = [&](const message::Message& m, Client& client) {
-    std::cout << "(Connection::read) Received\n" << m << std::endl;
+    //std::cout << "(Connection::read) Received\n" << m << std::endl;
     auto assign_handler = [&](const message::Assign& body) {
       player_id = m.metadata.player_id;
       my_player_id = player_id;
