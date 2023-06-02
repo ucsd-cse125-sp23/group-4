@@ -36,9 +36,9 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
     vec3f dv = (cData->horizontalVel * MOVE_VELOCITY - pObj->vel) * 0.6f;
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
-    dv *= pObj->onGround ? pObj->modifyValue(1, GRAVITY_MODIFIER) *
+    dv *= pObj->onGround ? std::min(1.0f, pObj->modifyValue(1, GRAVITY_MODIFIER) *
                                sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
-                               pObj->lastSurfaceFriction * 25
+                               pObj->lastSurfaceFriction * 25)
                          : 0.3f;
     pObj->vel.x += dv.x;
     pObj->vel.z += dv.z;
