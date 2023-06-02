@@ -41,6 +41,13 @@
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
 
+enum class GamePhase {
+    Start,
+    Lobby,
+    Game,
+    GameOver
+};
+
 class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
@@ -168,9 +175,9 @@ class Scene {
   virtual void init(void);
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
-  void receiveState(message::GameStateUpdate newState);  // receive from net
+  virtual void receiveState(message::GameStateUpdate newState);  // receive from net
 
-  virtual void update(float delta);
+  virtual void update(float delta, GamePhase& phase, bool& transition);
 
   virtual void draw();
 

@@ -1,6 +1,6 @@
 #include "Start.h"
 
-void Start::update(float delta) {
+void Start::update(float delta, GamePhase& phase, bool& transition) {
   timeElapsed += delta;
   offset += (0.25 * delta);
   if (timeElapsed >= 1.0 && renderText) {
@@ -19,6 +19,8 @@ void Start::update(float delta) {
 
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
     joinGame = true;
+    phase = GamePhase::Lobby;
+    transition = true;
   }
 }
 

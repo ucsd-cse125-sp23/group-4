@@ -92,10 +92,22 @@ std::unique_ptr<Client> network_init() {
       Window::gameScene->receiveState(body);
     };
 
-    auto lobby_update_handler = [](const message::LobbyUpdate& body) {};
+    auto lobby_update_handler = [](const message::LobbyUpdate& body) {
+      if (Window::phase == GamePhase::Lobby) {
+        dynamic_cast<Lobby*>(Window::gameScene)->receiveState(body);
+      } else {
+        Window::lobby_update = body;
+      }
+
+    };
 
     auto game_ready_handler = [](const message::GameStart& body) {
-      is_game_ready = true;
+      if (Window::phase != GamePhase::Game) {
+        Window::phase = GamePhase::Game;
+        Window::transition = true;
+        is_game_ready = true;
+      }
+          
     };
 
     auto any_handler = [](const message::Message::Body&) {};
@@ -184,13 +196,15 @@ int main(int argc, char* argv[]) {
   }
 
   // TODO: replace with lobby UI
-  std::cout << "Press Enter when you are ready to start..." << std::endl;
-  std::cin.get();
   client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId, "",
                                             true);
 
   while (!is_game_ready) {
     client->poll();
+    double curr_time = glfwGetTime();
+    double time_since_prev_frame = curr_time - prev_time;
+    prev_time = curr_time;
+    Window::update(window, time_since_prev_frame);
     Window::draw(window);
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
