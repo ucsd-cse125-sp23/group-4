@@ -195,7 +195,7 @@ int main(int argc, char* argv[]) {
 
   // rate limit sending updates to network, credit:
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step
-  const double min_time_between_updates = 1.0 / 60;
+  const double min_time_between_updates = 1.0 / 30;
   double prev_time = glfwGetTime();
   double num_updates_to_send = 0;
 
