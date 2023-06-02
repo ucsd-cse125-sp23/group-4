@@ -4,6 +4,9 @@
 #include <assimp/scene.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "client/graphics/AssimpAnimation.h"
 
 inline glm::vec3 aiVecToVec3(const aiVector3D& vec) {
   return glm::vec3(vec.x, vec.y, vec.z);
@@ -67,4 +70,20 @@ inline glm::mat3 aiQuaternionToMat3x3(const aiQuaternion& q) {
 
 inline glm::mat4 aiQuaternionToMat4x4(const aiQuaternion& q) {
   return glm::mat4(aiQuaternionToMat3x3(q));
+}
+
+inline glm::mat4 getMatrixFromDOFs(const glm::vec3& pos, const glm::vec4& rot,
+                                   const glm::vec3& sca) {
+  glm::mat4 result(1.0f);
+  result = glm::translate(result, pos);
+  result = result * quarternionToRotationMat4x4(rot);
+  result = glm::scale(result, sca);
+  return result;
+}
+
+inline A_ANIM_EXTRAP extrapModeOf(const aiAnimBehaviour& b) {
+  return b & aiAnimBehaviour::aiAnimBehaviour_CONSTANT ? A_ANIM_EXTRAP::CONSTANT
+         : b & aiAnimBehaviour::aiAnimBehaviour_LINEAR ? A_ANIM_EXTRAP::LINEAR
+         : b & aiAnimBehaviour::aiAnimBehaviour_REPEAT ? A_ANIM_EXTRAP::CYCLE
+                                                       : A_ANIM_EXTRAP::DEFAULT;
 }

@@ -1,42 +1,55 @@
 #include <algorithm>
+#include <config/lib.hpp>
 #include <core/lib.hpp>
 #include <network/message.hpp>
 #include <server/game.hpp>
 
 GameThing::GameThing(int id, Player* p, ControlModifierData* c)
-    : id(id), player(p), control(c), heading(0) {}
+    : id_(id), player_(p), control_(c), heading_(0) {}
 
 void GameThing::move(float x, float y, float z) {  // NOLINT
-  control->horizontalVel = vec3f(x, y, z);
+  control_->horizontalVel = vec3f(x, y, z);
 }
 
 void GameThing::update(const message::UserStateUpdate& update) {
   std::cout << "(GameThing::update) Updating GameThing " << update.id
             << std::endl;
-  control->horizontalVel = vec3f(update.movx, update.movy, update.movz);
-  control->doJump = update.jump;
-  heading = update.heading;
+  control_->horizontalVel = vec3f(update.movx, update.movy, update.movz);
+  control_->doJump = update.jump;
+  heading_ = update.heading;
 }
 
+void GameThing::remove() { player_->markRemove(); }
+
 message::GameStateUpdateItem GameThing::to_network() const {
-  return {id, player->getPos().x, player->getPos().y, player->getPos().z,
-          heading};
+  return {id_, player_->getPos().x, player_->getPos().y, player_->getPos().z,
+          heading_};
 }
 
 Game::Game() {
+  auto config = get_config();
+
   Environment* environment = new Environment();
-  std::vector<ColliderData> mapColliders =
-      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
-  for (auto collider : mapColliders) {
+  MapData mapData = MapDataImporter::Import(config["map_data_file"]);
+  for (auto collider : mapData.colliders) {
     environment->addConvex(collider.vertices, 0.2f);
+  }
+  for (auto spawn : mapData.spawnPoints) {
+    map_spawn_points.push_back(spawn.point);
   }
   initializeLevel(environment);
 }
 
-int Game::create_player() {
+int Game::add_player() {
   auto [player, control] = initializePlayer();
   game_things_.insert({player->pid, GameThing(player->pid, player, control)});
+  if (map_spawn_points.size() > 0) player->setPos(map_spawn_points[0]);
   return player->pid;
+}
+
+void Game::remove_player(int pid) {
+  game_things_.at(pid).remove();
+  game_things_.erase(pid);
 }
 
 void Game::update(const message::UserStateUpdate& update) {

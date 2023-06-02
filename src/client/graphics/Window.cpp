@@ -24,6 +24,8 @@
 int Window::fps;
 int Window::ups;
 
+bool Window::readyInput;
+
 // Window Properties
 int Window::width;
 int Window::height;
@@ -182,7 +184,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::idleCallback(GLFWwindow* window, float deltaTime) {
+void Window::update(GLFWwindow* window, float deltaTime) {
   gameScene->update(deltaTime);
 
   if (dynamic_cast<Start*>(gameScene) != nullptr) {
@@ -210,7 +212,7 @@ void Window::idleCallback(GLFWwindow* window, float deltaTime) {
   }
 }
 
-void Window::displayCallback(GLFWwindow* window) {
+void Window::draw(GLFWwindow* window) {
   // Gets events, including input such as keyboard and mouse or window resizing.
   glfwPollEvents();
 
@@ -269,6 +271,10 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_ESCAPE:
         // Close the window. This causes the program to also terminate.
         glfwSetWindowShouldClose(window, GL_TRUE);
+        break;
+
+      case GLFW_KEY_ENTER:
+        readyInput = true;
         break;
 
       case GLFW_KEY_R:

@@ -5,6 +5,7 @@ Mesh is an abstract class for a 3D rendered object.
 #pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 #include <vector>
 
 #include "client/graphics/shader.h"
@@ -23,6 +24,7 @@ class Mesh {
                                 // indices
 
   virtual void init() {}
+  void init(std::string str) { init(str.c_str()); }
   virtual void init(const char* s) {}
 
   virtual void draw(void) {

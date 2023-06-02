@@ -16,6 +16,7 @@
 #include <config/lib.hpp>
 #include <cstdio>
 #include <ctime>
+#include <ios>
 #include <iostream>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
@@ -25,7 +26,7 @@
 #include "Window.h"
 
 bool net_assigned = false;
-
+bool is_game_ready = false;
 bool game_exit = false;
 
 void error_callback(int error, const char* description) {
@@ -86,13 +87,22 @@ std::unique_ptr<Client> network_init() {
 
       net_assigned = true;
     };
+
     auto game_state_update_handler = [](const message::GameStateUpdate& body) {
       Window::gameScene->receiveState(body);
     };
+
+    auto lobby_update_handler = [](const message::LobbyUpdate& body) {};
+
+    auto game_ready_handler = [](const message::GameStart& body) {
+      is_game_ready = true;
+    };
+
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
-        assign_handler, game_state_update_handler, any_handler);
+        assign_handler, game_state_update_handler, lobby_update_handler,
+        game_ready_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
@@ -148,67 +158,79 @@ int main(int argc, char* argv[]) {
     std::cout << "Waiting for server to assign pid..." << std::endl;
     client->poll();
 
-    Window::idleCallback(window, deltaTime);
-    Window::displayCallback(window);  // TODO: this should be lobby draw
+    Window::draw(window);  // TODO: this should be lobby draw
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
-  // Delta time logic (see
-  // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
-  const double limitTPS = 1.0 / 60.0;
-  lastTime = glfwGetTime();
-  double timer = lastTime;
-  double deltaTimer = 0;
-  int frames = 0, updates = 0;
+  if (!game_exit) {
+    std::cout << "Press Enter when you are ready to start..." << std::endl;
+
+    while (!Window::readyInput) {  // press enter check
+      Window::draw(window);        // TODO: this should be lobby draw
+      std::this_thread::sleep_for(std::chrono::milliseconds(16));
+    }
+
+    client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId,
+                                              "", true);
+    std::cout << "Ready!" << std::endl;
+  }
+
+  // rate limit sending updates to network, credit:
+  // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step
+  const double min_time_between_updates = 1.0 / 60;
+  double prev_time = glfwGetTime();
+  double num_updates_to_send = 0;
+
+  double time_elapsed = 0;
+  int frame_count = 0;
+  int update_count = 0;
 
   // Loop while GLFW window should stay open.
   while (!game_exit && !glfwWindowShouldClose(window)) {
-    // - Measure time
-    double nowTime = glfwGetTime();
-    double deltaTime = nowTime - lastTime;
-    deltaTimer += (nowTime - lastTime) / limitTPS;  // for network ticks
-    lastTime = nowTime;
-
-    // POLL FROM SERVER
+    // check for updates from server
     client->poll();
 
-    // - Only update network at X frames / sec
-    while (deltaTimer >= 1.0) {
-      // Get a message back of input state
-      message::UserStateUpdate mout = Window::gameScene->pollInput();
+    // update stats
+    frame_count++;
+    double curr_time = glfwGetTime();
+    double time_since_prev_frame = curr_time - prev_time;
+    prev_time = curr_time;
 
-      // OUTPUT TO SERVER
-      if (net_assigned && mout.id >= 0)
-        client->write<message::UserStateUpdate>(mout);
+    // handle updates to server
+    num_updates_to_send += time_since_prev_frame / min_time_between_updates;
+    while (num_updates_to_send >= 1.0) {
+      message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
 
-      updates++;
-      deltaTimer--;
+      // check if update if valid
+      // TODO: in the future, remove this check since the player will definitely
+      // be initialized once we enter the game render loop
+      if (user_update.id == Window::gameScene->_myPlayerId)
+        client->write<message::UserStateUpdate>(user_update);
+
+      update_count++;
+      num_updates_to_send--;
     }
 
-    // Main render display callback. Rendering of objects is done here.
-    Window::idleCallback(window, deltaTime);
-    Window::displayCallback(window);
-    frames++;
+    // calculate fps/ups
+    time_elapsed += time_since_prev_frame;
+    if (time_elapsed > 1.0) {
+      Window::fps = frame_count / time_elapsed;
+      Window::ups = update_count / time_elapsed;
 
-    // - Reset after one second
-    if (glfwGetTime() - timer > 1.0) {
-      timer++;
-      Window::fps = frames;
-      Window::ups = updates;
-      updates = 0, frames = 0;
+      time_elapsed = 0;
+      update_count = 0;
+      frame_count = 0;
     }
+
+    // update and render scene
+    Window::update(window, time_since_prev_frame);
+    Window::draw(window);
 
     // prevent drawing too fast...
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 
   Window::cleanUp();
-  // Destroy the window.
   glfwDestroyWindow(window);
-  // Terminate GLFW.
   glfwTerminate();
-
-  exit(EXIT_SUCCESS);
 }
-
-////////////////////////////////////////////////////////////////////////////////

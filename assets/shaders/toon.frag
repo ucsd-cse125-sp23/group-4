@@ -46,13 +46,13 @@ void main()
 
 	vec3 color;
 
-	lightsum = sqrt(lightsum);
+	//lightsum = sqrt(lightsum);
 
 	// Stepped lighting ramp
 	if(length(lightsum) > 1.85) {
 		color = diffuseColor * 1.2;
 	}
-	else if(length(lightsum) > 0.70) {
+	else if(length(lightsum) > 0.80) {
 		color = diffuseColor * 1.0;
 	}
 	else {

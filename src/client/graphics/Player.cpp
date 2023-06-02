@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "Input.h"
+#include "client/graphics/AssimpAnimation.h"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -50,20 +51,28 @@ message::UserStateUpdate Player::pollInput() {
   bool moving = length(moveLocal) > 0;
 
   vec3 moveWorld = vec3(0);
+
   if (moving) {
     moveWorld = move(moveLocal);
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+    }
+  } else {
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+    }
   }
 
-  // Get ready to send a message to the server: ***
-  message::UserStateUpdate myInputState;
-  myInputState.id = netId;
-  myInputState.movx = moveWorld.x;
-  myInputState.movy = 0;
-  myInputState.movz = moveWorld.z;
-  myInputState.heading = azimuth;
-  myInputState.jump = jumping;
+  if (jumping) {
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
+    }
+  }
 
-  return myInputState;
+  return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
 }
 
 vec3 Player::move(vec3 movement) {

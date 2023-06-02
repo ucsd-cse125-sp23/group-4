@@ -23,6 +23,8 @@ class Window {
   static int fps;
   static int ups;  // updates from network per second
 
+  static bool readyInput;
+
   // Window Properties
   static int width;
   static int height;
@@ -46,8 +48,8 @@ class Window {
   static void resizeCallback(GLFWwindow* window, int width, int height);
 
   // update and draw functions
-  static void idleCallback(GLFWwindow* window, float deltaTime);
-  static void displayCallback(GLFWwindow*);
+  static void update(GLFWwindow* window, float deltaTime);
+  static void draw(GLFWwindow*);
 
   // helper to reset the camera
   static void resetCamera();

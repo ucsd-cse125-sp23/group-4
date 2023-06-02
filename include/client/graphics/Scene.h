@@ -20,6 +20,7 @@
 #include <map>
 #include <network/message.hpp>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -35,9 +36,11 @@
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/Skeleton.h"
+#include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
 #include "client/graphics/Timer.h"
+#include "client/graphics/TextureCube.h"
 #include "client/graphics/shader.h"
 
 class SceneResourceMap {
@@ -107,7 +110,8 @@ class Scene {
   // by setting the child_nodes.
   std::map<std::string, Node*> node;
 
-  std::vector<GameThing*> gamethings;
+  std::vector<GameThing*> localGameThings;
+  std::unordered_map<int, GameThing*> networkGameThings;
 
   Timer time;
   bool gameStart;
@@ -116,8 +120,8 @@ class Scene {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
-    camera->Fixed = false;
-    gamethings.push_back(camera);
+
+    localGameThings.push_back(camera);
     time.time = 300.0f;
     time.countdown = true;
     gameStart = false;
@@ -128,9 +132,9 @@ class Scene {
     {
       _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
-      _globalSceneResources.meshes["_gz-xyz"] =
-          new Obj();  // gizmo for debugging
-      _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+    _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
+    _globalSceneResources.meshes["_gz-xyz"]->init(
+        "assets/model/dev/_gizmo.obj");
 
       _globalSceneResources.shaderPrograms["unlit"] = LoadShaders(
           "assets/shaders/shader.vert", "assets/shaders/unlit.frag");
@@ -164,11 +168,12 @@ class Scene {
   }
 
   Player* createPlayer(int id);
+  void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
   virtual void init(void);
 
-  message::UserStateUpdate pollInput();                  // broadcast to net
+  message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
 
   virtual void update(float delta);
