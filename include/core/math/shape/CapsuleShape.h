@@ -9,7 +9,7 @@ static int sign(float f) {
     return 1;
   return -1;
 }
-class CylinderShape : public ConvexShape {
+class CapsuleShape : public ConvexShape {
  private:
   float halfheight, radius;
 
@@ -30,7 +30,7 @@ class CylinderShape : public ConvexShape {
   };
 
  public:
-  CylinderShape(float height, float radius)
+  CapsuleShape(float height, float radius)
       : halfheight(height / 2), radius(radius) {}
 
   AABShape* bounds() const {
