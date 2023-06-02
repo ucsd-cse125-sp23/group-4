@@ -35,7 +35,6 @@
 #include "client/graphics/Obj.h"
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
-#include "client/graphics/Skeleton.h"
 #include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
@@ -53,9 +52,7 @@ class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
   // referenced across the project.
-  std::map<std::string, Skeleton*> skeletons;
   std::map<std::string, Mesh*> meshes;
-  std::map<std::string, std::map<std::string, AnimationPlayer*>> animations;
   std::map<std::string, GLuint> shaderPrograms;
   std::map<std::string, Material*> materials;
   std::map<std::string, Texture*> textures;
@@ -69,10 +66,7 @@ class SceneResourceMap {
   ~SceneResourceMap() {
     // The containers of pointers own the object pointed to by the pointers.
     // All the objects should be deleted when the object palette ("prefab" list)
-    // is destructed. skeletons
-    for (auto entry : skeletons) {
-      delete entry.second;
-    }
+    // is destructed.
     // mesh geometry
     for (auto entry : meshes) {
       delete entry.second;

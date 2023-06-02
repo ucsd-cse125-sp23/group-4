@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "imported/Tokenizer.h"
-
 using glm::mat4;
 using glm::vec3;
 using glm::vec4;
@@ -14,7 +12,7 @@ void SkinnedMesh::init(const char* filename) {
   LoadCustom(filename);
 }
 
-void SkinnedMesh::updateSkin(Skeleton* skel) {
+/*void SkinnedMesh::updateSkin(Skeleton* skel) {
   if (!skel) return;
 
   // Update positions based on joints, bindings, and weights
@@ -31,10 +29,10 @@ void SkinnedMesh::updateSkin(Skeleton* skel) {
 
     vertices_curr[i] = vec3(sum * vec4(vertices_bind[i], 1));
   }
-}
+}*/
 
 bool SkinnedMesh::LoadCustom(const char* file) {
-  // uses custom filetype
+  /*// uses custom filetype
   Tokenizer t;
   bool success = t.Open(file);
 
@@ -151,6 +149,6 @@ bool SkinnedMesh::LoadCustom(const char* file) {
   t.Close();
 
   std::cerr << "Success Tokenizing..." << file << std::endl;
-
+  */
   return true;
 }

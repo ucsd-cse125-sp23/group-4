@@ -10,28 +10,24 @@
 #include <map>
 #include <string>
 
-#include "client/graphics/AnimationPlayer.h"
 #include "client/graphics/Model.h"
-#include "client/graphics/Skeleton.h"
 #include "client/graphics/SkinnedMesh.h"
 
 class PlayerModel : public Model {
  public:
-  Skeleton* skel;
   SkinnedMesh* skin;
-  std::map<std::string, AnimationPlayer*> anims;
-
-  AnimationPlayer* currAnim = nullptr;
 
   virtual void setAnimation(std::string animName) {
+    /* override me
     if (anims.find(animName) == anims.end()) {
       return;  // anim not found!
     }
 
-    currAnim = anims[animName];
+    currAnim = anims[animName];*/
   }
 
   virtual void update(float dt) {
+    /* override me
     // update anim + skeleton + skin
     if (currAnim) {
       currAnim->Update(dt);
@@ -40,6 +36,7 @@ class PlayerModel : public Model {
 
     skel->Update(dt);
     skin->updateSkin(skel);
+    */
   }
 
   virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
