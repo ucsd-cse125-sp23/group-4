@@ -2,15 +2,13 @@
 
 #include "core/math/shape/ConvexShape.h"
 
+#include <algorithm>
 #include <limits>
 #include <vector>
-#include <algorithm>
 
 #include "core/math/shape/LineShape.h"
 #include "core/math/shape/PointShape.h"
 #include "core/math/shape/Simplex.h"
-
-
 
 std::ostream& operator<<(std::ostream& os, Simplex& simplex) {
   os << "{";
@@ -39,7 +37,7 @@ bool line(Simplex& pts, vec3f& dir) {
 
   if (sameDir(ab, ao)) {
     dir = cross(cross(ab, ao), ab);
-    //if (length_squared(dir) == 0) return true;
+    // if (length_squared(dir) == 0) return true;
   } else {
     pts = {a};
     dir = ao;
@@ -185,7 +183,7 @@ vec3f vecToOrigin(vec3f a, vec3f b, vec3f c) {
   vec3f v1 = c - a;
   vec3f n = normalize(cross(v0, v1));
   vec3f l = dot(a, n) * n;
-  mat3f M = mat3f(a,v0,v1);
+  mat3f M = mat3f(a, v0, v1);
   vec3f s = inverse(M) * l;
   float u = s.y / s.x, v = s.z / s.x;
   if (u < 0) {
@@ -245,7 +243,7 @@ bool degenrate(Simplex pts, vec3f support) {
   }
 }
 vec3f originPointingNormal(Simplex pts) {
-  //std::cout << "n:" << pts.size() << std::endl;
+  // std::cout << "n:" << pts.size() << std::endl;
   vec3f norm;
   switch (pts.size()) {
     case 1:
@@ -260,7 +258,7 @@ vec3f originPointingNormal(Simplex pts) {
       vec3f avg = (pts[0] + pts[1] + pts[2] + pts[3]) / 4.0f;
       vec3f avg_n = normalize(avg);
       norm = normalize(cross(pts[1] - pts[0], pts[2] - pts[0]));
-      if (dot(norm, pts[0] - avg) < 0) norm = -norm; // Outward facing normal
+      if (dot(norm, pts[0] - avg) < 0) norm = -norm;  // Outward facing normal
       float d = dot(avg_n, norm);
 
       vec3f normt = normalize(cross(pts[2] - pts[0], pts[3] - pts[0]));
@@ -291,7 +289,7 @@ vec3f originPointingNormal(Simplex pts) {
   }
 }
 vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
-                             const mat3f& thisIMtx, const mat4f& otherMtx,
+                            const mat3f& thisIMtx, const mat4f& otherMtx,
                             const mat3f& otherIMtx) const {
   vec3f support = ConvexShape::support(this, thisMtx, thisIMtx, other, otherMtx,
                                        otherIMtx, {1, 0, 0});
@@ -319,9 +317,8 @@ vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
   }
   return vecToOrigin(pts);
 }
-vec3f ConvexShape::distance(const ConvexShape* other,
-                             const mat4f& thisMtx,
-                             const mat4f& otherMtx) const {
+vec3f ConvexShape::distance(const ConvexShape* other, const mat4f& thisMtx,
+                            const mat4f& otherMtx) const {
   mat3f thisIMtx = mat3f(thisMtx);
   if (thisIMtx != mat3f::identity()) thisIMtx = inverse(thisIMtx);
   mat3f otherIMtx = mat3f(otherMtx);
@@ -330,21 +327,18 @@ vec3f ConvexShape::distance(const ConvexShape* other,
   return this->distance(other, thisMtx, thisIMtx, otherMtx, otherIMtx);
 }
 
-vec3f ConvexShape::distance(const BoundingShape* other,
-                             const mat4f& thisMtx,
-                             const mat4f& otherMtx) const {
+vec3f ConvexShape::distance(const BoundingShape* other, const mat4f& thisMtx,
+                            const mat4f& otherMtx) const {
   mat3f thisIMtx = mat3f(thisMtx);
   if (thisIMtx != mat3f::identity()) thisIMtx = inverse(thisIMtx);
   mat3f otherIMtx = mat3f(otherMtx);
   if (otherIMtx != mat3f::identity()) otherIMtx = inverse(otherIMtx);
 
   const ConvexShape** ptr = other->seperate();
-  vec3f minVec =
-      ptr[0]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
+  vec3f minVec = ptr[0]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
   float minDist = length_squared(minVec);
   for (int i = 1; i < other->count(); i++) {
-    vec3f vec =
-        ptr[i]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
+    vec3f vec = ptr[i]->distance(this, otherMtx, otherIMtx, thisMtx, thisIMtx);
     float dist = length_squared(vec);
     if (dist < minDist) {
       minDist = dist;
@@ -514,8 +508,6 @@ vec4f ConvexShape::mtv(const BoundingShape* other, const mat4f& thisMtx,
   }
   return vec4f(-min.x, -min.y, -min.z, min.w);
 }
-
-
 
 bool ConvexShape::contains(const vec3f& point, const mat4f& thisMtx,
                            const mat4f& otherMtx) const {

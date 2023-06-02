@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/math/shape/ConvexShape.h"
 #include "core/math/shape/AABShape.h"
+#include "core/math/shape/ConvexShape.h"
 
 class LineShape : public ConvexShape {
  private:

@@ -1,10 +1,10 @@
 #pragma once
 
+#include <set>
 #include <vector>
 
 #include "core/game/physics/PObject.h"
 #include "core/math/shape/AABShape.h"
-#include <set>
 
 class Environment {
  public:
@@ -22,7 +22,6 @@ class Environment {
   std::pair<PObject*, vec4f> ccd(PObject* self, vec3f dPos,
                                  std::set<PObject*> ignore = {});
 
-  
   struct BVHNode {
     AABShape* bound;
     PObject* obj;

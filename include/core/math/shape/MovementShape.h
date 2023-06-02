@@ -21,7 +21,8 @@ class MovementShape : public ConvexShape {
 
   AABShape* bounds() const {
     AABShape *start = shape0->bounds(), *end = shape1->bounds();
-    AABShape* ret = new AABShape(min(start->minP, end->maxP), max(start->maxP, end->maxP));
+    AABShape* ret =
+        new AABShape(min(start->minP, end->maxP), max(start->maxP, end->maxP));
     delete start;
     delete end;
     return ret;

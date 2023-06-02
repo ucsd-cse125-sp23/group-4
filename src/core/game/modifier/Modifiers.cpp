@@ -1,14 +1,12 @@
 #include "core/game/modifier/AttractModifier.h"
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/modifier/FreezeModifier.h"
+#include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
-#include "core/game/modifier/NumberModifier.h"
 #include "core/util/global.h"
 
-
-ModifierData::ModifierData(unsigned long long duration)
-    : markedRemove(false) {
+ModifierData::ModifierData(unsigned long long duration) : markedRemove(false) {
   expire = duration == 0 ? 0 : level->getAge() + duration;
 }
 void ModifierData::markExpired() {
@@ -16,7 +14,6 @@ void ModifierData::markExpired() {
     this->markedRemove = true;
 }
 Modifier::Modifier() {}
-
 
 SpeedBoostModifier::SpeedBoostModifier() {}
 void SpeedBoostModifier::modify(Modifiable* obj, ModifierData* data) {
@@ -54,7 +51,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       }
       float c = std::max(0.0f, dj.y);
       float d = (1 - c) / 0.5f;
-      dj *= std::min(1.0f, d*d);
+      dj *= std::min(1.0f, d * d);
       dj.y = 1.0f / (1.0f + std::exp(-15.0f * (c - 0.36f)));
       dj = normalize(dj);
       dj *= cData->jumpVel;
@@ -74,7 +71,7 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
     if (pObj->level->getAge() - cData->taggedTime < TAG_COOLDOWN)
       pObj->freeze = true;
     else if (cData->isIt) {
-      int lvl = (pObj->level->getAge() - cData->taggedTime)/200;
+      int lvl = (pObj->level->getAge() - cData->taggedTime) / 200;
       if (lvl > 5) lvl = 5;
       pObj->addPos(lvl * 0.04f * pObj->vel * vec3f(1, 0, 1));
     }
@@ -96,7 +93,6 @@ void FreezeModifier::modify(Modifiable* obj, ModifierData* data) {
     pObj->freeze = true;
   }
 }
-
 
 NumberModifier::NumberModifier() {}
 void NumberModifier::modify(Modifiable* obj, ModifierData* data) {}

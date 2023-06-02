@@ -110,7 +110,7 @@ TEST_CASE("Assignment Vector Operations", "[vector]") {
   u *= 2.0f;
   CHECK(u == vec3f(2, 8, 18));
 }
-TEST_CASE("Special Vector Operations", "[vector]") { 
+TEST_CASE("Special Vector Operations", "[vector]") {
   CHECK(tangent(vec3f(1, 0, 0), vec3f(0, 1, 0)) == vec3f(1, 0, 0));
   CHECK(tangent(vec3f(-1, 0, 0), vec3f(0, 1, 0)) == vec3f(-1, 0, 0));
   CHECK(tangent(vec3f(0, 0, 1), vec3f(0, 1, 0)) == vec3f(0, 0, 1));

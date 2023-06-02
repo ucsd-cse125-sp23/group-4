@@ -2,10 +2,10 @@
 
 #include <stack>
 
-#include "core/util/global.h"
-#include "core/math/shape/MovementShape.h"
-#include "core/math/shape/ExpandedShape.h"
 #include "core/math/shape/ConvexMeshShape.h"
+#include "core/math/shape/ExpandedShape.h"
+#include "core/math/shape/MovementShape.h"
+#include "core/util/global.h"
 
 void Environment::addPObject(PObject* obj) {
   collisions.push_back(obj);
@@ -60,13 +60,13 @@ Environment::BVHNode* constructBVHHelper(
     minP = min(minP, node->bound->minP);
     maxP = max(maxP, node->bound->maxP);
   }
-  Environment::BVHNode* top = new Environment::BVHNode(new AABShape(minP, maxP));
+  Environment::BVHNode* top =
+      new Environment::BVHNode(new AABShape(minP, maxP));
   const int axis = maxInd(maxP - minP);
   std::sort(nodes.begin(), nodes.end(),
-    [axis](Environment::BVHNode* a, Environment::BVHNode* b) {
-      return a->bound->minP[axis] < b->bound->minP[axis];
-    }
-  );
+            [axis](Environment::BVHNode* a, Environment::BVHNode* b) {
+              return a->bound->minP[axis] < b->bound->minP[axis];
+            });
 
   size_t beg = 0, end = nodes.size(), mid = nodes.size() / 2;
   while (end - beg > 4) {
@@ -80,7 +80,7 @@ Environment::BVHNode* constructBVHHelper(
     v0 = volume(maxP - minP);
     minP = nodes[mid]->bound->minP;
     maxP = nodes[mid]->bound->maxP;
-    for (int i = mid+1; i < nodes.size(); i++) {
+    for (int i = mid + 1; i < nodes.size(); i++) {
       minP = min(minP, nodes[i]->bound->minP);
       maxP = max(maxP, nodes[i]->bound->maxP);
     }
@@ -120,7 +120,7 @@ std::vector<PObject*> Environment::collides(BoundingShape* shape) {
     while (!stack.empty()) {
       BVHNode* curr = stack.top();
       stack.pop();
-      //curr->bound has no position offset
+      // curr->bound has no position offset
       if (shape->collides(curr->bound)) {
         if (curr->obj == nullptr) {
           stack.push(curr->left);
@@ -189,7 +189,8 @@ std::pair<PObject*, vec4f> Environment::mtv(PObject* self) {
   return std::make_pair(minObj, minMTV);
 }
 
-std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos, std::set<PObject*> ignore) {
+std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos,
+                                            std::set<PObject*> ignore) {
   CollisionBounds* bounds = self->getBounds();
   OffsetShape* offsetShape = new OffsetShape(
       dynamic_cast<const ConvexShape*>(bounds->shape), bounds->getPos());

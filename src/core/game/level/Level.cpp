@@ -1,8 +1,7 @@
 #include "core/game/level/Level.h"
 
-#include "core/util/global.h"
 #include "core/game/level/Environment.h"
-
+#include "core/util/global.h"
 
 void Level::tick() {
   std::vector<size_t> allIds = this->objects.getAllIds();
@@ -80,7 +79,10 @@ void Level::tick() {
 }
 
 Level::Level(Environment* environment)
-    : environment(environment), age(TAG_COOLDOWN), objects(PObjectCollection()), gameMode(nullptr) {
+    : environment(environment),
+      age(TAG_COOLDOWN),
+      objects(PObjectCollection()),
+      gameMode(nullptr) {
   environment->constructBVH();
   for (int i = 0; i < 10; i++)
     for (int j = 0; j < 10; j++) collisionTypeLUT[i][j] = CollisionType::NONE;

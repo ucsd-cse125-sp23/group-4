@@ -43,7 +43,7 @@ void spawnPowerUp(vec3f min, vec3f max,
   std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());
   std::uniform_real_distribution<double> dist(0.0, 1.0);
   float minT = -1;
-  //Sufficiently efficient ray casting
+  // Sufficiently efficient ray casting
   Ray ray;
   int n = 0;
   while (n < 5) {

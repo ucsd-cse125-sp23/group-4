@@ -1,9 +1,10 @@
 #include "core/game/physics/PObject.h"
 
+#include <set>
+
 #include "core/game/level/Level.h"
 #include "core/game/modifier/NumberModifier.h"
 #include "core/util/global.h"
-#include <set>
 
 uint32_t PObject::maxId = 0;
 
@@ -61,7 +62,7 @@ PObject::PObject(BoundingShape* shape, unsigned int layer, float friction,
       onGround(false),
       freeze(false),
       level(nullptr),
-      lastSurfaceNormal(vec3f(0,0,0)),
+      lastSurfaceNormal(vec3f(0, 0, 0)),
       lastSurfaceFriction(0) {
   this->id = PObject::maxId++;
 }
@@ -72,7 +73,7 @@ void PObject::tick() {
 
   lastSurfaceNormal = vec3f(0, 0, 0);
   lastSurfaceFriction = 0;
-  
+
   move(this->vel);
   freeze = false;
 }

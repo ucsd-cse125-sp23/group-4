@@ -23,7 +23,7 @@ class CapsuleShape : public ConvexShape {
     if (dir.y > 0)
       return vec4f(
           vec3f(0.0f, halfheight - radius, 0.0f) + normalize(dir) * radius,
-                   1.0f);
+          1.0f);
     return vec4f(
         vec3f(0.0f, -halfheight + radius, 0.0f) + normalize(dir) * radius,
         1.0f);

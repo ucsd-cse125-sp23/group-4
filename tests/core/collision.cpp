@@ -247,8 +247,7 @@ TEST_CASE("Basic CCD", "[ccd]") {
              WithinAbs(0.25f, 0.01f));
   CHECK_THAT(
       level->getEnvironment()->ccd(pair.first, vec3f(50, -4, 0)).second.w,
-             WithinAbs(0.25f, 0.01f));
-
+      WithinAbs(0.25f, 0.01f));
 
   REQUIRE_NOTHROW(terminateLevel());
 }
@@ -278,7 +277,9 @@ TEST_CASE("Multi Obsticle CCD", "[ccd]") {
   checkCCD(pair.first, vec3f(-8, 0, 0));
 
   pair.first->setPos(vec3f(2.0, 2.0, 0.0));
-  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(0, -2, 50)).second.w, WithinAbs(0.5,0.001));
+  CHECK_THAT(
+      level->getEnvironment()->ccd(pair.first, vec3f(0, -2, 50)).second.w,
+      WithinAbs(0.5, 0.001));
 
   REQUIRE_NOTHROW(terminateLevel());
 }

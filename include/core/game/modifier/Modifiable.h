@@ -1,9 +1,9 @@
 #pragma once
 
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
 
 #include "core/game/modifier/ModifierInstance.h"
 

@@ -38,8 +38,8 @@ class ConvexMeshShape : public ConvexShape {
     std::copy(v.begin(), v.end(), this->vertices);
   }
   ~ConvexMeshShape() { free(vertices); }
-  
-  AABShape* bounds() const { 
+
+  AABShape* bounds() const {
     vec3f minP = vertices[0], maxP = vertices[0];
     for (int i = 1; i < size; i++) {
       minP = min(minP, vertices[i]);

@@ -5,7 +5,6 @@
 #define MAX_ITERATIONS 60
 #define TOLERANCE 0.001
 
-
 // https://blog.winter.dev/2020/gjk-algorithm/
 class ConvexShape : public BoundingShape {
  private:
@@ -22,9 +21,8 @@ class ConvexShape : public BoundingShape {
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx,
             const mat3f& thisIMtx, const mat4f& otherMtx,
             const mat3f& otherIMtx) const;
-  vec3f distance(const ConvexShape* other,
-                                   const mat4f& thisMtx,
-            const mat3f& thisIMtx, const mat4f& otherMtx,
+  vec3f distance(const ConvexShape* other, const mat4f& thisMtx,
+                 const mat3f& thisIMtx, const mat4f& otherMtx,
                  const mat3f& otherIMtx) const;
 
  public:
