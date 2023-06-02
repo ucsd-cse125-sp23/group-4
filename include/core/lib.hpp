@@ -16,6 +16,3 @@ void applyGameMode(GameMode* gamemode);
 int queryScore(uint32_t pid);
 std::vector<std::vector<uint32_t>> queryPlacements();
 void initPlayers(std::map<uint32_t, Player*> players);
-
-void spawnPowerUp(vec3f min, vec3f max,
-                  const std::vector<GlobalEffect*>& effects);

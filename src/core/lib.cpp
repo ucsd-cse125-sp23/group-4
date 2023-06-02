@@ -37,30 +37,3 @@ std::vector<std::vector<uint32_t>> queryPlacements() {
 void initPlayers(std::map<uint32_t, Player*> players) {
   level->gameMode->initPlayers(players);
 }
-
-void spawnPowerUp(vec3f min, vec3f max,
-                  const std::vector<GlobalEffect*>& effects) {
-  std::mt19937 rng(std::chrono::system_clock::now().time_since_epoch().count());
-  std::uniform_real_distribution<double> dist(0.0, 1.0);
-  float minT = -1;
-  // Sufficiently efficient ray casting
-  Ray ray;
-  int n = 0;
-  while (n < 5) {
-    ray = {vec3f(min.x + (max.x - min.x) * dist(rng), 1000.0,
-                 min.z + (max.z - min.z) * dist(rng)),
-           vec3f(0, -1, 0)};
-    LineShape* line = new LineShape(ray.src, ray.src + ray.dir * 1e9f);
-    for (auto obj : level->getEnvironment()->collides(line)) {
-      float t = obj->getBounds()->intersects(ray);
-      if (t >= 0 && t < minT) minT = t;
-    }
-    delete line;
-    if (minT >= 0) break;
-  }
-  if (minT < 0) return;
-
-  vec3f pos = ray.src + ray.dir * minT;
-  size_t i = static_cast<size_t>(dist(rng) * effects.size());
-  level->addPObject(new PowerUp(pos, effects[i]));
-}
