@@ -17,9 +17,13 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Scene.h"
-#include "UserState.h"
 
 ////////////////////////////////////////////////////////////////////////////////
+
+int Window::fps;
+int Window::ups;
+
+bool Window::readyInput;
 
 // Window Properties
 int Window::width;
@@ -167,14 +171,11 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-message::UserStateUpdate Window::idleCallback(GLFWwindow* window,
-                                              float deltaTime) {
-  UserState inputChanges = gameScene->update(deltaTime);
-
-  return inputChanges.toMessage();  // player input to be written to server
+void Window::update(GLFWwindow* window, float deltaTime) {
+  gameScene->update(deltaTime);
 }
 
-void Window::displayCallback(GLFWwindow* window) {
+void Window::draw(GLFWwindow* window) {
   // Gets events, including input such as keyboard and mouse or window resizing.
   glfwPollEvents();
 
@@ -183,9 +184,11 @@ void Window::displayCallback(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  // Render the objects.
-  gameScene->draw();
-  gameScene->drawHUD(window);
+  // Render the scene
+  if (gameScene) {
+    gameScene->draw();
+    gameScene->drawHUD(window);
+  }
 
   Input::handle(false);
   if (_debugmode) {
@@ -194,7 +197,7 @@ void Window::displayCallback(GLFWwindow* window) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    gameScene->gui();
+    if (gameScene) gameScene->gui();
 
     // imguiDraw(skeleton, animClip);   // simple helper method
 
@@ -233,6 +236,10 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_ESCAPE:
         // Close the window. This causes the program to also terminate.
         glfwSetWindowShouldClose(window, GL_TRUE);
+        break;
+
+      case GLFW_KEY_ENTER:
+        readyInput = true;
         break;
 
       case GLFW_KEY_R:
