@@ -45,6 +45,9 @@ void Scene::init(void) {
 #pragma region Textures
   sceneResources->textures["grid"] = new Texture;
   sceneResources->textures["grid"]->init("assets/image/test_uv.png");
+
+  sceneResources->textures["stars"] = new Texture;
+  sceneResources->textures["stars"]->init("assets/image/tile_stars.png");
 #pragma endregion
 
   // Create material palette
@@ -152,7 +155,7 @@ void Scene::init(void) {
   sceneResources->materials["toon.blue"]->shader =
       sceneResources->shaderPrograms["toon"];
   sceneResources->materials["toon.blue"]->texture =
-      sceneResources->textures["grid"];
+      sceneResources->textures["stars"];
   sceneResources->materials["toon.blue"]->ambient =
       vec4(0.1f, 0.1f, 0.1f, 1.0f);
   sceneResources->materials["toon.blue"]->diffuse =
@@ -228,18 +231,18 @@ void Scene::init(void) {
   // Setup player/gameplay prefabs
 #pragma region Prefabs
   Model* m_prefab = new Model;
-  sceneResources->models["PREFAB_player.model-old"] = m_prefab;
+  sceneResources->models["PREFAB_player.model"] = m_prefab;
   m_prefab->mesh = sceneResources->meshes["playermodel"];
   // TODO(matthew) copy over mesh too? for animations?
   m_prefab->material = sceneResources->materials["toon.blue"];
 
 
   AssimpModel* am = new AssimpModel();
-  am->loadAssimp("assets/animation/Animation - Testing.fbx");
+  am->loadAssimp("assets/animation/withUV/Animation -Bee2.fbx");
   am->setAnimation("walk");
-  sceneResources->models["PREFAB_player.model"] = am;
-  sceneResources->models["PREFAB_player.model"]->mesh = am;
-  sceneResources->models["PREFAB_player.model"]->material =
+  sceneResources->models["PREFAB_player.model2"] = am;
+  sceneResources->models["PREFAB_player.model2"]->mesh = am;
+  sceneResources->models["PREFAB_player.model2"]->material =
       sceneResources->materials["wood"];
 #pragma endregion
 

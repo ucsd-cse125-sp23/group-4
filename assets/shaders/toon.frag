@@ -6,6 +6,7 @@ in vec2 texCoord0;	// UV coordinates
 
 uniform mat4 view;      // from world coord to eye coord
 
+uniform int renderMode;	// 0 = no texture, 1 = texture
 uniform sampler2D gSampler;
 
 // uniforms used for lighting
@@ -68,8 +69,11 @@ void main()
 
 	// sampled texture color
 	vec4 texturedColor = texture2D(gSampler, texCoord0.st);
+	if (renderMode == 0) {
+		texturedColor = vec4(1);
+	}
 
 	// Gamma correction
-	fragColor = vec4(sqrt(reflectance)/* * vec3(texturedColor)*/, 1);
+	fragColor = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
 	//fragColor = vec4(color, 1);
 }
