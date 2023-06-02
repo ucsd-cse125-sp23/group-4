@@ -243,9 +243,6 @@ int main(int argc, char* argv[]) {
     // update and render scene
     Window::update(window, time_since_prev_frame);
     Window::draw(window);
-
-    // prevent drawing too fast...
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 
   Window::cleanUp();
