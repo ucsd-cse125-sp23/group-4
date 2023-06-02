@@ -7,33 +7,68 @@
 #include <network/connection.hpp>
 #include <network/message.hpp>
 #include <unordered_map>
-#include <vector>
+#include <utility>
 
 using boost::asio::ip::tcp;
-using message::PlayerID;
+using message::ClientID;
 
 class Server {
  public:
-  Server(boost::asio::io_context& io_context, int port);
+  using AcceptHandler = std::function<void(ClientID, Server&)>;
+  using CloseHandler = std::function<void(ClientID, Server&)>;
+  using ReadHandler = std::function<void(const message::Message&, Server&)>;
+  using WriteHandler =
+      std::function<void(std::size_t, const message::Message&, Server&)>;
+  using TickHandler = std::function<void(Server&)>;
+
+  Server(int port, AcceptHandler, CloseHandler, ReadHandler, WriteHandler,
+         TickHandler);
+
+  void start_tick();
+  void write(const ClientID&, const message::Message&);
+  void write_all(message::Message&);
+  template <typename T, typename... Args>
+  void write(const ClientID&, Args&&...);
+  template <typename T, typename... Args>
+  void write_all(Args&&...);
+
+  static constexpr std::chrono::milliseconds TICK_RATE{50};
 
  private:
-  int update_num_ = 1;
-  std::chrono::milliseconds tick_rate_ = std::chrono::milliseconds(50);
-  boost::asio::steady_timer timer_;
-  tcp::acceptor acceptor_;
-  std::unordered_map<PlayerID, std::unique_ptr<Connection<message::Message>>,
-                     boost::hash<PlayerID>>
-      connections_;
-
-  friend std::ostream& operator<<(std::ostream&, Server*);
   void do_accept();
-  void read(const PlayerID&);
-  void write(const message::Message&, const PlayerID&);
-  void write_all(message::Message&);
   void tick();
 
+  friend std::ostream& operator<<(std::ostream&, Server*);
 
-  //Temp
-  bool tempOnce = false;
-  int count = 0;
+  boost::asio::io_context io_context_;
+  AcceptHandler accept_handler_;
+  CloseHandler close_handler_;
+  ReadHandler read_handler_;
+  WriteHandler write_handler_;
+  TickHandler tick_handler_;
+  boost::asio::steady_timer timer_;
+  tcp::acceptor acceptor_;
+  std::unordered_map<ClientID, std::unique_ptr<Connection<message::Message>>,
+                     boost::hash<ClientID>>
+      connections_;
 };
+
+template <typename T, typename... Args>
+void Server::write(const ClientID& player_id, Args&&... args) {
+  T body{std::forward<Args>(args)...};
+  message::Type type = message::get_type(body);
+  message::Metadata metadata{player_id, std::time(nullptr)};
+  message::Message m{type, metadata, body};
+  write(player_id, m);
+}
+
+template <typename T, typename... Args>
+void Server::write_all(Args&&... args) {
+  for (const auto& kv : connections_) {
+    T body{std::forward<Args>(args)...};
+    message::Type type = message::get_type(body);
+    message::Metadata metadata{kv.first, std::time(nullptr)};
+    message::Message m{type, metadata, body};
+    write(kv.first, m);
+  }
+}

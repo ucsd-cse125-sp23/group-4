@@ -18,10 +18,13 @@
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
 #include <map>
+#include <network/message.hpp>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "client/graphics/AssimpModel.h"
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
@@ -32,11 +35,11 @@
 #include "client/graphics/Obj.h"
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
-#include "client/graphics/SceneState.h"
 #include "client/graphics/Skeleton.h"
+#include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
-#include "client/graphics/UserState.h"
+#include "client/graphics/TextureCube.h"
 #include "client/graphics/shader.h"
 
 struct Character {
@@ -98,6 +101,7 @@ class SceneResourceMap {
 
 class Scene {
  public:
+  static int _myPlayerId;
   static bool _freecam;
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
@@ -105,13 +109,14 @@ class Scene {
   SceneResourceMap* sceneResources;
 
   Camera* camera;
-  Player* myPlayer;
+  Player* myPlayer = nullptr;
 
   // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
   std::map<std::string, Node*> node;
 
-  std::vector<GameThing*> gamethings;
+  std::vector<GameThing*> localGameThings;
+  std::unordered_map<int, GameThing*> networkGameThings;
 
   std::map<char, Character> Characters;
 
@@ -119,7 +124,7 @@ class Scene {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
-    gamethings.push_back(camera);
+    localGameThings.push_back(camera);
 
     sceneResources = new SceneResourceMap();
 
@@ -127,7 +132,8 @@ class Scene {
     _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
     _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-    _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+    _globalSceneResources.meshes["_gz-xyz"]->init(
+        "assets/model/dev/_gizmo.obj");
 
     _globalSceneResources.shaderPrograms["unlit"] =
         LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
@@ -159,12 +165,16 @@ class Scene {
     node["world"] = new Node("world");
   }
 
-  Player* createPlayer(int id, bool isUser);
+  Player* createPlayer(int id);
+  void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
   void init(void);
-  UserState update(float delta);          // broadcast to net
-  void updateState(SceneState newState);  // receive from net
+
+  message::UserStateUpdate pollUpdate();                 // broadcast to net
+  void receiveState(message::GameStateUpdate newState);  // receive from net
+
+  void update(float delta);
 
   void drawHUD(GLFWwindow* window);
   void draw();

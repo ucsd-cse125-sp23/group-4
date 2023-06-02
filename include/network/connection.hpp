@@ -4,7 +4,6 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/asio.hpp>
-#include <functional>
 #include <iostream>
 #include <list>
 #include <string>
@@ -21,15 +20,13 @@ class Connection {
   using WriteHandler = std::function<void(boost::system::error_code ec,
                                           std::size_t length, const T& t)>;
 
-  Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
-      : socket_(std::move(s)), read_handler(rh), write_handler(wh) {}
+  Connection(tcp::socket&, ReadHandler, WriteHandler);
 
   ~Connection() {
     std::cout << "(~Connection) Closing connection and its socket" << std::endl;
     socket_.close();
   }
 
-  void start();
   void read();
   void write(const T&);
 
@@ -51,7 +48,8 @@ class Connection {
 };
 
 template <typename T>
-void Connection<T>::start() {
+Connection<T>::Connection(tcp::socket& s, ReadHandler rh, WriteHandler wh)
+    : socket_(std::move(s)), read_handler(rh), write_handler(wh) {
   read();
 }
 
@@ -106,9 +104,11 @@ void Connection<T>::read() {
   // read header
   boost::asio::async_read(
       socket_, boost::asio::buffer(inbound_header_),
-      [&](boost::system::error_code header_ec, std::size_t header_bytes_read) {
-        if (header_ec) {
-          return read_handler(header_ec, T());
+      [&](boost::system::error_code ec, std::size_t header_bytes_read) {
+        if (ec) {
+          std::cerr << "(Connection::read) Error reading header: "
+                    << ec.message() << std::endl;
+          return read_handler(ec, T());
         }
 
         try {
@@ -116,17 +116,25 @@ void Connection<T>::read() {
           inbound_data_.resize(inbound_data_size);
 
           // read message
-          boost::system::error_code message_ec;
+          boost::system::error_code ec;
           std::size_t message_bytes_read = boost::asio::read(
-              socket_, boost::asio::buffer(inbound_data_), message_ec);
-          if (message_ec) {
-            return read_handler(message_ec, T());
+              socket_, boost::asio::buffer(inbound_data_), ec);
+          if (ec) {
+            std::cerr << "(Connection::read) Error reading data: "
+                      << ec.message() << std::endl;
+            return read_handler(ec, T());
           }
 
           T t = parse_data();
-          read_handler(message_ec, t);
-        } catch (const boost::system::error_code& e) {
-          read_handler(e, T());
+          std::cout << "(Connection::read) Received ("
+                    << inbound_data_size + header_length_ << " bytes)\n"
+                    << t << std::endl;
+          read_handler(ec, t);
+          read();
+        } catch (const boost::system::error_code& ec) {
+          std::cerr << "(Connection::read) Error parsing data: " << ec.message()
+                    << std::endl;
+          read_handler(ec, T());
         }
       });
 }
@@ -138,6 +146,8 @@ void Connection<T>::write(const T& data) {
     std::string outbound_header = build_header(outbound_data);
     outbound_payloads_.push_back({outbound_header, outbound_data});
   } catch (const boost::system::error_code& ec) {
+    std::cerr << "(Connection::write) Error serializing data: " << ec.message()
+              << std::endl;
     return write_handler(ec, 0, data);
   }
 
@@ -148,6 +158,15 @@ void Connection<T>::write(const T& data) {
       socket_, buffers,
       [&, data](boost::system::error_code ec, std::size_t length) {
         outbound_payloads_.pop_front();
+
+        if (ec) {
+          std::cerr << "(Connection::write) Error writing data: "
+                    << ec.message() << std::endl;
+          return write_handler(ec, 0, data);
+        }
+
+        std::cout << "(Connection::write) Successfully wrote " << length
+                  << " bytes" << std::endl;
         write_handler(ec, length, data);
       });
 }

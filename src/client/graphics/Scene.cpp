@@ -14,23 +14,82 @@ adapted from CSE 167 - Matthew
 #include <stack>
 
 #include "Scene.inl"  // The scene init definition
+#include "client/graphics/Window.h"
 
 using glm::mat4x4;
 using glm::vec3;
+
+int Scene::_myPlayerId = -1;
 
 bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-void Scene::initFromServer(int myid) {
-  // TODO(matthew) make this better
-  for (auto e : gamethings) {
-    if (e->netId == myid) {
-      setToUserFocus(e);
-      return;
-    }
+Player* Scene::createPlayer(int id) {
+  bool isUser = false;
+  if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
+
+  // creating a player to be rendered... TODO call this from state update!
+  std::string playername = "_player" + std::to_string(id);
+
+  Player* player = new Player();
+  player->name = playername;
+  player->id = id;
+  if (isUser) {
+    setToUserFocus(player);
   }
+
+  // LOAD PLAYER ASSETS ---
+  // copy into a new model object
+  Model* myModel;
+  if (dynamic_cast<AssimpModel*>(
+          sceneResources->models["PREFAB_player.model"])) {
+    AssimpModel* amRef = dynamic_cast<AssimpModel*>(
+        sceneResources->models["PREFAB_player.model"]);
+    AssimpModel* am = new AssimpModel(*amRef);
+    myModel = am;
+    player->pmodel = am;
+  } else {
+    myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
+  }
+  player->model = myModel;
+  // TODO(matthew) set material here! if needed
+  sceneResources->models[playername + ".model"] = myModel;
+
+  // skin/costume
+  if (false) {
+    Model* myCostume =
+        new Model(*sceneResources->models["PREFAB_player.costume1"]);
+    // player->model = myModel; TODO: support multiple models on player
+    sceneResources->models[playername + ".costume"] = myCostume;
+  }
+
+  // animations TODO(?)
+  // player->pmodel->setAnimation("walk");  // TODO: make this automated
+
+  // ---
+
+  // position is set by server message
+
+  networkGameThings.insert({id, player});
+  node["world"]->childnodes.push_back(player);
+
+  return player;
 }
+
+void Scene::removePlayer(int id) {
+  auto player = networkGameThings.at(id);
+
+  // remove player from world
+  auto& nodes = node["world"]->childnodes;
+  auto it = std::find(nodes.begin(), nodes.end(), player);
+  nodes.erase(it);
+
+  networkGameThings.erase(id);
+  delete player;
+}
+
+void Scene::initFromServer(int myid) { _myPlayerId = myid; }
 
 void Scene::setToUserFocus(GameThing* t) {
   myPlayer = nullptr;
@@ -44,29 +103,33 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-UserState Scene::update(float delta) {
-  UserState ourPlayerUpdates;
-
-  for (auto e : gamethings) {
-    UserState currUpdate = e->update(delta);
-
-    if (e->isUser) ourPlayerUpdates = currUpdate;
-  }
-
-  return ourPlayerUpdates;
+void Scene::update(float delta) {
+  for (auto& thing : localGameThings) thing->update(delta);
+  for (auto& [_, thing] : networkGameThings) thing->update(delta);
 }
 
-void Scene::updateState(SceneState newState) {
-  // loop through GameThings, send newest state data
-  for (auto e : gamethings) {
-    int currId = e->netId;
+message::UserStateUpdate Scene::pollUpdate() {
+  if (!networkGameThings.count(_myPlayerId)) return {};
 
-    if (currId == -1) continue;  // skip thing
+  return networkGameThings.at(_myPlayerId)->pollInput();
+}
 
-    SceneGameThingState currState = newState.GetUpdateFor(currId);
-    // please check for non-null too!
-    e->updateFromState(currState);
+void Scene::receiveState(message::GameStateUpdate newState) {
+  // update existing items, create new item if it doesn't exist
+  for (auto& [id, state] : newState.things) {
+    // TODO: handle items besides Player as well
+    if (!networkGameThings.count(id)) createPlayer(id);
+
+    auto thing = networkGameThings.at(id);
+    thing->updateFromState(state);
   }
+
+  // remove items that don't exist on the server anymore
+  std::vector<int> removedIds;
+  for (auto& [id, _] : networkGameThings)
+    if (!newState.things.count(id)) removedIds.push_back(id);
+
+  for (int id : removedIds) removePlayer(id);
 }
 
 void Scene::drawHUD(GLFWwindow* window) {
@@ -77,12 +140,12 @@ void Scene::drawHUD(GLFWwindow* window) {
 
   std::map<std::string, float> player_times;
 
-  for (GameThing* e : gamethings) {
-    if (dynamic_cast<Player*>(e) != nullptr) {
-      Player* player = dynamic_cast<Player*>(e);
+  for (auto& [_, thing] : networkGameThings) {
+    if (auto player = dynamic_cast<Player*>(thing); player != nullptr) {
       std::string name = player->name;
       glm::vec3 position = player->transform.position;
-      player_times[name] = player->time;
+      // player_times[name] = player->time;  // player.time deprecated,
+      // use game state in future
       const unsigned char* cname =
           reinterpret_cast<const unsigned char*>(name.c_str());
       glColor3f(1.0f, 1.0f, 1.0f);
@@ -105,13 +168,30 @@ void Scene::drawHUD(GLFWwindow* window) {
     glWindowPos2f(10.0f, static_cast<float>(height) - 25);
     glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
   }
+
+  // draw FPS
+  std::string fps_text = std::to_string(Window::fps) + " FPS";
+  std::string ups_text = std::to_string(Window::ups) + " UPS";
+  const unsigned char* stringFPS =
+      reinterpret_cast<const unsigned char*>(fps_text.c_str());
+  const unsigned char* stringUPS =
+      reinterpret_cast<const unsigned char*>(ups_text.c_str());
+  glColor3f(0.3f, 1.0f, 0.3f);
+  glWindowPos2f(static_cast<float>(width) - 50,
+                static_cast<float>(height) - 25);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringFPS);
+  glWindowPos2f(static_cast<float>(width) - 50,
+                static_cast<float>(height) - 35);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringUPS);
 }
+
 void Scene::draw() {
   // Pre-draw sequence:
-  camera->SetPositionTarget(myPlayer->transform.position);
+  if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
   camera->UpdateView();
 
   glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
+  glm::mat4 viewProjOriginMtx = camera->GetViewProjectMtx(true);
   glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
 
   // Define stacks for depth-first search (DFS)
@@ -128,11 +208,10 @@ void Scene::draw() {
   matrix_stack.push(cur_MMtx);
 
   while (!dfs_stack.empty()) {
-    // Detect whether the search runs into infinite loop by checking whether the
-    // stack is longer than the size of the graph. Note that, at any time, the
-    // stack does not contain repeated element.
-    if (dfs_stack.size() > node.size()) {
-      std::cerr << "Error: The scene graph has a closed loop." << std::endl;
+    // Detect whether the search runs into infinite loop
+    if (dfs_stack.size() > std::max(static_cast<int>(node.size()), 100)) {
+      std::cerr << "Error: The scene graph probably has a closed loop."
+                << std::endl;
       exit(-1);
     }
 
@@ -143,7 +222,9 @@ void Scene::draw() {
     matrix_stack.pop();
 
     // draw the visuals of our current node
-    cur->draw(viewProjMtx, viewMtx, cur_MMtx);
+    glm::mat4 vp = viewProjMtx;
+    if (cur->skybox) vp = viewProjOriginMtx;  // not pretty oh well
+    cur->draw(vp, viewMtx, cur_MMtx);
 
     cur->draw_debug(viewProjMtx, cur_MMtx, Scene::_gizmos,
                     _globalSceneResources.models["_gz-xyz"],

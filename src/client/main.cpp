@@ -1,5 +1,10 @@
 // clang-format off
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
 #include <GL/glew.h>
+#endif
 // clang-format on
 #include <GL/freeglut_std.h>
 #include <GLFW/glfw3.h>
@@ -8,21 +13,22 @@
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/functional/overloaded_function.hpp>
+#include <chrono>
 #include <config/lib.hpp>
 #include <cstdio>
 #include <ctime>
+#include <ios>
 #include <iostream>
-#include <magic_enum.hpp>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
 #include <string>
+#include <thread>
 
 #include "Window.h"
 
-using message::PlayerID;
-
-PlayerID my_player_id;
 bool net_assigned = false;
+bool is_game_ready = false;
+bool game_exit = false;
 
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
@@ -69,63 +75,48 @@ void print_versions() {
 #endif
 }
 
-std::unique_ptr<Client> network_init(boost::asio::io_context& io_context) {
+std::unique_ptr<Client> network_init() {
   auto config = get_config();
   Addr server_addr{config["server_address"], config["server_port"]};
 
-  PlayerID player_id;
-  auto connect_handler = [&](tcp::endpoint endpoint, Client& client) {
-    std::cout << "(Client::connect) Connected to " << endpoint.address() << ":"
-              << endpoint.port() << std::endl;
-  };
-  auto read_handler = [&](const message::Message& m, Client& client) {
-    //std::cout << "(Connection::read) Received\n" << m << std::endl;
-    auto assign_handler = [&](const message::Assign& body) {
-      player_id = m.metadata.player_id;
-      my_player_id = player_id;
+  auto connect_handler = [](tcp::endpoint endpoint, Client& client) {};
+
+  auto read_handler = [](const message::Message& m, Client& client) {
+    auto assign_handler = [&client](const message::Assign& body) {
+      Window::gameScene->initFromServer(body.pid);  // need a unique int id
+      client.write<message::Greeting>("Hello, server!");
+
       net_assigned = true;
-      // Window::gameScene->initFromServer(myId); // need a unique int id
-      message::Message new_m{message::Type::Greeting,
-                             {player_id, std::time(nullptr)},
-                             message::Greeting{"Hello, server!"}};
-      client.write(new_m);
     };
-    auto greeting_handler = [&](const message::Greeting& body) {};
-    auto notify_handler = [&](const message::Notify& body) {};
-    auto game_state_update_handler = [&](const message::GameStateUpdate& body) {
-      Window::gameScene->updateState(SceneState(body));
+
+    auto game_state_update_handler = [](const message::GameStateUpdate& body) {
+      Window::gameScene->receiveState(body);
     };
-    auto user_state_update_handler = [&](const message::UserStateUpdate& body) {
+
+    auto lobby_update_handler = [](const message::LobbyUpdate& body) {};
+
+    auto game_ready_handler = [](const message::GameStart& body) {
+      is_game_ready = true;
     };
+
+    auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
-        assign_handler, greeting_handler, notify_handler,
-        game_state_update_handler, user_state_update_handler);
-
+        assign_handler, game_state_update_handler, lobby_update_handler,
+        game_ready_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
-  auto write_handler = [&](std::size_t bytes_transferred,
-                           const message::Message& m, Client& client) {
-    // std::cout << "(Connection::write, " << magic_enum::enum_name(m.type)
-    //          << ") Successfully wrote " << bytes_transferred
-    //          << " bytes to server" << std::endl;
-  };
-  auto client = std::make_unique<Client>(
-      io_context, server_addr, connect_handler, read_handler, write_handler);
+
+  auto write_handler = [](std::size_t bytes_transferred,
+                          const message::Message& m, Client& client) {};
+
+  auto client = std::make_unique<Client>(server_addr, connect_handler,
+                                         read_handler, write_handler);
   return client;
 }
 
 int main(int argc, char* argv[]) {
-  int pid = 1;  // default player id to control
-  if (argc > 1) {
-    int input = (*argv[1]) - '0';
-    if (input > 0 && input <= 4) {
-      pid = input;
-    }
-  }
-
-  boost::asio::io_context io_context;
-  auto client = network_init(io_context);
+  auto client = network_init();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
@@ -146,49 +137,104 @@ int main(int argc, char* argv[]) {
     char i = std::getchar();
     exit(EXIT_FAILURE);
   }
-  // Initialize objects/pointers for rendering; exit if initialization fails.
+
+  // Initialize game scene for rendering; exit if initialization fails.
   if (!Window::initializeObjects()) {
     std::cout << "Press enter...";
     char i = std::getchar();
     exit(EXIT_FAILURE);
   }
 
-  Window::gameScene->initFromServer(pid);  // temporary
+  // wait for server assignment, TODO: replace with start screen UI
+  while (!net_assigned) {
+    if (glfwWindowShouldClose(window)) {
+      game_exit = true;
+      break;
+    }
 
-  // Delta time logic (see
-  // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step)
-  double lastTime = glfwGetTime();
+    std::cout << "(net_assigned: " << net_assigned << ") ";
+    std::cout << "Waiting for server to assign pid..." << std::endl;
+    client->poll();
+
+    Window::draw(window);  // TODO: this should be lobby draw
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
+  }
+
+  if (!game_exit) {
+    std::cout << "Press Enter when you are ready to start..." << std::endl;
+
+    while (!Window::readyInput) {  // press enter check
+      Window::draw(window);        // TODO: this should be lobby draw
+      std::this_thread::sleep_for(std::chrono::milliseconds(16));
+    }
+
+    client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId,
+                                              "", true);
+    std::cout << "Ready!" << std::endl;
+  }
+
+  while (!game_exit && !is_game_ready) {
+    client->poll();
+    Window::draw(window);
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
+  }
+
+  // rate limit sending updates to network, credit:
+  // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step
+  const double min_time_between_updates = 1.0 / 60;
+  double prev_time = glfwGetTime();
+  double num_updates_to_send = 0;
+
+  double time_elapsed = 0;
+  int frame_count = 0;
+  int update_count = 0;
 
   // Loop while GLFW window should stay open.
-  while (!glfwWindowShouldClose(window)) {
-    // - Measure time
-    double nowTime = glfwGetTime();
-    double deltaTime = nowTime - lastTime;
-    lastTime = nowTime;
+  while (!game_exit && !glfwWindowShouldClose(window)) {
+    // check for updates from server
+    client->poll();
 
-    // POLL FROM SERVER
-    io_context.poll();
+    // update stats
+    frame_count++;
+    double curr_time = glfwGetTime();
+    double time_since_prev_frame = curr_time - prev_time;
+    prev_time = curr_time;
 
-    // Idle callback. Updating local objects, input, etc.
-    // Get a message back of all updates
-    message::UserStateUpdate mout = Window::idleCallback(window, deltaTime);
+    // handle updates to server
+    num_updates_to_send += time_since_prev_frame / min_time_between_updates;
+    while (num_updates_to_send >= 1.0) {
+      message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
 
-    PlayerID pid = my_player_id;
-    message::Message my_m{
-        message::Type::UserStateUpdate, {pid, std::time(nullptr)}, mout};
+      // check if update if valid
+      // TODO: in the future, remove this check since the player will definitely
+      // be initialized once we enter the game render loop
+      if (user_update.id == Window::gameScene->_myPlayerId)
+        client->write<message::UserStateUpdate>(user_update);
 
-    // OUTPUT TO SERVER
-    if (net_assigned) client.get()->write(my_m);
+      update_count++;
+      num_updates_to_send--;
+    }
 
-    // Main render display callback. Rendering of objects is done here.
-    Window::displayCallback(window);
+    // calculate fps/ups
+    time_elapsed += time_since_prev_frame;
+    if (time_elapsed > 1.0) {
+      Window::fps = frame_count / time_elapsed;
+      Window::ups = update_count / time_elapsed;
+
+      time_elapsed = 0;
+      update_count = 0;
+      frame_count = 0;
+    }
+
+    // update and render scene
+    Window::update(window, time_since_prev_frame);
+    Window::draw(window);
+
+    // prevent drawing too fast...
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 
   Window::cleanUp();
-  // Destroy the window.
   glfwDestroyWindow(window);
-  // Terminate GLFW.
   glfwTerminate();
-
-  exit(EXIT_SUCCESS);
 }

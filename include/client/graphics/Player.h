@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "Camera.h"
 #include "GameThing.h"
 #include "InputListener.h"
@@ -21,15 +23,12 @@ class Player : public GameThing, InputListener {
 
   PlayerModel* pmodel;  // visual information
 
-  float time;  // how long we've been tagged
-  bool tagged;
+  Player() { pmodel = nullptr; }
 
-  Player() {
-    time = 0;
-    pmodel = nullptr;
-    tagged = true;
-  }
+  message::UserStateUpdate pollInput();
 
-  UserState update(float dt);
-  glm::vec3 move(glm::vec3 movement);  // NOLINT
+  void update(float dt);
+  glm::vec3 move(glm::vec3 movement);
+
+  void faceDirection(glm::vec3 direction);
 };

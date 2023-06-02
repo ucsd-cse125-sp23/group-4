@@ -16,19 +16,21 @@
 #else
 #include <GL/glew.h>
 #endif
+
 #include <GLFW/glfw3.h>
 #include <math.h>
 
+#include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/rotate_normalized_axis.hpp>
 #include <glm/gtx/transform.hpp>
+#include <network/message.hpp>
+#include <network/tcp_server.hpp>
 #include <utility>
 #include <vector>
 
 #include "client/graphics/Node.h"
-#include "client/graphics/SceneState.h"
-#include "client/graphics/UserState.h"
 
 struct Transform {
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -52,29 +54,35 @@ struct Transform {
 // a GameThing (tm)
 class GameThing : public Node {
  public:
-  int netId = -1;  // used to connect with network/core data (-1 means unset)
+  int id = -1;  // used to connect with network/core data (-1 means unset)
   bool isUser = false;  // controls whether we want to read input and send it
 
   Transform transform;
   float azimuth = 0;  // for visuals only (aka heading)
 
-  virtual UserState update(float dt) {
+  virtual void update(float dt) {
     // --- example (spin spin) ---
     transform.rotation += glm::vec3(0, 30 * dt, 0);  // spin on y axis
     transform.updateMtx(&transformMtx);  // needed to update node matrix
-
-    return UserState();
   }
 
-  void updateFromState(SceneGameThingState state) {
+  virtual message::UserStateUpdate pollInput() {
+    return message::UserStateUpdate();
+  }
+
+  void updateFromState(message::GameStateUpdateItem state) {
     // update self from server input
-    setPositionTarget(state.position);
+    glm::vec3 pos = glm::vec3(state.posx, state.posy, state.posz);
+    setPositionTarget(pos);
     setHeading(state.heading);
   }
 
   // transform helpers
-
-  const float t_rate = 0.065f;  // in seconds (50ms tickrate + lag)
+  const float t_rate =
+      std::chrono::duration_cast<std::chrono::duration<double>>(
+          Server::TICK_RATE)
+          .count() +
+      0.015f;  // in seconds (50ms tickrate + lag)
   glm::vec3 position_p;
   glm::vec3 position_t;
   float lerp_p = 0.0f;
@@ -86,7 +94,7 @@ class GameThing : public Node {
   }
   void setPositionTarget(glm::vec3 pos) {
     // interpolated!
-    position_p = position_t;
+    position_p = transform.position;
     position_t = pos;
     lerp_p = 0.0f;
   }

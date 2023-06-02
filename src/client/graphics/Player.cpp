@@ -4,20 +4,24 @@
 #include <glm/glm.hpp>
 
 #include "Input.h"
-#include "UserState.h"
+#include "client/graphics/AssimpAnimation.h"
 
 using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
-UserState Player::update(float dt) {
-  // interpolate states
+void Player::update(float dt) {
+  // interpolate between old to new state
   updateInterpolate(dt);
 
-  if (!isUser) return UserState();
+  if (pmodel) pmodel->update(dt);
+}
+
+message::UserStateUpdate Player::pollInput() {
+  if (!isUser) return message::UserStateUpdate();
 
   if (camera && camera->Fixed)
-    return UserState();  // don't move the player in no clip (for now)
+    return message::UserStateUpdate();  // don't move the player in no clip
 
   vec3 moveLocal = vec3(0);  // relative to... keyboard
   bool jumping = false;
@@ -45,21 +49,28 @@ UserState Player::update(float dt) {
   bool moving = length(moveLocal) > 0;
 
   vec3 moveWorld = vec3(0);
+
   if (moving) {
     moveWorld = move(moveLocal);
-    if (pmodel) pmodel->update(dt);
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+    }
+  } else {
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+    }
   }
 
-  if (tagged) time += dt;  // move this to server TODO
+  if (jumping) {
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
+    }
+  }
 
-  // Get ready to send a message to the server: ***
-  UserState myInputState;
-  myInputState.id = netId;
-  myInputState.movement = moveWorld;
-  myInputState.heading = azimuth;
-  myInputState.jump = jumping;
-
-  return myInputState;
+  return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
 }
 
 vec3 Player::move(vec3 movement) {

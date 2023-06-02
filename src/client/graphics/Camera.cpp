@@ -49,6 +49,7 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
   // Compute final view-projection matrix
   ViewMtx = view;
   ViewProjectMtx = project * view;
+  ViewProjectOriginMtx = project * glm::mat4(glm::mat3(view));
 }
 
 void Camera::CamDrag(float a, float i) {
@@ -68,11 +69,11 @@ void Camera::CamZoom(float y) {
   SetDistance(dist);
 }
 
-UserState Camera::update(float dt) {
+void Camera::update(float dt) {
   // interpolate camera
   position_prev = glm::lerp(position_prev, position_target, lerpSpeed * dt);
 
-  if (!Fixed) return UserState();
+  if (!Fixed) return;
 
   vec3 moveLocal = vec3(0);
 
@@ -97,7 +98,7 @@ UserState Camera::update(float dt) {
 
   if (length(moveLocal) > 0) move_local(moveLocal);
 
-  return UserState();
+  return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +107,7 @@ void Camera::Reset() {
   FOV = 45.0f;
   Aspect = 1.33f;
   NearClip = 0.1f;
-  FarClip = 500.0f;
+  FarClip = 800.0f;
 
   Distance = 10.0f;
   Azimuth = -0.0f;

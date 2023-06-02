@@ -1,7 +1,7 @@
 #pragma once
 
+#include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/variant.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
@@ -9,35 +9,47 @@
 #include <ctime>
 #include <ostream>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace message {
 
-using PlayerID = boost::uuids::uuid;
+using ClientID = boost::uuids::uuid;
 
-enum class Type { Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate };
+enum class Type {
+  Assign,
+  Greeting,
+  Notify,
+  GameStateUpdate,
+  UserStateUpdate,
+  LobbyUpdate,
+  LobbyPlayerUpdate,
+  GameStart,
+};
 
 struct Metadata {
-  PlayerID player_id;
-  std::time_t time;
+  ClientID id;       // client id
+  std::time_t time;  // time of request being sent
 
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& player_id& time;
+    ar& id& time;
   }
 };
 
 struct Assign {
-  std::string toString() { return "assign response"; }
+  int pid;
 
+  std::string to_string() const;
   template <typename Archive>
-  void serialize(Archive& ar, unsigned int) {}
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid;
+  }
 };
 
 struct Greeting {
   std::string greeting;
-  std::string toString() { return greeting; }
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& greeting;
@@ -46,8 +58,8 @@ struct Greeting {
 
 struct Notify {
   std::string message;
-  std::string toString() { return message; }
 
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& message;
@@ -55,110 +67,86 @@ struct Notify {
 };
 
 struct GameStateUpdateItem {
-  friend class boost::serialization::access;
   int id;
   float posx;
   float posy;
   float posz;
   float heading;
 
-  GameStateUpdateItem() {}
-
-  std::string toString() {
-    // clang-format off
-    std::string str = std::string("") + "{\n" +
-                      "  id: " + std::to_string(id) +
-                      ",\n" +  // NOLINT
-                      "  position: {\n" +
-                      "  " + std::to_string(posx) +
-                      ", " + std::to_string(posy) +
-                      ", " + std::to_string(posz) +
-                      "\n" +  // NOLINT
-                      "  },\n" +
-                      "  heading: " + std::to_string(heading) +
-                      ",\n" +  // NOLINT
-                      "}";
-    // clang-format on
-    return str;
-  }
-
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id;
-    ar& posx;
-    ar& posy;
-    ar& posz;
-    ar& heading;
+    ar& id& posx& posy& posz& heading;
   }
 };
 
 struct GameStateUpdate {
-  std::vector<GameStateUpdateItem*> things;
+  std::unordered_map<int, GameStateUpdateItem> things;
   // add global params later
 
-  std::string toString() {
-    // clang-format off
-    std::string str = std::string("") + "{...\n" +
-                      "game things:\n";
-    // clang-format on
-    for (auto i : things) {
-      str += i->toString();
-    }
-    str += "\n}...\n";
-    return str;
-  }
-
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
     ar& things;
   }
 };
+
 struct UserStateUpdate {
-  int id;
+  int id = -1;  // assume -1 IDs invalid
   float movx;
   float movy;
   float movz;
   bool jump;
   float heading;
 
-  std::string toString() {
-    // clang-format off
-    std::string str = std::string("") + "{\n" +
-                      "  id: " + std::to_string(id) +
-                      ",\n" +  // NOLINT
-                      "  movement delta: {\n" +
-                      "  " + std::to_string(movx) +
-                      ", " + std::to_string(movy) +
-                      ", " + std::to_string(movz) +
-                      "\n" +  // NOLINT
-                      "  },\n" +
-                      "  jump: " + std::to_string(jump) +
-                      ",\n" +  // NOLINT
-                      "  heading: " + std::to_string(heading) +
-                      ",\n" +  // NOLINT
-                      "}";
-    // clang-format on
-    return str;
-  }
-
+  std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id;
-    ar& movx;
-    ar& movy;
-    ar& movz;
-    ar& jump;
-    ar& heading;
+    ar& id& movx& movy& movz& jump& heading;
+  }
+};
+
+struct LobbyPlayer {
+  int id;
+  std::string skin;
+  bool is_ready;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id& skin& is_ready;
+  }
+};
+using LobbyPlayerUpdate = LobbyPlayer;  // type alias for client usage
+
+struct LobbyUpdate {
+  std::unordered_map<int, LobbyPlayer> players;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& players;
+  }
+};
+
+struct GameStart {
+  std::unordered_map<int, bool> client_states;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& client_states;
   }
 };
 
 struct Message {
+  using Body =
+      boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate,
+                     LobbyUpdate, LobbyPlayerUpdate, GameStart>;
   Type type;
   Metadata metadata;
-  boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate>
-      body;
-
-  std::string toString() const;
+  Body body;
+  std::string to_string() const;
   friend std::ostream& operator<<(std::ostream&, const Message&);
 
   template <typename Archive>
@@ -166,5 +154,7 @@ struct Message {
     ar& type& metadata& body;
   }
 };
+
+Type get_type(const Message::Body&);
 
 }  // namespace message
