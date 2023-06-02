@@ -68,8 +68,7 @@ PObject::PObject(BoundingShape* shape, unsigned int layer, float friction,
 PObject::~PObject() { delete bounds; }
 void PObject::tick() {
   Modifiable::tick();
-  this->vel.y -= std::max(
-      0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
+  this->vel.y -= std::max(0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
   lastSurfaceNormal = vec3f(0, 0, 0);
   lastSurfaceFriction = 0;
@@ -112,8 +111,9 @@ void PObject::move(vec3f dPos) {
       this->vel = tangent(this->vel, norm);
       float baseMu = hit.first->getBounds()->friction;
       float modifiedMu = this->modifyValue(baseMu, FRICTION_MODIFIER);
-      this->vel -= this->vel * w * modifiedMu;
-      rDPos -= rDPos * w * modifiedMu;
+      this->vel = this->vel * std::max(0.0f, 1.0f - w * modifiedMu);
+      rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
+      //std::cout << length(rDPos * vec3f(1,0,1)) << " " << length(rDPos * vec3f(0,1,0)) << std::endl;
 
       this->lastSurfaceNormal = norm;
       this->lastSurfaceFriction = baseMu;
