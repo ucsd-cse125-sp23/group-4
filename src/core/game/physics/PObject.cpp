@@ -113,7 +113,6 @@ void PObject::move(vec3f dPos) {
       float modifiedMu = this->modifyValue(baseMu, FRICTION_MODIFIER);
       this->vel = this->vel * std::max(0.0f, 1.0f - w * modifiedMu);
       rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
-      //std::cout << length(rDPos * vec3f(1,0,1)) << " " << length(rDPos * vec3f(0,1,0)) << std::endl;
 
       this->lastSurfaceNormal = norm;
       this->lastSurfaceFriction = baseMu;
