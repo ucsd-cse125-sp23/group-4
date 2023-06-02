@@ -262,8 +262,7 @@ std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos, std::set<
       norm = normalize(vec3f(offsetShape->mtv(
           objBounds->shape, translate(movement),
           translate_scale(objBounds->getPos(), objBounds->getScale()))));
-      //std::cout << "deep" << std::endl;
-    } //else std::cout << "shallow" << std::endl;
+    }
   }
   return std::make_pair(lastHit, vec4f(norm, t));
 }

@@ -59,8 +59,6 @@ PObject::~PObject() { delete bounds; }
 void PObject::tick() {
   Modifiable::tick();
 
-  //if (!onGround)
-  //  lastSurfaceNormal = vec3f(0, 0, 0);
   lastSurfaceFriction = 0;
   
   move(this->vel);
@@ -69,26 +67,20 @@ void PObject::tick() {
 void PObject::move(vec3f dPos) {
   oPos = pos;
 
-  //std::cout << "::" << pos << " " << vel << " " << onGround << std::endl;
-
   int ite = 0;
   float totalY = 0;
   vec3f rDPos = dPos;
   std::set<PObject*> collided;
-  //vec3f latestNorm = vec3f(0, 0, 0);
   while (length_squared(rDPos) > 0.01 && ite++ < 15) {
     std::pair<PObject*, vec4f> hit =
         this->level->getEnvironment()->ccd(this, rDPos, collided);
     float t = hit.second.w;
     vec3f norm = vec3f(hit.second);
-    //if (norm == vec3f(0, 0, 0)) norm = latestNorm;
 
     vec3f mDPos = rDPos * hit.second.w;
 
     mDPos -= normalize(mDPos) * 0.001f;
     rDPos -= mDPos;
-
-    //std::cout << ":" << norm << " " << rDPos << " " << mDPos << std::endl;
 
     pos.y += mDPos.y;
     if (!freeze) {
@@ -120,7 +112,6 @@ void PObject::move(vec3f dPos) {
     this->onCollision(obj);
     level->eventManager->fireCollisionEvent(this, obj);
   }
-  //std::cout << std::endl;
 
   if (totalY < -0.01 &&
       lastSurfaceNormal.y <
