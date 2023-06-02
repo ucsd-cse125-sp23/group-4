@@ -33,6 +33,7 @@ class Level {
   explicit Level(Environment* environment);
   ~Level();
   void setCollisionType(CollisionType type, int layer0, int layer1);
+  CollisionType collisionType(int layer0, int layer1);
   void addPObject(PObject* obj);
   unsigned long long getAge();
   Environment* getEnvironment();

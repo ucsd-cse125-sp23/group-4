@@ -38,4 +38,6 @@ class PObject : public Modifiable {
   virtual void move(vec3f dPos);
   virtual void onCollision(PObject* other) {}
   virtual void onTrigger(PObject* other) {}
+
+  static void response(PObject* self, PObject* other, vec4f mtv);
 };

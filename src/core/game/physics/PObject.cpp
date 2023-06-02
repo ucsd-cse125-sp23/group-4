@@ -5,7 +5,7 @@
 
 uint32_t PObject::maxId = 0;
 
-void response(PObject* self, PObject* other, vec4f mtv) {
+void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
   /*If object is falling and mtv is atleast a little up, the we determine the
    * object to be onGround*/
@@ -38,6 +38,7 @@ void response(PObject* self, PObject* other, vec4f mtv) {
 
   other->onCollision(self);
   self->onCollision(other);
+  self->level->eventManager->fireCollisionEvent(self, other);
 }
 
 PObject::PObject(BoundingShape* shape, unsigned int layer, float friction,
@@ -114,6 +115,11 @@ void PObject::move(vec3f dPos) {
     }
     this->bounds->setPos(pos);
   }
+  for (PObject* obj : collided) {
+    obj->onCollision(this);
+    this->onCollision(obj);
+    level->eventManager->fireCollisionEvent(this, obj);
+  }
   //std::cout << std::endl;
 
   if (totalY < -0.01 &&
@@ -127,6 +133,15 @@ void PObject::move(vec3f dPos) {
     response(this, pair.first, pair.second);
     pair = environment->mtv(this);
   }
+
+  const CollisionBounds* selfBounds = this->getBounds();
+  for (PObject* obj : environment->collides(this))
+    if (level->collisionType(selfBounds->layer, obj->getBounds()->layer) ==
+        CollisionType::TRIGGER) {
+      this->onTrigger(obj);
+      obj->onTrigger(this);
+      level->eventManager->fireTriggerEvent(this, obj);
+    }
 }
 vec3f PObject::getPos() { return pos; }
 void PObject::setPos(vec3f pos) {

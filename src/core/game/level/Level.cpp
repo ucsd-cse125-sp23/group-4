@@ -48,7 +48,6 @@ void Level::tick() {
     }
   }
 
-  /*
   allIds = this->objects.getAllIds();
   std::vector<PObject*> collisions;
   for (size_t id : allIds) {
@@ -83,15 +82,9 @@ void Level::tick() {
         }
       }
       if (collisions.empty() || ind == -1) break;
-      response(self, collisions[ind], minMTV);
+      PObject::response(self, collisions[ind], minMTV);
       collisions[ind] = collisions.back();
       collisions.pop_back();
-    }
-
-    std::pair<PObject*, vec4f> pair = environment->mtv(self);
-    while (pair.first != nullptr) {
-      response(self, pair.first, pair.second);
-      pair = environment->mtv(self);
     }
   }
 
@@ -115,15 +108,7 @@ void Level::tick() {
           break;
       }
     }
-    for (PObject* obj : this->environment->collides(self))
-      if (collisionTypeLUT[selfBounds->layer][obj->getBounds()->layer] ==
-          CollisionType::TRIGGER) {
-        self->onTrigger(obj);
-        obj->onTrigger(self);
-        this->eventManager->fireTriggerEvent(self, obj);
-      }
   }
-  */
 
   this->age++;
 }
@@ -144,6 +129,9 @@ Level::~Level() {
 void Level::setCollisionType(CollisionType type, int layer0, int layer1) {
   collisionTypeLUT[layer0][layer1] = type;
   collisionTypeLUT[layer1][layer0] = type;
+}
+CollisionType Level::collisionType(int layer0, int layer1) {
+  return collisionTypeLUT[layer0][layer1];
 }
 void Level::addPObject(PObject* obj) {
   objects.addPObject(obj);
