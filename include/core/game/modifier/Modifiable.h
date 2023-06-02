@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include "core/game/modifier/ModifierInstance.h"
 
@@ -41,9 +42,9 @@ class Modifiable {
     return false;
   }
   void removeMarkedModifier() {
-    for (auto pair : modifiers) {
+    for (auto& pair : modifiers) {
       for (int i = 0; i < pair.second.size(); i++) {
-        if (static_cast<ModifierData*>(pair.second[i]->get())->markedRemove) {
+        if (pair.second[i]->get()->markedRemove) {
           delete pair.second[i];
           pair.second[i] = pair.second.back();
           pair.second.pop_back();
@@ -59,7 +60,7 @@ class Modifiable {
     return modifiers[modifier];
   }
   void tick() {
-    for (auto pair : this->getModifiers()) {
+    for (auto pair : modifiers) {
       for (auto instance : pair.second)
         pair.first->modify(this, instance->get());
     }
