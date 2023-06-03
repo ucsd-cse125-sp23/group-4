@@ -6,20 +6,29 @@ void Lobby::update(float delta, GamePhase& phase, bool& transition) {
   GameThing* display = models[index];
   display->update(delta);
 
+  
+}
+
+message::LobbyPlayerUpdate Lobby::pollUpdate() {
+  int message_id = -1;
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
+    message_id = _myPlayerId;
     ready = true;
     selectedModel = player_models[index];
   }
   if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
+    message_id = _myPlayerId;
     index++;
     if (index >= models.size()) index = 0;
     buildSceneTree();
   }
   if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
+    message_id = _myPlayerId;
     index--;
     if (index < 0) index = models.size() - 1;
     buildSceneTree();
   }
+  return {message_id, "", ready};
 }
 
 void Lobby::receiveState(message::LobbyUpdate newState) {

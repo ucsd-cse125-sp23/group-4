@@ -28,6 +28,7 @@
 bool net_assigned = false;
 bool is_game_ready = false;
 bool game_exit = false;
+int player_id = -1;
 
 void error_callback(int error, const char* description) {
   std::cerr << description << std::endl;
@@ -84,7 +85,7 @@ std::unique_ptr<Client> network_init() {
     auto assign_handler = [&client](const message::Assign& body) {
       Window::gameScene->initFromServer(body.pid);  // need a unique int id
       client.write<message::Greeting>("Hello, server!");
-
+      player_id = body.pid;
       net_assigned = true;
     };
 
@@ -98,7 +99,6 @@ std::unique_ptr<Client> network_init() {
       } else {
         Window::lobby_update = body;
       }
-
     };
 
     auto game_ready_handler = [](const message::GameStart& body) {
@@ -107,7 +107,6 @@ std::unique_ptr<Client> network_init() {
         Window::transition = true;
         is_game_ready = true;
       }
-          
     };
 
     auto any_handler = [](const message::Message::Body&) {};
@@ -165,7 +164,7 @@ int main(int argc, char* argv[]) {
   int update_count = 0;
 
   // wait for server assignment, TODO: replace with start screen UI
-  while (!net_assigned) {
+  while (!net_assigned || Window::phase == GamePhase::Start) {
     if (glfwWindowShouldClose(window)) {
       game_exit = true;
       break;
@@ -196,14 +195,16 @@ int main(int argc, char* argv[]) {
   }
 
   // TODO: replace with lobby UI
-  client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId, "",
-                                            true);
-
   while (!is_game_ready) {
     client->poll();
     double curr_time = glfwGetTime();
     double time_since_prev_frame = curr_time - prev_time;
     prev_time = curr_time;
+    auto lobby = dynamic_cast<Lobby*>(Window::gameScene);
+    message::LobbyPlayerUpdate message = lobby->pollUpdate();
+    if (message.id != -1) {
+      client->write<message::LobbyPlayerUpdate>(message);
+    }
     Window::update(window, time_since_prev_frame);
     Window::draw(window);
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
