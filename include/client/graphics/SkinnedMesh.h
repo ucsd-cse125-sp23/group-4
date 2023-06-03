@@ -22,7 +22,7 @@ class SkinnedMesh : public Mesh {
 
   virtual void init(const char* filename);
 
-  //void updateSkin(Skeleton* skel);
+  // void updateSkin(Skeleton* skel);
 
   virtual void draw(void) {
     // special skin behavior: always rebind vertices(?)

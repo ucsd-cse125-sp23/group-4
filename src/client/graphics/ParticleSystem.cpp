@@ -1,5 +1,7 @@
 #include "ParticleSystem.h"
 
+using std::string;
+
 void ParticleSystem::Emit(int amount) {
   amount *= creationAmount;
   for (int i = 0; i < amount; i++) Emit();
@@ -62,8 +64,8 @@ void ParticleSystem::Spawner(float deltaTime) {
   timer += deltaTime;
 
   float num = deltaTime * creationRate + _roundOffError;
-  int n = int(num);
-  _roundOffError = num - float(n);
+  int n = static_cast<int>(num);
+  _roundOffError = num - static_cast<float>(n);
 
   Emit(n);
 }
@@ -88,7 +90,7 @@ void ParticleSystem::draw(const DrawInfo info) {
   }
 }
 
-void ParticleSystem::show(const string name) {
+void ParticleSystem::show(const std::string name) {
   /*// Tweak bar
   bar = TwNewBar(name.c_str());
 

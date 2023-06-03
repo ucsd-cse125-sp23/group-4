@@ -6,10 +6,12 @@
 #pragma once
 
 #include "client/graphics/core.h"
-using namespace ::std;
-using namespace ::glm;
+using glm::vec3;
+using glm::vec4;
 
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "client/graphics/Cube.h"
 #include "client/graphics/DOF.h"
@@ -61,10 +63,10 @@ class ParticleSystem : public GameThing {
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
             const glm::mat4& parentMtx);
   void draw(const DrawInfo info);
-  void show(const string name);
+  void show(const std::string name);
 
  private:
-  vector<DOF> position = {DOF(), DOF(), DOF()};  // System position
+  std::vector<DOF> position = {DOF(), DOF(), DOF()};  // System position
   vec4 rotation;
 
   Cube* box;
@@ -83,7 +85,7 @@ class ParticleSystem : public GameThing {
 
   const unsigned int _maxParticles = 1000;
 
-  vector<Particle*> particles;
+  std::vector<Particle*> particles;
 
   // For maintaining vector structure
   void DeleteParticleAt(int index) {
@@ -100,9 +102,9 @@ class ParticleSystem : public GameThing {
 
   // Properties
   float initColor[4] = {1.0f, 0.9f, 0.3f, 1.0f};
-  vector<DOFr> initPosition = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
+  std::vector<DOFr> initPosition = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
                                DOFr(-50, 50, 0)};  // Ranges for offset
-  vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 5),
+  std::vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 5),
                                DOFr(-50, 50, 0)};  // Ranges
   DOF radialPosition = DOF(0, 50, 0);
   DOF radialVelocity = DOF(0, 100, 4);

@@ -34,7 +34,7 @@ class Particle {
     fixed = false;
   }
   Particle(vec3 pos, float m) : Particle(pos, vec3(0), m) {}
-  Particle(vec3 pos) : Particle(pos, vec3(0), 0.25f) {}
+  explicit Particle(vec3 pos) : Particle(pos, vec3(0), 0.25f) {}
 
   void AddForce(vec3& f) { force += f; }
   void AddForceRaw(vec3& f) { forceraw += f; }
@@ -85,7 +85,7 @@ class Particle {
   vec3* windVelocity = nullptr;
   float airDensity = 0.0f;
   float drag = 0.0f;  // Coefficient
-  float area() { return glm::pi<float>() * (float)pow(radius, 2); }
+  float area() { return glm::pi<float>() * static_cast<float>(pow(radius, 2)); }
 
   bool* collisions = nullptr;
   float restitution = 0.1f;  // elasticity
