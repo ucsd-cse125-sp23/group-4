@@ -45,9 +45,10 @@ void Particle::draw(const DrawInfo info) {
   particleMtx = alignToViewMtx(pos, vMatrix);
 
   // draw
+  particleModel.draw(info.viewProjMtx, info.viewMtx, particleMtx);
 }
 
-float Particle::CollisionLowBound() { return 0.0f; }
+float Particle::CollisionLowBound() { return 1.0f; }
 
 void Particle::Integrate(float dt) {
   if (fixed) return;

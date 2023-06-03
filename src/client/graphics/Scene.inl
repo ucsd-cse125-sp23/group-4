@@ -31,6 +31,9 @@ void Scene::init(void) {
   sceneResources->meshes["cubeUV"] = new Obj();
   sceneResources->meshes["cubeUV"]->init(
       "assets/model/dev/bevel_cube.obj");  // includes UV data
+
+  sceneResources->meshes["particleQuad"] = new Obj();
+  sceneResources->meshes["particleQuad"]->init("assets/model/quad.obj");
 #pragma endregion
 
   // Create shader palette
@@ -187,6 +190,17 @@ void Scene::init(void) {
   sfx->load("assets/sounds/sound_test.wav");
 #pragma endregion
 
+  // Setup particle effects
+#pragma region Particles
+  ParticleSystem* ptcl = new ParticleSystem();
+  ptcl->name = "GT_particleSystemTest";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["grid"];
+  ptcl->transform.position = vec3(0, 3, 0);
+  ptcl->transform.updateMtx(&ptcl->transformMtx);
+  localGameThings.push_back(ptcl);
+#pragma endregion
+
   // Skybox setup
 #pragma region Skybox
   sceneResources->shaderPrograms["skybox"] =
@@ -236,7 +250,6 @@ void Scene::init(void) {
   // TODO(matthew) copy over mesh too? for animations?
   m_prefab->material = sceneResources->materials["toon.blue"];
 
-
   AssimpModel* am = new AssimpModel();
   am->loadAssimp("assets/animation/withUV/Animation -Bee2.fbx");
   am->setAnimation("walk");
@@ -263,6 +276,8 @@ void Scene::init(void) {
   node["teapot1"] = thing_example;
   node["cubeTest"] = thing_cube;
 
+  node["particleTest"] = ptcl;
+
   node["map"] = new Node("_map");
   node["map"]->model = sceneResources->models["map"];
 
@@ -284,8 +299,11 @@ void Scene::init(void) {
 
   // node["world"]->childnodes.push_back(node["teapot1"]);
   node["world"]->childnodes.push_back(node["cubeTest"]);
+  node["world"]->childnodes.push_back(node["particleTest"]);
 
   node["world"]->childnodes.push_back(node["collision"]);
 
   node["world"]->childnodes.push_back(node["map"]);
+
+  createPlayer(-1);
 }

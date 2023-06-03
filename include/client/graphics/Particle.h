@@ -12,6 +12,7 @@ using glm::vec4;
 
 #include "Cube.h"
 #include "Mesh.h"
+#include "Model.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +20,7 @@ using glm::vec4;
 
 class Particle {
  public:
-  Mesh* mesh;
+  Model particleModel;
 
   mat4 particleMtx;  // applied first!
   vec3 colorTint;
@@ -28,15 +29,12 @@ class Particle {
       : position(pos), velocity(vel), refPosition(pos), mass(m) {
     force = vec3(0);
 
-    // mesh = new Quad();
-    // mesh->setMatrix(translate(position));
+    // particleModel gets set by system
+
     fixed = false;
   }
   Particle(vec3 pos, float m) : Particle(pos, vec3(0), m) {}
   Particle(vec3 pos) : Particle(pos, vec3(0), 0.25f) {}
-  ~Particle() {
-    if (mesh) delete mesh;
-  }
 
   void AddForce(vec3& f) { force += f; }
   void AddForceRaw(vec3& f) { forceraw += f; }

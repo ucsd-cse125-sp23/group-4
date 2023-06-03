@@ -41,9 +41,9 @@ class Tools {
 };
 
 struct DrawInfo {
-  const glm::mat4& viewProjMtx;
-  const glm::mat4& viewProjOrigMtx;
-  const glm::mat4& viewMtx;
+  glm::mat4 viewProjMtx;
+  glm::mat4 viewProjOrigMtx;
+  glm::mat4 viewMtx;
   GLuint shader;
 
   /**DrawInfo(const glm::mat4& vp, const glm::mat4& v, GLuint sdr) :

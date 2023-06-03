@@ -13,14 +13,20 @@ using namespace ::glm;
 
 #include "Cube.h"
 #include "DOF.h"
+#include "GameThing.h"
+#include "Material.h"
+#include "Mesh.h"
 #include "Particle.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // The ParticleSystem class for spawning and managing many particles.
 
-class ParticleSystem {
+class ParticleSystem : public GameThing {
  public:
+  Mesh* meshRef;
+  Material* materialRef;
+
   ParticleSystem() : rotation(vec4(0)) {
     particles.reserve(_maxParticles);
 
@@ -50,9 +56,12 @@ class ParticleSystem {
   }
 
   void Emit(int amount);
-  void Update(float deltaTime);
-  void Draw(const DrawInfo info);
-  void Show(const string name);
+
+  void update(float dt);
+  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+            const glm::mat4& parentMtx);
+  void draw(const DrawInfo info);
+  void show(const string name);
 
  private:
   vector<DOF> position = {DOF(), DOF(), DOF()};  // System position
@@ -68,7 +77,7 @@ class ParticleSystem {
   float timer = 0.0f;     // Internal timer for emissions
   float duration = 1.0f;  // Negative for infinite loop
 
-  float creationRate = 1.0f;        // How many emissions per second
+  float creationRate = 5.0f;        // How many emissions per second
   unsigned int creationAmount = 1;  // How many particles to emit
   float _roundOffError = 0.0f;
 
@@ -93,10 +102,10 @@ class ParticleSystem {
   float initColor[4] = {1.0f, 0.9f, 0.3f, 1.0f};
   vector<DOFr> initPosition = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
                                DOFr(-50, 50, 0)};  // Ranges for offset
-  vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
+  vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 5),
                                DOFr(-50, 50, 0)};  // Ranges
   DOF radialPosition = DOF(0, 50, 0);
-  DOF radialVelocity = DOF(0, 100, 0);
+  DOF radialVelocity = DOF(0, 100, 4);
 
   DOF initMass = DOF(0.1f, 10, 0.1f);
 
