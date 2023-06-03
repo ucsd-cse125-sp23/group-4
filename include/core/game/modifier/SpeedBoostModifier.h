@@ -2,17 +2,17 @@
 
 #include <cstdint>
 
-#include "core/game/modifier/TimedModifier.h"
+#include "core/game/modifier/Modifier.h"
 #include "core/game/physics/PObject.h"
 #include "core/math/vector.h"
 
-struct SpeedBoostModifierData : TimedModifierData {
+struct SpeedBoostModifierData : ModifierData {
   float factorIncrease;
-  SpeedBoostModifierData(uint64_t expire, float factorIncrease)
-      : TimedModifierData(expire), factorIncrease(factorIncrease) {}
+  SpeedBoostModifierData(std::uint64_t duration, float factorIncrease)
+      : ModifierData(duration), factorIncrease(factorIncrease) {}
 };
-class SpeedBoostModifier : public TimedModifier {
+class SpeedBoostModifier : public Modifier {
  public:
   SpeedBoostModifier();
-  void timedModify(Modifiable* obj, ModifierData* data) override;
+  void modify(Modifiable* obj, ModifierData* data) override;
 };
