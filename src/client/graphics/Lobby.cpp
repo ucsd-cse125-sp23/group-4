@@ -150,12 +150,16 @@ void Lobby::drawPlayers() {
   int y = 30;
   for (auto player : players) {
     message::LobbyPlayer play = player.second;
+    int id = play.id;
     std::string name = play.skin;
     // get index
     // draw
     glViewport(x, y, size, size);
-
-    glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
+    if (id != _myPlayerId) {
+      glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
+    } else {
+      glColor3f(1.0, 0.0, 0.0);
+    }
     glBegin(GL_TRIANGLES);
     glVertex2f(0, 1);
     glVertex2f(1, 0);
