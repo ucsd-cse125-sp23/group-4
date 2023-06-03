@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include "core.h"
+#include "client/graphics/core.h"
 using glm::mat4;
 using glm::vec3;
 using glm::vec4;
 
-#include "Cube.h"
-#include "Mesh.h"
-#include "Model.h"
+#include "client/graphics/Cube.h"
+#include "client/graphics/Mesh.h"
+#include "client/graphics/Model.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

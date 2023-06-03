@@ -5,18 +5,18 @@
 
 #pragma once
 
-#include "core.h"
+#include "client/graphics/core.h"
 using namespace ::std;
 using namespace ::glm;
 
 #include <sstream>
 
-#include "Cube.h"
-#include "DOF.h"
-#include "GameThing.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Particle.h"
+#include "client/graphics/Cube.h"
+#include "client/graphics/DOF.h"
+#include "client/graphics/GameThing.h"
+#include "client/graphics/Material.h"
+#include "client/graphics/Mesh.h"
+#include "client/graphics/Particle.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

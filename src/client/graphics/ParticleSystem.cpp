@@ -146,8 +146,10 @@ void ParticleSystem::show(const string name) {
   initVelocity[1].Show(bar, "Speed.Y", "RandomSpeed");
   initVelocity[2].Show(bar, "Speed.Z", "RandomSpeed");
 
+
   TwDefine(string(name + "/RandomSpeed group=Transform").c_str());
   TwDefine(string(name + "/RandomSpeed opened=false").c_str());
+
 
   // Particles
   lifespan.Show(bar, "Lifespan", "Particles");
