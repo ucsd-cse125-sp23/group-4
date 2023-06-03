@@ -1,34 +1,32 @@
 #include "Lobby.h"
 
-#include "Lobby.inl"
+#include <network/message.hpp>
 
-void Lobby::update(float delta, GamePhase& phase, bool& transition) {
+#include "Lobby.inl"
+#include "Window.h"
+
+void Lobby::update(float delta) {
   GameThing* display = models[index];
   display->update(delta);
 
-  
-}
-
-message::LobbyPlayerUpdate Lobby::pollUpdate() {
-  int message_id = -1;
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-    message_id = _myPlayerId;
     ready = true;
     selectedModel = player_models[index];
+    Window::client->write<message::LobbyPlayerUpdate>(
+        Window::my_pid, "selected skin " + std::to_string(index), ready);
   }
   if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
-    message_id = _myPlayerId;
-    index++;
-    if (index >= models.size()) index = 0;
+    index = (index + 1) % models.size();
     buildSceneTree();
+    Window::client->write<message::LobbyPlayerUpdate>(
+        Window::my_pid, "selected skin " + std::to_string(index), ready);
   }
   if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
-    message_id = _myPlayerId;
-    index--;
-    if (index < 0) index = models.size() - 1;
+    index = (index - 1 + models.size()) % models.size();
     buildSceneTree();
+    Window::client->write<message::LobbyPlayerUpdate>(
+        Window::my_pid, "selected skin " + std::to_string(index), ready);
   }
-  return {message_id, "", ready};
 }
 
 void Lobby::receiveState(message::LobbyUpdate newState) {

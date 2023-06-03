@@ -46,9 +46,8 @@ class Lobby : public Scene, public InputListener {
   }
 
   void init(void);
-  void update(float delta, GamePhase& phase, bool& transition);
+  void update(float delta) override;
   void receiveState(message::LobbyUpdate newState);
-  message::LobbyPlayerUpdate pollUpdate();
   void buildSceneTree();
   void draw();
   void drawBackground();
