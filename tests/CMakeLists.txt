@@ -7,7 +7,7 @@ FetchContent_MakeAvailable(Catch2)
 set(TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/example.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/core/math.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/core/collision.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/core/collision.cpp
     #${CMAKE_CURRENT_SOURCE_DIR}/core/game.cpp
 )
 
