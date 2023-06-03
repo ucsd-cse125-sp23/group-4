@@ -196,6 +196,10 @@ int main(int argc, char* argv[]) {
 
   // TODO: replace with lobby UI
   while (!is_game_ready) {
+    if (glfwWindowShouldClose(window)) {
+      game_exit = true;
+      break;
+    }
     client->poll();
     double curr_time = glfwGetTime();
     double time_since_prev_frame = curr_time - prev_time;

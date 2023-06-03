@@ -5,8 +5,6 @@
 void Lobby::update(float delta, GamePhase& phase, bool& transition) {
   GameThing* display = models[index];
   display->update(delta);
-
-  
 }
 
 message::LobbyPlayerUpdate Lobby::pollUpdate() {
@@ -28,7 +26,7 @@ message::LobbyPlayerUpdate Lobby::pollUpdate() {
     if (index < 0) index = models.size() - 1;
     buildSceneTree();
   }
-  return {message_id, "", ready};
+  return {message_id, skin_names[index], ready};
 }
 
 void Lobby::receiveState(message::LobbyUpdate newState) {
@@ -151,6 +149,8 @@ void Lobby::drawPlayers() {
   int x = midpoint - (4 * (size - (30 * scale))) + 10;  // TODO: fix spacing
   int y = 30;
   for (auto player : players) {
+    message::LobbyPlayer play = player.second;
+    std::string name = play.skin;
     // get index
     // draw
     glViewport(x, y, size, size);
@@ -187,7 +187,7 @@ void Lobby::drawPlayers() {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    icons["blushing"].bindgl();
+    icons[name].bindgl();
     glEnable(GL_TEXTURE_2D);
 
     glColor3f(1.0f, 1.0f, 1.0f);

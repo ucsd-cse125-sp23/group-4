@@ -13,6 +13,7 @@ class Lobby : public Scene, public InputListener {
   FontRenderer* fr = new FontRenderer("assets/fonts/Roboto-Black.ttf");
   Texture background;
   Texture flag;
+  std::vector<std::string> skin_names;
   std::map<std::string, Texture> icons;
   std::map<int, message::LobbyPlayer> players;
 
@@ -32,12 +33,16 @@ class Lobby : public Scene, public InputListener {
 
     background.init("assets/image/character_select.png");
     flag.init("assets/image/flag.png");
+
     icons["neutral"].init("assets/icons/neutral.png");
-    icons["angry"].init("assets/icons/angry.png");
     icons["blushing"].init("assets/icons/blushing.png");
     icons["crying"].init("assets/icons/crying.png");
-    icons["heart"].init("assets/icons/heart.png");
     icons["side_eye"].init("assets/icons/side_eye.png");
+
+    skin_names.push_back("neutral");
+    skin_names.push_back("blushing");
+    skin_names.push_back("crying");
+    skin_names.push_back("side_eye");
 
     wait.time = 5;
     wait.countdown = true;
