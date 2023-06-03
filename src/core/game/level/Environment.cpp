@@ -177,11 +177,12 @@ std::pair<PObject*, vec4f> Environment::mtv(PObject* self) {
           stack.push(curr->right);
         } else {
           vec4f v = self->getBounds()->mtv(curr->obj->getBounds());
-          if (v.w > 0)
+          if (v.w > 0) {
             if (v.w < minMTV.w) {
               minMTV = v;
               minObj = curr->obj;
             }
+          }
         }
       }
     }

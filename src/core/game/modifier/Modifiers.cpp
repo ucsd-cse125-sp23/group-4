@@ -1,3 +1,5 @@
+#include <cstdint>
+
 #include "core/game/modifier/AttractModifier.h"
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/modifier/FreezeModifier.h"
@@ -6,7 +8,7 @@
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 
-ModifierData::ModifierData(unsigned long long duration) : markedRemove(false) {
+ModifierData::ModifierData(std::uint64_t duration) : markedRemove(false) {
   expire = duration == 0 ? 0 : level->getAge() + duration;
 }
 void ModifierData::markExpired() {
@@ -68,9 +70,9 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     TaggedStatusModifierData* cData =
         static_cast<TaggedStatusModifierData*>(data);
-    if (pObj->level->getAge() - cData->taggedTime < TAG_COOLDOWN)
+    if (pObj->level->getAge() - cData->taggedTime < TAG_COOLDOWN) {
       pObj->freeze = true;
-    else if (cData->isIt) {
+    } else if (cData->isIt) {
       int lvl = (pObj->level->getAge() - cData->taggedTime) / 200;
       if (lvl > 5) lvl = 5;
       pObj->addPos(lvl * 0.04f * pObj->vel * vec3f(1, 0, 1));

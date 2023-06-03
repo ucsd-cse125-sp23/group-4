@@ -14,9 +14,10 @@ struct TVector3 {
   template <typename T2>
   TVector3(const TVector3<T2>& v) : x(T(v.x)), y(T(v.y)), z(T(v.z)) {}
   template <typename T2>
-  TVector3(const T2* v) : x(T(v[0])), y(T(v[1])), z(T(v[2])) {}
+  explicit TVector3(const T2* v) : x(T(v[0])), y(T(v[1])), z(T(v[2])) {}
   template <typename T2>
-  TVector3(const TVector4<T2>& v) : x(T(v[0])), y(T(v[1])), z(T(v[2])) {}
+  explicit TVector3(const TVector4<T2>& v)
+      : x(T(v[0])), y(T(v[1])), z(T(v[2])) {}
 
   T& operator[](int i) { return *(&x + i); }
 
@@ -46,7 +47,8 @@ struct TVector4 {
   TVector4(const TVector4<T2>& v)
       : x(T(v.x)), y(T(v.y)), z(T(v.z)), w(T(v.w)) {}
   template <typename T2>
-  TVector4(const T2* v) : x(T(v[0])), y(T(v[1])), z(T(v[2])), w(T(v[3])) {}
+  explicit TVector4(const T2* v)
+      : x(T(v[0])), y(T(v[1])), z(T(v[2])), w(T(v[3])) {}
   template <typename T2>
   TVector4(const TVector3<T2>& v, T2 w)
       : x(T(v[0])), y(T(v[1])), z(T(v[2])), w(w) {}

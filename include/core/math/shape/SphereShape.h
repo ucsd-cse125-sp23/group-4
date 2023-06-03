@@ -12,7 +12,7 @@ class SphereShape : public ConvexShape {
   };
 
  public:
-  SphereShape(float radius) : radius(radius) {}
+  explicit SphereShape(float radius) : radius(radius) {}
 
   AABShape* bounds() const {
     return new AABShape(vec3f(-radius, -radius, -radius),

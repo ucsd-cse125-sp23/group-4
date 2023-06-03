@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <utility>
+#include <vector>
 
 #include "core/game/mode/GameMode.h"
 #include "core/game/mode/Gamemodes.h"

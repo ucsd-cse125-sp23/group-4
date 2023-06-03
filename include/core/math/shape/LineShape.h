@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "core/math/shape/AABShape.h"
 #include "core/math/shape/ConvexShape.h"
 

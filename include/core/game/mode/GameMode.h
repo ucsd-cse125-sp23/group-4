@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include "core/game/level/Level.h"
@@ -10,7 +11,7 @@ class GameMode {
   bool lowerScoreLead;
 
  public:
-  GameMode(bool lowerScoreLead);
+  explicit GameMode(bool lowerScoreLead);
   virtual void registerTrackers(Level* l);
   virtual int queryScore(uint32_t pid) = 0;
   std::vector<std::vector<uint32_t>> queryPlacements();

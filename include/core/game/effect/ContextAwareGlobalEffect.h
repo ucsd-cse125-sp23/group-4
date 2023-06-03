@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "core/game/effect/GlobalEffect.h"
 
 struct ContextAwareGlobalEffect : public GlobalEffect {
@@ -11,10 +13,9 @@ struct ContextAwareGlobalEffect : public GlobalEffect {
    * SELF - target the list of PObject*s provided
    * OTHER - target all players not in the PObject* vector parameter
    * SELF_TAG_STATUS - target all players with the same it/notit
-   *					 status as the first PObject* in the vector
-   *parameter NOT_SELF_TAG_STATUS - target all players with a different it/notit
-   *						 status as the first PObject* in the vector
-   *parameter
+   *					 status as the first PObject* in the
+   *vector parameter NOT_SELF_TAG_STATUS - target all players with a different
+   *it/notit status as the first PObject* in the vector parameter
    *
    */
   enum class Targets {

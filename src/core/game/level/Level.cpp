@@ -1,5 +1,7 @@
 #include "core/game/level/Level.h"
 
+#include <cstdint>
+
 #include "core/game/level/Environment.h"
 #include "core/util/global.h"
 
@@ -106,5 +108,5 @@ void Level::addPObject(PObject* obj) {
   obj->level = this;
   if (auto player = dynamic_cast<Player*>(obj)) players[player->pid] = player;
 }
-unsigned long long Level::getAge() { return age; }
+std::uint64_t Level::getAge() { return age; }
 Environment* Level::getEnvironment() { return environment; }

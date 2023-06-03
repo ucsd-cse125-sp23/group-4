@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 #include "core/math/shape/ConvexShape.h"
@@ -26,15 +27,15 @@ class ConvexMeshShape : public ConvexShape {
 
  public:
   ConvexMeshShape(size_t size, vec3f* v) : size(size) {
-    this->vertices = (vec3f*)malloc(sizeof(vec3f) * size);
+    this->vertices = reinterpret_cast<vec3f*>(malloc(sizeof(vec3f) * size));
     memcpy(this->vertices, v, sizeof(vec3f) * size);
   }
-  ConvexMeshShape(std::vector<vec3f> v) : size(v.size()) {
-    this->vertices = (vec3f*)malloc(sizeof(vec3f) * v.size());
+  explicit ConvexMeshShape(std::vector<vec3f> v) : size(v.size()) {
+    this->vertices = reinterpret_cast<vec3f*>(malloc(sizeof(vec3f) * v.size()));
     std::copy(v.begin(), v.end(), this->vertices);
   }
   ConvexMeshShape(std::initializer_list<vec3f> v) : size(v.size()) {
-    this->vertices = (vec3f*)malloc(sizeof(vec3f) * v.size());
+    this->vertices = reinterpret_cast<vec3f*>(malloc(sizeof(vec3f) * v.size()));
     std::copy(v.begin(), v.end(), this->vertices);
   }
   ~ConvexMeshShape() { free(vertices); }

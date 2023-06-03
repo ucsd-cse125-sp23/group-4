@@ -14,7 +14,7 @@ class GameMode;
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {
  private:
-  unsigned long long age;
+  std::uint64_t age;
   CollisionType collisionTypeLUT[10][10];
   Environment* environment;
 
@@ -35,7 +35,7 @@ class Level {
   void setCollisionType(CollisionType type, int layer0, int layer1);
   CollisionType collisionType(int layer0, int layer1);
   void addPObject(PObject* obj);
-  unsigned long long getAge();
+  std::uint64_t getAge();
   Environment* getEnvironment();
   void tick();
 };

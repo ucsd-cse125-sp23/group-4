@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <utility>
 #include <vector>
 
 #include "core/game/physics/PObject.h"
@@ -26,7 +27,7 @@ class Environment {
     AABShape* bound;
     PObject* obj;
     BVHNode *left, *right;
-    BVHNode(AABShape* aab)
+    explicit BVHNode(AABShape* aab)
         : bound(aab), obj(nullptr), left(nullptr), right(nullptr) {}
   };
 

@@ -9,12 +9,12 @@ struct TMat4 {
       for (int j = 0; j < 4; j++) data[i][j] = T(0);
   }
   template <typename T2>
-  TMat4(const T2 s) {
+  explicit TMat4(const T2 s) {
     for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++) data[i][j] = T(s);
   }
   template <typename T2>
-  TMat4(const T2* arr) {
+  explicit TMat4(const T2* arr) {
     for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++) data[i][j] = (T)arr[i * 4 + j];
   }
@@ -78,12 +78,12 @@ struct TMat3 {
       for (int j = 0; j < 3; j++) data[i][j] = T(0);
   }
   template <typename T2>
-  TMat3(const T2 s) {
+  explicit TMat3(const T2 s) {
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++) data[i][j] = T(s);
   }
   template <typename T2>
-  TMat3(const T2* arr) {
+  explicit TMat3(const T2* arr) {
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++) data[i][j] = (T)arr[i * 3 + j];
   }
@@ -96,7 +96,7 @@ struct TMat3 {
     }
   }
   template <typename T2>
-  TMat3(const TMat4<T2>& m) {
+  explicit TMat3(const TMat4<T2>& m) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
         data[i][j] = T(m.data[i][j]);

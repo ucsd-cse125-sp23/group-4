@@ -46,11 +46,12 @@ std::vector<std::vector<uint32_t>> GameMode::queryPlacements() {
     s2p[score].push_back(pair.first);
   }
   std::vector<std::vector<uint32_t>> ret;
-  if (lowerScoreLead)
+  if (lowerScoreLead) {
     for (auto ite = s2p.begin(); ite != s2p.end(); ite++)
       ret.push_back((*ite).second);
-  else
+  } else {
     for (auto ite = s2p.rbegin(); ite != s2p.rend(); ite++)
       ret.push_back((*ite).second);
+  }
   return ret;
 }

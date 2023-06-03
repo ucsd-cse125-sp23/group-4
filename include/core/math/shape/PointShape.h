@@ -10,7 +10,7 @@ class PointShape : public ConvexShape {
   vec4f furthestPoint(vec3f dir) const override { return vec4f(point, 1.0f); };
 
  public:
-  PointShape(vec3f point) : point(point) {}
+  explicit PointShape(vec3f point) : point(point) {}
 
   AABShape* bounds() const { return new AABShape(point, point); }
 };
