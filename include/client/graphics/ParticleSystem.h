@@ -103,9 +103,9 @@ class ParticleSystem : public GameThing {
   // Properties
   float initColor[4] = {1.0f, 0.9f, 0.3f, 1.0f};
   std::vector<DOFr> initPosition = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
-                               DOFr(-50, 50, 0)};  // Ranges for offset
+                                    DOFr(-50, 50, 0)};  // Ranges for offset
   std::vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 5),
-                               DOFr(-50, 50, 0)};  // Ranges
+                                    DOFr(-50, 50, 0)};  // Ranges
   DOF radialPosition = DOF(0, 50, 0);
   DOF radialVelocity = DOF(0, 100, 4);
 

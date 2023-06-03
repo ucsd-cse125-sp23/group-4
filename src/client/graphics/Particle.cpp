@@ -7,7 +7,8 @@ void Particle::Update(float deltaTime) {
   vec3 v = velocity;
   if (windVelocity) v = velocity - *windVelocity;
   vec3 e = -unit(v);
-  vec3 fdrag = 0.5f * airDensity * (float)pow(length(v), 2) * drag * area() * e;
+  vec3 fdrag = 0.5f * airDensity * static_cast<float>(pow(length(v), 2)) *
+               drag * area() * e;
 
   AddForce(fdrag);
 
