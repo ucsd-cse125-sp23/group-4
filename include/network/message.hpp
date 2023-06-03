@@ -1,7 +1,9 @@
 #pragma once
 
+#include <boost/serialization/string.hpp>
 #include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/variant.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
@@ -73,10 +75,26 @@ struct GameStateUpdateItem {
   float posz;
   float heading;
 
+  long score;
+  float speed;
+
+  bool is_grounded;
+  bool is_tagged;
+
+  std::vector<std::string> has_powerup;
+
+  bool has_jumped;
+  bool has_landed;
+  bool has_obtained;
+  bool has_tagged;
+  bool has_been_tagged;
+
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id& posx& posy& posz& heading;
+    ar& id& posx& posy& posz& heading& score& speed& is_grounded& is_tagged&
+        has_powerup& has_jumped& has_landed& has_obtained& has_tagged&
+            has_been_tagged;
   }
 };
 
