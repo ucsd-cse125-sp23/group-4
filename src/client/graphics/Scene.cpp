@@ -103,9 +103,12 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-void Scene::update(float delta) {
+void Scene::update(float delta, GamePhase& phase, bool& transition) {
   for (auto& thing : localGameThings) thing->update(delta);
   for (auto& [_, thing] : networkGameThings) thing->update(delta);
+  if (gameStart) {
+    time.Update(delta);
+  }
 }
 
 message::UserStateUpdate Scene::pollUpdate() {

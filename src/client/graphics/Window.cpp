@@ -31,6 +31,9 @@ int Window::width;
 int Window::height;
 const char* Window::windowTitle = "tagguys :O";
 bool Window::inGame;
+GamePhase Window::phase;
+bool Window::transition;
+message::LobbyUpdate Window::lobby_update;
 
 // Game stuff to render
 Scene* Window::gameScene;
@@ -71,8 +74,10 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
+  phase = GamePhase::Start;
   gameScene = new Start(Cam);
   loadScreen = new Load();
+  transition = false;
 
   GLFWwindow* window = glfwGetCurrentContext();
   gameScene->init();
@@ -187,28 +192,26 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::update(GLFWwindow* window, float deltaTime) {
   gameScene->update(deltaTime);
 
-  if (dynamic_cast<Start*>(gameScene) != nullptr) {
-    Start* startScreen = dynamic_cast<Start*>(gameScene);
-    if (startScreen->joinGame) {
-      gameScene = new Lobby(Cam);
-      gameScene->init();
-    }
-  } else if (dynamic_cast<Lobby*>(gameScene) != nullptr) {
-    Lobby* lobby = dynamic_cast<Lobby*>(gameScene);
-    if (lobby->gameStart) {
-      gameScene = new Scene(Cam);
-      glfwHideWindow(window);
-      std::thread x(&Load::load, loadScreen, window);
-      gameScene->init();
-      hud = new HUD(gameScene);
-      x.join();
+  if (phase == GamePhase::Lobby && transition == true) {
+    gameScene = new Lobby(Cam);
+    gameScene->init();
+    auto lobby = dynamic_cast<Lobby*>(gameScene);
+    lobby->receiveState(lobby_update);
+    transition = false;
+  } else if (phase == GamePhase::Game && transition == true) {
+    gameScene = new Scene(Cam);
+    glfwHideWindow(window);
+    std::thread x(&Load::load, loadScreen, window);
+    gameScene->init();
+    hud = new HUD(gameScene);
+    x.join();
 
-      glfwMakeContextCurrent(window);
-      glfwShowWindow(window);
-      glfwFocusWindow(window);
+    glfwMakeContextCurrent(window);
+    glfwShowWindow(window);
+    glfwFocusWindow(window);
 
-      inGame = true;
-    }
+    inGame = true;
+    transition = false;
   }
 }
 

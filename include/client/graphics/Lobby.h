@@ -14,6 +14,7 @@ class Lobby : public Scene, public InputListener {
   Texture background;
   Texture flag;
   std::map<std::string, Texture> icons;
+  std::map<int, message::LobbyPlayer> players;
 
   Timer wait;
   bool ready;
@@ -45,8 +46,9 @@ class Lobby : public Scene, public InputListener {
   }
 
   void init(void);
-  void update(float delta);
-
+  void update(float delta, GamePhase& phase, bool& transition);
+  void receiveState(message::LobbyUpdate newState);
+  message::LobbyPlayerUpdate pollUpdate();
   void buildSceneTree();
   void draw();
   void drawBackground();

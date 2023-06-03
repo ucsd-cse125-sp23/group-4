@@ -44,5 +44,5 @@ class Start : public Scene, public InputListener {
 
   void drawName();
 
-  void update(float delta);
+  void update(float delta, GamePhase& phase, bool& transition);
 };

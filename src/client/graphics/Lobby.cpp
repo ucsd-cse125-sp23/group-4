@@ -2,30 +2,40 @@
 
 #include "Lobby.inl"
 
-void Lobby::update(float delta) {
+void Lobby::update(float delta, GamePhase& phase, bool& transition) {
   GameThing* display = models[index];
   display->update(delta);
-  if (ready) {
-    wait.Update(delta);
-    offset += (7 * delta);
-    if (wait.time == 0) {
-      gameStart = true;
-    }
-  } else {
-    if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-      ready = true;
-      selectedModel = player_models[index];
-    }
-    if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
-      index++;
-      if (index >= models.size()) index = 0;
-      buildSceneTree();
-    }
-    if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
-      index--;
-      if (index < 0) index = models.size() - 1;
-      buildSceneTree();
-    }
+
+  
+}
+
+message::LobbyPlayerUpdate Lobby::pollUpdate() {
+  int message_id = -1;
+  if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
+    message_id = _myPlayerId;
+    ready = true;
+    selectedModel = player_models[index];
+  }
+  if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
+    message_id = _myPlayerId;
+    index++;
+    if (index >= models.size()) index = 0;
+    buildSceneTree();
+  }
+  if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
+    message_id = _myPlayerId;
+    index--;
+    if (index < 0) index = models.size() - 1;
+    buildSceneTree();
+  }
+  return {message_id, "", ready};
+}
+
+void Lobby::receiveState(message::LobbyUpdate newState) {
+  for (auto player : newState.players) {
+    int ind = player.first;
+    message::LobbyPlayer p = player.second;
+    players[ind] = p;
   }
 }
 
@@ -140,7 +150,9 @@ void Lobby::drawPlayers() {
   float midpoint = width / 2.0f;
   int x = midpoint - (4 * (size - (30 * scale))) + 10;  // TODO: fix spacing
   int y = 30;
-  for (int i = 0; i < 4; i++) {
+  for (auto player : players) {
+    // get index
+    // draw
     glViewport(x, y, size, size);
 
     glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);

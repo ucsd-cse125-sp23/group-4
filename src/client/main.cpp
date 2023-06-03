@@ -84,7 +84,6 @@ std::unique_ptr<Client> network_init() {
     auto assign_handler = [&client](const message::Assign& body) {
       Window::gameScene->initFromServer(body.pid);  // need a unique int id
       client.write<message::Greeting>("Hello, server!");
-
       net_assigned = true;
     };
 
@@ -92,10 +91,20 @@ std::unique_ptr<Client> network_init() {
       Window::gameScene->receiveState(body);
     };
 
-    auto lobby_update_handler = [](const message::LobbyUpdate& body) {};
+    auto lobby_update_handler = [](const message::LobbyUpdate& body) {
+      if (Window::phase == GamePhase::Lobby) {
+        dynamic_cast<Lobby*>(Window::gameScene)->receiveState(body);
+      } else {
+        Window::lobby_update = body;
+      }
+    };
 
     auto game_ready_handler = [](const message::GameStart& body) {
-      is_game_ready = true;
+      if (Window::phase != GamePhase::Game) {
+        Window::phase = GamePhase::Game;
+        Window::transition = true;
+        is_game_ready = true;
+      }
     };
 
     auto any_handler = [](const message::Message::Body&) {};
@@ -142,17 +151,12 @@ int main(int argc, char* argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  double lastTime = glfwGetTime();
-
   // wait for server assignment, TODO: replace with start screen UI
-  while (!net_assigned) {
+  while (!net_assigned || Window::phase == GamePhase::Start) {
     if (glfwWindowShouldClose(window)) {
       game_exit = true;
       break;
     }
-    double nowTime = glfwGetTime();
-    double deltaTime = nowTime - lastTime;
-    lastTime = nowTime;
 
     std::cout << "(net_assigned: " << net_assigned << ") ";
     std::cout << "Waiting for server to assign pid..." << std::endl;

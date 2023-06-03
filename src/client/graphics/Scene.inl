@@ -177,8 +177,23 @@ void Scene::init(void) {
       sceneResources->materials["grid"];
 #pragma endregion
 
-  // Import sound palette
-#pragma region Sounds
+  PlayerModel* waspModel = new PlayerModel;
+  waspModel->skel = sceneResources->skeletons["wasp"];
+  waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
+  waspModel->anims = sceneResources->animations["wasp"];
+
+  sceneResources->models["wasp"] = waspModel;
+  sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
+  sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
+
+  // THE player !!!
+  sceneResources->models["playerRef"] = new Model;
+  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
+  // TODO(matthew) copy over mesh too?
+  sceneResources->models["playerRef"]->material =
+      sceneResources->materials["toon.blue"];
+
+  // Sound palette
   SoundEffect* sfx = new SoundEffect();
   sceneResources->sounds["test"] = sfx;
   sfx->load("assets/sounds/sound_test.wav");
@@ -247,7 +262,25 @@ void Scene::init(void) {
   thing_cube->name = "GT_cube";
   localGameThings.push_back(thing_cube);
 
-  // Build nodes of the scene graph
+  GameThing* thing_modeltest = new GameThing;
+  thing_modeltest->name = "GT_playerTest";
+  localGameThings.push_back(thing_modeltest);
+
+  GameThing* thing_modeltestB = new GameThing;
+  thing_modeltestB->name = "GT_playerTestB";
+  localGameThings.push_back(thing_modeltestB);
+
+  Player* player = new Player();
+  player->camera = camera;               // give a reference to the game camera
+  player->pmodel = waspModel;            // updating!
+  player->model = waspModel;             // drawing!
+  player->pmodel->setAnimation("walk");  // TODO: make this automated
+  player->name = "Player 1";
+  player->transform.position = vec3(0, 2, 0);
+  player->transform.updateMtx(&(player->transformMtx));
+  // gamethings.push_back(player);
+
+  // Build the scene graph
   node["teapot1"] = thing_example;
   node["cubeTest"] = thing_cube;
 

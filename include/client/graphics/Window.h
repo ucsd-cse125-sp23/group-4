@@ -30,6 +30,9 @@ class Window {
   static int height;
   static const char* windowTitle;
   static bool inGame;
+  static GamePhase phase;
+  static bool transition;
+  static message::LobbyUpdate lobby_update;
 
   // Objects to render
   static Scene* gameScene;
