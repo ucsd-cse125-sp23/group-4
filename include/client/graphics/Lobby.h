@@ -25,7 +25,7 @@ class Lobby : public Scene, public InputListener {
   int index;
 
   explicit Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
-    gamethings.clear();
+    localGameThings.clear();
     ready = false;
     index = 0;
 

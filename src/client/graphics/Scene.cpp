@@ -132,59 +132,6 @@ void Scene::receiveState(message::GameStateUpdate newState) {
   for (int id : removedIds) removePlayer(id);
 }
 
-void Scene::drawHUD(GLFWwindow* window) {
-  if (camera->Fixed) return;
-
-  int width, height;
-  glfwGetWindowSize(window, &width, &height);
-
-  std::map<std::string, float> player_times;
-
-  for (auto& [_, thing] : networkGameThings) {
-    if (auto player = dynamic_cast<Player*>(thing); player != nullptr) {
-      std::string name = player->name;
-      glm::vec3 position = player->transform.position;
-      // player_times[name] = player->time;  // player.time deprecated,
-      // use game state in future
-      const unsigned char* cname =
-          reinterpret_cast<const unsigned char*>(name.c_str());
-      glColor3f(1.0f, 1.0f, 1.0f);
-      // glRasterPos2f(-0.1f, position[1] + 0.1);
-      // TODO(matthew): implement world to screen-space positions
-      glRasterPos2f(-0.1f, 0.1f);
-      glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, cname);
-    }
-  }
-
-  for (auto times : player_times) {
-    std::string str = times.first;
-    float time = times.second;
-    std::string num_text = std::to_string(time);
-    std::string rounded = num_text.substr(0, num_text.find(".") + 3);
-    str += " " + rounded;
-    const unsigned char* string =
-        reinterpret_cast<const unsigned char*>(str.c_str());
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glWindowPos2f(10.0f, static_cast<float>(height) - 25);
-    glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, string);
-  }
-
-  // draw FPS
-  std::string fps_text = std::to_string(Window::fps) + " FPS";
-  std::string ups_text = std::to_string(Window::ups) + " UPS";
-  const unsigned char* stringFPS =
-      reinterpret_cast<const unsigned char*>(fps_text.c_str());
-  const unsigned char* stringUPS =
-      reinterpret_cast<const unsigned char*>(ups_text.c_str());
-  glColor3f(0.3f, 1.0f, 0.3f);
-  glWindowPos2f(static_cast<float>(width) - 50,
-                static_cast<float>(height) - 25);
-  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringFPS);
-  glWindowPos2f(static_cast<float>(width) - 50,
-                static_cast<float>(height) - 35);
-  glutBitmapString(GLUT_BITMAP_HELVETICA_10, stringUPS);
-}
-
 void Scene::draw() {
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);

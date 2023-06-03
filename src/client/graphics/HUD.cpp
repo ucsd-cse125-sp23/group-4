@@ -10,7 +10,7 @@ void HUD::draw(GLFWwindow* window) {
 
   float scale = static_cast<float>(width) / static_cast<float>(800);
 
-  for (GameThing* e : scene->gamethings) {
+  for (auto& [_, e] : scene->networkGameThings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       std::string name = player->name;
@@ -75,7 +75,7 @@ void HUD::draw(GLFWwindow* window) {
 
   drawMinimap();
 
-  for (GameThing* e : scene->gamethings) {
+  for (auto& [_, e] : scene->networkGameThings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
