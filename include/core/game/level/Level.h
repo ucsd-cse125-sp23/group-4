@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <map>
 #include <vector>
 
 #include "core/game/event/EventManager.h"
@@ -8,19 +8,23 @@
 #include "core/game/level/PObjectCollection.h"
 #include "core/game/level/StatisticManager.h"
 #include "core/game/physics/PObject.h"
+#include "core/game/physics/Player.h"
 
+class GameMode;
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {
  private:
-  uint64_t age;
+  std::uint64_t age;
   CollisionType collisionTypeLUT[10][10];
   Environment* environment;
 
+ public:
+  std::map<uint32_t, Player*> players;
   PObjectCollection objects;
 
- public:
   EventManager* eventManager;
   StatisticManager* statisticManager;
+  GameMode* gameMode;
 
   /**
    * @param environment defines the environement of the level. Will be deleted
@@ -29,7 +33,9 @@ class Level {
   explicit Level(Environment* environment);
   ~Level();
   void setCollisionType(CollisionType type, int layer0, int layer1);
+  CollisionType collisionType(int layer0, int layer1);
   void addPObject(PObject* obj);
-  uint64_t getAge();
+  std::uint64_t getAge();
+  Environment* getEnvironment();
   void tick();
 };
