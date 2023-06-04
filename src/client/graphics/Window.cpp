@@ -83,8 +83,8 @@ bool Window::initializeObjects() {
   gameScene->init();
 
   glfwMakeContextCurrent(window);
-  //glfwShowWindow(window);
-  glfwFocusWindow(window);
+  glfwShowWindow(window);
+  //glfwFocusWindow(window);
 
   return true;
 }
@@ -206,7 +206,7 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     x.join();
 
     glfwMakeContextCurrent(window);
-    //glfwShowWindow(window);
+    glfwShowWindow(window);
     glfwFocusWindow(window);
   } else {
     gameScene->update(deltaTime);
