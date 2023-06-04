@@ -7,7 +7,7 @@
 #include "core/game/physics/PowerUp.h"
 #include "core/math/shape/LineShape.h"
 
-Level * initializeLevel(Environment* environment) {
+Level* initializeLevel(Environment* environment) {
   level = new Level(environment);
   level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER,
                           ENVIRONMENT_LAYER);
