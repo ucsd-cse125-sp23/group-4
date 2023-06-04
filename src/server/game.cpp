@@ -37,7 +37,7 @@ Game::Game() {
   for (auto spawn : mapData.spawnPoints) {
     map_spawn_points.push_back(spawn.point);
   }
-  initializeLevel(environment);
+  level = initializeLevel(environment);
 }
 
 int Game::add_player() {
