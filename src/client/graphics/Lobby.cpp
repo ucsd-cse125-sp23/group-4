@@ -1,32 +1,67 @@
 #include "Lobby.h"
 
-#include "Lobby.inl"
+#include <network/message.hpp>
 
-void Lobby::update(float delta, GamePhase& phase, bool& transition) {
-  GameThing* display = models[index];
-  display->update(delta);
+#include "Lobby.inl"
+#include "Window.h"
+
+Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
+  localGameThings.clear();
+  ready = false;
+  index = 0;
+
+  receiveState(Window::lobby_state);
+
+  background.init("assets/image/character_select.png");
+  flag.init("assets/image/flag.png");
+
+  icons["neutral"].init("assets/icons/neutral.png");
+  icons["angry"].init("assets/icons/angry.png");
+  icons["blushing"].init("assets/icons/blushing.png");
+  icons["crying"].init("assets/icons/crying.png");
+  icons["heart"].init("assets/icons/heart.png");
+  icons["side_eye"].init("assets/icons/side_eye.png");
+
+  skin_names.push_back("neutral");
+  skin_names.push_back("blushing");
+  skin_names.push_back("crying");
+  skin_names.push_back("side_eye");
+
+  wait.time = 5;
+  wait.countdown = true;
+  gameStart = false;
+  offset = 0;
 }
 
-message::LobbyPlayerUpdate Lobby::pollUpdate() {
-  int message_id = -1;
+Lobby::~Lobby() {
+  for (std::pair<std::string, Node*> entry : node) {
+    delete entry.second;
+  }
+  delete sceneResources;
+}
+
+void Lobby::update(float delta) {
+  GameThing* display = models[index];
+  display->update(delta);
+
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-    message_id = _myPlayerId;
     ready = true;
     selectedModel = player_models[index];
+    Window::client->write<message::LobbyPlayerUpdate>(Window::my_pid,
+                                                      skin_names[index], ready);
   }
   if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
-    message_id = _myPlayerId;
-    index++;
-    if (index >= models.size()) index = 0;
+    index = (index + 1) % models.size();
     buildSceneTree();
+    Window::client->write<message::LobbyPlayerUpdate>(Window::my_pid,
+                                                      skin_names[index], ready);
   }
   if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
-    message_id = _myPlayerId;
-    index--;
-    if (index < 0) index = models.size() - 1;
+    index = (index - 1 + models.size()) % models.size();
     buildSceneTree();
+    Window::client->write<message::LobbyPlayerUpdate>(Window::my_pid,
+                                                      skin_names[index], ready);
   }
-  return {message_id, skin_names[index], ready};
 }
 
 void Lobby::receiveState(message::LobbyUpdate newState) {

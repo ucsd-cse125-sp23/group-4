@@ -5,13 +5,14 @@
 
 void Texture::init(const char* filename) {
   glGenTextures(1, &textureID);
-  glBindTexture(GL_TEXTURE_2D, textureID);
+  glBindTexture(target, textureID);
   // set the texture wrapping/filtering options (on the currently bound
   // texture object)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapping);
+  glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapping);
+  glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapping);
+  glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filtering);
+  glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filtering);
 
   // load and generate the texture
   int width, height, nrChannels;
@@ -62,5 +63,5 @@ void Texture::init(const unsigned char* rawImgData, int dataLen) {
 
 void Texture::bindgl() {
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, textureID);
+  glBindTexture(target, textureID);
 }

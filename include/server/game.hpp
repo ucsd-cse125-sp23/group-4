@@ -3,8 +3,9 @@
 #include <core/lib.hpp>
 #include <network/message.hpp>
 #include <unordered_map>
+#include <vector>
 
-#include "client/graphics/ColliderImporter.h"
+#include "client/graphics/MapDataImporter.h"
 
 // represents a new Player right now
 // TODO: figure out how to support items later on
@@ -37,4 +38,7 @@ class Game {
 
  private:
   std::unordered_map<int, GameThing> game_things_;
+
+  std::vector<vec3f> map_spawn_points;
+  // TODO: add other map things here...
 };

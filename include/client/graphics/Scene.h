@@ -36,17 +36,12 @@
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
 #include "client/graphics/Skeleton.h"
+#include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
 #include "client/graphics/Timer.h"
+#include "client/graphics/TextureCube.h"
 #include "client/graphics/shader.h"
-
-enum class GamePhase {
-    Start,
-    Lobby,
-    Game,
-    GameOver
-};
 
 class SceneResourceMap {
  public:
@@ -175,9 +170,9 @@ class Scene {
   virtual void init(void);
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
-  virtual void receiveState(message::GameStateUpdate newState);  // receive from net
+  void receiveState(message::GameStateUpdate newState);  // receive from net
 
-  virtual void update(float delta, GamePhase& phase, bool& transition);
+  virtual void update(float delta);
 
   virtual void draw();
 

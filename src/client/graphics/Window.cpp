@@ -24,19 +24,22 @@
 int Window::fps;
 int Window::ups;
 
+bool Window::readyInput;
+
 // Window Properties
 int Window::width;
 int Window::height;
 const char* Window::windowTitle = "tagguys :O";
-bool Window::inGame;
 GamePhase Window::phase;
-bool Window::transition;
-message::LobbyUpdate Window::lobby_update;
+message::LobbyUpdate Window::lobby_state;
 
 // Game stuff to render
 Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;
+
+std::unique_ptr<Client> Window::client = nullptr;
+int Window::my_pid = -1;
 
 Camera* Cam;
 
@@ -75,7 +78,6 @@ bool Window::initializeObjects() {
   phase = GamePhase::Start;
   gameScene = new Start(Cam);
   loadScreen = new Load();
-  transition = false;
 
   GLFWwindow* window = glfwGetCurrentContext();
   gameScene->init();
@@ -105,7 +107,6 @@ void Window::cleanUp() {
 // for the Window
 GLFWwindow* Window::createWindow(int width, int height) {
   // Initialize GLFW.
-  inGame = false;
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return NULL;
@@ -188,15 +189,14 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 
 // update and draw functions
 void Window::update(GLFWwindow* window, float deltaTime) {
-  gameScene->update(deltaTime, phase, transition);
-
-  if (phase == GamePhase::Lobby && transition == true) {
+  if (dynamic_cast<Start*>(gameScene) &&
+      phase == GamePhase::Lobby) {  // start -> lobby
     gameScene = new Lobby(Cam);
     gameScene->init();
     auto lobby = dynamic_cast<Lobby*>(gameScene);
-    lobby->receiveState(lobby_update);
-    transition = false;
-  } else if (phase == GamePhase::Game && transition == true) {
+    lobby->receiveState(lobby_state);
+  } else if (dynamic_cast<Lobby*>(gameScene) &&
+             phase == GamePhase::Game) {  // lobby -> game
     gameScene = new Scene(Cam);
     glfwHideWindow(window);
     std::thread x(&Load::load, loadScreen, window);
@@ -207,9 +207,8 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     glfwMakeContextCurrent(window);
     glfwShowWindow(window);
     glfwFocusWindow(window);
-
-    inGame = true;
-    transition = false;
+  } else {
+    gameScene->update(deltaTime);
   }
 }
 
@@ -224,7 +223,7 @@ void Window::draw(GLFWwindow* window) {
 
   // Render the objects.
   gameScene->draw();
-  if (inGame) hud->draw(window);
+  if (phase == GamePhase::Game) hud->draw(window);
 
   Input::handle(false);
   if (_debugmode) {
@@ -272,6 +271,10 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_ESCAPE:
         // Close the window. This causes the program to also terminate.
         glfwSetWindowShouldClose(window, GL_TRUE);
+        break;
+
+      case GLFW_KEY_ENTER:
+        readyInput = true;
         break;
 
       case GLFW_KEY_R:

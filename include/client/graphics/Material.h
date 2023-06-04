@@ -50,6 +50,7 @@ struct Material {
       mode = 1;
       texture->bindgl();
       glUniform1i(glGetUniformLocation(shader, "gSampler"), 0);
+      glUniform1i(glGetUniformLocation(shader, "skybox"), 0);
     }
     glUniform1i(glGetUniformLocation(shader, "renderMode"), mode);
 

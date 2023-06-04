@@ -7,6 +7,8 @@
 #pragma once
 #include <atomic>
 #include <network/message.hpp>
+#include <network/tcp_client.hpp>
+#include <memory>
 
 #include "client/graphics/Camera.h"
 #include "client/graphics/HUD.h"
@@ -18,24 +20,35 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+enum class GamePhase {
+    Start,
+    Lobby,
+    Game,
+    GameOver
+};
+
 class Window {
  public:
   static int fps;
   static int ups;  // updates from network per second
 
+  static bool readyInput;
+
   // Window Properties
   static int width;
   static int height;
   static const char* windowTitle;
-  static bool inGame;
   static GamePhase phase;
-  static bool transition;
-  static message::LobbyUpdate lobby_update;
+  static message::LobbyUpdate lobby_state;
 
   // Objects to render
   static Scene* gameScene;
   static Load* loadScreen;
   static HUD* hud;
+  
+  // network
+  static std::unique_ptr<Client> client;
+  static int my_pid;
 
   // Act as Constructors and desctructors
   static bool initializeProgram(GLFWwindow* window);

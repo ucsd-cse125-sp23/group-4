@@ -28,6 +28,7 @@ class Node {
   glm::mat4 getWorldMtx() { return parentMtxCache * transformMtx; }
 
   Model* model = nullptr;
+  bool skybox = false;
 
   std::vector<Node*> childnodes;
 

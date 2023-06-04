@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <config/lib.hpp>
 #include <core/lib.hpp>
 #include <network/message.hpp>
 #include <server/game.hpp>
@@ -26,11 +27,15 @@ message::GameStateUpdateItem GameThing::to_network() const {
 }
 
 Game::Game() {
+  auto config = get_config();
+
   Environment* environment = new Environment();
-  std::vector<ColliderData> mapColliders =
-      ColliderImporter::ImportCollisionData("assets/models/test_colliders.obj");
-  for (auto collider : mapColliders) {
+  MapData mapData = MapDataImporter::Import(config["map_data_file"]);
+  for (auto collider : mapData.colliders) {
     environment->addConvex(collider.vertices, 0.2f);
+  }
+  for (auto spawn : mapData.spawnPoints) {
+    map_spawn_points.push_back(spawn.point);
   }
   initializeLevel(environment);
 }
@@ -38,6 +43,7 @@ Game::Game() {
 int Game::add_player() {
   auto [player, control] = initializePlayer();
   game_things_.insert({player->pid, GameThing(player->pid, player, control)});
+  if (map_spawn_points.size() > 0) player->setPos(map_spawn_points[0]);
   return player->pid;
 }
 
