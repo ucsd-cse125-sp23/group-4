@@ -39,8 +39,8 @@
 #include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
-#include "client/graphics/Timer.h"
 #include "client/graphics/TextureCube.h"
+#include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
 
 class SceneResourceMap {
