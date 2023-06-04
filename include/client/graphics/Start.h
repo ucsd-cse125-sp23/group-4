@@ -16,7 +16,6 @@ class Start : public Scene, public InputListener {
   int index;
   float timeElapsed;
   float offset;
-  bool joinGame;
   bool renderText;
 
   explicit Start(Camera* camFromWindow) : Scene(camFromWindow) {
@@ -24,7 +23,6 @@ class Start : public Scene, public InputListener {
     timeElapsed = 0.0f;
     offset = 0.0f;
     background.init("assets/image/clouds.png");
-    joinGame = false;
     renderText = true;
 
     timeOnFrame = 0;
