@@ -17,6 +17,7 @@
 #include "client/graphics/MapPointData.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Node.h"
+#include "core/math/vector.h"
 
 class Collider : public Node {
  public:
@@ -47,5 +48,15 @@ class Collider : public Node {
             modelMtx * glm::translate(v) * glm::scale(glm::vec3(0.15f)), true);
       }
     }
+  }
+
+  std::vector<vec3f> core_vertices() {
+    std::vector<vec3f> varr;
+
+    for (glm::vec3 v : vertices) {
+      varr.push_back(vec3f(v.x, v.y, v.z));
+    }
+
+    return varr;
   }
 };

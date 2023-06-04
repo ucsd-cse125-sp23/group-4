@@ -1,5 +1,6 @@
 #include "core/game/level/Environment.h"
 
+#include <cmath>
 #include <stack>
 
 #include "core/math/shape/ConvexMeshShape.h"
@@ -253,7 +254,7 @@ std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos,
     if (length_squared(diff) < TOLERANCE * TOLERANCE) break;
   } while (maxDistSqr - length_squared(movement) > TOLERANCE * TOLERANCE &&
            ++ite < MAX_ITERATIONS);
-  float t = std::min(1.0f, sqrt(dot(movement, movement) / maxDistSqr));
+  float t = std::min(1.0f, std::sqrt(dot(movement, movement) / maxDistSqr));
   vec3f norm = vec3f(0, 0, 0);
   if (lastHit != nullptr) {
     CollisionBounds* objBounds = lastHit->getBounds();

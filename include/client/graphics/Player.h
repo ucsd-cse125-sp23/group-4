@@ -11,8 +11,10 @@
 
 #include "Camera.h"
 #include "GameThing.h"
+#include "Input.h"
 #include "InputListener.h"
 #include "PlayerModel.h"
+#include "Timer.h"
 
 class Player : public GameThing, InputListener {
  public:
@@ -22,9 +24,13 @@ class Player : public GameThing, InputListener {
       nullptr;  // a reference to the scene camera, so we know where we're going
 
   PlayerModel* pmodel;  // visual information
+  Timer time;
+  bool tagged;
 
-  Player() { pmodel = nullptr; }
-
+  Player() {
+    pmodel = nullptr;
+    tagged = true;
+  }
   message::UserStateUpdate pollInput();
 
   void update(float dt);

@@ -13,7 +13,7 @@ class Manager {
     GameOver,
   };
 
-  static const std::size_t MAX_PLAYERS = 2;
+  static const std::size_t MAX_PLAYERS = 4;
 
   int add_player();
   void remove_player(int);

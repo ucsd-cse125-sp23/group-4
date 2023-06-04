@@ -7,8 +7,9 @@
 
 #include <vector>
 
-#include "Channel.h"
-#include "Pose.h"
+#include "client/graphics/Channel.h"
+#include "client/graphics/Pose.h"
+#include "client/graphics/imported/Tokenizer.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 

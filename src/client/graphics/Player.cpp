@@ -15,6 +15,8 @@ void Player::update(float dt) {
   updateInterpolate(dt);
 
   if (pmodel) pmodel->update(dt);
+
+  if (tagged) time.Update(dt);
 }
 
 message::UserStateUpdate Player::pollInput() {

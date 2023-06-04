@@ -4,7 +4,8 @@
 
 int Manager::add_player() {
   int pid = game_.add_player();
-  players_.insert({pid, {pid, "", false}});
+  std::string default_skin = "trash panda";
+  players_.insert({pid, {pid, default_skin, false}});
 
   return pid;
 }
@@ -16,7 +17,9 @@ void Manager::remove_player(int pid) {
 
 message::LobbyUpdate Manager::handle_lobby_update(
     const message::LobbyPlayerUpdate& update) {
-  if (update.is_ready) players_.at(update.id).is_ready = true;
+  auto& player = players_.at(update.id);
+  player.skin = update.skin;
+  player.is_ready = update.is_ready;
 
   return get_lobby_update();
 }

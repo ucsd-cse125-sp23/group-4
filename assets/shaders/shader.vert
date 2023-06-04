@@ -13,6 +13,7 @@ out vec3 fragPosition;
 out vec3 fragNormal;
 out vec2 texCoord0;
 
+
 void main()
 {
     // proj * view * model * p

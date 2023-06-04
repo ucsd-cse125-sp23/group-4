@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include "Camera.h"
 #include "Input.h"
@@ -29,9 +30,16 @@ bool Window::readyInput;
 int Window::width;
 int Window::height;
 const char* Window::windowTitle = "tagguys :O";
+GamePhase Window::phase;
+message::LobbyUpdate Window::lobby_state;
 
 // Game stuff to render
 Scene* Window::gameScene;
+Load* Window::loadScreen;
+HUD* Window::hud;
+
+std::unique_ptr<Client> Window::client = nullptr;
+int Window::my_pid = -1;
 
 Camera* Cam;
 
@@ -67,15 +75,23 @@ bool Window::initializeProgram(GLFWwindow* window) {
 }
 
 bool Window::initializeObjects() {
-  gameScene = new Scene(Cam);
+  phase = GamePhase::Start;
+  gameScene = new Start(Cam);
+  loadScreen = new Load();
+
+  GLFWwindow* window = glfwGetCurrentContext();
   gameScene->init();
+
+  glfwMakeContextCurrent(window);
+  glfwShowWindow(window);
+  glfwFocusWindow(window);
 
   return true;
 }
 
 void Window::cleanObjects() {
   // Deallcoate the objects.
-  // delete gameScene;
+  delete gameScene;
 }
 
 void Window::cleanUp() {
@@ -111,6 +127,7 @@ GLFWwindow* Window::createWindow(int width, int height) {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+  glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
   GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
 
@@ -172,7 +189,27 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 
 // update and draw functions
 void Window::update(GLFWwindow* window, float deltaTime) {
-  gameScene->update(deltaTime);
+  if (dynamic_cast<Start*>(gameScene) &&
+      phase == GamePhase::Lobby) {  // start -> lobby
+    gameScene = new Lobby(Cam);
+    gameScene->init();
+    auto lobby = dynamic_cast<Lobby*>(gameScene);
+    lobby->receiveState(lobby_state);
+  } else if (dynamic_cast<Lobby*>(gameScene) &&
+             phase == GamePhase::Game) {  // lobby -> game
+    gameScene = new Scene(Cam);
+    glfwHideWindow(window);
+    std::thread x(&Load::load, loadScreen, window);
+    gameScene->init();
+    hud = new HUD(gameScene);
+    x.join();
+
+    glfwMakeContextCurrent(window);
+    glfwShowWindow(window);
+    glfwFocusWindow(window);
+  } else {
+    gameScene->update(deltaTime);
+  }
 }
 
 void Window::draw(GLFWwindow* window) {
@@ -184,11 +221,9 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  // Render the scene
-  if (gameScene) {
-    gameScene->draw();
-    gameScene->drawHUD(window);
-  }
+  // Render the objects.
+  gameScene->draw();
+  if (phase == GamePhase::Game) hud->draw(window);
 
   Input::handle(false);
   if (_debugmode) {

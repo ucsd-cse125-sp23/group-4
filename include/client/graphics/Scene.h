@@ -40,14 +40,8 @@
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
 #include "client/graphics/TextureCube.h"
+#include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
-
-struct Character {
-  unsigned int TextureID;  // ID handle of the glyph texture
-  glm::ivec2 Size;         // Size of glyph
-  glm::ivec2 Bearing;      // Offset from baseline to left/top of glyph
-  unsigned int Advance;    // Offset to advance to next glyph
-};
 
 class SceneResourceMap {
  public:
@@ -113,18 +107,23 @@ class Scene {
 
   // The container of nodes will be the scene graph after we connect the nodes
   // by setting the child_nodes.
+  // by setting the child_nodes.
   std::map<std::string, Node*> node;
 
   std::vector<GameThing*> localGameThings;
   std::unordered_map<int, GameThing*> networkGameThings;
 
-  std::map<char, Character> Characters;
+  Timer time;
+  bool gameStart;
 
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
     localGameThings.push_back(camera);
+    time.time = 300.0f;
+    time.countdown = true;
+    gameStart = false;
 
     sceneResources = new SceneResourceMap();
 
@@ -132,8 +131,7 @@ class Scene {
     _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
     _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-    _globalSceneResources.meshes["_gz-xyz"]->init(
-        "assets/model/dev/_gizmo.obj");
+    _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
 
     _globalSceneResources.shaderPrograms["unlit"] =
         LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
@@ -169,15 +167,14 @@ class Scene {
   void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
-  void init(void);
+  virtual void init(void);
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
 
-  void update(float delta);
+  virtual void update(float delta);
 
-  void drawHUD(GLFWwindow* window);
-  void draw();
+  virtual void draw();
 
   void gui();
 

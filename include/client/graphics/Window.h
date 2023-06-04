@@ -5,10 +5,22 @@
  *****************************************************/
 
 #pragma once
+#include <atomic>
+#include <memory>
+#include <network/message.hpp>
+#include <network/tcp_client.hpp>
 
-#include "Scene.h"
+#include "client/graphics/Camera.h"
+#include "client/graphics/HUD.h"
+#include "client/graphics/Load.h"
+#include "client/graphics/Lobby.h"
+#include "client/graphics/Scene.h"
+#include "client/graphics/Start.h"
+#include "client/graphics/main.h"
 
 ////////////////////////////////////////////////////////////////////////////////
+
+enum class GamePhase { Start, Lobby, Game, GameOver };
 
 class Window {
  public:
@@ -21,9 +33,17 @@ class Window {
   static int width;
   static int height;
   static const char* windowTitle;
+  static GamePhase phase;
+  static message::LobbyUpdate lobby_state;
 
   // Objects to render
   static Scene* gameScene;
+  static Load* loadScreen;
+  static HUD* hud;
+
+  // network
+  static std::unique_ptr<Client> client;
+  static int my_pid;
 
   // Act as Constructors and desctructors
   static bool initializeProgram(GLFWwindow* window);

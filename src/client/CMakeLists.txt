@@ -48,12 +48,6 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/assimp/assimp
   GIT_TAG 18b6cff
   GIT_PROGRESS TRUE)
-FetchContent_Declare(
-  freeglut
-  GIT_REPOSITORY https://github.com/FreeGLUTProject/freeglut.git
-  GIT_TAG v3.4.0
-  GIT_PROGRESS TRUE)
-
 # override find_package(zlib)
 FetchContent_MakeAvailable(
   zlib
@@ -85,7 +79,7 @@ FetchContent_MakeAvailable(
   glew
   glfw
   glm
-  freeglut
+  freetype
   imgui
   SFML)
 
@@ -110,12 +104,14 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/AssimpAnimation.cpp
     ${PROJECT_SOURCE_DIR}/graphics/AssimpMesh.cpp
     ${PROJECT_SOURCE_DIR}/graphics/AssimpModel.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/AssimpNode.cpp)
+    ${PROJECT_SOURCE_DIR}/graphics/AssimpNode.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/HUD.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/Lobby.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/Start.cpp)
 
 add_executable(client ${SOURCES})
 target_include_directories(
-  client PRIVATE ${CMAKE_SOURCE_DIR}/include/client/graphics
-                 ${freeglut_SOURCE_DIR}/include)
+  client PRIVATE ${CMAKE_SOURCE_DIR}/include/client/graphics)
 target_link_libraries(
   client
   PRIVATE core
@@ -129,7 +125,6 @@ target_link_libraries(
           imgui-glfw
           imgui-opengl3
           assimp
-          freeglut_static
           freetype
           sfml-audio)
 
