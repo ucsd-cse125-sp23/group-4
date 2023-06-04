@@ -103,6 +103,11 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
+void Scene::animate(float delta) {
+  for (auto& thing : localGameThings) thing->animate(delta);
+  for (auto& [_, thing] : networkGameThings) thing->animate(delta);
+}
+
 void Scene::update(float delta) {
   for (auto& thing : localGameThings) thing->update(delta);
   for (auto& [_, thing] : networkGameThings) thing->update(delta);

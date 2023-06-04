@@ -269,17 +269,17 @@ void Scene::init(void) {
   // Setup player/gameplay prefabs
 #pragma region Prefabs
   Model* m_prefab = new Model;
-  sceneResources->models["PREFAB_player.model"] = m_prefab;
+  sceneResources->models["PREFAB_player.model3"] = m_prefab;
   m_prefab->mesh = sceneResources->meshes["playermodel"];
   // TODO(matthew) copy over mesh too? for animations?
   m_prefab->material = sceneResources->materials["toon.blue"];
 
   AssimpModel* am = new AssimpModel();
-  am->loadAssimp("assets/animation/withUV/Animation -Bee2.fbx");
+  am->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
   am->setAnimation("walk");
-  sceneResources->models["PREFAB_player.model2"] = am;
-  sceneResources->models["PREFAB_player.model2"]->mesh = am;
-  sceneResources->models["PREFAB_player.model2"]->material =
+  sceneResources->models["PREFAB_player.model"] = am;
+  sceneResources->models["PREFAB_player.model"]->mesh = am;
+  sceneResources->models["PREFAB_player.model"]->material =
       sceneResources->materials["wood"];
 #pragma endregion
 
@@ -326,5 +326,5 @@ void Scene::init(void) {
 
   node["world"]->childnodes.push_back(node["map"]);
 
-  createPlayer(-1);
+  //createPlayer(-1);
 }

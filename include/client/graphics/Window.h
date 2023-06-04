@@ -37,6 +37,7 @@ class Window {
   static void resizeCallback(GLFWwindow* window, int width, int height);
 
   // update and draw functions
+  static void animate(float deltaTime);
   static void update(GLFWwindow* window, float deltaTime);
   static void draw(GLFWwindow*);
 

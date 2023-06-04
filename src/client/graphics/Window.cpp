@@ -171,6 +171,10 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
+void Window::animate(float deltaTime) {
+  gameScene->animate(deltaTime);
+}
+
 void Window::update(GLFWwindow* window, float deltaTime) {
   gameScene->update(deltaTime);
 }

@@ -10,11 +10,14 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
+void Player::animate(float dt) {
+  // traverse animation bones (SLOW)
+  if (pmodel) pmodel->update(dt);
+}
+
 void Player::update(float dt) {
   // interpolate between old to new state
   updateInterpolate(dt);
-
-  if (pmodel) pmodel->update(dt);
 }
 
 message::UserStateUpdate Player::pollInput() {

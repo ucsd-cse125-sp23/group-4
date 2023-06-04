@@ -27,6 +27,7 @@ class Player : public GameThing, InputListener {
 
   message::UserStateUpdate pollInput();
 
+  void animate(float dt) override;
   void update(float dt);
   glm::vec3 move(glm::vec3 movement);
 

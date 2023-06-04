@@ -305,10 +305,10 @@ void AssimpModel::setAnimation(std::string animName) {
   animation.useAnimation(animName);
 }
 
-void AssimpModel::update(float deltaTimeInMs) {
+void AssimpModel::update(float dt) {
   if (!rootNode) return;
 
-  animation.update(deltaTimeInMs);
+  animation.update(dt);
 
   for (unsigned int i = 0; i < meshes.size(); i++) {
     for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {

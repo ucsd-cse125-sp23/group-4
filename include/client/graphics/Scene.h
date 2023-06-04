@@ -169,6 +169,7 @@ class Scene {
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
 
+  void animate(float delta);
   void update(float delta);
 
   void drawHUD(GLFWwindow* window);
