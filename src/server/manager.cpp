@@ -4,7 +4,7 @@
 
 int Manager::add_player() {
   int pid = game_.add_player();
-  std::string default_skin = "neutral";
+  std::string default_skin = "trash panda";
   players_.insert({pid, {pid, default_skin, false}});
 
   return pid;

@@ -15,17 +15,20 @@ Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
   background.init("assets/image/character_select.png");
   flag.init("assets/image/flag.png");
 
-  icons["neutral"].init("assets/icons/neutral.png");
-  icons["angry"].init("assets/icons/angry.png");
-  icons["blushing"].init("assets/icons/blushing.png");
-  icons["crying"].init("assets/icons/crying.png");
-  icons["heart"].init("assets/icons/heart.png");
-  icons["side_eye"].init("assets/icons/side_eye.png");
-
-  skin_names.push_back("neutral");
-  skin_names.push_back("blushing");
-  skin_names.push_back("crying");
-  skin_names.push_back("side_eye");
+  ready_icons["trash panda"].init("assets/UI/IMG_2421.PNG");
+  icons["trash panda"].init("assets/UI/IMG_2422.PNG");
+  icons["bee"].init("assets/UI/IMG_2423.PNG");
+  ready_icons["bee"].init("assets/UI/IMG_2424.PNG");
+  icons["avocado"].init("assets/UI/IMG_2425.PNG");
+  ready_icons["avocado"].init("assets/UI/IMG_2426.PNG");
+  icons["duck"].init("assets/UI/IMG_2427.PNG");
+  ready_icons["duck"].init("assets/UI/IMG_2428.PNG");
+  icons["cat"].init("assets/UI/IMG_2429.PNG");
+  ready_icons["cat"].init("assets/UI/IMG_2430.PNG");
+  icons["unicorn"].init("assets/UI/IMG_2431.PNG");
+  ready_icons["unicorn"].init("assets/UI/IMG_2432.PNG");
+  icons["waffle"].init("assets/UI/IMG_2436.PNG");
+  ready_icons["waffle"].init("assets/UI/IMG_2437.PNG");
 
   wait.time = 5;
   wait.countdown = true;
@@ -51,12 +54,14 @@ void Lobby::update(float delta) {
         Window::my_pid, skin_names[index], is_ready);
   }
   if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
+    is_ready = false;
     index = (index + 1) % models.size();
     buildSceneTree();
     Window::client->write<message::LobbyPlayerUpdate>(
         Window::my_pid, skin_names[index], is_ready);
   }
   if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
+    is_ready = false;
     index = (index - 1 + models.size()) % models.size();
     buildSceneTree();
     Window::client->write<message::LobbyPlayerUpdate>(
@@ -180,54 +185,46 @@ void Lobby::drawPlayers() {
   glfwGetWindowSize(window, &width, &height);
   float scale = static_cast<float>(width) / static_cast<float>(800);
 
-  int size = (width / 8 > 200) ? 200 : width / 8;
+  // TODO: fix size and scaling
+  int size = width / 4;
   float midpoint = width / 2.0f;
-  int x = midpoint - (4 * (size - (30 * scale))) + 10;  // TODO: fix spacing
-  int y = 30;
+  int x = midpoint - (1.25 * size);
+  int y = -size / 6;
   for (auto player : players) {
     message::LobbyPlayer play = player.second;
     int id = play.id;
     std::string name = play.skin;
-    // get index
-    // draw
+
     glViewport(x, y, size, size);
-    if (id != _myPlayerId) {
-      glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
-    } else {
-      glColor3f(1.0, 0.0, 0.0);
+
+    if (id == _myPlayerId) {
+      glColor3f(1, 0, 0);
+      glLineStipple(1, 0xF00F);
+      glEnable(GL_LINE_STIPPLE);
+      glLineWidth(4);
+      glBegin(GL_LINES);
+      glVertex2f(-0.75, -0.65);
+      glVertex2f(-0.32, 0.6);
+
+      glVertex2f(-0.32, 0.6);
+      glVertex2f(0.65, 0.6);
+
+      glVertex2f(0.65, 0.6);
+      glVertex2f(0.2, -0.65);
+
+      glVertex2f(-0.75, -0.65);
+      glVertex2f(0.2, -0.65);
+
+      glEnd();
     }
-    glBegin(GL_TRIANGLES);
-    glVertex2f(0, 1);
-    glVertex2f(1, 0);
-    glVertex2f(-1, 0);
-
-    glVertex2f(0, -1);
-    glVertex2f(1, 0);
-    glVertex2f(-1, 0);
-
-    glEnd();
-
-    glColor3f(1, 1, 1);
-    glLineStipple(1, 0xF00F);
-    glEnable(GL_LINE_STIPPLE);
-    glLineWidth(5);
-    glBegin(GL_LINES);
-    glVertex2f(0, 1);
-    glVertex2f(1, 0);
-
-    glVertex2f(0, 1);
-    glVertex2f(-1, 0);
-
-    glVertex2f(0, -1);
-    glVertex2f(1, 0);
-
-    glVertex2f(0, -1);
-    glVertex2f(-1, 0);
-    glEnd();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    icons[name].bindgl();
+    if (!play.is_ready) {
+      icons[name].bindgl();
+    } else {
+      ready_icons[name].bindgl();
+    }
     glEnable(GL_TEXTURE_2D);
 
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -246,7 +243,7 @@ void Lobby::drawPlayers() {
 
     glDisable(GL_TEXTURE_2D);
 
-    x += (size + (30 * scale));
+    x += (size / 2);
   }
   glViewport(0, 0, width, height);
   glEnable(GL_DEPTH_TEST);

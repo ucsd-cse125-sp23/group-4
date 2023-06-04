@@ -71,7 +71,6 @@ void HUD::draw(GLFWwindow* window) {
   fr->RenderText(width, height, game_time, width - (w + (15 * scale)),
                  height - (48 * 0.75 * scale), 0.75f * scale,
                  glm::vec3(1.0f, 0.0f, 0.0f));
-  glEnable(GL_DEPTH_TEST);
 
   // minimap stuff
   int map_size = (width / 5 > 250) ? 250 : width / 4;
@@ -92,6 +91,7 @@ void HUD::draw(GLFWwindow* window) {
       glEnd();
     }
   }
+  glEnable(GL_DEPTH_TEST);
 
   glViewport(0, 0, width, height);
 
@@ -133,7 +133,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     glViewport(x - (2 * scale), y - (10 * scale), size, size);
     drawIcon("neutral");
-    
+
     glViewport(0, 0, width, height);
 
     // Draw highlight
@@ -193,7 +193,6 @@ void HUD::drawIcon(std::string icon) {
 
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
-
 }
 
 void HUD::drawMinimap() {

@@ -16,8 +16,10 @@ class Lobby : public Scene, public InputListener {
   FontRenderer* fr = new FontRenderer("assets/fonts/Roboto-Black.ttf");
   Texture background;
   Texture flag;
-  std::vector<std::string> skin_names;
+  std::vector<std::string> skin_names{
+      "trash panda", "bee", "avocado", "duck", "cat", "unicorn", "waffle"};
   std::map<std::string, Texture> icons;
+  std::map<std::string, Texture> ready_icons;
   std::map<int, message::LobbyPlayer> players;
 
   Timer wait;

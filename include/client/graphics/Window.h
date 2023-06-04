@@ -6,9 +6,9 @@
 
 #pragma once
 #include <atomic>
+#include <memory>
 #include <network/message.hpp>
 #include <network/tcp_client.hpp>
-#include <memory>
 
 #include "client/graphics/Camera.h"
 #include "client/graphics/HUD.h"
@@ -20,12 +20,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum class GamePhase {
-    Start,
-    Lobby,
-    Game,
-    GameOver
-};
+enum class GamePhase { Start, Lobby, Game, GameOver };
 
 class Window {
  public:
@@ -45,7 +40,7 @@ class Window {
   static Scene* gameScene;
   static Load* loadScreen;
   static HUD* hud;
-  
+
   // network
   static std::unique_ptr<Client> client;
   static int my_pid;
