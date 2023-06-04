@@ -5,7 +5,7 @@ void Lobby::init(void) {
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
                   // resource)
-  sceneResources->meshes["player"]->init("assets/model/model-skeleton.obj");
+  sceneResources->meshes["player"]->init("assets/model/dev/model-skeleton.obj");
 
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =

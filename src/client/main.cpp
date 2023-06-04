@@ -156,6 +156,8 @@ int main(int argc, char* argv[]) {
     std::cout << "(net_assigned: " << net_assigned << ") ";
     std::cout << "Waiting for server to assign pid..." << std::endl;
     Window::client->poll();
+    Window::draw(window);  // necessary otherwise window will hang
+
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
