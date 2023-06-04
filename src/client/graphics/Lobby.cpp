@@ -5,6 +5,35 @@
 #include "Lobby.inl"
 #include "Window.h"
 
+Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
+  localGameThings.clear();
+  ready = false;
+  index = 0;
+
+  receiveState(Window::lobby_state);
+
+  background.init("assets/image/character_select.png");
+  flag.init("assets/image/flag.png");
+  icons["neutral"].init("assets/icons/neutral.png");
+  icons["angry"].init("assets/icons/angry.png");
+  icons["blushing"].init("assets/icons/blushing.png");
+  icons["crying"].init("assets/icons/crying.png");
+  icons["heart"].init("assets/icons/heart.png");
+  icons["side_eye"].init("assets/icons/side_eye.png");
+
+  wait.time = 5;
+  wait.countdown = true;
+  gameStart = false;
+  offset = 0;
+}
+
+Lobby::~Lobby() {
+  for (std::pair<std::string, Node*> entry : node) {
+    delete entry.second;
+  }
+  delete sceneResources;
+}
+
 void Lobby::update(float delta) {
   GameThing* display = models[index];
   display->update(delta);

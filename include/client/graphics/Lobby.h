@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -7,6 +8,7 @@
 #include "client/graphics/Input.h"
 #include "client/graphics/InputListener.h"
 #include "client/graphics/Scene.h"
+#include "client/graphics/Window.h"
 
 class Lobby : public Scene, public InputListener {
  public:
@@ -25,39 +27,15 @@ class Lobby : public Scene, public InputListener {
   Model* selectedModel;
   int index;
 
-  explicit Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
-    localGameThings.clear();
-    ready = false;
-    index = 0;
+  explicit Lobby(Camera*);
+  ~Lobby();
 
-    background.init("assets/image/character_select.png");
-    flag.init("assets/image/flag.png");
-    icons["neutral"].init("assets/icons/neutral.png");
-    icons["angry"].init("assets/icons/angry.png");
-    icons["blushing"].init("assets/icons/blushing.png");
-    icons["crying"].init("assets/icons/crying.png");
-    icons["heart"].init("assets/icons/heart.png");
-    icons["side_eye"].init("assets/icons/side_eye.png");
-
-    wait.time = 5;
-    wait.countdown = true;
-    gameStart = false;
-    offset = 0;
-  }
-
-  void init(void);
+  void init(void) override;
   void update(float delta) override;
   void receiveState(message::LobbyUpdate newState);
   void buildSceneTree();
-  void draw();
+  void draw() override;
   void drawBackground();
   void drawPlayers();
   void lockIn();
-
-  ~Lobby() {
-    for (std::pair<std::string, Node*> entry : node) {
-      delete entry.second;
-    }
-    delete sceneResources;
-  }
 };
