@@ -13,6 +13,9 @@
 #include "client/graphics/Texture.h"
 #include "client/graphics/core.h"
 
+#ifndef __MATERIAL_H__
+#define __MATERIAL_H__
+
 struct Material {
   GLuint shader;  // points to the shader program we want to use
 
@@ -73,3 +76,5 @@ struct Material {
     // TODO(matthew)
   }
 };
+
+#endif

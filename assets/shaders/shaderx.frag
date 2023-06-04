@@ -10,11 +10,14 @@ uniform int renderMode;	// 0 = no texture, 1 = texture
 uniform sampler2D gSampler;
 
 // uniforms used for lighting
+uniform vec3 AmbientColor = vec3(0.1);
 uniform vec3 LightDirections[] = {
 									normalize(vec3(1, 5, 2)),
 									normalize(vec3(-5, -1, -3))
 								 };
 uniform vec3 LightColors[] = { vec3(1), vec3(0.6, 0.7, 1) * 0.4 };
+uniform vec3 DiffuseColor;	// passed in from c++ side NOTE: you can also set the value here and then remove 
+							// color from the c++ side
 
 uniform vec3 ambientColor;
 uniform vec3 diffuseColor;

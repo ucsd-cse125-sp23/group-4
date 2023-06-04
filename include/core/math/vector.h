@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 template <typename T>
@@ -199,7 +200,7 @@ inline T distance_squared(const TVector3<T>& v0, const TVector3<T>& v1) {
 }
 template <typename T>
 inline T distance(const TVector3<T>& v0, const TVector3<T>& v1) {
-  return sqrt(distance_squared(v0, v1));
+  return std::sqrt(distance_squared(v0, v1));
 }
 template <typename T>
 inline T length_squared(const TVector3<T>& v) {
@@ -207,7 +208,7 @@ inline T length_squared(const TVector3<T>& v) {
 }
 template <typename T>
 inline T length(const TVector3<T>& v) {
-  return sqrt(length_squared(v));
+  return std::sqrt(length_squared(v));
 }
 template <typename T>
 inline TVector3<T> normalize(const TVector3<T>& v0) {
@@ -215,7 +216,7 @@ inline TVector3<T> normalize(const TVector3<T>& v0) {
   if (l <= 0) {
     return TVector3<T>{0, 0, 0};
   } else {
-    return v0 / sqrt(l);
+    return v0 / std::sqrt(l);
   }
 }
 template <typename T>
@@ -360,7 +361,7 @@ inline T distance_squared(const TVector4<T>& v0, const TVector4<T>& v1) {
 }
 template <typename T>
 inline T distance(const TVector4<T>& v0, const TVector4<T>& v1) {
-  return sqrt(distance_squared(v0, v1));
+  return std::sqrt(distance_squared(v0, v1));
 }
 template <typename T>
 inline T length_squared(const TVector4<T>& v) {
@@ -368,7 +369,7 @@ inline T length_squared(const TVector4<T>& v) {
 }
 template <typename T>
 inline T length(const TVector4<T>& v) {
-  return sqrt(length_squared(v));
+  return std::sqrt(length_squared(v));
 }
 template <typename T>
 inline TVector4<T> normalize(const TVector4<T>& v0) {
@@ -376,7 +377,7 @@ inline TVector4<T> normalize(const TVector4<T>& v0) {
   if (l <= 0) {
     return TVector4<T>{0, 0, 0, 0};
   } else {
-    return v0 / sqrt(l);
+    return v0 / std::sqrt(l);
   }
 }
 template <typename T>

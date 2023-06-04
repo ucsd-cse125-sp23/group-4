@@ -6,7 +6,6 @@
 #include <GL/glew.h>
 #endif
 // clang-format on
-#include <GL/freeglut_std.h>
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 
@@ -27,7 +26,6 @@
 #include "Window.h"
 
 bool net_assigned = false;
-bool is_game_ready = false;
 bool game_exit = false;
 
 void error_callback(int error, const char* description) {
@@ -75,7 +73,7 @@ void print_versions() {
 #endif
 }
 
-std::unique_ptr<Client> network_init() {
+void network_init() {
   auto config = get_config();
   Addr server_addr{config["server_address"], config["server_port"]};
 
@@ -84,8 +82,8 @@ std::unique_ptr<Client> network_init() {
   auto read_handler = [](const message::Message& m, Client& client) {
     auto assign_handler = [&client](const message::Assign& body) {
       Window::gameScene->initFromServer(body.pid);  // need a unique int id
+      Window::my_pid = body.pid;
       client.write<message::Greeting>("Hello, server!");
-
       net_assigned = true;
     };
 
@@ -93,36 +91,39 @@ std::unique_ptr<Client> network_init() {
       Window::gameScene->receiveState(body);
     };
 
-    auto lobby_update_handler = [](const message::LobbyUpdate& body) {};
+    auto lobby_update_handler = [](const message::LobbyUpdate& body) {
+      if (Window::phase == GamePhase::Lobby) {
+        dynamic_cast<Lobby*>(Window::gameScene)->receiveState(body);
+      } else {
+        Window::lobby_state = body;
+      }
+    };
 
-    auto game_ready_handler = [](const message::GameStart& body) {
-      is_game_ready = true;
+    auto game_start_handler = [](const message::GameStart& body) {
+      Window::phase = GamePhase::Game;
     };
 
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, game_state_update_handler, lobby_update_handler,
-        game_ready_handler, any_handler);
+        game_start_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
   auto write_handler = [](std::size_t bytes_transferred,
                           const message::Message& m, Client& client) {};
 
-  auto client = std::make_unique<Client>(server_addr, connect_handler,
-                                         read_handler, write_handler);
-  return client;
+  Window::client = std::make_unique<Client>(server_addr, connect_handler,
+                                            read_handler, write_handler);
 }
 
 int main(int argc, char* argv[]) {
-  auto client = network_init();
+  network_init();
 
   // Create the GLFW window.
   GLFWwindow* window = Window::createWindow(800, 600);
   if (!window) exit(EXIT_FAILURE);
-
-  glutInit(&argc, argv);
 
   // Print OpenGL and GLSL versions.
   print_versions();
@@ -154,42 +155,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "(net_assigned: " << net_assigned << ") ";
     std::cout << "Waiting for server to assign pid..." << std::endl;
-    client->poll();
-
-    Window::draw(window);  // TODO: this should be lobby draw
-    std::this_thread::sleep_for(std::chrono::milliseconds(16));
-  }
-
-  // Check for user ready
-  if (!game_exit) {
-    std::cout << "Press Enter when you are ready to start..." << std::endl;
-
-    while (!Window::readyInput) {  // press enter check
-      if (glfwWindowShouldClose(window)) {
-        game_exit = true;
-        break;
-      }
-
-      Window::draw(window);  // TODO: this should be lobby draw
-      std::this_thread::sleep_for(std::chrono::milliseconds(16));
-    }
-
-    if (!game_exit) {
-      client->write<message::LobbyPlayerUpdate>(Window::gameScene->_myPlayerId,
-                                                "", true);
-      std::cout << "Ready!" << std::endl;
-    }
-  }
-
-  // After ready, wait until server GameReady message
-  while (!game_exit && !is_game_ready) {
-    if (glfwWindowShouldClose(window)) {
-      game_exit = true;
-      break;
-    }
-
-    client->poll();
-    Window::draw(window);  // TODO: this should be lobby draw
+    Window::client->poll();
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
@@ -206,7 +172,7 @@ int main(int argc, char* argv[]) {
   // Main game loop
   while (!game_exit && !glfwWindowShouldClose(window)) {
     // check for updates from server
-    client->poll();
+    Window::client->poll();
 
     // update stats
     frame_count++;
@@ -214,16 +180,17 @@ int main(int argc, char* argv[]) {
     double time_since_prev_frame = curr_time - prev_time;
     prev_time = curr_time;
 
-    // handle updates to server
-    num_updates_to_send += time_since_prev_frame / min_time_between_updates;
-    while (num_updates_to_send >= 1.0) {
-      message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
+    if (Window::phase == GamePhase::Game) {
+      // handle updates to server
+      num_updates_to_send += time_since_prev_frame / min_time_between_updates;
+      while (num_updates_to_send >= 1.0) {
+        message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
 
-      // check if update if valid
-      // TODO: in the future, remove this check since the player will definitely
-      // be initialized once we enter the game render loop
-      if (user_update.id == Window::gameScene->_myPlayerId)
-        client->write<message::UserStateUpdate>(user_update);
+        // check if update if valid
+        // TODO: in the future, remove this check since the player will
+        // definitely be initialized once we enter the game render loop
+        if (user_update.id == Window::gameScene->_myPlayerId)
+          Window::client->write<message::UserStateUpdate>(user_update);
 
       Window::animate(min_time_between_updates);
 
