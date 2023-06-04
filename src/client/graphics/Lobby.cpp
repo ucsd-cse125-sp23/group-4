@@ -174,6 +174,7 @@ void Lobby::drawBackground() {
 }
 
 void Lobby::drawPlayers() {
+  glDisable(GL_DEPTH_TEST);
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
@@ -248,6 +249,7 @@ void Lobby::drawPlayers() {
     x += (size + (30 * scale));
   }
   glViewport(0, 0, width, height);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void Lobby::lockIn() {

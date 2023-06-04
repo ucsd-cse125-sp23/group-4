@@ -39,8 +39,10 @@ void HUD::draw(GLFWwindow* window) {
       } else {
         size = 0.5 * scale;
       }
+      glDisable(GL_DEPTH_TEST);
       fr->RenderText(width, height, name, windowSpace[0], windowSpace[1], size,
                      glm::vec3(0.0f, 0.0f, 1.0f));
+      glEnable(GL_DEPTH_TEST);
     }
   }
 
@@ -65,9 +67,11 @@ void HUD::draw(GLFWwindow* window) {
 
   glEnd();
 
+  glDisable(GL_DEPTH_TEST);
   fr->RenderText(width, height, game_time, width - (w + (15 * scale)),
                  height - (48 * 0.75 * scale), 0.75f * scale,
                  glm::vec3(1.0f, 0.0f, 0.0f));
+  glEnable(GL_DEPTH_TEST);
 
   // minimap stuff
   int map_size = (width / 5 > 250) ? 250 : width / 4;
@@ -157,14 +161,17 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     glEnd();
 
+    glDisable(GL_DEPTH_TEST);
     fr->RenderText(width, height, str, x + (4 * scale), y - 20, 0.2 * scale,
                    glm::vec3(1.0, 1.0, 1.0));
+    glEnable(GL_DEPTH_TEST);
 
     x += (size + (25 * scale));
   }
 }
 
 void HUD::drawIcon(std::string icon) {
+  glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   icons[icon].bindgl();
@@ -185,6 +192,7 @@ void HUD::drawIcon(std::string icon) {
   glEnd();
 
   glDisable(GL_TEXTURE_2D);
+  glEnable(GL_DEPTH_TEST);
 
 }
 
@@ -269,8 +277,10 @@ void HUD::gameOver() {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     float w = fr->TextWidth("Time's Up!", offset * scale);
+    glDisable(GL_DEPTH_TEST);
     fr->RenderText(width, height, "Time's Up!", (width / 2) - (w / 2),
                    height / 2, offset * scale, glm::vec3(1, 0, 0));
+    glEnable(GL_DEPTH_TEST);
     offset--;
     if (offset < 1) offset = 1;
     glDisable(GL_CULL_FACE);
