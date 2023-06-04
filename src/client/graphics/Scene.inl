@@ -51,6 +51,9 @@ void Scene::init(void) {
 
   sceneResources->textures["stars"] = new Texture;
   sceneResources->textures["stars"]->init("assets/image/tile_stars.png");
+
+  sceneResources->textures["stars-ptcl"] = new Texture;
+  sceneResources->textures["stars-ptcl"]->init("assets/image/particle_stars.png");
 #pragma endregion
 
   // Create material palette
@@ -195,8 +198,9 @@ void Scene::init(void) {
   ParticleSystem* ptcl = new ParticleSystem();
   ptcl->name = "GT_particleSystemTest";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
-  ptcl->materialRef = sceneResources->materials["grid"];
+  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
+  ptcl->SetPosition(vec3(0, 3, 0));
   ptcl->transform.updateMtx(&ptcl->transformMtx);
   localGameThings.push_back(ptcl);
 #pragma endregion
