@@ -21,7 +21,7 @@ class Lobby : public Scene, public InputListener {
   std::map<int, message::LobbyPlayer> players;
 
   Timer wait;
-  bool ready;
+  bool is_ready;
   bool gameStart;
   float offset;
   std::vector<GameThing*> models;

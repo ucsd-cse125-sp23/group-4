@@ -7,7 +7,7 @@
 
 Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
   localGameThings.clear();
-  ready = false;
+  is_ready = false;
   index = 0;
 
   receiveState(Window::lobby_state);
@@ -45,22 +45,22 @@ void Lobby::update(float delta) {
   display->update(delta);
 
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-    ready = true;
+    is_ready = true;
     selectedModel = player_models[index];
-    Window::client->write<message::LobbyPlayerUpdate>(Window::my_pid,
-                                                      skin_names[index], ready);
+    Window::client->write<message::LobbyPlayerUpdate>(
+        Window::my_pid, skin_names[index], is_ready);
   }
   if (Input::GetInputState(InputAction::MoveRight) == InputState::Press) {
     index = (index + 1) % models.size();
     buildSceneTree();
-    Window::client->write<message::LobbyPlayerUpdate>(Window::my_pid,
-                                                      skin_names[index], ready);
+    Window::client->write<message::LobbyPlayerUpdate>(
+        Window::my_pid, skin_names[index], is_ready);
   }
   if (Input::GetInputState(InputAction::MoveLeft) == InputState::Press) {
     index = (index - 1 + models.size()) % models.size();
     buildSceneTree();
-    Window::client->write<message::LobbyPlayerUpdate>(Window::my_pid,
-                                                      skin_names[index], ready);
+    Window::client->write<message::LobbyPlayerUpdate>(
+        Window::my_pid, skin_names[index], is_ready);
   }
 }
 
@@ -251,7 +251,7 @@ void Lobby::drawPlayers() {
 }
 
 void Lobby::lockIn() {
-  if (ready) {
+  if (is_ready) {
     GLFWwindow* window = glfwGetCurrentContext();
     int width, height;
     glfwGetWindowSize(window, &width, &height);
