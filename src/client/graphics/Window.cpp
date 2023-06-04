@@ -83,7 +83,7 @@ bool Window::initializeObjects() {
   gameScene->init();
 
   glfwMakeContextCurrent(window);
-  glfwShowWindow(window);
+  //glfwShowWindow(window);
   glfwFocusWindow(window);
 
   return true;
@@ -127,9 +127,10 @@ GLFWwindow* Window::createWindow(int width, int height) {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-  glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+  //glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
-  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
+                                        glfwGetPrimaryMonitor(), NULL);
 
   // Check if the window could not be created.
   if (!window) {
@@ -198,14 +199,14 @@ void Window::update(GLFWwindow* window, float deltaTime) {
   } else if (dynamic_cast<Lobby*>(gameScene) &&
              phase == GamePhase::Game) {  // lobby -> game
     gameScene = new Scene(Cam);
-    glfwHideWindow(window);
+    // glfwHideWindow(window);
     std::thread x(&Load::load, loadScreen, window);
     gameScene->init();
     hud = new HUD(gameScene);
     x.join();
 
     glfwMakeContextCurrent(window);
-    glfwShowWindow(window);
+    //glfwShowWindow(window);
     glfwFocusWindow(window);
   } else {
     gameScene->update(deltaTime);

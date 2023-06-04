@@ -102,14 +102,14 @@ class Load {
     int width, height;
     glfwGetWindowSize(win, &width, &height);
 
-    GLFWwindow* window =
-        glfwCreateWindow(width, height, "loading...", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, "loading...",
+                                          glfwGetPrimaryMonitor(), NULL);
     glfwMakeContextCurrent(window);
 
     loadFrames();
 
     glfwShowWindow(window);
-    while (timeElapsed <= 15) {
+    while (timeElapsed <= 45) { // while (timeElapsed <= min_load_time || scene_loading)
       update();
       draw();
 

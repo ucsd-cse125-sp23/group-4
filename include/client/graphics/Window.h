@@ -12,6 +12,7 @@
 
 #include "client/graphics/Camera.h"
 #include "client/graphics/HUD.h"
+#include "client/graphics/Leaderboard.h"
 #include "client/graphics/Load.h"
 #include "client/graphics/Lobby.h"
 #include "client/graphics/Scene.h"
