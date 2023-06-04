@@ -52,10 +52,8 @@ class ParticleSystem : public GameThing {
 
   void Emit(int amount);
 
-  void update(float dt);
-  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-            const glm::mat4& parentMtx);
-  void draw(const DrawInfo info, const glm::mat4& parentMtx);
+  void update(float dt) override;
+  void draw(const DrawInfo info, const glm::mat4& parentMtx) override;
   void show(const std::string name);
 
  private:

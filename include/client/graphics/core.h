@@ -46,6 +46,10 @@ struct DrawInfo {
   glm::mat4 viewMtx;
   GLuint shader;
 
+  const glm::mat4 GetVP(bool origin) {
+    return origin ? viewProjOrigMtx : viewProjMtx;
+  }
+
   /**DrawInfo(const glm::mat4& vp, const glm::mat4& v, GLuint sdr) :
   viewProjMtx(vp), viewMtx(v), shader(sdr) {
 

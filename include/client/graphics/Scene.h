@@ -144,6 +144,7 @@ class Scene {
         _globalSceneResources.materials["unlit"];
     _globalSceneResources.models["_gz-xyz"]->modelMtx =
         glm::scale(glm::vec3(1.0f));
+    _globalSceneResources.models["_gz-xyz"]->depthFunction = GL_ALWAYS;
 
     _globalSceneResources.models["_gz-cube"] = new Model;
     _globalSceneResources.models["_gz-cube"]->mesh =
@@ -152,6 +153,7 @@ class Scene {
         _globalSceneResources.materials["unlit"];
     _globalSceneResources.models["_gz-cube"]->modelMtx =
         glm::translate(glm::vec3(0.0f));
+    _globalSceneResources.models["_gz-cube"]->depthFunction = GL_ALWAYS;
     // --
 
     // the default scene graph already has one node named "world."

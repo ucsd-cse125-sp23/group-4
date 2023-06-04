@@ -39,8 +39,8 @@ class PlayerModel : public Model {
     */
   }
 
-  virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-                    const glm::mat4& transformMtx) {
+  void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
+            const glm::mat4& transformMtx) override {
     if (!material || !mesh) return;
 
     GLuint shader = material->shader;

@@ -5,13 +5,7 @@ void Lobby::init(void) {
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
                   // resource)
-  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
-
-  sceneResources->models["playerRef"] = new Model;
-  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
-  // TODO(matthew) copy over mesh too?
-  sceneResources->models["playerRef"]->material =
-      sceneResources->materials["toon.blue"];
+  sceneResources->meshes["player"]->init("assets/model/model-skeleton.obj");
 
   // Create a shader program with a vertex shader and a fragment shader.
   sceneResources->shaderPrograms["basic"] =
@@ -103,7 +97,7 @@ void Lobby::init(void) {
   player_models.push_back(sceneResources->models["player4"]);
 
   ///////////////////////////////////////////////////////
-  printf("\nScene: done loading resources!\n");
+  printf("\nLobby: done loading resources!\n");
   ///////////////////////////////////////////////////////
 
   GameThing* thing_player = new GameThing;

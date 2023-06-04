@@ -71,15 +71,6 @@ void ParticleSystem::Spawner(float deltaTime) {
   Emit(n);
 }
 
-void ParticleSystem::draw(const glm::mat4& viewProjMtx,
-                          const glm::mat4& viewMtx,
-                          const glm::mat4& parentMtx) {
-  DrawInfo i = DrawInfo();
-  i.viewMtx = glm::mat4(viewMtx);
-  i.viewProjMtx = glm::mat4(viewProjMtx);
-  draw(i, parentMtx);
-}
-
 void ParticleSystem::draw(const DrawInfo info, const glm::mat4& parentMtx) {
   const mat4 viewProjMtx = info.viewProjMtx;
   GLint shader = info.shader;
