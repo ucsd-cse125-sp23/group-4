@@ -49,7 +49,7 @@ void Particle::draw(const DrawInfo info, const glm::mat4& parentMtx) {
   particleModel.draw(info.viewProjMtx, info.viewMtx, parentMtx * particleMtx);
 }
 
-float Particle::CollisionLowBound() { return 0.5f; }
+float Particle::CollisionLowBound() { return 0.0f; }
 
 void Particle::Integrate(float dt) {
   if (fixed) return;
@@ -63,7 +63,7 @@ void Particle::Integrate(float dt) {
   forceraw = vec3(0);
 
   // Check ground
-  if ((!collisions || *collisions) && position.y < CollisionLowBound()) {
+  if ((collisions && *collisions) && position.y < CollisionLowBound()) {
     float delta = abs(CollisionLowBound() - position.y);
     position.y = CollisionLowBound();  // New ending position
 

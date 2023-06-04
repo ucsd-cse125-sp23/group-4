@@ -120,7 +120,7 @@ class ParticleSystem : public GameThing {
   DOF airdensity = DOF(0, 1000, 1.2f);
   DOF drag = DOF(0, 1.5f, 0.1f);
 
-  bool collision = true;
+  bool collision = false;
   DOF elasticity = DOF(0, 1, 0.1f);
   DOF friction = DOF(0, 1.5f, 0.1f);
 };

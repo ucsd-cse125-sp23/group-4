@@ -205,12 +205,24 @@ void Scene::init(void) {
   // Setup particle effects
 #pragma region Particles
   ParticleSystem* ptcl = new ParticleSystem();
-  ptcl->name = "GT_particleSystemTest";
+  ptcl->name = "GT_particle1";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
   ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
   ptcl->transform.updateMtx(&ptcl->transformMtx);
   localGameThings.push_back(ptcl);
+  node["particleTest"] = ptcl;
+  node["world"]->childnodes.push_back(node["particleTest"]);
+
+  ptcl = new ParticleSystem();
+  ptcl->name = "GT_particle2";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
+  ptcl->transform.position = vec3(10, 9, 3);
+  ptcl->transform.updateMtx(&ptcl->transformMtx);
+  localGameThings.push_back(ptcl);
+  node["particleTest2"] = ptcl;
+  node["world"]->childnodes.push_back(node["particleTest2"]);
 #pragma endregion
 
   // Skybox setup
@@ -288,8 +300,6 @@ void Scene::init(void) {
   node["teapot1"] = thing_example;
   node["cubeTest"] = thing_cube;
 
-  node["particleTest"] = ptcl;
-
   node["map"] = new Node("_map");
   node["map"]->model = sceneResources->models["map"];
 
@@ -311,7 +321,6 @@ void Scene::init(void) {
 
   // node["world"]->childnodes.push_back(node["teapot1"]);
   node["world"]->childnodes.push_back(node["cubeTest"]);
-  node["world"]->childnodes.push_back(node["particleTest"]);
 
   node["world"]->childnodes.push_back(node["collision"]);
 
