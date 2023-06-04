@@ -7,12 +7,14 @@
 #include "core/game/physics/PowerUp.h"
 #include "core/math/shape/LineShape.h"
 
-void initializeLevel(Environment* environment) {
+Level * initializeLevel(Environment* environment) {
   level = new Level(environment);
   level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER,
                           ENVIRONMENT_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER, PLAYER_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, POWER_LAYER, PLAYER_LAYER);
+
+  return level;
 }
 
 std::pair<Player*, ControlModifierData*> initializePlayer() {

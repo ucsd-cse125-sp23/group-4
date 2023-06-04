@@ -10,7 +10,7 @@
 #include "core/game/physics/Player.h"
 #include "core/util/global.h"
 
-void initializeLevel(Environment* environment);
+Level* initializeLevel(Environment* environment);
 void terminateLevel();
 std::pair<Player*, ControlModifierData*> initializePlayer();
 
