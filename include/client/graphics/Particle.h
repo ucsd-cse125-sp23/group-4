@@ -65,7 +65,7 @@ class Particle {
 
   void Update(float deltaTime);
   bool PostUpdate(float deltaTime);  // Return false if should be destroyed
-  void draw(const DrawInfo info);
+  void draw(const DrawInfo info, const glm::mat4& parentMtx);
 
  private:
   const vec3 refPosition;

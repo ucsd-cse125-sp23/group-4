@@ -10,8 +10,9 @@ void ParticleSystem::Emit(int amount) {
 void ParticleSystem::Emit() {
   if (particles.size() >= particles.capacity()) return;
 
+  // TODO(matthew): support world/local space option
   Particle* p =
-      new Particle(GetPosition() + DOFr::GetRandomVector3(initPosition) +
+      new Particle(DOFr::GetRandomVector3(initPosition) +
                        (Tools::randomizeSphere() * radialPosition.GetValue()),
                    DOFr::GetRandomVector3(initVelocity) +
                        (Tools::randomizeSphere() * radialVelocity.GetValue()),
@@ -76,17 +77,17 @@ void ParticleSystem::draw(const glm::mat4& viewProjMtx,
   DrawInfo i = DrawInfo();
   i.viewMtx = glm::mat4(viewMtx);
   i.viewProjMtx = glm::mat4(viewProjMtx);
-  draw(i);
+  draw(i, parentMtx);
 }
 
-void ParticleSystem::draw(const DrawInfo info) {
+void ParticleSystem::draw(const DrawInfo info, const glm::mat4& parentMtx) {
   const mat4 viewProjMtx = info.viewProjMtx;
   GLint shader = info.shader;
 
   // if(showBox) box->draw(viewProjMtx, shader);
 
   for (Particle* p : particles) {
-    p->draw(info);  // draw particles
+    p->draw(info, parentMtx * transformMtx);  // draw particles
   }
 }
 

@@ -38,7 +38,7 @@ static mat4 alignToViewMtx(const vec3 pos, const mat4 vMatrix) {
   return glm::inverse(glm::lookAt(pos, pos - camFwd, camUp));
 }
 
-void Particle::draw(const DrawInfo info) {
+void Particle::draw(const DrawInfo info, const glm::mat4& parentMtx) {
   // Face camera
   mat4 vMatrix = mat4(info.viewMtx);
   vec3 pos = vec3(particleMtx[3]);
@@ -46,10 +46,10 @@ void Particle::draw(const DrawInfo info) {
   particleMtx = alignToViewMtx(pos, vMatrix);
 
   // draw
-  particleModel.draw(info.viewProjMtx, info.viewMtx, particleMtx);
+  particleModel.draw(info.viewProjMtx, info.viewMtx, parentMtx * particleMtx);
 }
 
-float Particle::CollisionLowBound() { return 1.0f; }
+float Particle::CollisionLowBound() { return 0.5f; }
 
 void Particle::Integrate(float dt) {
   if (fixed) return;

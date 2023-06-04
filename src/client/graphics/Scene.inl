@@ -19,7 +19,6 @@ void Scene::init(void) {
 
   // Create mesh palette
 #pragma region Meshes
-  // TODO(eddie) use Assimp here...
   sceneResources->meshes["playermodel"] = new Obj();
   sceneResources->meshes["playermodel"]->init(
       "assets/model/dev/model-skeleton.obj");
@@ -40,6 +39,8 @@ void Scene::init(void) {
 #pragma region Shaders
   sceneResources->shaderPrograms["basic"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["unlitx"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlitx.frag");
   sceneResources->shaderPrograms["toon"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 #pragma endregion
@@ -53,7 +54,8 @@ void Scene::init(void) {
   sceneResources->textures["stars"]->init("assets/image/tile_stars.png");
 
   sceneResources->textures["stars-ptcl"] = new Texture;
-  sceneResources->textures["stars-ptcl"]->init("assets/image/particle_stars.png");
+  sceneResources->textures["stars-ptcl"]->init(
+      "assets/image/particle_stars.png");
 #pragma endregion
 
   // Create material palette
@@ -157,6 +159,13 @@ void Scene::init(void) {
   sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   sceneResources->materials["grid"]->diffuse = vec4(0.7f, 0.7f, 0.7f, 1.0f);
 
+  Material* mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["unlitx"];
+  mtl->texture = sceneResources->textures["stars-ptcl"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.9f, 0.82f, 0.0f, 1.0f);
+  sceneResources->materials["stars-ptcl"] = mtl;
+
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
       sceneResources->shaderPrograms["toon"];
@@ -200,7 +209,6 @@ void Scene::init(void) {
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
   ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
-  ptcl->SetPosition(vec3(0, 3, 0));
   ptcl->transform.updateMtx(&ptcl->transformMtx);
   localGameThings.push_back(ptcl);
 #pragma endregion

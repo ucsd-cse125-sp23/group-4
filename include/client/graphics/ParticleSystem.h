@@ -29,23 +29,16 @@ class ParticleSystem : public GameThing {
   Mesh* meshRef;
   Material* materialRef;
 
-  ParticleSystem() : rotation(vec4(0)) {
+  ParticleSystem() {
     particles.reserve(_maxParticles);
+
+    meshRef = nullptr;
+    materialRef = nullptr;
 
     box = new Cube(vec3(-0.05f), vec3(0.05f));
   }
   ~ParticleSystem() {
     if (box) delete box;
-  }
-
-  vec3 GetPosition() {
-    return vec3(position[0].GetValue(), position[1].GetValue(),
-                position[2].GetValue());
-  }
-  void SetPosition(vec3 pos) {
-    position[0].SetValue(pos.x);
-    position[1].SetValue(pos.y);
-    position[2].SetValue(pos.z);
   }
 
   void Reset() {
@@ -62,13 +55,10 @@ class ParticleSystem : public GameThing {
   void update(float dt);
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
             const glm::mat4& parentMtx);
-  void draw(const DrawInfo info);
+  void draw(const DrawInfo info, const glm::mat4& parentMtx);
   void show(const std::string name);
 
  private:
-  std::vector<DOF> position = {DOF(), DOF(), DOF()};  // System position
-  vec4 rotation;
-
   Cube* box;
 
   bool showBox = true;
@@ -104,7 +94,7 @@ class ParticleSystem : public GameThing {
   float initColor[4] = {1.0f, 0.9f, 0.3f, 1.0f};
   std::vector<DOFr> initPosition = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
                                     DOFr(-50, 50, 0)};  // Ranges for offset
-  std::vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 5),
+  std::vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 10),
                                     DOFr(-50, 50, 0)};  // Ranges
   DOF radialPosition = DOF(0, 50, 0);
   DOF radialVelocity = DOF(0, 100, 4);
