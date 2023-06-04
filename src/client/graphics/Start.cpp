@@ -1,6 +1,5 @@
 #include "Start.h"
 
-#include "iostream"
 #include "Window.h"
 
 void Start::update(float delta) {
