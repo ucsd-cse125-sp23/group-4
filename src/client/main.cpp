@@ -192,10 +192,11 @@ int main(int argc, char* argv[]) {
         if (user_update.id == Window::gameScene->_myPlayerId)
           Window::client->write<message::UserStateUpdate>(user_update);
 
-      Window::animate(min_time_between_updates);
+        Window::animate(min_time_between_updates);  // update player anims
 
-      update_count++;
-      num_updates_to_send--;
+        update_count++;
+        num_updates_to_send--;
+      }
     }
 
     // calculate fps/ups

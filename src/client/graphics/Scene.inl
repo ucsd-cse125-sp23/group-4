@@ -195,22 +195,7 @@ void Scene::init(void) {
       sceneResources->materials["grid"];
 #pragma endregion
 
-  PlayerModel* waspModel = new PlayerModel;
-  waspModel->skel = sceneResources->skeletons["wasp"];
-  waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel->anims = sceneResources->animations["wasp"];
-
-  sceneResources->models["wasp"] = waspModel;
-  sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
-
-  // THE player !!!
-  sceneResources->models["playerRef"] = new Model;
-  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
-  // TODO(matthew) copy over mesh too?
-  sceneResources->models["playerRef"]->material =
-      sceneResources->materials["toon.blue"];
-
+#pragma region Sounds
   // Sound palette
   SoundEffect* sfx = new SoundEffect();
   sceneResources->sounds["test"] = sfx;
@@ -319,16 +304,6 @@ void Scene::init(void) {
   thing_modeltestB->name = "GT_playerTestB";
   localGameThings.push_back(thing_modeltestB);
 
-  Player* player = new Player();
-  player->camera = camera;               // give a reference to the game camera
-  player->pmodel = waspModel;            // updating!
-  player->model = waspModel;             // drawing!
-  player->pmodel->setAnimation("walk");  // TODO: make this automated
-  player->name = "Player 1";
-  player->transform.position = vec3(0, 2, 0);
-  player->transform.updateMtx(&(player->transformMtx));
-  // gamethings.push_back(player);
-
   // Build the scene graph
   node["teapot1"] = thing_example;
   node["cubeTest"] = thing_cube;
@@ -359,5 +334,5 @@ void Scene::init(void) {
 
   node["world"]->childnodes.push_back(node["map"]);
 
-  //createPlayer(-1);
+  // createPlayer(-1); // for testing
 }
