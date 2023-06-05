@@ -1,9 +1,8 @@
 #include "core/game/level/Environment.h"
 
+#include <algorithm>
 #include <cmath>
 #include <stack>
-
-#include <algorithm>
 
 #include "core/math/shape/ConvexMeshShape.h"
 #include "core/math/shape/ExpandedShape.h"
@@ -41,7 +40,6 @@ void Environment::addConvex(std::initializer_list<vec3f> vertices,
   this->addPObject(obj);
 }
 
-
 void Environment::addPlayerSpawnpoint(vec3f pos) {
   playerSpawns.push_back(pos);
 }
@@ -55,8 +53,6 @@ void Environment::placePlayers(std::mt19937& rng,
 }
 const std::vector<vec3f> Environment::getItemSpawns() { return itemSpawns; }
 float Environment::getDeathHeight() { return deathHeight; }
-
-
 
 inline double volume(const vec3f& v) { return v.x * v.y * v.z; }
 inline int maxInd(const vec3f& v) {

@@ -1,9 +1,9 @@
 #pragma once
 
+#include <random>
 #include <set>
 #include <utility>
 #include <vector>
-#include <random>
 
 #include "core/game/physics/PObject.h"
 #include "core/game/physics/Player.h"
@@ -25,7 +25,6 @@ class Environment {
   void placePlayers(std::mt19937& rng, std::vector<Player*> players);
   const std::vector<vec3f> getItemSpawns();
   float getDeathHeight();
-
 
   void constructBVH();
   std::vector<PObject*> collides(BoundingShape* shape);

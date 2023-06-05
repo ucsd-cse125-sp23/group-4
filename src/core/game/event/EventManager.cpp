@@ -23,7 +23,6 @@ void EventManager::onPickupEvent(PickupEvent event) {
   for (auto handler : this->pickupEventHandlers) handler(event);
 }
 
-
 void EventManager::registerEventHandler(
     std::function<void(CollisionEvent)> handler) {
   this->collisionEventHandlers.push_back(handler);
@@ -36,7 +35,6 @@ void EventManager::registerEventHandler(
     std::function<void(TaggingEvent)> handler) {
   this->taggingEventHandlers.push_back(handler);
 }
-
 
 void EventManager::fireCollisionEvent(PObject* self, PObject* other) {
   this->onCollisionEvent({level, self, other});
