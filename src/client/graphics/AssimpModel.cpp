@@ -332,15 +332,13 @@ void AssimpModel::update(float dt) {
 }
 
 void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-                       const glm::mat4& transformMtx, const bool ignoreDepth) {
+                       const glm::mat4& transformMtx) {
   if (!material) {
     return;
   }
 
   GLuint shader = material->shader;
   glUseProgram(shader);
-
-  if (ignoreDepth) glDisable(GL_DEPTH_TEST);
 
   for (int i = 0; i < meshes.size(); i++) {
     material->diffuse = meshes[i]->diffuse;
@@ -360,7 +358,6 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
 
     meshes[i]->draw();
   }
-  if (ignoreDepth) glEnable(GL_DEPTH_TEST);
 
   glUseProgram(0);
 }
