@@ -10,6 +10,7 @@
 #include "core/game/physics/PObject.h"
 #include "core/game/physics/Player.h"
 
+class GlobalEffect;
 class GameMode;
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {

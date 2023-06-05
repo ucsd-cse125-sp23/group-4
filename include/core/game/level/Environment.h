@@ -6,6 +6,7 @@
 #include <random>
 
 #include "core/game/physics/PObject.h"
+#include "core/game/physics/Player.h"
 #include "core/math/shape/AABShape.h"
 
 class Environment {

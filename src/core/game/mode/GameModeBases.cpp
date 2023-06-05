@@ -8,7 +8,7 @@
 CountGameMode::CountGameMode() {}
 void CountGameMode::registerTrackers(Level* level) {
   level->statisticManager->registerStat("it_count", 0);
-  level->eventManager->registerTaggingEventHandler([](TaggingEvent event) {
+  level->eventManager->registerEventHandler([](TaggingEvent event) {
     if (Player* p = dynamic_cast<Player*>(event.tagee))
       p->level->statisticManager->setValue(
           p->pid, "it_count",
@@ -24,7 +24,7 @@ int CountGameMode::queryScore(uint32_t pid) {
 TimeGameMode::TimeGameMode() {}
 void TimeGameMode::registerTrackers(Level* level) {
   level->statisticManager->registerStat("ticks_it", 0);
-  level->eventManager->registerTaggingEventHandler([](TaggingEvent event) {
+  level->eventManager->registerEventHandler([](TaggingEvent event) {
     if (Player* p = dynamic_cast<Player*>(event.tagger))
       p->level->statisticManager->setValue(
           p->pid, "ticks_it",
