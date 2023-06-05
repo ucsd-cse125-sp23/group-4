@@ -14,9 +14,18 @@ class GameMode;
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {
  private:
+  std::mt19937 rng;
   std::uint64_t age;
   CollisionType collisionTypeLUT[10][10];
   Environment* environment;
+
+  size_t powerupMin = 400, powerupMax = 800;
+  std::vector<std::pair<int, GlobalEffect*>> powerups;
+  int totalWeight = 0;
+
+  size_t nextPowerupTime;
+  std::vector<std::pair<uint32_t, vec3f>> powerupSpawns;
+  int freeSpaces;
 
  public:
   std::map<uint32_t, Player*> players;
@@ -38,4 +47,9 @@ class Level {
   std::uint64_t getAge();
   Environment* getEnvironment();
   void tick();
+
+
+  void definePowerupSpawn(GlobalEffect* power, int weight = 1);
+  void definePowerupDelayMin(size_t ticks);
+  void definePowerupDelayMax(size_t ticks);
 };

@@ -6,7 +6,7 @@
 #include "core/game/modifier/NumberModifier.h"
 #include "core/util/global.h"
 
-uint32_t PObject::maxId = 0;
+uint32_t PObject::maxId = 1;
 
 void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
