@@ -2,6 +2,9 @@
 
 #include "core/math/shape/BoundingShape.h"
 
+#define MAX_ITERATIONS 60
+#define TOLERANCE 0.001
+
 // https://blog.winter.dev/2020/gjk-algorithm/
 class ConvexShape : public BoundingShape {
  private:
@@ -18,6 +21,9 @@ class ConvexShape : public BoundingShape {
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx,
             const mat3f& thisIMtx, const mat4f& otherMtx,
             const mat3f& otherIMtx) const;
+  vec3f distance(const ConvexShape* other, const mat4f& thisMtx,
+                 const mat3f& thisIMtx, const mat4f& otherMtx,
+                 const mat3f& otherIMtx) const;
 
  public:
   ConvexShape() {
@@ -36,6 +42,16 @@ class ConvexShape : public BoundingShape {
             const mat4f& otherMtx = mat4f::identity()) const override;
   vec4f mtv(const ConvexShape* other, const mat4f& thisMtx = mat4f::identity(),
             const mat4f& otherMtx = mat4f::identity()) const override;
+  vec3f distance(const BoundingShape* other,
+                 const mat4f& thisMtx = mat4f::identity(),
+                 const mat4f& otherMtx = mat4f::identity()) const override;
+  vec3f distance(const ConvexShape* other,
+                 const mat4f& thisMtx = mat4f::identity(),
+                 const mat4f& otherMtx = mat4f::identity()) const override;
+  bool contains(const vec3f& point, const mat4f& thisMtx = mat4f::identity(),
+                const mat4f& otherMtx = mat4f::identity()) const override;
+  float intersects(const Ray& ray,
+                   const mat4f& thisMtx = mat4f::identity()) const override;
 
   const ConvexShape** seperate() const override { return self; }
   const size_t count() const override { return 1; }

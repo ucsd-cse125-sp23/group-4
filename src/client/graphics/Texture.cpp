@@ -1,7 +1,7 @@
 #include "Texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "client/graphics/imported/stb_image.h"
+#include "imported/stb_image.h"
 
 void Texture::init(const char* filename) {
   glGenTextures(1, &textureID);
@@ -17,16 +17,23 @@ void Texture::init(const char* filename) {
   // load and generate the texture
   int width, height, nrChannels;
   unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
+
   if (data) {
-    glTexImage2D(targetImage, 0, GL_RGB, width, height, 0, format,
-                 GL_UNSIGNED_BYTE, data);
-    // glGenerateMipmap(GL_TEXTURE_2D); // no mipmaps rn
+    if (nrChannels == 3) {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                   GL_UNSIGNED_BYTE, data);
+    } else {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA,
+                   GL_UNSIGNED_BYTE, data);
+    }
+    // glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     std::cerr << "Cannot open file: " << filename << std::endl;
   }
 
   stbi_image_free(data);
-  glBindTexture(target, 0);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::init(const unsigned char* rawImgData, int dataLen) {

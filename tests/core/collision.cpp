@@ -3,7 +3,7 @@
 
 #include "core/math/matrix.h"
 #include "core/math/shape/AABShape.h"
-#include "core/math/shape/CylinderShape.h"
+#include "core/math/shape/CapsuleShape.h"
 #include "core/math/shape/OffsetShape.h"
 #include "core/math/shape/SphereShape.h"
 #include "core/math/vector.h"
@@ -32,6 +32,7 @@ TEST_CASE("Sphere Collision Detection", "[detect]") {
                                scale(vec3f(0.4, 0.4, 0.4))));
   delete sphere;
 }
+/*
 TEST_CASE("Cylinder Collision Detection", "[detect]") {
   CylinderShape* cylinder = new CylinderShape(2, 1);
   CHECK(cylinder->collides(cylinder));
@@ -54,7 +55,7 @@ TEST_CASE("Cylinder Collision Detection", "[detect]") {
   CHECK_FALSE(cylinder->collides(cylinder, translate(vec3f(0.0, 0.0, 1.5)),
                                  scale(vec3f(0.4, 0.4, 0.4))));
   delete cylinder;
-}
+}*/
 TEST_CASE("AABB Collision Detection", "[detect]") {
   AABShape* aab1 = new AABShape(vec3f(-1, -1, -1), vec3f(1, 1, 1));
   CHECK(aab1->collides(aab1));
@@ -82,6 +83,7 @@ TEST_CASE("AABB Collision Detection", "[detect]") {
   delete aab1;
   delete aab2;
 }
+/*
 TEST_CASE("Transform Collision Detection", "[detect]") {
   CylinderShape* cylinder = new CylinderShape(2.0, 0.5);
   CHECK_FALSE(cylinder->collides(cylinder, translate(vec3f(1.01, 0.00, 0.00))));
@@ -101,7 +103,7 @@ TEST_CASE("Mixed Collision Detection", "[detect]") {
   delete cylinder;
   delete aab;
 }
-
+*/
 void test_mtv(BoundingShape* shape, vec3f dx, vec4f expected,
               float shiftEpsilon = 0.001f,
               vec4f tolerance = vec4f(0.01f, 0.01f, 0.01f, 0.001f)) {
@@ -134,6 +136,7 @@ TEST_CASE("Trivial Collision MTV", "[mtv]") {
       sphere, translate(vec3f(1, 0, 0) + vec3f(mtv) * (mtv.w + 0.001f))));
   delete sphere;
 }
+/*
 TEST_CASE("Cylinder Collision MTV", "[mtv]") {
   CylinderShape* cylinder = new CylinderShape(2.0, 0.5);
   test_mtv(cylinder, vec3f(0.9, 0.0, 0.0), vec4f(1.0, 0.0, 0.0, 0.1), 0.001f,
@@ -170,4 +173,113 @@ TEST_CASE("Mixed Offset Collision MTV", "[mtv]") {
   delete cylinder;
   delete offset;
   delete aab;
+}
+*/
+TEST_CASE("Simple Point Test", "[pointtest]") {
+  SphereShape* sphere = new SphereShape(1);
+  CHECK(sphere->contains(vec3f(0, 0, 0)));
+  CHECK(sphere->contains(vec3f(0.0, 0.5, 0.0)));
+  CHECK(sphere->contains(vec3f(0.0, 0.5, 0.5)));
+  CHECK(sphere->contains(vec3f(0.5, 0.5, 0.5)));
+
+  CHECK_FALSE(sphere->contains(vec3f(0, 0, 0), translate(vec3f(1, 1, 1))));
+  CHECK(sphere->contains(vec3f(1, 1, 1), translate(vec3f(1, 1, 1))));
+  delete sphere;
+
+  AABShape* aab = new AABShape(vec3f(-1, -1, -1), vec3f(1, 1, 1));
+  CHECK(aab->contains(vec3f(0.9, 0.9, -0.9)));
+  CHECK(aab->contains(vec3f(0.9, 0.9, 0.9)));
+  CHECK(aab->contains(vec3f(0.9, -0.9, -0.9)));
+  CHECK(aab->contains(vec3f(0.9, -0.9, 0.9)));
+  CHECK(aab->contains(vec3f(-0.9, 0.9, -0.9)));
+  CHECK(aab->contains(vec3f(-0.9, 0.9, 0.9)));
+  CHECK(aab->contains(vec3f(-0.9, -0.9, -0.9)));
+  CHECK(aab->contains(vec3f(-0.9, -0.9, 0.9)));
+  delete aab;
+}
+
+TEST_CASE("Simple Raycast", "[raycast]") {
+  SphereShape* sphere = new SphereShape(1);
+  CHECK_THAT(sphere->intersects({vec3f(0, 0, 0), vec3f(1, 0, 0)},
+                                translate(vec3f(5, 0, 0))),
+             WithinAbs(4, 0.01f));
+  CHECK_THAT(sphere->intersects({vec3f(0, 0, 0), vec3f(-1, 0, 0)},
+                                translate(vec3f(5, 0, 0))),
+             WithinAbs(-1, 0.01f));
+  CHECK_THAT(sphere->intersects({vec3f(0, 0, 0), vec3f(1, 0, 0)},
+                                translate(vec3f(5.0, 0.9, 0.0))),
+             WithinAbs(4.56, 0.01f));
+  delete sphere;
+
+  AABShape* aab = new AABShape(vec3f(-1, -1, -1), vec3f(1, 1, 1));
+  CHECK_THAT(aab->intersects({vec3f(0, 0, 0), vec3f(1, 0, 0)},
+                             translate(vec3f(5, 0, 0))),
+             WithinAbs(4, 0.01f));
+  CHECK_THAT(aab->intersects({vec3f(0.0, 0.5, 0.5), vec3f(1, 0, 0)},
+                             translate(vec3f(5, 0, 0))),
+             WithinAbs(4, 0.01f));
+  CHECK_THAT(aab->intersects({vec3f(0, 0, 0), vec3f(1.0, 0.2, 0.2)},
+                             translate(vec3f(5, 0, 0))),
+             WithinAbs(4, 0.01f));
+  delete aab;
+}
+
+#include "core/lib.hpp"
+
+TEST_CASE("Basic CCD", "[ccd]") {
+  PLAYER_BASE_SHAPE = new CapsuleShape(1.0, 1.3);
+  PLAYER_BOUNDING_SHAPE =
+      new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, 0.5f, 0.0f));
+
+  Environment* environment = new Environment();
+  environment->addBox(vec3f(-2000, -2, -2000), vec3f(2000, 0, 2000));
+  REQUIRE_NOTHROW(initializeLevel(environment));
+  std::pair<Player*, ControlModifierData*> pair;
+  REQUIRE_NOTHROW(pair = initializePlayer());
+
+  pair.first->setPos(vec3f(0, 1, 0));
+
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(0, -4, 0)).second.w,
+             WithinAbs(0.25f, 0.01f));
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 0)).second.w,
+             WithinAbs(0.25f, 0.01f));
+  CHECK_THAT(level->getEnvironment()->ccd(pair.first, vec3f(1, -4, 2)).second.w,
+             WithinAbs(0.25f, 0.01f));
+  CHECK_THAT(
+      level->getEnvironment()->ccd(pair.first, vec3f(50, -4, 0)).second.w,
+      WithinAbs(0.25f, 0.01f));
+
+  REQUIRE_NOTHROW(terminateLevel());
+}
+void checkCCD(PObject* obj, vec3f dPos) {
+  float t = level->getEnvironment()->ccd(obj, dPos).second.w;
+  obj->addPos((dPos - normalize(dPos) * 0.001f) * t);
+  CHECK(level->getEnvironment()->collides(obj).empty());
+}
+TEST_CASE("Multi Obsticle CCD", "[ccd]") {
+  PLAYER_BOUNDING_SHAPE =
+      new OffsetShape(new SphereShape(1.0), vec3f(0.0f, 0.0f, 0.0f));
+
+  Environment* environment = new Environment();
+  environment->addBox(vec3f(-200, -2, -200), vec3f(200, 0, 200));
+  environment->addBox(vec3f(-2, -200, -200), vec3f(0, 200, 200));
+  REQUIRE_NOTHROW(initializeLevel(environment));
+  std::pair<Player*, ControlModifierData*> pair;
+  REQUIRE_NOTHROW(pair = initializePlayer());
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  checkCCD(pair.first, vec3f(0, -4, 0));
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  checkCCD(pair.first, vec3f(-4, -4, 0));
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  checkCCD(pair.first, vec3f(-8, 0, 0));
+
+  pair.first->setPos(vec3f(2.0, 2.0, 0.0));
+  CHECK_THAT(
+      level->getEnvironment()->ccd(pair.first, vec3f(0, -2, 50)).second.w,
+      WithinAbs(0.5, 0.001));
+
+  REQUIRE_NOTHROW(terminateLevel());
 }

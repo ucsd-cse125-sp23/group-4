@@ -36,7 +36,6 @@ void TextureCube::init() {
 
     stbi_image_free(data);
   }
-  stbi_set_flip_vertically_on_load(true);
 
   glBindTexture(target, 0);
 }

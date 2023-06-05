@@ -103,6 +103,18 @@ struct TMat3 {
       }
     }
   }
+  template <typename T2>
+  TMat3(const TVector3<T2>& a, const TVector3<T2>& b, const TVector3<T2>& c) {
+    data[0][0] = (T)a.x;
+    data[0][1] = (T)b.x;
+    data[0][2] = (T)c.x;
+    data[1][0] = (T)a.y;
+    data[1][1] = (T)b.y;
+    data[1][2] = (T)c.y;
+    data[2][0] = (T)a.z;
+    data[2][1] = (T)b.z;
+    data[2][2] = (T)c.z;
+  }
 
   template <typename T2>
   TMat3(T2 v00, T2 v01, T2 v02, T2 v10, T2 v11, T2 v12, T2 v20, T2 v21,
