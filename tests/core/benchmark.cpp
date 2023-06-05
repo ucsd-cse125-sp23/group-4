@@ -36,7 +36,8 @@ inline Time tick(Timer& timer) {
 }
 
 void testEnvironment(Environment* environment, int S, int P = 1) {
-  REQUIRE_NOTHROW(initializeLevel(environment));
+  Level* level;
+  REQUIRE_NOTHROW(level = initializeLevel(environment));
   std::vector<std::pair<Player*, ControlModifierData*>> pairs;
   for (int i = 0; i < P; i++)
     REQUIRE_NOTHROW(pairs.push_back(initializePlayer()));
