@@ -29,8 +29,7 @@ class TaggingEvent : public Event {
 class JumpEvent : public Event {
  public:
   PObject* self;
-  JumpEvent(Level* level, PObject* self)
-      : Event(level), self(self) {}
+  JumpEvent(Level* level, PObject* self) : Event(level), self(self) {}
 };
 class LandEvent : public Event {
  public:
