@@ -5,7 +5,6 @@
 class Event {
  public:
   Level* level;
-  virtual Level* getLevel() { return level; }
   explicit Event(Level* level) : level(level) {}
 };
 class CollisionEvent : public Event {
@@ -26,4 +25,20 @@ class TaggingEvent : public Event {
   int ticksIt;
   TaggingEvent(Level* level, PObject* tagger, PObject* tagee, int ticksIt)
       : Event(level), tagger(tagger), tagee(tagee), ticksIt(ticksIt) {}
+};
+class JumpEvent : public Event {
+ public:
+  PObject* self;
+  JumpEvent(Level* level, PObject* self)
+      : Event(level), self(self) {}
+};
+class LandEvent : public Event {
+ public:
+  PObject* self;
+  LandEvent(Level* level, PObject* self) : Event(level), self(self) {}
+};
+class PickupEvent : public Event {
+ public:
+  PObject* self;
+  PickupEvent(Level* level, PObject* self) : Event(level), self(self) {}
 };
