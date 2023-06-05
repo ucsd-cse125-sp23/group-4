@@ -5,7 +5,7 @@ void Lobby::init(void) {
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
                   // resource)
-  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
+  sceneResources->meshes["player"]->init("assets/model/dev/model-skeleton.obj");
 
   sceneResources->models["playerRef"] = new Model;
   sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
@@ -132,17 +132,20 @@ void Lobby::init(void) {
   thing_player->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
   thing_player->model = sceneResources->models["player"];
 
-  thing_player2->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  thing_player2->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  thing_player2->transform.position = thing_player->transform.position;
+  thing_player2->transform.rotation = thing_player->transform.rotation;
   thing_player2->model = sceneResources->models["player2"];
 
-  thing_player3->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  thing_player3->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  thing_player3->transform.position = thing_player->transform.position;
+  thing_player3->transform.rotation = thing_player->transform.rotation;
   thing_player3->model = sceneResources->models["player3"];
 
-  thing_player4->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  thing_player4->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  thing_player4->transform.position = thing_player->transform.position;
+  thing_player4->transform.rotation = thing_player->transform.rotation;
   thing_player4->model = sceneResources->models["player4"];
 
+  for (auto model : models) {
+    model->update(0);
+  }
   buildSceneTree();
 }
