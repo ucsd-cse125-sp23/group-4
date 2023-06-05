@@ -19,9 +19,9 @@ void Texture::init(const char* filename) {
   unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
 
   if (data) {
-    //glTexImage2D(targetImage, 0, format, width, height, 0, format,
+    // glTexImage2D(targetImage, 0, format, width, height, 0, format,
     //             GL_UNSIGNED_BYTE, data);
-    
+
     if (nrChannels == 3) {
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                    GL_UNSIGNED_BYTE, data);

@@ -18,7 +18,7 @@ void Player::animate(float dt) {
 void Player::update(float dt) {
   // interpolate between old to new state
   updateInterpolate(dt);
-  
+
   if (tagged) time.Update(dt);
 }
 
