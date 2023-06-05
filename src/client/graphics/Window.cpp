@@ -47,7 +47,7 @@ Camera* Cam;
 bool LeftDown, RightDown;
 int MouseX, MouseY;
 
-bool _debugmode = false;
+bool Window::_debugmode = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -29,6 +29,8 @@ class Window {
 
   static bool readyInput;
 
+  static bool _debugmode;
+
   // Window Properties
   static int width;
   static int height;
