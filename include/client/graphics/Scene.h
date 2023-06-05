@@ -112,6 +112,7 @@ class Scene {
 
   std::vector<GameThing*> localGameThings;
   std::unordered_map<int, GameThing*> networkGameThings;
+  std::map<int, std::string> skins;
 
   Timer time;
   bool gameStart;
@@ -168,6 +169,7 @@ class Scene {
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
   virtual void init(void);
+  void init(std::map<int, message::LobbyPlayer> players);
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net

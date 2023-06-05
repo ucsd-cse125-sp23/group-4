@@ -197,10 +197,11 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     lobby->receiveState(lobby_state);
   } else if (dynamic_cast<Lobby*>(gameScene) &&
              phase == GamePhase::Game) {  // lobby -> game
+    auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = new Scene(Cam);
     glfwHideWindow(window);
     std::thread x(&Load::load, loadScreen, window);
-    gameScene->init();
+    gameScene->init(lobby->players);
     hud = new HUD(gameScene);
     x.join();
 

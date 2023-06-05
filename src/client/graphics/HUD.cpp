@@ -108,73 +108,47 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
-  int size = (width / 10 > 250) ? 250 : width / 10;
-  int x = 10;
-  int y = 50;
+  int bar_width = (width / 4 > 800) ? 800 : width / 4;
+  int bar_height = (height / 5 > 200) ? 200 : height / 5;
+  int x = 0;
+  int y = 0;
 
   Player* player;
   std::string str;
-  for (auto p : players) {
-    str = p.first;
-    player = p.second;
-    Timer time = player->time;
-    str += " " + time.ToString();
+  for (auto it = scene->skins.rbegin(); it != scene->skins.rend(); it++) { 
+    glViewport(x, y, bar_width, bar_height);
 
-    glViewport(x, y, size, size);
-
-    // Camera viewport;
-
-    glBegin(GL_TRIANGLES);
-    glColor4f(0.0, 0.0, 0.0, 0.5);
-    glVertex2f(-1, -1);
-    glVertex2f(1, -1);
-    glVertex2f(0, 1);
-    glEnd();
-
-    glViewport(x - (2 * scale), y - (10 * scale), size, size);
-    drawIcon("neutral");
+    drawBar(it->second);
 
     glViewport(0, 0, width, height);
 
-    // Draw highlight
-    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-
-    // screen coordinates
-    float x_left = x;
-    float x_right = x + size;
-    float y_top = y - 27 + (60 * 0.2 * scale);
-    float y_bot = y - 27;
-
-    // convert to normalized device coordinate
-    float x_leftNDC = (x_left / width * 2) - 1;
-    float x_rightNDC = (x_right / width * 2) - 1;
-    float y_topNDC = (y_top / height * 2) - 1;
-    float y_botNDC = (y_bot / height * 2) - 1;
-
-    // render the text background
-    glBegin(GL_QUADS);
-
-    glVertex2f(x_rightNDC, y_topNDC);
-    glVertex2f(x_leftNDC, y_topNDC);
-    glVertex2f(x_leftNDC, y_botNDC);
-    glVertex2f(x_rightNDC, y_botNDC);
-
-    glEnd();
+    y += (bar_height / 1.5);
+  }
+  
+  x = bar_width / 2.5;
+  y = bar_height / 1.75;
+  for (auto it = players.rbegin(); it != players.rend(); it++) {
+    str = it->first;
+    player = it->second;
+    Timer time = player->time;
+    str += " " + time.ToString();
 
     glDisable(GL_DEPTH_TEST);
-    fr->RenderText(width, height, str, x + (4 * scale), y - 20, 0.2 * scale,
-                   glm::vec3(1.0, 1.0, 1.0));
+    fr->RenderText(width, height, str, x, y, 0.3 * scale,
+                   glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
     glEnable(GL_DEPTH_TEST);
 
-    x += (size + (25 * scale));
+    y += (bar_height / 1.5);
+
+    glViewport(0, 0, width, height);
   }
 }
 
-void HUD::drawIcon(std::string icon) {
+void HUD::drawBar(std::string skin) {
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  icons[icon].bindgl();
+  player_bars[skin].bindgl();
   glEnable(GL_TEXTURE_2D);
 
   glColor3f(1.0f, 1.0f, 1.0f);
