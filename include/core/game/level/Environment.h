@@ -20,7 +20,7 @@ class Environment {
 
   void addPlayerSpawnpoint(vec3f pos);
   void addItemSpawnpoint(vec3f pos);
-  void setDeathHeight(vec3f pos);
+  void setDeathHeight(float height);
 
   void placePlayers(std::mt19937& rng, std::vector<Player*> players);
   const std::vector<vec3f> getItemSpawns();

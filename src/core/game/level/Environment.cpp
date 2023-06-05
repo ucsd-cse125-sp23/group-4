@@ -46,7 +46,7 @@ void Environment::addPlayerSpawnpoint(vec3f pos) {
   playerSpawns.push_back(pos);
 }
 void Environment::addItemSpawnpoint(vec3f pos) { itemSpawns.push_back(pos); }
-void Environment::setDeathHeight(vec3f pos) { deathHeight = pos.y; }
+void Environment::setDeathHeight(float height) { deathHeight = height; }
 
 void Environment::placePlayers(std::mt19937& rng,
                                std::vector<Player*> players) {
