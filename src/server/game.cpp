@@ -43,6 +43,7 @@ Game::Game() {
   }
   environment->setDeathHeight(mapData.fallBoundY);
   level = initializeLevel(environment);
+  applyGameMode(level, new ThreeTaggersTimeGameMode());
 }
 
 int Game::add_player() {
@@ -69,3 +70,5 @@ std::unordered_map<int, message::GameStateUpdateItem> Game::to_network() {
     things.insert({pid, thing.to_network()});
   return things;
 }
+
+void Game::restart_game() { level->restartGame(); }

@@ -35,6 +35,8 @@ class Game {
   void update(const message::UserStateUpdate&);
   void tick();
   std::unordered_map<int, message::GameStateUpdateItem> to_network();
+  
+  void restart_game();
 
  private:
   std::unordered_map<int, GameThing> game_things_;

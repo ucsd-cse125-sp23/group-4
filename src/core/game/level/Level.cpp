@@ -153,6 +153,7 @@ Level::~Level() {
   delete environment;
   delete eventManager;
   delete statisticManager;
+  if (gameMode != nullptr) delete gameMode;
 }
 void Level::setCollisionType(CollisionType type, int layer0, int layer1) {
   collisionTypeLUT[layer0][layer1] = type;
@@ -170,6 +171,14 @@ void Level::addPObject(PObject* obj) {
 }
 std::uint64_t Level::getAge() { return age; }
 Environment* Level::getEnvironment() { return environment; }
+
+void Level::spreadPlayers(std::vector<Player*> ps) {
+  this->environment->placePlayers(rng, ps);
+}
+void Level::restartGame() {
+  this->age = TAG_COOLDOWN;
+  if (gameMode != nullptr) this->gameMode->initPlayers(players);
+}
 
 void Level::definePowerupSpawn(GlobalEffect* power, int weight) {
   totalWeight += weight;

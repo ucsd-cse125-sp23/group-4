@@ -13,7 +13,7 @@ class Manager {
     GameOver,
   };
 
-  static const std::size_t MAX_PLAYERS = 4;
+  static const std::size_t MAX_PLAYERS = 1;
 
   int add_player();
   void remove_player(int);
@@ -23,6 +23,7 @@ class Manager {
   void handle_game_update(const message::UserStateUpdate&);
   void tick_game();
   message::GameStateUpdate get_game_update();
+  void restart_game();
 
   Status status_ = Status::Lobby;
 

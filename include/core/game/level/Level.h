@@ -10,9 +10,9 @@
 #include "core/game/level/StatisticManager.h"
 #include "core/game/physics/PObject.h"
 #include "core/game/physics/Player.h"
+#include "core/game/mode/GameMode.h"
 
 class GlobalEffect;
-class GameMode;
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {
  private:
@@ -49,6 +49,9 @@ class Level {
   std::uint64_t getAge();
   Environment* getEnvironment();
   void tick();
+
+  void spreadPlayers(std::vector<Player*> ps);
+  void restartGame();
 
   void definePowerupSpawn(GlobalEffect* power, int weight = 1);
   void definePowerupDelayMin(size_t ticks);
