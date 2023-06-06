@@ -19,7 +19,7 @@ CapsuleShape* PLAYER_BASE_SHAPE = new CapsuleShape(1.0, 1.3);
 OffsetShape* PLAYER_BOUNDING_SHAPE =
     new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, 0.5f, 0.0f));
 
-Level* level = nullptr;
+//Level* level = nullptr;
 
 ControlModifier* CONTROL_MODIFIER = new ControlModifier();
 TaggedStatusModifier* TAGGED_STATUS_MODIFIER = new TaggedStatusModifier();
@@ -35,25 +35,27 @@ GlobalEffect* SPEEDBOOST_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
-            SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, 0.25f)));
+            SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(level, 100, 0.25f)));
     });
 GlobalEffect* SLOWDOWN_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
-            SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, -0.25f)));
+            SPEEDBOOST_MODIFIER,
+            new SpeedBoostModifierData(level, 100, -0.25f)));
     });
 GlobalEffect* FREEZE_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
-        target->addModifierInstance(
-            new ModifierInstance(FREEZE_MODIFIER, new FreezeModifierData(40)));
+        target->addModifierInstance(new ModifierInstance(
+            FREEZE_MODIFIER, new FreezeModifierData(level, 40)));
     });
 GlobalEffect* REVERSE_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
-            SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(100, -2.0f)));
+            SPEEDBOOST_MODIFIER,
+            new SpeedBoostModifierData(level, 100, -2.0f)));
     });
 GlobalEffect* LAUNCH_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
@@ -67,21 +69,21 @@ GlobalEffect* SLOW_FALL_EFFECT =
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
             GRAVITY_MODIFIER,
-            new NumberModifierData(Operation::MULTIPLY, 0.5, 200)));
+            new NumberModifierData(level, Operation::MULTIPLY, 0.5, 200)));
     });
 GlobalEffect* FAST_FALL_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
             GRAVITY_MODIFIER,
-            new NumberModifierData(Operation::MULTIPLY, 2, 200)));
+            new NumberModifierData(level, Operation::MULTIPLY, 2, 200)));
     });
 extern GlobalEffect* SLIPPERY_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
             FRICTION_MODIFIER,
-            new NumberModifierData(Operation::MULTIPLY, 0.01, 400)));
+            new NumberModifierData(level, Operation::MULTIPLY, 0.01, 400)));
     });
 
 int swaptable2[1][2] = {{1, 0}};

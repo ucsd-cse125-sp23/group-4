@@ -22,7 +22,7 @@ struct AttractOtherToTaggersEffect : public GlobalEffect {
       if (ids.find(pair.second->id) == ids.end())
         for (PObject* obj : taggers)
           pair.second->addModifierInstance(new ModifierInstance(
-              ATTRACT_MODIFIER, new AttractModifierData(200, obj, 0.2)));
+              ATTRACT_MODIFIER, new AttractModifierData(level, 200, obj, 0.2)));
   }
 };
 struct RepellTaggersFromSelfEffect : public GlobalEffect {
@@ -34,6 +34,6 @@ struct RepellTaggersFromSelfEffect : public GlobalEffect {
               ->isIt)
         for (PObject* self : targets)
           pair.second->addModifierInstance(new ModifierInstance(
-              ATTRACT_MODIFIER, new AttractModifierData(200, self, -0.1)));
+              ATTRACT_MODIFIER, new AttractModifierData(level, 200, self, -0.1)));
   }
 };
