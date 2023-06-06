@@ -132,7 +132,6 @@ void Scene::update(float delta) {
       if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
         Window::phase = GamePhase::Lobby;
         reset();
-        glEnable(GL_DEPTH_TEST);
       }
     }
   }
@@ -145,8 +144,8 @@ message::UserStateUpdate Scene::pollUpdate() {
 }
 
 void Scene::receiveState(message::GameStateUpdate newState) {
-  // update existing items, create new item if it doesn't exist
-  if (Window::phase != GamePhase::Lobby) {
+  if (Window::phase == GamePhase::Game) {
+    // update existing items, create new item if it doesn't exist
     for (auto& [id, state] : newState.things) {
       // TODO: handle items besides Player as well
       if (!networkGameThings.count(id)) createPlayer(id);

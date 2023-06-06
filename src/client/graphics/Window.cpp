@@ -202,15 +202,14 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::update(GLFWwindow* window, float deltaTime) {
   if (!dynamic_cast<Lobby*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
-    start->reset();
-    resetCamera();
+    Cam->SetPositionTarget(glm::vec3(0.0f, 0.0f, 0.0f));
+    Cam->Reset();
+    Cam->UpdateView();
     gameScene = lob;
-    auto l = dynamic_cast<Lobby*>(gameScene);
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     lobby->receiveState(lobby_state);
   } else if (dynamic_cast<Lobby*>(gameScene) &&
              phase == GamePhase::Game) {  // lobby -> game
-    lob->reset();
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = game;
     glfwHideWindow(window);
@@ -336,7 +335,7 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset && phase == GamePhase::Game) {
+  if (yoffset/* && phase == GamePhase::Game*/) {
     Cam->CamZoom(yoffset);
   }
 }
@@ -355,7 +354,7 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && phase == GamePhase::Game) {
+  if ((RightDown || LeftDown) /*&& phase == GamePhase::Game*/) {
     Cam->CamDrag(dx, dy);
   }
 }
