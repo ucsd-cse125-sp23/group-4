@@ -178,6 +178,12 @@ void Scene::init(void) {
   mtl->diffuse = vec4(0.9f, 0.82f, 0.0f, 1.0f);
   sceneResources->materials["star1-ptcl"] = mtl;
 
+  mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["toon"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.9f, 0.82f, 0.9f, 1.0f);
+  sceneResources->materials["toon"] = mtl;
+
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
       sceneResources->shaderPrograms["toon"];
@@ -222,9 +228,9 @@ void Scene::init(void) {
   ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
   ptcl->transform.updateMtx(&ptcl->transformMtx);
-  //localGameThings.push_back(ptcl);
-  //node["particleTest"] = ptcl;
-  //node["world"]->childnodes.push_back(node["particleTest"]);
+  // localGameThings.push_back(ptcl);
+  // node["particleTest"] = ptcl;
+  // node["world"]->childnodes.push_back(node["particleTest"]);
 
   /*
   ptcl = new ParticleSystem();
@@ -302,7 +308,7 @@ void Scene::init(void) {
   sceneResources->models["PREFAB_player.model"] = am;
   sceneResources->models["PREFAB_player.model"]->mesh = am;
   sceneResources->models["PREFAB_player.model"]->material =
-      sceneResources->materials["wood"];
+      sceneResources->materials["toon"];
 #pragma endregion
 
   ///////////////////////////////////////////////////////
@@ -356,5 +362,5 @@ void Scene::init(void) {
 
   node["world"]->childnodes.push_back(node["map"]);
 
-  //createPlayer(-1); // for testing
+  // createPlayer(-1); // for testing
 }
