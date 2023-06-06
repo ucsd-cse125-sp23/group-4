@@ -33,8 +33,8 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
    *   Current animation is not inherited
    */
   AssimpModel(const AssimpModel& am);
-  // TODO
-  // ~AssimpModel();
+  /** Destructor */
+  ~AssimpModel();
 
   /** Load a model file (displaying default pose).
    * Returns whether the model file is loaded properly.

@@ -23,6 +23,20 @@ AssimpModel::AssimpModel(const AssimpModel& am)
   material = am.material;
 }
 
+AssimpModel::~AssimpModel() {
+  for (auto& kv : nodeMap) {
+    AssimpNode* node = kv.second;
+    delete node;
+  }
+
+  name = "destructed";
+  path = name;
+  numNode = 0;
+  rootNode = nullptr;
+  nodeMap.clear();
+  meshes.clear();
+}
+
 bool AssimpModel::loadAssimp(const char* path) {
   if (rootNode) {
     return false;

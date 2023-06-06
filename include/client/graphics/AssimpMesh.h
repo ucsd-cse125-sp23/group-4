@@ -37,6 +37,8 @@ struct NodeJoint {
 class AssimpMesh {
  public:
   AssimpMesh();
+  /** Destructor */
+  ~AssimpMesh();
 
   std::string name;
 

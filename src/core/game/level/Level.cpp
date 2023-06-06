@@ -96,33 +96,35 @@ void Level::tick() {
   }
 
   // Spawn Powerups
-  if (age > nextPowerupTime) {
-    std::uniform_int_distribution dist(powerupMin, powerupMax);
-    nextPowerupTime = age + dist(rng);
+  if (powerups.size() > 0) {
+    if (age > nextPowerupTime) {
+      std::uniform_int_distribution dist(powerupMin, powerupMax);
+      nextPowerupTime = age + dist(rng);
 
-    std::uniform_int_distribution weight(0, totalWeight - 1);
-    int budget = weight(rng);
-    size_t ind = -1;
-    do {
-      budget -= powerups[ind].first;
-    } while (budget >= 0);
-    GlobalEffect* effect = powerups[ind].second;
+      std::uniform_int_distribution weight(0, totalWeight - 1);
+      int budget = weight(rng);
+      size_t ind = -1;
+      do {
+        budget -= powerups[ind].first;
+      } while (budget >= 0);
+      GlobalEffect* effect = powerups[ind].second;
 
-    weight = std::uniform_int_distribution(1, freeSpaces);
-    budget = weight(rng);
+      weight = std::uniform_int_distribution(1, freeSpaces);
+      budget = weight(rng);
 
-    ind = -1;
-    while (budget > 0) {
-      ind++;
-      if (!powerupSpawns[ind].first) budget--;
+      ind = -1;
+      while (budget > 0) {
+        ind++;
+        if (!powerupSpawns[ind].first) budget--;
+      }
+
+      freeSpaces--;
+
+      PowerUp* power = new PowerUp(powerupSpawns[ind].second, effect);
+      powerupSpawns[ind].first = power->id;
+
+      this->addPObject(power);
     }
-
-    freeSpaces--;
-
-    PowerUp* power = new PowerUp(powerupSpawns[ind].second, effect);
-    powerupSpawns[ind].first = power->id;
-
-    this->addPObject(power);
   }
 
   this->age++;
