@@ -191,9 +191,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
-void Window::animate(float deltaTime) {
-  gameScene->animate(deltaTime);
-}
+void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
 
 void Window::update(GLFWwindow* window, float deltaTime) {
   if (dynamic_cast<Start*>(gameScene) &&
