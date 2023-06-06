@@ -77,6 +77,7 @@ bool Window::initializeProgram(GLFWwindow* window) {
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
   gameScene = new Start(Cam);
+  gameScene->init();
   loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
@@ -191,6 +192,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::update(GLFWwindow* window, float deltaTime) {
   if (dynamic_cast<Start*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
+    resetCamera();
     gameScene = new Lobby(Cam);
     gameScene->init();
     auto lobby = dynamic_cast<Lobby*>(gameScene);
@@ -321,7 +323,7 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset && phase == GamePhase::Game) {
+  if (yoffset && (phase == GamePhase::Game || phase == GamePhase::Start)) {
     Cam->CamZoom(yoffset);
   }
 }
@@ -340,8 +342,9 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && phase == GamePhase::Game) {
+  if ((RightDown || LeftDown) && (phase == GamePhase::Game || phase == GamePhase::Start)) {
     Cam->CamDrag(dx, dy);
+    std::cout << "Incline: " << Cam->GetIncline() << std::endl;
   }
 }
 

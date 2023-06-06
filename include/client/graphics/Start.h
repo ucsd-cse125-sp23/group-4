@@ -19,12 +19,13 @@ class Start : public Scene, public InputListener {
   bool renderText;
 
   explicit Start(Camera* camFromWindow) : Scene(camFromWindow) {
-    localGameThings.clear();
     timeElapsed = 0.0f;
     offset = 0.0f;
     background.init("assets/image/clouds.png");
     renderText = true;
-
+    camera->SetDistance(600.0);
+    camera->SetIncline(32.0);
+    camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
     timeOnFrame = 0;
     index = 0;
     for (int i = 1; i < 33; i++) {
