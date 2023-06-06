@@ -78,6 +78,11 @@ void PObject::tick() {
   lastSurfaceNormal = vec3f(0, 0, 0);
   lastSurfaceFriction = 0;
 
+  if (onGround && this->vel.y > -0.1)
+    ticksFallen = 0;
+  else
+    ticksFallen++;
+
   move(this->vel);
   freeze = false;
 }

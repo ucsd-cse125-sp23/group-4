@@ -21,6 +21,7 @@ class PObject : public Modifiable {
   uint32_t id;
   vec3f vel, oPos;
   int onGround;
+  int ticksFallen;
   bool static_, freeze;
   Level* level;
 
