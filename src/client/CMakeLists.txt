@@ -85,21 +85,18 @@ FetchContent_MakeAvailable(
 
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/main.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/AnimationClip.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Camera.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Cube.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/Joint.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Scene.cpp
     ${PROJECT_SOURCE_DIR}/graphics/shader.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Input.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/Skeleton.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/Skin.cpp
     ${PROJECT_SOURCE_DIR}/graphics/SkinnedMesh.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/Particle.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/ParticleSystem.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Texture.cpp
     ${PROJECT_SOURCE_DIR}/graphics/TextureCube.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Player.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Window.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/imported/Tokenizer.cpp
     ${PROJECT_SOURCE_DIR}/graphics/imported/parallel.cpp
     ${PROJECT_SOURCE_DIR}/graphics/AssimpAnimation.cpp
     ${PROJECT_SOURCE_DIR}/graphics/AssimpMesh.cpp

@@ -35,6 +35,8 @@ class Start : public Scene, public InputListener {
     }
   }
 
+  void init(void) override;
+
   void draw();
 
   void drawName();

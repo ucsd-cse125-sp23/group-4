@@ -32,20 +32,17 @@ class Node {
 
   std::vector<Node*> childnodes;
 
-  virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-                    const glm::mat4& parentMtx) {
+  virtual void draw(DrawInfo info, const glm::mat4& parentMtx) {
     parentMtxCache = parentMtx;
     if (model) {
-      model->draw(viewProjMtx, viewMtx, parentMtx * transformMtx);
+      model->draw(info.GetVP(skybox), info.viewMtx, parentMtx * transformMtx);
     }
   }
 
-  virtual void draw_debug(const glm::mat4& viewProjMtx,
-                          const glm::mat4& parentMtx, bool gizmos,
-                          Model* gizmo_mdl, Model* gizmoCube_mdl) {
+  virtual void draw_debug(DrawInfo info, const glm::mat4& parentMtx,
+                          bool gizmos, Model* gizmo_mdl, Model* gizmoCube_mdl) {
     if (gizmos && _renderGizmo) {
-      gizmo_mdl->draw(viewProjMtx, glm::mat4(1), parentMtx * transformMtx,
-                      true);
+      gizmo_mdl->draw(info.viewProjMtx, info.viewMtx, parentMtx * transformMtx);
     }
   }
 

@@ -38,14 +38,14 @@ class Collider : public Node {
     vertices = v;
   }
 
-  void draw_debug(const glm::mat4& viewProjMtx, const glm::mat4& modelMtx,
-                  bool gizmos, Model* gizmo_mdl, Model* gizmoCube_mdl) {
+  void draw_debug(DrawInfo info, const glm::mat4& parentMtx, bool gizmos,
+                  Model* gizmo_mdl, Model* gizmoCube_mdl) override {
     // render in the vertices!
     if (gizmos && _renderGizmo) {
       for (glm::vec3 v : vertices) {
         gizmoCube_mdl->draw(
-            viewProjMtx, glm::mat4(1),
-            modelMtx * glm::translate(v) * glm::scale(glm::vec3(0.15f)), true);
+            info.viewProjMtx, info.viewMtx,
+            parentMtx * glm::translate(v) * glm::scale(glm::vec3(0.15f)));
       }
     }
   }

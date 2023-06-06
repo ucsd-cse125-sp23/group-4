@@ -3,6 +3,7 @@
  * contains the definition of the scene graph
  *****************************************************/
 #include "client/graphics/Collider.h"
+#include "client/graphics/DOF.h"
 #include "client/graphics/MapDataImporter.h"
 #include "client/graphics/MapObj.h"
 #include "client/graphics/Scene.h"
@@ -19,7 +20,6 @@ void Scene::init(void) {
 
   // Create mesh palette
 #pragma region Meshes
-  // TODO(eddie) use Assimp here...
   sceneResources->meshes["playermodel"] = new Obj();
   sceneResources->meshes["playermodel"]->init(
       "assets/model/dev/model-skeleton.obj");
@@ -31,12 +31,17 @@ void Scene::init(void) {
   sceneResources->meshes["cubeUV"] = new Obj();
   sceneResources->meshes["cubeUV"]->init(
       "assets/model/dev/bevel_cube.obj");  // includes UV data
+
+  sceneResources->meshes["particleQuad"] = new Obj();
+  sceneResources->meshes["particleQuad"]->init("assets/model/quad.obj");
 #pragma endregion
 
   // Create shader palette
 #pragma region Shaders
   sceneResources->shaderPrograms["basic"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["unlitx"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlitx.frag");
   sceneResources->shaderPrograms["toon"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 #pragma endregion
@@ -45,6 +50,17 @@ void Scene::init(void) {
 #pragma region Textures
   sceneResources->textures["grid"] = new Texture;
   sceneResources->textures["grid"]->init("assets/image/test_uv.png");
+
+  sceneResources->textures["stars"] = new Texture;
+  sceneResources->textures["stars"]->init("assets/image/tile_stars.png");
+
+  sceneResources->textures["stars-ptcl"] = new Texture;
+  sceneResources->textures["stars-ptcl"]->init(
+      "assets/image/particle_stars.png");
+
+  sceneResources->textures["star1-ptcl"] = new Texture;
+  sceneResources->textures["star1-ptcl"]->init(
+      "assets/image/particle_star1.png");
 #pragma endregion
 
   // Create material palette
@@ -148,11 +164,31 @@ void Scene::init(void) {
   sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   sceneResources->materials["grid"]->diffuse = vec4(0.7f, 0.7f, 0.7f, 1.0f);
 
+  Material* mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["unlitx"];
+  mtl->texture = sceneResources->textures["stars-ptcl"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.9f, 0.82f, 0.0f, 1.0f);
+  sceneResources->materials["stars-ptcl"] = mtl;
+
+  mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["unlitx"];
+  mtl->texture = sceneResources->textures["star1-ptcl"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.9f, 0.82f, 0.0f, 1.0f);
+  sceneResources->materials["star1-ptcl"] = mtl;
+
+  mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["toon"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.9f, 0.82f, 0.9f, 1.0f);
+  sceneResources->materials["toon"] = mtl;
+
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
       sceneResources->shaderPrograms["toon"];
   sceneResources->materials["toon.blue"]->texture =
-      sceneResources->textures["grid"];
+      sceneResources->textures["stars"];
   sceneResources->materials["toon.blue"]->ambient =
       vec4(0.1f, 0.1f, 0.1f, 1.0f);
   sceneResources->materials["toon.blue"]->diffuse =
@@ -177,26 +213,44 @@ void Scene::init(void) {
       sceneResources->materials["grid"];
 #pragma endregion
 
-  PlayerModel* waspModel = new PlayerModel;
-  waspModel->skel = sceneResources->skeletons["wasp"];
-  waspModel->skin = dynamic_cast<SkinnedMesh*>(sceneResources->meshes["wasp"]);
-  waspModel->anims = sceneResources->animations["wasp"];
-
-  sceneResources->models["wasp"] = waspModel;
-  sceneResources->models["wasp"]->mesh = sceneResources->meshes["wasp"];
-  sceneResources->models["wasp"]->material = sceneResources->materials["wood"];
-
-  // THE player !!!
-  sceneResources->models["playerRef"] = new Model;
-  sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];
-  // TODO(matthew) copy over mesh too?
-  sceneResources->models["playerRef"]->material =
-      sceneResources->materials["toon.blue"];
-
+#pragma region Sounds
   // Sound palette
   SoundEffect* sfx = new SoundEffect();
   sceneResources->sounds["test"] = sfx;
   sfx->load("assets/sounds/sound_test.wav");
+#pragma endregion
+
+  // Setup particle effects
+#pragma region Particles
+  ParticleSystem* ptcl = new ParticleSystem();
+  ptcl->name = "GT_particle1";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
+  ptcl->transform.position = vec3(0, 3, 0);
+  ptcl->transform.updateMtx(&ptcl->transformMtx);
+  // localGameThings.push_back(ptcl);
+  // node["particleTest"] = ptcl;
+  // node["world"]->childnodes.push_back(node["particleTest"]);
+
+  /*
+  ptcl = new ParticleSystem();
+  ptcl->name = "GT_particle2";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
+  ptcl->transform.position = vec3(10, 9, 3);
+  ptcl->transform.updateMtx(&ptcl->transformMtx);
+  localGameThings.push_back(ptcl);
+  node["particleTest2"] = ptcl;
+  node["world"]->childnodes.push_back(node["particleTest2"]);*/
+
+  ptcl = new ParticleSystem();
+  ptcl->name = "GTptcl_jump";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["star1-ptcl"];
+  ptcl->worldSpace = true;
+  ptcl->creationRate = 0;
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-0, 0, 0), DOFr(-10, 10)};
+  sceneResources->prefabs["ptcl_jump"] = ptcl;
 #pragma endregion
 
   // Skybox setup
@@ -243,10 +297,18 @@ void Scene::init(void) {
   // Setup player/gameplay prefabs
 #pragma region Prefabs
   Model* m_prefab = new Model;
-  sceneResources->models["PREFAB_player.model"] = m_prefab;
+  sceneResources->models["PREFAB_player.model3"] = m_prefab;
   m_prefab->mesh = sceneResources->meshes["playermodel"];
   // TODO(matthew) copy over mesh too? for animations?
   m_prefab->material = sceneResources->materials["toon.blue"];
+
+  AssimpModel* am = new AssimpModel();
+  am->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
+  am->setAnimation("walk");
+  sceneResources->models["PREFAB_player.model"] = am;
+  sceneResources->models["PREFAB_player.model"]->mesh = am;
+  sceneResources->models["PREFAB_player.model"]->material =
+      sceneResources->materials["toon"];
 #pragma endregion
 
   ///////////////////////////////////////////////////////
@@ -269,16 +331,6 @@ void Scene::init(void) {
   GameThing* thing_modeltestB = new GameThing;
   thing_modeltestB->name = "GT_playerTestB";
   localGameThings.push_back(thing_modeltestB);
-
-  Player* player = new Player();
-  player->camera = camera;               // give a reference to the game camera
-  player->pmodel = waspModel;            // updating!
-  player->model = waspModel;             // drawing!
-  player->pmodel->setAnimation("walk");  // TODO: make this automated
-  player->name = "Player 1";
-  player->transform.position = vec3(0, 2, 0);
-  player->transform.updateMtx(&(player->transformMtx));
-  // gamethings.push_back(player);
 
   // Build the scene graph
   node["teapot1"] = thing_example;
@@ -309,6 +361,8 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["collision"]);
 
   node["world"]->childnodes.push_back(node["map"]);
+
+  // createPlayer(-1); // for testing
 }
 
 void Scene::init(std::map<int, message::LobbyPlayer> players) {

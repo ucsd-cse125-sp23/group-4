@@ -63,5 +63,4 @@ void main()
 
 	// Gamma correction
 	fragColor = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
-	//fragColor = texturedColor;	// testing
 }
