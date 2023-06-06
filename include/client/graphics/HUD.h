@@ -22,7 +22,7 @@ class HUD {
 
   explicit HUD(Scene* scn) {
     scene = scn;
-    map.init("assets/image/tagguys/frame_24_delay-0.08s.png");
+    map.init("assets/UI/IMG_2468.PNG");
     offset = 10;
     index = 0;
     lastTime = glfwGetTime();

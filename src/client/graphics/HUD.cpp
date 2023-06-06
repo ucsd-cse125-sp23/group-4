@@ -73,21 +73,28 @@ void HUD::draw(GLFWwindow* window) {
                  glm::vec3(1.0f, 0.0f, 0.0f));
 
   // minimap stuff
-  int map_size = (width / 5 > 250) ? 250 : width / 4;
-  glViewport(10, height - map_size + 10, map_size, map_size);
+  int map_height = (width / 5 > 250) ? 250 : width / 4;
+  int map_width = (map_height * 1920) / 1080;
+  glViewport(-(map_width / 4) + 10, height - map_height - 10, (map_height * 1920) / 1080,
+             map_height);
 
   drawMinimap();
 
-  for (auto& [_, e] : scene->networkGameThings) {
+  int world_height = 130;
+  int world_width = (world_height * 1920) / 1080;
+  for (auto& [i, e] : scene->networkGameThings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
-      glColor3f(0.0f, 0.0f, 1.0f);
+      if (i == scene->_myPlayerId) {
+        glColor3f(1.0f, 0.0f, 0.0f);
+      } else {
+        glColor3f(0.0f, 0.0f, 1.0f);
+      }
       glPointSize(10);
       glBegin(GL_POINTS);
-      glVertex3f(
-          position[0] / map_size, -position[2] / map_size,
-          0.0f);  // TODO: get minimap coordinates based off player position
+      glVertex2f(
+          -(position[2] - 23) / world_width, -((position[0] - 33)) / world_height);  
       glEnd();
     }
   }
