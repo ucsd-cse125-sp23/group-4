@@ -35,7 +35,7 @@ class Tools {
   }
 
   static float random(float l, float h) {
-    float r = l + static_cast<float>(rand()) /
+    float r = l + static_cast<float>(rand()) /                 // NOLINT
                       static_cast<float>(RAND_MAX / (h - l));  // NOLINT
 
     return r;
