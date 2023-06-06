@@ -354,6 +354,12 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
   GLuint shader = material->shader;
   glUseProgram(shader);
 
+  glm::vec4 tempDiffuse = material->diffuse;
+  glm::vec4 tempSpecular = material->specular;
+  /*glm::vec4 tempAmbient = material->ambient;
+  glm::vec4 tempEmission = material->emission;
+  float tempShininess = material->shininess;*/
+
   for (int i = 0; i < meshes.size(); i++) {
     material->diffuse = meshes[i]->diffuse;
     material->specular = meshes[i]->specular;
@@ -372,6 +378,12 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
 
     meshes[i]->draw();
   }
+
+  material->diffuse = tempDiffuse;
+  material->specular = tempSpecular;
+  /*material->ambient = tempAmbient;
+  material->emission = tempEmission;
+  material->shininess = tempShininess;*/
 
   glUseProgram(0);
 }
