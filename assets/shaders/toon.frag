@@ -9,6 +9,8 @@ uniform mat4 view;      // from world coord to eye coord
 uniform int renderMode;	// 0 = no texture, 1 = texture
 uniform sampler2D gSampler;
 
+uniform float gamma;
+
 // uniforms used for lighting
 uniform vec3 LightDirections[] = {
 									normalize(vec3(1, 5, 2)),
@@ -73,7 +75,9 @@ void main()
 		texturedColor = vec4(1);
 	}
 
-	// Gamma correction
-	fragColor = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
+	vec4 final = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
 	//fragColor = vec4(color, 1);
+
+	// Gamma correction
+	fragColor = vec4(pow(final.rgb, vec3(1.0/gamma)), 1);
 }

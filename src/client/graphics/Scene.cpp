@@ -5,6 +5,8 @@ adapted from CSE 167 - Matthew
 *****************************************************/
 #include "Scene.h"
 
+#include "Settings.h"
+
 // The scene init definition
 #include <Player.h>
 #include <stdint.h>
@@ -71,7 +73,7 @@ Player* Scene::createPlayer(int id) {
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
   player->fx_jump = new ParticleSystem(*ptclRef);
-  player->fx_jump->Reset(false);    // important!!!
+  player->fx_jump->Reset(false);  // important!!!
   player->fx_jump->name += "." + playername;
   player->fx_jump->transform.position = glm::vec3(0, 0, 0);
   player->fx_jump->transform.updateMtx(&player->fx_jump->transformMtx);
@@ -205,7 +207,11 @@ void Scene::draw() {
 
 #include <imgui.h>
 
+Settings settings;  // define extern var
+
 void Scene::gui() {
+  settings.gui();
+
   ImGui::Begin("scene debug +++");
 
   ImGui::Checkbox("free camera", &camera->Fixed);
