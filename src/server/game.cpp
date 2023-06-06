@@ -1,8 +1,11 @@
 #include <algorithm>
 #include <config/lib.hpp>
 #include <core/lib.hpp>
+#include <network/item.hpp>
 #include <network/message.hpp>
 #include <server/game.hpp>
+
+#include "core/game/event/Event.h"
 
 GameThing::GameThing(int id, Player* p, ControlModifierData* c)
     : id_(id), player_(p), control_(c), heading_(0) {}
@@ -43,6 +46,18 @@ Game::Game() {
   }
   environment->setDeathHeight(mapData.fallBoundY);
   level = initializeLevel(environment);
+
+  // register event handlers
+  auto jump_handler = [this](JumpEvent&& e) { jump_events_.push_back(e); };
+  auto land_handler = [this](LandEvent&& e) { land_events_.push_back(e); };
+  auto item_pickup_handler = [this](PickupEvent&& e) {
+    item_pickup_events_.push_back(e);
+  };
+  auto tag_handler = [this](TaggingEvent&& e) { tag_events_.push_back(e); };
+  level->eventManager->registerEventHandler(jump_handler);
+  level->eventManager->registerEventHandler(land_handler);
+  level->eventManager->registerEventHandler(item_pickup_handler);
+  level->eventManager->registerEventHandler(tag_handler);
 }
 
 int Game::add_player() {
@@ -62,6 +77,44 @@ void Game::update(const message::UserStateUpdate& update) {
 }
 
 void Game::tick() { level->tick(); }
+
+std::vector<message::JumpEvent> Game::get_jump_events() {
+  std::vector<message::JumpEvent> events;
+  for (auto& e : jump_events_) events.push_back({static_cast<int>(e.self->id)});
+
+  return events;
+}
+
+std::vector<message::LandEvent> Game::get_land_events() {
+  std::vector<message::LandEvent> events;
+  for (auto& e : land_events_) events.push_back({static_cast<int>(e.self->id)});
+
+  return events;
+}
+
+std::vector<message::ItemPickupEvent> Game::get_item_pickup_events() {
+  std::vector<message::ItemPickupEvent> events;
+  for (auto& e : land_events_)
+    events.push_back({static_cast<int>(e.self->id), Item::GiftBox});
+
+  return events;
+}
+
+std::vector<message::TagEvent> Game::get_tag_events() {
+  std::vector<message::TagEvent> events;
+  for (auto& e : tag_events_)
+    events.push_back(
+        {static_cast<int>(e.tagger->id), static_cast<int>(e.tagee->id)});
+
+  return events;
+}
+
+void Game::clear_events() {
+  jump_events_.clear();
+  land_events_.clear();
+  item_pickup_events_.clear();
+  tag_events_.clear();
+}
 
 std::unordered_map<int, message::GameStateUpdateItem> Game::to_network() {
   std::unordered_map<int, message::GameStateUpdateItem> things;
