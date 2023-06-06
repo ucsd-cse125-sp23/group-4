@@ -551,8 +551,6 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 
   if (ac == PLAYER_AC::IDLE || ac == PLAYER_AC::WALK) {
-    printf("DISSOLVE DEBUG: base %s input %s\n",
-           AC_TO_NAME.at(baseAnim).c_str(), AC_TO_NAME.at(ac).c_str());
     if (isJump || baseAnim == PLAYER_AC::JUMP) {
       // No blending if player switch between idle & walk when jump is
       // dissolving out :(
@@ -563,7 +561,6 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
     if (ac == baseAnim) {
       if (isDissolve && !isDissolveReversed) {
         // backward dissolve
-        printf("DISSOLVE DEBUG: reverse dissolve\n");
         isDissolveReversed = true;
       }
       return;
@@ -571,7 +568,6 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
 
     if (!isDissolve) {
       // start dissolve blending to the other animation
-      printf("DISSOLVE DEBUG: start dissolve\n");
       isDissolve = true;
       isDissolveReversed = false;
       timeDissolve = 0.0f;
@@ -580,7 +576,6 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
           baseAnim == PLAYER_AC::IDLE ? PLAYER_AC::WALK : PLAYER_AC::IDLE;
     } else {
       // forward dissolve
-      printf("DISSOLVE DEBUG: forwards dissolve\n");
       isDissolveReversed = false;
     }
   }
