@@ -136,7 +136,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
   }
 
   x = bar_width / 2.5;
-  y = bar_height / 1.75;
+  y = bar_height / 2;
   for (auto it = players.rbegin(); it != players.rend(); it++) {
     str = it->first;
     player = it->second;
