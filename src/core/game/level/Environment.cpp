@@ -1,5 +1,6 @@
 #include "core/game/level/Environment.h"
 
+#include <algorithm>
 #include <cmath>
 #include <stack>
 
@@ -13,7 +14,7 @@ void Environment::addPObject(PObject* obj) {
   obj->static_ = true;
 }
 
-Environment::Environment() : root(nullptr) {}
+Environment::Environment() : root(nullptr), deathHeight(0.0f) {}
 
 Environment::~Environment() {
   for (PObject* obj : collisions) delete obj;
@@ -38,6 +39,20 @@ void Environment::addConvex(std::initializer_list<vec3f> vertices,
   PObject* obj = new PObject(shape, ENVIRONMENT_LAYER, friction, true);
   this->addPObject(obj);
 }
+
+void Environment::addPlayerSpawnpoint(vec3f pos) {
+  playerSpawns.push_back(pos);
+}
+void Environment::addItemSpawnpoint(vec3f pos) { itemSpawns.push_back(pos); }
+void Environment::setDeathHeight(float height) { deathHeight = height; }
+
+void Environment::placePlayers(std::mt19937& rng,
+                               std::vector<Player*> players) {
+  std::shuffle(playerSpawns.begin(), playerSpawns.end(), rng);
+  for (int i = 0; i < players.size(); i++) players[i]->setPos(playerSpawns[i]);
+}
+const std::vector<vec3f> Environment::getItemSpawns() { return itemSpawns; }
+float Environment::getDeathHeight() { return deathHeight; }
 
 inline double volume(const vec3f& v) { return v.x * v.y * v.z; }
 inline int maxInd(const vec3f& v) {

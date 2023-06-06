@@ -43,6 +43,8 @@ int Window::my_pid = -1;
 
 Camera* Cam;
 
+std::atomic<bool> loading_resources{false};
+
 // Interaction Variables
 bool LeftDown, RightDown;
 int MouseX, MouseY;
@@ -77,6 +79,7 @@ bool Window::initializeProgram(GLFWwindow* window) {
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
   gameScene = new Start(Cam);
+  gameScene->init();
   loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
@@ -195,17 +198,21 @@ void Window::animate(float deltaTime) {
 void Window::update(GLFWwindow* window, float deltaTime) {
   if (dynamic_cast<Start*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
+    resetCamera();
     gameScene = new Lobby(Cam);
     gameScene->init();
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     lobby->receiveState(lobby_state);
   } else if (dynamic_cast<Lobby*>(gameScene) &&
              phase == GamePhase::Game) {  // lobby -> game
+    auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = new Scene(Cam);
     glfwHideWindow(window);
+    loading_resources = true;
     std::thread x(&Load::load, loadScreen, window);
-    gameScene->init();
+    gameScene->init(lobby->players);
     hud = new HUD(gameScene);
+    loading_resources = false;
     x.join();
 
     glfwMakeContextCurrent(window);
@@ -324,7 +331,7 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset) {
+  if (yoffset && phase == GamePhase::Game) {
     Cam->CamZoom(yoffset);
   }
 }
@@ -343,7 +350,7 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if (RightDown || LeftDown) {
+  if ((RightDown || LeftDown) && phase == GamePhase::Game) {
     Cam->CamDrag(dx, dy);
   }
 }

@@ -6,14 +6,16 @@
 #include "core/game/modifier/NumberModifier.h"
 #include "core/util/global.h"
 
-uint32_t PObject::maxId = 0;
+uint32_t PObject::maxId = 1;
 
 void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
   /*If object is falling and mtv is atleast a little up, the we determine the
    * object to be onGround*/
-  if (self->vel.y < 0 && norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z)))
+  if (self->vel.y < 0 && norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
     self->onGround = true;
+    self->level->eventManager->fireLandEvent(self);
+  }
   if (other->isStatic()) {
     self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
     self->vel = tangent(self->vel, norm);
@@ -25,8 +27,10 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
     self->lastSurfaceFriction = other->getBounds()->friction;
   } else {
     if (other->vel.y < 0 &&
-        norm.y / (std::abs(norm.x) + std::abs(norm.z)) > -0.05)
-      other->onGround = true;
+        norm.y / (std::abs(norm.x) + std::abs(norm.z)) > -0.05) {
+      self->onGround = true;
+      self->level->eventManager->fireLandEvent(self);
+    }
 
     self->addPos(vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
     self->vel = tangent(self->vel, norm);
@@ -103,8 +107,10 @@ void PObject::move(vec3f dPos) {
     totalY += mDPos.y;
     if (norm != vec3f(0, 0, 0)) {
       if (this->vel.y < 0 &&
-          norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z)))
+          norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
         this->onGround = true;
+        this->level->eventManager->fireLandEvent(this);
+      }
 
       vec3f v = tangent(rDPos, norm);
       float w = length(rDPos - v);

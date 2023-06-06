@@ -364,3 +364,31 @@ void Scene::init(void) {
 
   // createPlayer(-1); // for testing
 }
+
+void Scene::init(std::map<int, message::LobbyPlayer> players) {
+  init();
+
+  Model* racoon_prefab = new Model;
+  sceneResources->models["trash panda"] = racoon_prefab;
+  racoon_prefab->mesh = sceneResources->meshes["playermodel"];
+  racoon_prefab->material = sceneResources->materials["toon.blue"];
+
+  Model* bee_prefab = new Model;
+  sceneResources->models["bee"] = bee_prefab;
+  bee_prefab->mesh = sceneResources->meshes["playermodel"];
+  bee_prefab->material = sceneResources->materials["marble"];
+
+  Model* avocado_prefab = new Model;
+  sceneResources->models["avocado"] = avocado_prefab;
+  avocado_prefab->mesh = sceneResources->meshes["playermodel"];
+  avocado_prefab->material = sceneResources->materials["ceramic"];
+
+  Model* duck_prefab = new Model;
+  sceneResources->models["duck"] = duck_prefab;
+  duck_prefab->mesh = sceneResources->meshes["playermodel"];
+  duck_prefab->material = sceneResources->materials["silver"];
+
+  for (auto& [i, p] : players) {
+    skins[i] = p.skin;
+  }
+}

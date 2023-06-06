@@ -1,20 +1,30 @@
 #include "core/game/level/Level.h"
 
+#include <chrono>
 #include <cstdint>
 
 #include "core/game/level/Environment.h"
+#include "core/game/physics/PowerUp.h"
 #include "core/util/global.h"
 
 void Level::tick() {
+  // Tick & remove POjbects
   std::vector<size_t> allIds = this->objects.getAllIds();
   for (size_t id : allIds) {
     PObject* obj = this->objects[id];
     obj->tick();
     if (obj->markedRemove()) {
       this->objects.removeById(id);
+
+      // Frees up powerup spawnpoint
+      for (auto pair : powerupSpawns) {
+        if (pair.first == id) pair.first = 0;
+        freeSpaces++;
+      }
     }
   }
 
+  // Handle remaining collisions
   allIds = this->objects.getAllIds();
   std::vector<PObject*> collisions;
   for (size_t id : allIds) {
@@ -77,6 +87,44 @@ void Level::tick() {
     }
   }
 
+  // Respawn out of bounds Players
+  for (size_t id : allIds) {
+    PObject* obj = this->objects[id];
+    if (Player* player = dynamic_cast<Player*>(obj))
+      if (player->getPos().y < this->environment->getDeathHeight())
+        this->environment->placePlayers(rng, {player});
+  }
+
+  // Spawn Powerups
+  if (age > nextPowerupTime) {
+    std::uniform_int_distribution dist(powerupMin, powerupMax);
+    nextPowerupTime = age + dist(rng);
+
+    std::uniform_int_distribution weight(0, totalWeight - 1);
+    int budget = weight(rng);
+    size_t ind = -1;
+    do {
+      budget -= powerups[ind].first;
+    } while (budget >= 0);
+    GlobalEffect* effect = powerups[ind].second;
+
+    weight = std::uniform_int_distribution(1, freeSpaces);
+    budget = weight(rng);
+
+    ind = -1;
+    while (budget > 0) {
+      ind++;
+      if (!powerupSpawns[ind].first) budget--;
+    }
+
+    freeSpaces--;
+
+    PowerUp* power = new PowerUp(powerupSpawns[ind].second, effect);
+    powerupSpawns[ind].first = power->id;
+
+    this->addPObject(power);
+  }
+
   this->age++;
 }
 
@@ -90,6 +138,12 @@ Level::Level(Environment* environment)
     for (int j = 0; j < 10; j++) collisionTypeLUT[i][j] = CollisionType::NONE;
   eventManager = new EventManager(this);
   statisticManager = new StatisticManager();
+
+  rng =
+      std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+  for (vec3f pos : environment->getItemSpawns())
+    powerupSpawns.push_back(std::make_pair(0, pos));
+  freeSpaces = powerupSpawns.size();
 }
 Level::~Level() {
   delete environment;
@@ -110,3 +164,10 @@ void Level::addPObject(PObject* obj) {
 }
 std::uint64_t Level::getAge() { return age; }
 Environment* Level::getEnvironment() { return environment; }
+
+void Level::definePowerupSpawn(GlobalEffect* power, int weight) {
+  totalWeight += weight;
+  powerups.push_back(std::make_pair(weight, power));
+}
+void Level::definePowerupDelayMin(size_t ticks) { powerupMin = ticks; }
+void Level::definePowerupDelayMax(size_t ticks) { powerupMax = ticks; }

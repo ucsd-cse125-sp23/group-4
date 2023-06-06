@@ -9,7 +9,7 @@ GameMode::GameMode(bool lowerScoreLead)
 void GameMode::registerTrackers(Level* l) {
   this->level = l;
 
-  level->eventManager->registerTriggerEventHandler([](TriggerEvent event) {
+  level->eventManager->registerEventHandler([](TriggerEvent event) {
     if (event.self->hasModifier(TAGGED_STATUS_MODIFIER) &&
         event.other->hasModifier(TAGGED_STATUS_MODIFIER)) {
       TaggedStatusModifierData

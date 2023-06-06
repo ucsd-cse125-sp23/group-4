@@ -52,7 +52,7 @@ Player* Scene::createPlayer(int id) {
     myModel = am;
     player->pmodel = am;
   } else {
-    myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
+    myModel = new Model(*sceneResources->models[skins[id]]);
   }
   player->model = myModel;
   // TODO(matthew) set material here! if needed
