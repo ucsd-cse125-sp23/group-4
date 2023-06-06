@@ -2,6 +2,7 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <limits>
 
 #include "core/lib.hpp"
 
@@ -35,13 +36,15 @@ inline Time tick(Timer& timer) {
 }
 
 void testEnvironment(Environment* environment, int S, int P = 1) {
-  REQUIRE_NOTHROW(initializeLevel(environment));
+  Level* level;
+  REQUIRE_NOTHROW(level = initializeLevel(environment));
   std::vector<std::pair<Player*, ControlModifierData*>> pairs;
   for (int i = 0; i < P; i++)
     REQUIRE_NOTHROW(pairs.push_back(initializePlayer()));
 
   Timer timer;
-  Time minT = {DBL_MAX}, maxT = {DBL_MIN}, sum = {0};
+  Time minT = {std::numeric_limits<double>::max()},
+       maxT = {std::numeric_limits<double>::min()}, sum = {0};
   for (int i = 0; i < S; i++) {
     for (auto pair : pairs) pair.first->setPos(vec3f(0.0, 0.9, 0.0));
     tick(timer);
@@ -51,7 +54,8 @@ void testEnvironment(Environment* environment, int S, int P = 1) {
     if (time > maxT) maxT = time;
     sum += time;
   }
-  std::cout << S << " samples: (avg = " << (sum / Time({(double)S}))
+  std::cout << S
+            << " samples: (avg = " << (sum / Time({static_cast<double>(S)}))
             << ", min = " << minT << ", max = " << maxT << ")" << std::endl;
 
   REQUIRE_NOTHROW(terminateLevel());
