@@ -19,18 +19,17 @@ std::string Message::to_string() const {
                 std::localtime(&metadata.time));
 
   // clang-format off
-  std::string str =
-      std::string("") +
-      "{" +                                                             "\n"
-      "  type: " + std::string(magic_enum::enum_name(type)) + "," +     "\n"
-      "  metadata: {," +                                                "\n"
-      "    client_id: " + boost::uuids::to_string(metadata.id) + "," + "\n"
-      "    time: " + buffer + "," +              "\n"
-      "  }," +                                                          "\n"
-      "  body: {" +                                                     "\n"
-      + body_str +                                                      "\n"
-      "  }" +                                                           "\n"
-      "}";
+  std::string str = std::string("") +
+    "{" +                                                             "\n"
+    "  type: " + std::string(magic_enum::enum_name(type)) + "," +     "\n"
+    "  metadata: {," +                                                "\n"
+    "    client_id: " + boost::uuids::to_string(metadata.id) + "," + "\n"
+    "    time: " + buffer + "," +              "\n"
+    "  }," +                                                          "\n"
+    "  body: {" +                                                     "\n"
+    + body_str +                                                      "\n"
+    "  }" +                                                           "\n"
+    "}";
   // clang-format on
   return str;
 }
@@ -86,21 +85,21 @@ std::string effects_to_string(const std::vector<Effect>& effects) {
 
 std::string GameStateUpdateItem::to_string() const {
   // clang-format off
-    std::string str = std::string("") +
-      "      {"                                               "\n"
-      "        id: " + std::to_string(id) + "," +             "\n"
-      "        position: {" +                                 "\n"
-      "          " + std::to_string(posx) + "," +             "\n"
-      "          " + std::to_string(posy) + "," +             "\n"
-      "          " + std::to_string(posz) + "," +             "\n"
-      "        }," +                                          "\n"
-      "        heading: " + std::to_string(heading) +         "\n"
-      "        score: " + std::to_string(score) +             "\n"
-      "        speed: " + std::to_string(speed) +             "\n"
-      "        is_grounded: " + std::to_string(is_grounded) + "\n"
-      "        is_tagged: " + std::to_string(is_tagged) +     "\n"
-      "        effects: " + effects_to_string(effects) +      "\n"
-      "      },"                                              "\n";
+  std::string str = std::string("") +
+    "      {"                                               "\n"
+    "        id: " + std::to_string(id) + "," +             "\n"
+    "        position: {" +                                 "\n"
+    "          " + std::to_string(posx) + "," +             "\n"
+    "          " + std::to_string(posy) + "," +             "\n"
+    "          " + std::to_string(posz) + "," +             "\n"
+    "        }," +                                          "\n"
+    "        heading: " + std::to_string(heading) +         "\n"
+    "        score: " + std::to_string(score) +             "\n"
+    "        speed: " + std::to_string(speed) +             "\n"
+    "        is_grounded: " + std::to_string(is_grounded) + "\n"
+    "        is_tagged: " + std::to_string(is_tagged) +     "\n"
+    "        effects: " + effects_to_string(effects) +      "\n"
+    "      },"                                              "\n";
   // clang-format on
   return str;
 }
@@ -123,27 +122,27 @@ std::string GameStateUpdate::to_string() const {
 
 std::string UserStateUpdate::to_string() const {
   // clang-format off
-    std::string str = std::string("") +
-      "      id: " + std::to_string(id) + "," +     "\n"
-      "      movement_delta: {" +                   "\n"
-      "        " + std::to_string(movx) + "," +     "\n"
-      "        " + std::to_string(movy) + "," +     "\n"
-      "        " + std::to_string(movz) + "," +     "\n"
-      "      }," +                                  "\n"
-      "      jump: " + std::to_string(jump) +       "\n"
-      "      heading: " + std::to_string(heading) + "\n";
+  std::string str = std::string("") +
+    "      id: " + std::to_string(id) + "," +     "\n"
+    "      movement_delta: {" +                   "\n"
+    "        " + std::to_string(movx) + "," +     "\n"
+    "        " + std::to_string(movy) + "," +     "\n"
+    "        " + std::to_string(movz) + "," +     "\n"
+    "      }," +                                  "\n"
+    "      jump: " + std::to_string(jump) +       "\n"
+    "      heading: " + std::to_string(heading) + "\n";
   // clang-format on
   return str;
 }
 
 std::string LobbyPlayerUpdate::to_string() const {
   // clang-format off
-    std::string str = std::string("") +
-      "      {"                                       "\n"
-      "        id: " + std::to_string(id) + "," +       "\n"
-      "        skin: " + skin +                         "\n"
-      "        is_ready: " + std::to_string(is_ready) + "\n"
-      "      },"                                       "\n";
+  std::string str = std::string("") +
+    "      {"                                       "\n"
+    "        id: " + std::to_string(id) + "," +       "\n"
+    "        skin: " + skin +                         "\n"
+    "        is_ready: " + std::to_string(is_ready) + "\n"
+    "      },"                                       "\n";
   // clang-format on
   return str;
 }
@@ -170,18 +169,18 @@ std::string LandEvent::to_string() const {
 
 std::string ItemPickupEvent::to_string() const {
   // clang-format off
-    std::string str = std::string("") +
-      "      pid: " + std::to_string(pid) + "," +     "\n"
-      "      item: " + std::string(magic_enum::enum_name(item)) + "\n";
+  std::string str = std::string("") +
+    "      pid: " + std::to_string(pid) + "," +     "\n"
+    "      item: " + std::string(magic_enum::enum_name(item)) + "\n";
   // clang-format on
   return str;
 }
 
 std::string TagEvent::to_string() const {
   // clang-format off
-    std::string str = std::string("") +
-      "      tagger: " + std::to_string(tagger) + "," +     "\n"
-      "      taggee: " + std::to_string(taggee) + "\n";
+  std::string str = std::string("") +
+    "      tagger: " + std::to_string(tagger) + "," +     "\n"
+    "      taggee: " + std::to_string(taggee) + "\n";
   // clang-format on
   return str;
 }
