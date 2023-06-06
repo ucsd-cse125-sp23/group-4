@@ -64,7 +64,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       pObj->vel.x += dj.x;
       pObj->vel.y = dj.y;
       pObj->vel.z += dj.z;
-      pObj->onGround = false;
+      pObj->onGround = 0;
       pObj->level->eventManager->fireJumpEvent(pObj);
     }
   }

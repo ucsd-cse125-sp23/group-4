@@ -14,6 +14,7 @@
 #include "core/math/shape/OffsetShape.h"
 #include "core/math/shape/SphereShape.h"
 
+extern int COYOTE_TIME;
 extern int TAG_COOLDOWN;
 extern float MOVE_VELOCITY;
 extern float JUMP_VELOCITY;

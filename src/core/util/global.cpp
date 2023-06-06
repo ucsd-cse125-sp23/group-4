@@ -5,6 +5,7 @@
 
 #include "core/game/effect/AttractEffects.h"
 
+int COYOTE_TIME = 2;
 int TAG_COOLDOWN = 20;
 float MOVE_VELOCITY = 1.2f;
 float JUMP_VELOCITY = 1.7f;
@@ -62,7 +63,7 @@ GlobalEffect* LAUNCH_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets) {
         target->vel += vec3f(0.0f, 2.0f, 0.0f);
-        target->onGround = false;
+        target->onGround = 0;
       }
     });
 GlobalEffect* SLOW_FALL_EFFECT =
