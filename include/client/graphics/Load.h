@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "client/graphics/Texture.h"
 #include "Window.h"
+#include "client/graphics/Texture.h"
 
 extern std::atomic<bool> loading_resources;
 
