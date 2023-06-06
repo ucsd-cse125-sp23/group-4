@@ -49,9 +49,7 @@ FetchContent_Declare(
   GIT_TAG 18b6cff
   GIT_PROGRESS TRUE)
 # override find_package(zlib)
-FetchContent_MakeAvailable(
-  zlib
-)
+FetchContent_MakeAvailable(zlib)
 file(RENAME ${zlib_SOURCE_DIR}/zconf.h.included ${zlib_SOURCE_DIR}/zconf.h)
 set(ZLIB_ROOT ${zlib_SOURCE_DIR})
 set(ZLIB_LIBRARY zlibstatic)
@@ -59,29 +57,20 @@ set(ZLIB_LIBRARY zlibstatic)
 # turn off install for freetype and assimp
 set(_disable_install TRUE)
 function(install)
-  if (NOT _disable_install)
+  if(NOT _disable_install)
     _install(${ARGV})
   endif()
 endfunction(install)
 
-FetchContent_MakeAvailable(
-    freetype
-    assimp)
+FetchContent_MakeAvailable(freetype assimp)
 set(_disable_install FALSE)
-
 
 FetchContent_Declare(
   SFML
   GIT_REPOSITORY https://github.com/SFML/SFML
   GIT_TAG 2.5.1
   GIT_PROGRESS TRUE)
-FetchContent_MakeAvailable(
-  glew
-  glfw
-  glm
-  freetype
-  imgui
-  SFML)
+FetchContent_MakeAvailable(glew glfw glm freetype imgui SFML)
 
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/main.cpp
@@ -107,8 +96,8 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/Start.cpp)
 
 add_executable(client ${SOURCES})
-target_include_directories(
-  client PRIVATE ${CMAKE_SOURCE_DIR}/include/client/graphics)
+target_include_directories(client
+                           PRIVATE ${CMAKE_SOURCE_DIR}/include/client/graphics)
 target_link_libraries(
   client
   PRIVATE core
@@ -133,19 +122,6 @@ endif()
 
 set_target_properties(
   sfml-audio
-  PROPERTIES CXX_STANDARD 98 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO)
-
-# Copy OpenAL32.dll to executable directory
-add_custom_command(
-  TARGET client
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy
-          ${FETCHCONTENT_BASE_DIR}/sfml-src/extlibs/bin/x64/openal32.dll
-          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-
-# Copy assets folder to executable root directory
-add_custom_command(
-  TARGET client
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/assets"
-          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
+  PROPERTIES CXX_STANDARD 98
+             CXX_STANDARD_REQUIRED YES
+             CXX_EXTENSIONS NO)
