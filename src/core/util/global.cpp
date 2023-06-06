@@ -19,7 +19,7 @@ CapsuleShape* PLAYER_BASE_SHAPE = new CapsuleShape(1.0, 1.3);
 OffsetShape* PLAYER_BOUNDING_SHAPE =
     new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, 0.5f, 0.0f));
 
-//Level* level = nullptr;
+// Level* level = nullptr;
 
 ControlModifier* CONTROL_MODIFIER = new ControlModifier();
 TaggedStatusModifier* TAGGED_STATUS_MODIFIER = new TaggedStatusModifier();
@@ -35,7 +35,8 @@ GlobalEffect* SPEEDBOOST_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets)
         target->addModifierInstance(new ModifierInstance(
-            SPEEDBOOST_MODIFIER, new SpeedBoostModifierData(level, 100, 0.25f)));
+            SPEEDBOOST_MODIFIER,
+            new SpeedBoostModifierData(level, 100, 0.25f)));
     });
 GlobalEffect* SLOWDOWN_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {

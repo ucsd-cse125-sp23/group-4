@@ -34,6 +34,7 @@ struct RepellTaggersFromSelfEffect : public GlobalEffect {
               ->isIt)
         for (PObject* self : targets)
           pair.second->addModifierInstance(new ModifierInstance(
-              ATTRACT_MODIFIER, new AttractModifierData(level, 200, self, -0.1)));
+              ATTRACT_MODIFIER,
+              new AttractModifierData(level, 200, self, -0.1)));
   }
 };

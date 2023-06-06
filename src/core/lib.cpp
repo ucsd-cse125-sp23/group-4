@@ -30,7 +30,9 @@ void applyGameMode(Level* level, GameMode* gamemode) {
   gamemode->registerTrackers(level);
   level->gameMode = gamemode;
 }
-int queryScore(Level* level, uint32_t pid) { return level->gameMode->queryScore(pid); }
+int queryScore(Level* level, uint32_t pid) {
+  return level->gameMode->queryScore(pid);
+}
 std::vector<std::vector<uint32_t>> queryPlacements(Level* level) {
   return level->gameMode->queryPlacements();
 }

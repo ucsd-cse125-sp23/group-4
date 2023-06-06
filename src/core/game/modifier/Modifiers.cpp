@@ -8,7 +8,8 @@
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 
-ModifierData::ModifierData(Level* level, std::uint64_t duration) : level(level), markedRemove(false) {
+ModifierData::ModifierData(Level* level, std::uint64_t duration)
+    : level(level), markedRemove(false) {
   expire = duration == 0 ? 0 : level->getAge() + duration;
 }
 void ModifierData::markExpired() {
@@ -28,7 +29,10 @@ void SpeedBoostModifier::modify(Modifiable* obj, ModifierData* data) {
 ControlModifierData::ControlModifierData(Level* level)
     : ControlModifierData(level, JUMP_VELOCITY) {}
 ControlModifierData::ControlModifierData(Level* level, float jumpVel)
-    : ModifierData(level), jumpVel(jumpVel), horizontalVel(vec3f(0, 0, 0)), doJump(false) {}
+    : ModifierData(level),
+      jumpVel(jumpVel),
+      horizontalVel(vec3f(0, 0, 0)),
+      doJump(false) {}
 void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     ControlModifierData* cData = static_cast<ControlModifierData*>(data);
