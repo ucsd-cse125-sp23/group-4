@@ -4,6 +4,9 @@
 #include <vector>
 
 #include "client/graphics/Texture.h"
+#include "Window.h"
+
+extern std::atomic<bool> loading_resources;
 
 class Load {
  public:
@@ -109,7 +112,7 @@ class Load {
     loadFrames();
 
     glfwShowWindow(window);
-    while (timeElapsed <= 45) {
+    while (timeElapsed <= 1|| loading_resources) {
       update();
       draw();
 

@@ -43,6 +43,8 @@ int Window::my_pid = -1;
 
 Camera* Cam;
 
+std::atomic<bool> loading_resources{false};
+
 // Interaction Variables
 bool LeftDown, RightDown;
 int MouseX, MouseY;
@@ -202,9 +204,11 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = new Scene(Cam);
     glfwHideWindow(window);
+    loading_resources = true;
     std::thread x(&Load::load, loadScreen, window);
     gameScene->init(lobby->players);
     hud = new HUD(gameScene);
+    loading_resources = false;
     x.join();
 
     glfwMakeContextCurrent(window);
@@ -323,7 +327,7 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset && (phase == GamePhase::Game || phase == GamePhase::Start)) {
+  if (yoffset && phase == GamePhase::Game) {
     Cam->CamZoom(yoffset);
   }
 }
@@ -342,9 +346,8 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && (phase == GamePhase::Game || phase == GamePhase::Start)) {
+  if ((RightDown || LeftDown) && phase == GamePhase::Game) {
     Cam->CamDrag(dx, dy);
-    std::cout << "Incline: " << Cam->GetIncline() << std::endl;
   }
 }
 
