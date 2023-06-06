@@ -25,24 +25,27 @@ void HUD::draw(GLFWwindow* window) {
       glm::vec2 windowSpace = ((glm::vec2(normalizedSpace) + 1.0f) / 2.0f) *
                                   glm::vec2(width, height) +
                               glm::vec2(0.0f, 0.0f);
-
-      // Scale the size of the text based on camera distance
-      Camera* cam = scene->camera;
-      float deltaD = 10 - cam->GetDistance();
-      float size;
-      if (deltaD < 0) {
-        size = (0.5 * scale) / (0.5 * abs(deltaD));
-        if (size < 0.1 * scale)
-          size = 0.1 * scale;
-        else if (size > 0.5 * scale)
+      
+      float view = 1;
+      if (normalizedSpace[2] >= -view && normalizedSpace[2] <= view) {
+        // Scale the size of the text based on camera distance
+        Camera* cam = scene->camera;
+        float deltaD = 10 - cam->GetDistance();
+        float size;
+        if (deltaD < 0) {
+          size = (0.5 * scale) / (0.5 * abs(deltaD));
+          if (size < 0.1 * scale)
+            size = 0.1 * scale;
+          else if (size > 0.5 * scale)
+            size = 0.5 * scale;
+        } else {
           size = 0.5 * scale;
-      } else {
-        size = 0.5 * scale;
+        }
+        glDisable(GL_DEPTH_TEST);
+        fr->RenderText(width, height, name, windowSpace[0], windowSpace[1],
+                       size, glm::vec3(0.0f, 0.0f, 1.0f));
+        glEnable(GL_DEPTH_TEST);
       }
-      glDisable(GL_DEPTH_TEST);
-      fr->RenderText(width, height, name, windowSpace[0], windowSpace[1], size,
-                     glm::vec3(0.0f, 0.0f, 1.0f));
-      glEnable(GL_DEPTH_TEST);
     }
   }
 
