@@ -6,7 +6,6 @@
 #include "Window.h"
 
 Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
-  localGameThings.clear();
   is_ready = false;
   index = 0;
 
@@ -29,11 +28,6 @@ Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
   ready_icons["unicorn"].init("assets/UI/IMG_2432.PNG");
   icons["waffle"].init("assets/UI/IMG_2436.PNG");
   ready_icons["waffle"].init("assets/UI/IMG_2437.PNG");
-
-  wait.time = 5;
-  wait.countdown = true;
-  gameStart = false;
-  offset = 0;
 }
 
 Lobby::~Lobby() {
@@ -49,7 +43,6 @@ void Lobby::update(float delta) {
 
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
     is_ready = true;
-    selectedModel = player_models[index];
     Window::client->write<message::LobbyPlayerUpdate>(
         Window::my_pid, skin_names[index], is_ready);
   }
@@ -89,7 +82,6 @@ void Lobby::draw() {
   glEnable(GL_DEPTH_TEST);
   Scene::draw();
   drawPlayers();
-  lockIn();
 }
 
 void Lobby::drawBackground() {
@@ -247,50 +239,4 @@ void Lobby::drawPlayers() {
   }
   glViewport(0, 0, width, height);
   glEnable(GL_DEPTH_TEST);
-}
-
-void Lobby::lockIn() {
-  if (is_ready) {
-    GLFWwindow* window = glfwGetCurrentContext();
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-    float scale = static_cast<float>(width) / static_cast<float>(800);
-    glColor3f(255.0 / 256.0, 243.0 / 256.0, 201 / 256.0);
-
-    float x = -1 + offset;
-    if (x > 1) x = 1;
-    glBegin(GL_QUADS);
-
-    glVertex2f(x, 0.1);
-    glVertex2f(-1, 0.1);
-    glVertex2f(-1, -0.1);
-    glVertex2f(x, -0.1);
-
-    glEnd();
-
-    glColor3f(1, 1, 1);
-    glLineWidth(5);
-    glBegin(GL_LINES);
-
-    glVertex2f(-1, 0.1);
-    glVertex2f(x, 0.1);
-
-    glVertex2f(-1, -0.1);
-    glVertex2f(x, -0.1);
-    glEnd();
-
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-
-    float text_Xndc = -1.5 + offset;
-    if (text_Xndc > -0.2) text_Xndc = -0.2;
-    float text_Yndc = -0.07;
-    float textX = ((text_Xndc + 1) / 2) * width;
-    float textY = ((text_Yndc + 1) / 2) * height;
-    fr->RenderText(width, height, "Ready!", textX, textY, scale,
-                   glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
-
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_BLEND);
-  }
 }
