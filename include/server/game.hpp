@@ -12,7 +12,7 @@
 // TODO: figure out how to support items later on
 class GameThing {
  public:
-  GameThing(int, Player*, ControlModifierData*);
+  GameThing(int, Player*, ControlModifierData*, Level*);
 
   void update(const message::UserStateUpdate& update);
   void remove();
@@ -21,6 +21,7 @@ class GameThing {
  private:
   void move(float, float, float);  // NOLINT
 
+  Level* level_;
   int id_;
   float heading_;
   Player* player_;
@@ -49,8 +50,7 @@ class Game {
   std::vector<PickupEvent> item_pickup_events_;
   std::vector<TaggingEvent> tag_events_;
 
-  Level* level;
-
+  Level* level_;
   std::vector<vec3f> map_spawn_points;
   // TODO: add other map things here...
 };

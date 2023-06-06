@@ -8,8 +8,8 @@
 #include "core/game/event/Event.h"
 #include "core/game/mode/GameModes.h"
 
-GameThing::GameThing(int id, Player* p, ControlModifierData* c)
-    : id_(id), player_(p), control_(c), heading_(0) {}
+GameThing::GameThing(int id, Player* p, ControlModifierData* c, Level* l)
+    : id_(id), player_(p), control_(c), heading_(0), level_(l) {}
 
 void GameThing::move(float x, float y, float z) {  // NOLINT
   control_->horizontalVel = vec3f(x, y, z);
@@ -26,17 +26,13 @@ void GameThing::update(const message::UserStateUpdate& update) {
 void GameThing::remove() { player_->markRemove(); }
 
 message::GameStateUpdateItem GameThing::to_network() const {
-  std::cout << "converting pid " << id_ << " to network" << std::endl;
-  std::cout << "queryScore(id_): " << level->gameMode->queryScore(id_)
-            << std::endl;
-
   return {
       id_,
       player_->getPos().x,
       player_->getPos().y,
       player_->getPos().z,
       heading_,
-      level->gameMode->queryScore(id_),
+      level_->gameMode->queryScore(id_),
       0,  // TODO: get player speed
       player_->onGround,
       false,  // TODO: get player is_tagged
@@ -60,8 +56,8 @@ Game::Game() {
     environment->addItemSpawnpoint(spawn.point);
   }
   environment->setDeathHeight(mapData.fallBoundY);
-  level = initializeLevel(environment);
-  level->gameMode = new OneTaggerTimeGameMode();
+  level_ = initializeLevel(environment);
+  applyGameMode(level_, new OneTaggerTimeGameMode());
 
   // register event handlers
   auto jump_handler = [this](JumpEvent&& e) { jump_events_.push_back(e); };
@@ -70,15 +66,16 @@ Game::Game() {
     item_pickup_events_.push_back(e);
   };
   auto tag_handler = [this](TaggingEvent&& e) { tag_events_.push_back(e); };
-  level->eventManager->registerEventHandler(jump_handler);
-  level->eventManager->registerEventHandler(land_handler);
-  level->eventManager->registerEventHandler(item_pickup_handler);
-  level->eventManager->registerEventHandler(tag_handler);
+  level_->eventManager->registerEventHandler(jump_handler);
+  level_->eventManager->registerEventHandler(land_handler);
+  level_->eventManager->registerEventHandler(item_pickup_handler);
+  level_->eventManager->registerEventHandler(tag_handler);
 }
 
 int Game::add_player() {
-  auto [player, control] = initializePlayer(level);
-  game_things_.insert({player->pid, GameThing(player->pid, player, control)});
+  auto [player, control] = initializePlayer(level_);
+  game_things_.insert(
+      {player->pid, GameThing(player->pid, player, control, level_)});
   if (map_spawn_points.size() > 0) player->setPos(map_spawn_points[0]);
   return player->pid;
 }
@@ -92,7 +89,7 @@ void Game::update(const message::UserStateUpdate& update) {
   game_things_.at(update.id).update(update);
 }
 
-void Game::tick() { level->tick(); }
+void Game::tick() { level_->tick(); }
 
 std::vector<message::JumpEvent> Game::get_jump_events() {
   std::vector<message::JumpEvent> events;
