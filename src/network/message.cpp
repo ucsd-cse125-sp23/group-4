@@ -5,6 +5,8 @@
 #include <magic_enum.hpp>
 #include <network/message.hpp>
 
+#include "core/game/event/Event.h"
+
 namespace message {
 
 std::string Message::to_string() const {
@@ -51,9 +53,16 @@ Type get_type(const Message::Body& body) {
     return Type::LobbyPlayerUpdate;
   };
   auto game_start = [](const GameStart&) { return Type::GameStart; };
+  auto jump_event = [](const JumpEvent&) { return Type::JumpEvent; };
+  auto land_event = [](const LandEvent&) { return Type::LandEvent; };
+  auto item_pickup_event = [](const ItemPickupEvent&) {
+    return Type::ItemPickupEvent;
+  };
+  auto tag_event = [](const TagEvent&) { return Type::TagEvent; };
   auto overload = boost::make_overloaded_function(
       assign, greeting, notify, game_state, user_state, lobby_update,
-      lobby_player_update, game_start);
+      lobby_player_update, game_start, jump_event, land_event,
+      item_pickup_event, tag_event);
   return boost::apply_visitor(overload, body);
 }
 
@@ -129,5 +138,31 @@ std::string LobbyUpdate::to_string() const {
 }
 
 std::string GameStart::to_string() const { return "    game_start: true"; }
+
+std::string JumpEvent::to_string() const {
+  return "    pid: " + std::to_string(pid);
+}
+
+std::string LandEvent::to_string() const {
+  return "    pid: " + std::to_string(pid);
+}
+
+std::string ItemPickupEvent::to_string() const {
+  // clang-format off
+    std::string str = std::string("") +
+      "      pid: " + std::to_string(pid) + "," +     "\n"
+      "      item: " + std::string(magic_enum::enum_name(item)) + "\n";
+  // clang-format on
+  return str;
+}
+
+std::string TagEvent::to_string() const {
+  // clang-format off
+    std::string str = std::string("") +
+      "      tagger: " + std::to_string(tagger) + "," +     "\n"
+      "      taggee: " + std::to_string(taggee) + "\n";
+  // clang-format on
+  return str;
+}
 
 }  // namespace message

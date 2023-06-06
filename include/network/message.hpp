@@ -7,9 +7,12 @@
 #include <boost/uuid/uuid_serialize.hpp>
 #include <boost/variant.hpp>
 #include <ctime>
+#include <network/item.hpp>
 #include <ostream>
 #include <string>
 #include <unordered_map>
+
+#include "core/game/event/Event.h"
 
 namespace message {
 
@@ -24,6 +27,10 @@ enum class Type {
   LobbyUpdate,
   LobbyPlayerUpdate,
   GameStart,
+  JumpEvent,
+  LandEvent,
+  ItemPickupEvent,
+  TagEvent,
 };
 
 struct Metadata {
@@ -139,10 +146,53 @@ struct GameStart {
   }
 };
 
+struct JumpEvent {
+  int pid;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid;
+  }
+};
+
+struct LandEvent {
+  int pid;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid;
+  }
+};
+
+struct ItemPickupEvent {
+  int pid;
+  Item item;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid& item;
+  }
+};
+
+struct TagEvent {
+  int tagger;
+  int taggee;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& tagger& taggee;
+  }
+};
+
 struct Message {
   using Body =
       boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate,
-                     LobbyUpdate, LobbyPlayerUpdate, GameStart>;
+                     LobbyUpdate, LobbyPlayerUpdate, GameStart, JumpEvent,
+                     LandEvent, ItemPickupEvent, TagEvent>;
   Type type;
   Metadata metadata;
   Body body;
