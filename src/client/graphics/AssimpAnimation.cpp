@@ -537,9 +537,6 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 
   if (ac == PLAYER_AC::JUMP) {
-    if (isJump || baseAnim == PLAYER_AC::JUMP) {
-      return;
-    }
     // play full jump animation first, then dissolve out jump's last frame
     dissolveAnim = baseAnim;
     baseAnim = PLAYER_AC::JUMP;
