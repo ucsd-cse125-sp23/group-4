@@ -20,9 +20,9 @@ class Tools {
 
   static glm::vec3 randomizeSphere() {
     float r =
-        static_cast<float>(rand()) / static_cast<float>(RAND_MAX);  // NO LINT
+        static_cast<float>(rand()) / static_cast<float>(RAND_MAX);  // NOLINT
     float q =
-        static_cast<float>(rand()) / static_cast<float>(RAND_MAX);  // NO LINT
+        static_cast<float>(rand()) / static_cast<float>(RAND_MAX);  // NOLINT
 
     float u = 2 * glm::pi<float>() * r;
     float v = glm::sqrt(q * (1 - q));
@@ -36,7 +36,7 @@ class Tools {
 
   static float random(float l, float h) {
     float r = l + static_cast<float>(rand()) /
-                      static_cast<float>(RAND_MAX / (h - l));  // NO LINT
+                      static_cast<float>(RAND_MAX / (h - l));  // NOLINT
 
     return r;
   }
