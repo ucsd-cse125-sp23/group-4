@@ -13,6 +13,7 @@ void AssimpChannel::prep() {
 
   timeStart = keyframes[0].time;
   timeEnd = keyframes[1].time;
+  timeLen = timeEnd - timeStart;
   if (keyframes.size() == 1) {
     AssimpKeyframe& kf = keyframes[0];
     kf.invT = 1.0f;
@@ -73,30 +74,28 @@ float AssimpChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
   if (t < timeStart) {
     switch (extrapIn) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t + timeEnd - timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[0].val;
       case A_ANIM_EXTRAP::LINEAR:
         return keyframes[0].val + keyframes[0].tangent * (timeStart - t);
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
-        return eval(t + timeEnd - timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
+        if (t < timeStart) {
+          t += timeLen;
+        }
     }
   } else if (t > timeEnd) {
     switch (extrapOut) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t - timeEnd + timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[keyframes.size() - 1].val;
       case A_ANIM_EXTRAP::LINEAR:
         return keyframes[keyframes.size() - 1].val +
-               keyframes[keyframes.size() - 1].tangent *
-                   (t - keyframes[keyframes.size() - 1].time);
+               keyframes[keyframes.size() - 1].tangent * (t - timeEnd);
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
-        return eval(t - timeEnd + timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
     }
   }
 
@@ -120,6 +119,7 @@ void AssimpRotChannel::prep() {
 
   timeStart = keyframes[0].time;
   timeEnd = keyframes[keyframes.size() - 1].time;
+  timeLen = timeEnd - timeStart;
   if (keyframes.size() == 1) {
     AssimpRotKeyframe& rkf = keyframes[0];
     rkf.invT = 1.0f;
@@ -162,26 +162,25 @@ glm::vec4 AssimpRotChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
   if (t < timeStart) {
     switch (extrapIn) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t + timeEnd - timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[0].val;
+      case A_ANIM_EXTRAP::LINEAR:  // not supported
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::LINEAR:   // not supported
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
-        return eval(t + timeEnd - timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
+        if (t < timeStart) {
+          t += timeLen;
+        }
     }
   } else if (t > timeEnd) {
     switch (extrapOut) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t - timeEnd + timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[keyframes.size() - 1].val;
       case A_ANIM_EXTRAP::LINEAR:  // not supported
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
-        return eval(t - timeEnd + timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
     }
   }
 

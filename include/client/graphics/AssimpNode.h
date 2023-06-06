@@ -17,6 +17,8 @@ struct NodeJoint;
 class AssimpNode {
  public:
   explicit AssimpNode(unsigned int id);
+  /** Destructor */
+  ~AssimpNode();
 
   void update(const glm::mat4& accWorldMtx);
   void draw(const glm::mat4& viewProjMtx);

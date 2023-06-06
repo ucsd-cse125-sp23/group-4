@@ -2,6 +2,8 @@
 
 AssimpMesh::AssimpMesh() : isUpdated(false), isLoaded(false) {}
 
+AssimpMesh::~AssimpMesh() { delete texture; }
+
 void AssimpMesh::draw() {
   if (!isLoaded) {
     gl_load();
