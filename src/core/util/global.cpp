@@ -15,10 +15,14 @@ int PLAYER_LAYER = 0;
 int ENVIRONMENT_LAYER = 1;
 int POWER_LAYER = 2;
 
+float PLAYER_RADIUS = 1.3f;
+float PLAYER_HEIGHT = 1.0f;
+
 SphereShape* POWERUP_BASE_SHAPE = new SphereShape(0.4);
-CapsuleShape* PLAYER_BASE_SHAPE = new CapsuleShape(1.0, 1.3);
+CapsuleShape* PLAYER_BASE_SHAPE =
+    new CapsuleShape(PLAYER_HEIGHT, PLAYER_RADIUS);
 OffsetShape* PLAYER_BOUNDING_SHAPE =
-    new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, 0.5f, 0.0f));
+    new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, PLAYER_HEIGHT/2, 0.0f));
 
 // Level* level = nullptr;
 

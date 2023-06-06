@@ -20,6 +20,9 @@ extern float MOVE_VELOCITY;
 extern float JUMP_VELOCITY;
 extern float GRAVITY_STRENGTH;
 
+extern float PLAYER_RADIUS;
+extern float PLAYER_HEIGHT;
+
 extern int PLAYER_LAYER;       // = 0;
 extern int ENVIRONMENT_LAYER;  // = 1;
 extern int POWER_LAYER;        // = 2;
