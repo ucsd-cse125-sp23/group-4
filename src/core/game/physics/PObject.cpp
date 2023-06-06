@@ -141,7 +141,7 @@ void PObject::move(vec3f dPos) {
 
   Environment* environment = this->level->getEnvironment();
   std::pair<PObject*, vec4f> pair = environment->mtv(this);
-  while (pair.first != nullptr) {
+  while (pair.first != nullptr && ite++ < 20) {
     response(this, pair.first, pair.second);
     pair = environment->mtv(this);
   }
