@@ -135,7 +135,7 @@ void PObject::move(vec3f dPos) {
   }
 
   if (totalY < -0.01 &&
-      lastSurfaceNormal.y <
+      lastSurfaceNormal.y <=
           0.1 * (std::abs(lastSurfaceNormal.x) + std::abs(lastSurfaceNormal.z)))
     onGround = false;
 
