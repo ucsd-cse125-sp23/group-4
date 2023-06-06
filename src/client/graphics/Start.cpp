@@ -2,8 +2,6 @@
 
 #include "Window.h"
 
-void Start::init(void) {}
-
 void Start::update(float delta) {
   timeElapsed += delta;
   offset += (0.25 * delta);
