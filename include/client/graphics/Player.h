@@ -13,6 +13,7 @@
 #include "GameThing.h"
 #include "Input.h"
 #include "InputListener.h"
+#include "ParticleSystem.h"
 #include "PlayerModel.h"
 #include "Timer.h"
 
@@ -24,6 +25,10 @@ class Player : public GameThing, InputListener {
       nullptr;  // a reference to the scene camera, so we know where we're going
 
   PlayerModel* pmodel;  // visual information
+
+  ParticleSystem* fx_jump;
+  ParticleSystem* fx_tag;   // TODO(matthew)
+
   Timer time;
   bool tagged;
 
@@ -31,6 +36,11 @@ class Player : public GameThing, InputListener {
     pmodel = nullptr;
     tagged = true;
   }
+
+  ~Player() {
+      if(fx_jump) delete fx_jump;
+  }
+
   message::UserStateUpdate pollInput();
 
   void animate(float dt) override;

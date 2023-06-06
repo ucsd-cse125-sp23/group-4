@@ -29,17 +29,40 @@ class ParticleSystem : public GameThing {
   Mesh* meshRef;
   Material* materialRef;
 
+  // Properties
+  bool worldSpace = false;
+  float creationRate = 5.0f;        // How many emissions per second
+  unsigned int creationAmount = 1;  // How many particles to emit
+
+  float initColor[4] = {1.0f, 0.9f, 0.3f, 1.0f};
+  std::vector<DOFr> initPosition = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
+                                    DOFr(-50, 50, 0)};  // Ranges for offset
+  std::vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 10),
+                                    DOFr(-50, 50, 0)};  // Ranges
+  DOF radialPosition = DOF(0, 50, 0);
+  DOF radialVelocity = DOF(0, 100, 4);
+
+  DOF initMass = DOF(0.1f, 10, 0.1f);
+
+  DOFr lifespan = DOFr(0, 50, 2);
+  DOF radius = DOF(0.1f, 2, 0.1f);
+
+  DOF gravity = DOF(-20, 4.9f, -9.8f);
+
+  DOF airdensity = DOF(0, 1000, 1.2f);
+  DOF drag = DOF(0, 1.5f, 0.1f);
+
+  bool collision = false;
+  DOF elasticity = DOF(0, 1, 0.1f);
+  DOF friction = DOF(0, 1.5f, 0.1f);
+
   ParticleSystem() {
     particles.reserve(_maxParticles);
 
     meshRef = nullptr;
     materialRef = nullptr;
-
-    box = new Cube(vec3(-0.05f), vec3(0.05f));
   }
-  ~ParticleSystem() {
-    if (box) delete box;
-  }
+  ~ParticleSystem() {}
 
   void Reset() {
     for (Particle* p : particles) {
@@ -57,18 +80,12 @@ class ParticleSystem : public GameThing {
   void show(const std::string name);
 
  private:
-  Cube* box;
-
-  bool showBox = true;
-
   // Spawning
   void Emit();
   void Spawner(float deltaTime);
   float timer = 0.0f;     // Internal timer for emissions
   float duration = 1.0f;  // Negative for infinite loop
 
-  float creationRate = 5.0f;        // How many emissions per second
-  unsigned int creationAmount = 1;  // How many particles to emit
   float _roundOffError = 0.0f;
 
   const unsigned int _maxParticles = 1000;
@@ -88,22 +105,7 @@ class ParticleSystem : public GameThing {
     particles.pop_back();  // Pop end element out
   }
 
-  // Properties
-  float initColor[4] = {1.0f, 0.9f, 0.3f, 1.0f};
-  std::vector<DOFr> initPosition = {DOFr(-50, 50, 0), DOFr(-50, 50, 0),
-                                    DOFr(-50, 50, 0)};  // Ranges for offset
-  std::vector<DOFr> initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 10),
-                                    DOFr(-50, 50, 0)};  // Ranges
-  DOF radialPosition = DOF(0, 50, 0);
-  DOF radialVelocity = DOF(0, 100, 4);
-
-  DOF initMass = DOF(0.1f, 10, 0.1f);
-
-  DOFr lifespan = DOFr(0, 50, 2);
-  DOF radius = DOF(0.1f, 2, 0.1f);
-
-  DOF gravity = DOF(-20, 4.9f, -9.8f);
-
+  // (private) Properties
   const vec3 vairdir = vec3(0, 0, 1);  // wind
   float windspeed = 4.0f;
   float winddir = 0.0f;
@@ -114,13 +116,6 @@ class ParticleSystem : public GameThing {
         (vec3(normalize(vec4(vairdir, 1) * rotate(winddir, vec3(0, 1, 0)))) *
          windspeed);
   }
-
-  DOF airdensity = DOF(0, 1000, 1.2f);
-  DOF drag = DOF(0, 1.5f, 0.1f);
-
-  bool collision = false;
-  DOF elasticity = DOF(0, 1, 0.1f);
-  DOF friction = DOF(0, 1.5f, 0.1f);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

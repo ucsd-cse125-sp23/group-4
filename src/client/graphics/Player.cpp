@@ -46,6 +46,8 @@ message::UserStateUpdate Player::pollInput() {
   }
 
   if (Input::GetInputState(InputAction::MoveJump) != InputState::None) {
+    if (fx_jump) fx_jump->Emit(5);  // TODO(matthew) move this to jump event msg
+
     jumping = true;
   }
 

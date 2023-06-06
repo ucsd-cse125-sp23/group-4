@@ -54,6 +54,7 @@ class SceneResourceMap {
   std::map<std::string, Model*>
       models;  // more complex; meshes + other info combined
   std::map<std::string, SoundEffect*> sounds;
+  std::map<std::string, GameThing*> prefabs;
   // std::map< std::string, Light* > light;
 
   SceneResourceMap() {}
@@ -83,6 +84,10 @@ class SceneResourceMap {
     }
     // sounds
     for (auto entry : sounds) {
+      delete entry.second;
+    }
+    // prefabs
+    for (auto entry : prefabs) {
       delete entry.second;
     }
   }

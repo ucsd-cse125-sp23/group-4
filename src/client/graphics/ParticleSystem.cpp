@@ -11,9 +11,15 @@ void ParticleSystem::Emit() {
   if (particles.size() >= particles.capacity()) return;
 
   // TODO(matthew): support world/local space option
+  glm::vec3 initPos = DOFr::GetRandomVector3(initPosition) +
+                      (Tools::randomizeSphere() * radialPosition.GetValue());
+
+  if (worldSpace) {
+    initPos = glm::vec3(parentMtxCache * glm::vec4(initPos, 1));
+  }
+
   Particle* p =
-      new Particle(DOFr::GetRandomVector3(initPosition) +
-                       (Tools::randomizeSphere() * radialPosition.GetValue()),
+      new Particle(initPos,
                    DOFr::GetRandomVector3(initVelocity) +
                        (Tools::randomizeSphere() * radialVelocity.GetValue()),
                    initMass.GetValue());
@@ -35,6 +41,8 @@ void ParticleSystem::Emit() {
 void ParticleSystem::update(float dt) {
   // box->setMatrix(translate(GetPosition()));
   Spawner(dt);
+
+  if (particles.size() == 0) return;
 
   // Compute forces
   // For each particle: apply gravity
@@ -72,18 +80,20 @@ void ParticleSystem::Spawner(float deltaTime) {
 }
 
 void ParticleSystem::draw(const DrawInfo info, const glm::mat4& parentMtx) {
-  const mat4 viewProjMtx = info.viewProjMtx;
-  GLint shader = info.shader;
+  parentMtxCache = parentMtx;
 
-  // if(showBox) box->draw(viewProjMtx, shader);
+  const mat4 viewProjMtx = info.viewProjMtx;
+
+  glm::mat4 m = parentMtx * transformMtx;
+  if (worldSpace) m = glm::mat4(1);
 
   for (Particle* p : particles) {
-    p->draw(info, parentMtx * transformMtx);  // draw particles
+    p->draw(info, m);  // draw particles
   }
 }
 
 void ParticleSystem::show(const std::string name) {
-  /*// Tweak bar
+  /*// gui
   bar = TwNewBar(name.c_str());
 
   TwDefine((" " + name + " color = '175 55 215' ").c_str());

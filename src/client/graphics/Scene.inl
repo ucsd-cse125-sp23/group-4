@@ -3,6 +3,7 @@
  * contains the definition of the scene graph
  *****************************************************/
 #include "client/graphics/Collider.h"
+#include "client/graphics/DOF.h"
 #include "client/graphics/MapDataImporter.h"
 #include "client/graphics/MapObj.h"
 #include "client/graphics/Scene.h"
@@ -166,6 +167,13 @@ void Scene::init(void) {
   mtl->diffuse = vec4(0.9f, 0.82f, 0.0f, 1.0f);
   sceneResources->materials["stars-ptcl"] = mtl;
 
+  mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["unlitx"];
+  mtl->texture = sceneResources->textures["star1-ptcl"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.97f, 0.94f, 0.82f, 1.0f);
+  sceneResources->materials["star1-ptcl"] = mtl;
+
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
       sceneResources->shaderPrograms["toon"];
@@ -223,6 +231,14 @@ void Scene::init(void) {
   localGameThings.push_back(ptcl);
   node["particleTest2"] = ptcl;
   node["world"]->childnodes.push_back(node["particleTest2"]);
+
+  ptcl = new ParticleSystem();
+  ptcl->name = "GTptcl_jump";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["star1-ptcl"];
+  ptcl->creationRate = 0;
+  ptcl->initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 0), DOFr(-50, 50, 0)};
+  sceneResources->prefabs["ptcl_jump"] = ptcl;
 #pragma endregion
 
   // Skybox setup

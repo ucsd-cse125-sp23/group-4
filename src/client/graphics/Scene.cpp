@@ -67,6 +67,13 @@ Player* Scene::createPlayer(int id) {
   // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
+  // particle emitters
+  ParticleSystem* ptclRef =
+      dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
+  player->fx_jump = new ParticleSystem(*ptclRef);
+  localGameThings.push_back(player->fx_jump);
+  player->childnodes.push_back(player->fx_jump);
+
   // ---
 
   // position is set by server message
