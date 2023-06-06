@@ -54,25 +54,38 @@ message::UserStateUpdate Player::pollInput() {
 
   if (moving) {
     moveWorld = move(moveLocal);
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
-    }
-  } else {
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
-    }
-  }
-
-  if (jumping) {
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
-    }
   }
 
   return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
+}
+
+void Player::updateFromState(message::GameStateUpdateItem state) {
+  // Same as GameThing - update self from server input
+  glm::vec3 pos = glm::vec3(state.posx, state.posy, state.posz);
+  setPositionTarget(pos);
+  setHeading(state.heading);
+
+  // aninmation calls
+  if (!pmodel) {
+    return;
+  }
+  if (state.has_jumped) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
+  }
+
+  if (state.has_tagged) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TAG));
+  }
+
+  if (state.speed > 1.0f) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+  } else {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+  }
 }
 
 vec3 Player::move(vec3 movement) {

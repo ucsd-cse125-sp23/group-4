@@ -32,6 +32,7 @@ class Player : public GameThing, InputListener {
     tagged = true;
   }
   message::UserStateUpdate pollInput();
+  void updateFromState(message::GameStateUpdateItem state);
 
   void update(float dt);
   glm::vec3 move(glm::vec3 movement);
