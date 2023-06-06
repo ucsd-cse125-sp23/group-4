@@ -118,7 +118,26 @@ class AssimpAnimationClip {
 
 class AssimpAnimation {
  public:
-  enum class PLAYER_AC { IDLE, WALK, JUMP, TAG };
+  enum class PLAYER_AC {
+    IDLE = 0,
+    WALK,
+    JUMP,
+    TAG,
+    TRIP,
+    FALL,
+    LOBBY1,
+    LOBBY2,
+    LOBBY3,
+    LOBBY4,
+    PLACE1_1,
+    PLACE1_2,
+    PLACE2_1,
+    PLACE2_2,
+    PLACE3_1,
+    PLACE3_2,
+    PLACE4_1,
+    PLACE4_2
+  };
   static const std::map<PLAYER_AC, std::string> AC_TO_NAME;
   static const std::map<std::string, PLAYER_AC> NAME_TO_AC;
 

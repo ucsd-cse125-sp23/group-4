@@ -307,16 +307,44 @@ void AssimpAnimationClip::update(double currentTimeInMs,
 
 const std::map<AssimpAnimation::PLAYER_AC, std::string>
     AssimpAnimation::AC_TO_NAME = {
-        {AssimpAnimation::PLAYER_AC::IDLE, "Armature|idel"},
+        {AssimpAnimation::PLAYER_AC::IDLE, "Armature|idle0"},
         {AssimpAnimation::PLAYER_AC::WALK, "Armature|walk"},
         {AssimpAnimation::PLAYER_AC::JUMP, "Armature|jump"},
-        {AssimpAnimation::PLAYER_AC::TAG, "Armature|tag"}};
+        {AssimpAnimation::PLAYER_AC::TAG, "Armature|tag"},
+        {AssimpAnimation::PLAYER_AC::TRIP, "Armature|trip"},
+        {AssimpAnimation::PLAYER_AC::FALL, "Armature|fall"},
+        {AssimpAnimation::PLAYER_AC::LOBBY1, "Armature|idle1"},
+        {AssimpAnimation::PLAYER_AC::LOBBY2, "Armature|idle2"},
+        {AssimpAnimation::PLAYER_AC::LOBBY3, "Armature|idle3"},
+        {AssimpAnimation::PLAYER_AC::LOBBY4, "Armature|idle4"},
+        {AssimpAnimation::PLAYER_AC::PLACE1_1, "Armature|place1.0"},
+        {AssimpAnimation::PLAYER_AC::PLACE1_2, "Armature|place1.1"},
+        {AssimpAnimation::PLAYER_AC::PLACE2_1, "Armature|place2.0"},
+        {AssimpAnimation::PLAYER_AC::PLACE2_2, "Armature|place2.1"},
+        {AssimpAnimation::PLAYER_AC::PLACE3_1, "Armature|place3.0"},
+        {AssimpAnimation::PLAYER_AC::PLACE3_2, "Armature|place3.1"},
+        {AssimpAnimation::PLAYER_AC::PLACE4_1, "Armature|place4.0"},
+        {AssimpAnimation::PLAYER_AC::PLACE4_2, "Armature|place4.1"}};
 const std::map<std::string, AssimpAnimation::PLAYER_AC>
     AssimpAnimation::NAME_TO_AC = {
-        {"Armature|idel", AssimpAnimation::PLAYER_AC::IDLE},
+        {"Armature|idle0", AssimpAnimation::PLAYER_AC::IDLE},
         {"Armature|walk", AssimpAnimation::PLAYER_AC::WALK},
         {"Armature|jump", AssimpAnimation::PLAYER_AC::JUMP},
-        {"Armature|tag", AssimpAnimation::PLAYER_AC::TAG}};
+        {"Armature|tag", AssimpAnimation::PLAYER_AC::TAG},
+        {"Armature|trip", AssimpAnimation::PLAYER_AC::TRIP},
+        {"Armature|fall", AssimpAnimation::PLAYER_AC::FALL},
+        {"Armature|idle1", AssimpAnimation::PLAYER_AC::LOBBY1},
+        {"Armature|idle2", AssimpAnimation::PLAYER_AC::LOBBY2},
+        {"Armature|idle3", AssimpAnimation::PLAYER_AC::LOBBY3},
+        {"Armature|idle4", AssimpAnimation::PLAYER_AC::LOBBY4},
+        {"Armature|place1.0", AssimpAnimation::PLAYER_AC::PLACE1_1},
+        {"Armature|place1.1", AssimpAnimation::PLAYER_AC::PLACE1_2},
+        {"Armature|place2.0", AssimpAnimation::PLAYER_AC::PLACE2_1},
+        {"Armature|place2.1", AssimpAnimation::PLAYER_AC::PLACE2_2},
+        {"Armature|place3.0", AssimpAnimation::PLAYER_AC::PLACE3_1},
+        {"Armature|place3.1", AssimpAnimation::PLAYER_AC::PLACE3_2},
+        {"Armature|place4.0", AssimpAnimation::PLAYER_AC::PLACE4_1},
+        {"Armature|place4.1", AssimpAnimation::PLAYER_AC::PLACE4_2}};
 const float AssimpAnimation::MS_DISSOLVE = 0.5f;
 const float AssimpAnimation::MS_JUMP = 0.25f;
 const std::vector<std::string> AssimpAnimation::NODES_TAG(
