@@ -10,7 +10,6 @@
 class Start : public Scene, public InputListener {
  public:
   FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
-  Texture background;
   std::vector<Texture> frames;
   float timeOnFrame;
   int index;
@@ -21,7 +20,6 @@ class Start : public Scene, public InputListener {
   explicit Start(Camera* camFromWindow) : Scene(camFromWindow) {
     timeElapsed = 0.0f;
     offset = 0.0f;
-    background.init("assets/image/clouds.png");
     renderText = true;
     camera->SetDistance(600.0);
     camera->SetIncline(32.0);
@@ -38,8 +36,6 @@ class Start : public Scene, public InputListener {
   }
 
   void draw();
-
-  void drawBackground();
 
   void drawName();
 

@@ -48,27 +48,6 @@ void Start::draw() {
   glDisable(GL_BLEND);
 }
 
-void Start::drawBackground() {
-  background.bindgl();
-  glEnable(GL_TEXTURE_2D);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glBegin(GL_QUADS);
-
-  glTexCoord2f(1 + offset, 0);
-  glVertex3f(1.0f, 1.0f, 0.0f);
-  glTexCoord2f(0 + offset, 0);
-  glVertex3f(-1.0f, 1.0f, 0.0f);
-  glTexCoord2f(0 + offset, 1);
-  glVertex3f(-1.0f, -1.0f, 0.0f);
-  glTexCoord2f(1 + offset, 1);
-  glVertex3f(1.0f, -1.0f, 0.0f);
-
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D);
-}
-
 void Start::drawName() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
