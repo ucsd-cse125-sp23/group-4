@@ -13,6 +13,7 @@ void AssimpChannel::prep() {
 
   timeStart = keyframes[0].time;
   timeEnd = keyframes[1].time;
+  timeLen = timeEnd - timeStart;
   if (keyframes.size() == 1) {
     AssimpKeyframe& kf = keyframes[0];
     kf.invT = 1.0f;
@@ -81,7 +82,10 @@ float AssimpChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
       case A_ANIM_EXTRAP::CYCLE:
       case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
       default:
-        return eval(t + timeEnd - timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
+        if (t < timeStart) {
+          t += timeLen;
+        }
     }
   } else if (t > timeEnd) {
     switch (extrapOut) {
@@ -96,7 +100,7 @@ float AssimpChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
       case A_ANIM_EXTRAP::CYCLE:
       case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
       default:
-        return eval(t - timeEnd + timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
     }
   }
 
@@ -120,6 +124,7 @@ void AssimpRotChannel::prep() {
 
   timeStart = keyframes[0].time;
   timeEnd = keyframes[keyframes.size() - 1].time;
+  timeLen = timeEnd - timeStart;
   if (keyframes.size() == 1) {
     AssimpRotKeyframe& rkf = keyframes[0];
     rkf.invT = 1.0f;
@@ -169,7 +174,10 @@ glm::vec4 AssimpRotChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
       case A_ANIM_EXTRAP::LINEAR:   // not supported
       case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
       default:
-        return eval(t + timeEnd - timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
+        if (t < timeStart) {
+          t += timeLen;
+        }
     }
   } else if (t > timeEnd) {
     switch (extrapOut) {
@@ -181,7 +189,7 @@ glm::vec4 AssimpRotChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
       case A_ANIM_EXTRAP::CYCLE:
       case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
       default:
-        return eval(t - timeEnd + timeStart, extrapIn, extrapOut);
+        t = std::fmod(t - timeStart, timeLen) + timeStart;
     }
   }
 
