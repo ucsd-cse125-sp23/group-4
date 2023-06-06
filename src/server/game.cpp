@@ -6,6 +6,7 @@
 #include <server/game.hpp>
 
 #include "core/game/event/Event.h"
+#include "core/game/mode/GameModes.h"
 
 GameThing::GameThing(int id, Player* p, ControlModifierData* c)
     : id_(id), player_(p), control_(c), heading_(0) {}
@@ -25,8 +26,22 @@ void GameThing::update(const message::UserStateUpdate& update) {
 void GameThing::remove() { player_->markRemove(); }
 
 message::GameStateUpdateItem GameThing::to_network() const {
-  return {id_, player_->getPos().x, player_->getPos().y, player_->getPos().z,
-          heading_};
+  std::cout << "converting pid " << id_ << " to network" << std::endl;
+  std::cout << "queryScore(id_): " << level->gameMode->queryScore(id_)
+            << std::endl;
+
+  return {
+      id_,
+      player_->getPos().x,
+      player_->getPos().y,
+      player_->getPos().z,
+      heading_,
+      level->gameMode->queryScore(id_),
+      0,  // TODO: get player speed
+      player_->onGround,
+      false,  // TODO: get player is_tagged
+      {}      // TODO: get player effects
+  };
 }
 
 Game::Game() {
@@ -46,6 +61,7 @@ Game::Game() {
   }
   environment->setDeathHeight(mapData.fallBoundY);
   level = initializeLevel(environment);
+  level->gameMode = new OneTaggerTimeGameMode();
 
   // register event handlers
   auto jump_handler = [this](JumpEvent&& e) { jump_events_.push_back(e); };
@@ -120,5 +136,6 @@ std::unordered_map<int, message::GameStateUpdateItem> Game::to_network() {
   std::unordered_map<int, message::GameStateUpdateItem> things;
   for (const auto& [pid, thing] : game_things_)
     things.insert({pid, thing.to_network()});
+
   return things;
 }
