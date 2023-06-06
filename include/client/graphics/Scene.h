@@ -131,7 +131,7 @@ class Scene {
     _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
     _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-    _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+    _globalSceneResources.meshes["_gz-xyz"]->init("assets/model/dev/_gizmo.obj");
 
     _globalSceneResources.shaderPrograms["unlit"] =
         LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
