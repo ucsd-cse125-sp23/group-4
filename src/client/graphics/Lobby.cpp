@@ -60,7 +60,6 @@ void Lobby::update(float delta) {
     Window::client->write<message::LobbyPlayerUpdate>(
         Window::my_pid, skin_names[index], is_ready);
   }
-
 }
 
 void Lobby::receiveState(message::LobbyUpdate newState) {

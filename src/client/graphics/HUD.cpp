@@ -25,7 +25,7 @@ void HUD::draw(GLFWwindow* window) {
       glm::vec2 windowSpace = ((glm::vec2(normalizedSpace) + 1.0f) / 2.0f) *
                                   glm::vec2(width, height) +
                               glm::vec2(0.0f, 0.0f);
-      
+
       float view = 1;
       if (normalizedSpace[2] >= -view && normalizedSpace[2] <= view) {
         // Scale the size of the text based on camera distance
@@ -78,8 +78,8 @@ void HUD::draw(GLFWwindow* window) {
   // minimap stuff
   int map_height = (width / 5 > 250) ? 250 : width / 4;
   int map_width = (map_height * 1920) / 1080;
-  glViewport(-(map_width / 4) + 10, height - map_height - 10, (map_height * 1920) / 1080,
-             map_height);
+  glViewport(-(map_width / 4) + 10, height - map_height - 10,
+             (map_height * 1920) / 1080, map_height);
 
   drawMinimap();
 
@@ -96,8 +96,8 @@ void HUD::draw(GLFWwindow* window) {
       }
       glPointSize(10);
       glBegin(GL_POINTS);
-      glVertex2f(
-          -(position[2] - 23) / world_width, -((position[0] - 33)) / world_height);  
+      glVertex2f(-(position[2] - 23) / world_width,
+                 -((position[0] - 33)) / world_height);
       glEnd();
     }
   }
@@ -125,7 +125,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
   Player* player;
   std::string str;
-  for (auto it = scene->skins.rbegin(); it != scene->skins.rend(); it++) { 
+  for (auto it = scene->skins.rbegin(); it != scene->skins.rend(); it++) {
     glViewport(x, y, bar_width, bar_height);
 
     drawBar(it->second);
@@ -134,7 +134,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     y += (bar_height / 1.5);
   }
-  
+
   x = bar_width / 2.5;
   y = bar_height / 1.75;
   for (auto it = players.rbegin(); it != players.rend(); it++) {
