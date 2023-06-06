@@ -57,6 +57,10 @@ void Scene::init(void) {
   sceneResources->textures["stars-ptcl"] = new Texture;
   sceneResources->textures["stars-ptcl"]->init(
       "assets/image/particle_stars.png");
+
+  sceneResources->textures["star1-ptcl"] = new Texture;
+  sceneResources->textures["star1-ptcl"]->init(
+      "assets/image/particle_star1.png");
 #pragma endregion
 
   // Create material palette
@@ -171,7 +175,7 @@ void Scene::init(void) {
   mtl->shader = sceneResources->shaderPrograms["unlitx"];
   mtl->texture = sceneResources->textures["star1-ptcl"];
   mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mtl->diffuse = vec4(0.97f, 0.94f, 0.82f, 1.0f);
+  mtl->diffuse = vec4(0.9f, 0.82f, 0.0f, 1.0f);
   sceneResources->materials["star1-ptcl"] = mtl;
 
   sceneResources->materials["toon.blue"] = new Material;
@@ -218,10 +222,11 @@ void Scene::init(void) {
   ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
   ptcl->transform.updateMtx(&ptcl->transformMtx);
-  localGameThings.push_back(ptcl);
-  node["particleTest"] = ptcl;
-  node["world"]->childnodes.push_back(node["particleTest"]);
+  //localGameThings.push_back(ptcl);
+  //node["particleTest"] = ptcl;
+  //node["world"]->childnodes.push_back(node["particleTest"]);
 
+  /*
   ptcl = new ParticleSystem();
   ptcl->name = "GT_particle2";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
@@ -230,14 +235,15 @@ void Scene::init(void) {
   ptcl->transform.updateMtx(&ptcl->transformMtx);
   localGameThings.push_back(ptcl);
   node["particleTest2"] = ptcl;
-  node["world"]->childnodes.push_back(node["particleTest2"]);
+  node["world"]->childnodes.push_back(node["particleTest2"]);*/
 
   ptcl = new ParticleSystem();
   ptcl->name = "GTptcl_jump";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
   ptcl->materialRef = sceneResources->materials["star1-ptcl"];
+  ptcl->worldSpace = true;
   ptcl->creationRate = 0;
-  ptcl->initVelocity = {DOFr(-50, 50, 0), DOFr(-50, 50, 0), DOFr(-50, 50, 0)};
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-0, 0, 0), DOFr(-10, 10)};
   sceneResources->prefabs["ptcl_jump"] = ptcl;
 #pragma endregion
 
@@ -350,5 +356,5 @@ void Scene::init(void) {
 
   node["world"]->childnodes.push_back(node["map"]);
 
-  // createPlayer(-1); // for testing
+  //createPlayer(-1); // for testing
 }

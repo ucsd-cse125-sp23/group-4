@@ -72,6 +72,7 @@ void ParticleSystem::update(float dt) {
 void ParticleSystem::Spawner(float deltaTime) {
   timer += deltaTime;
 
+  if (creationRate <= 0) return;
   float num = deltaTime * creationRate + _roundOffError;
   int n = static_cast<int>(num);
   _roundOffError = num - static_cast<float>(n);
@@ -81,8 +82,6 @@ void ParticleSystem::Spawner(float deltaTime) {
 
 void ParticleSystem::draw(const DrawInfo info, const glm::mat4& parentMtx) {
   parentMtxCache = parentMtx;
-
-  const mat4 viewProjMtx = info.viewProjMtx;
 
   glm::mat4 m = parentMtx * transformMtx;
   if (worldSpace) m = glm::mat4(1);

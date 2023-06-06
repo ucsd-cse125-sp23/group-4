@@ -62,15 +62,19 @@ class ParticleSystem : public GameThing {
     meshRef = nullptr;
     materialRef = nullptr;
   }
+
   ~ParticleSystem() {}
 
-  void Reset() {
-    for (Particle* p : particles) {
-      delete p;
-      p = nullptr;
+  void Reset(bool deletion = true) {
+    if (deletion) {
+      for (Particle* p : particles) {
+        delete p;
+        p = nullptr;
+      }
     }
 
     particles.clear();
+    particles.reserve(_maxParticles);
   }
 
   void Emit(int amount);

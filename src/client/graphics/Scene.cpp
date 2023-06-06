@@ -71,7 +71,10 @@ Player* Scene::createPlayer(int id) {
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
   player->fx_jump = new ParticleSystem(*ptclRef);
-  localGameThings.push_back(player->fx_jump);
+  player->fx_jump->Reset(false);    // important!!!
+  player->fx_jump->name += "." + playername;
+  player->fx_jump->transform.position = glm::vec3(0, 0, 0);
+  player->fx_jump->transform.updateMtx(&player->fx_jump->transformMtx);
   player->childnodes.push_back(player->fx_jump);
 
   // ---

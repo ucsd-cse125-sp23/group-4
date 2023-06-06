@@ -19,6 +19,8 @@ void Player::update(float dt) {
   // interpolate between old to new state
   updateInterpolate(dt);
 
+  if (fx_jump) fx_jump->update(dt);
+
   if (tagged) time.Update(dt);
 }
 
