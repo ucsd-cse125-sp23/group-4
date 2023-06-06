@@ -22,13 +22,9 @@ class Lobby : public Scene, public InputListener {
   std::map<std::string, Texture> ready_icons;
   std::map<int, message::LobbyPlayer> players;
 
-  Timer wait;
   bool is_ready;
-  bool gameStart;
-  float offset;
   std::vector<GameThing*> models;
   std::vector<Model*> player_models;
-  Model* selectedModel;
   int index;
 
   explicit Lobby(Camera*);
@@ -41,5 +37,4 @@ class Lobby : public Scene, public InputListener {
   void draw() override;
   void drawBackground();
   void drawPlayers();
-  void lockIn();
 };

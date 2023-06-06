@@ -29,7 +29,7 @@ void TeamedTaggersTimeGameMode::registerTrackers(Level* l) {
   this->level = l;
   TimeGameMode::registerTrackers(level);
 
-  level->eventManager->registerTriggerEventHandler([=](TriggerEvent event) {
+  level->eventManager->registerEventHandler([=](TriggerEvent event) {
     if (event.self->hasModifier(TAGGED_STATUS_MODIFIER) &&
         event.other->hasModifier(TAGGED_STATUS_MODIFIER)) {
       TaggedStatusModifierData

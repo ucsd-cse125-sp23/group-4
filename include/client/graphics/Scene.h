@@ -112,6 +112,7 @@ class Scene {
 
   std::vector<GameThing*> localGameThings;
   std::unordered_map<int, GameThing*> networkGameThings;
+  std::map<int, std::string> skins;
 
   Timer time;
   bool gameStart;
@@ -131,7 +132,8 @@ class Scene {
     _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
     _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-    _globalSceneResources.meshes["_gz-xyz"]->init("assets/models/_gizmo.obj");
+    _globalSceneResources.meshes["_gz-xyz"]->init(
+        "assets/model/dev/_gizmo.obj");
 
     _globalSceneResources.shaderPrograms["unlit"] =
         LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
@@ -168,6 +170,7 @@ class Scene {
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
   virtual void init(void);
+  void init(std::map<int, message::LobbyPlayer> players);
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net

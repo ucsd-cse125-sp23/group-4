@@ -3,7 +3,10 @@
 #include <string>
 #include <vector>
 
+#include "Window.h"
 #include "client/graphics/Texture.h"
+
+extern std::atomic<bool> loading_resources;
 
 class Load {
  public:
@@ -102,14 +105,14 @@ class Load {
     int width, height;
     glfwGetWindowSize(win, &width, &height);
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "loading...",
-                                          glfwGetPrimaryMonitor(), NULL);
+    GLFWwindow* window =
+        glfwCreateWindow(width, height, "loading...", NULL, NULL);
     glfwMakeContextCurrent(window);
 
     loadFrames();
 
     glfwShowWindow(window);
-    while (timeElapsed <= 45) { // while (timeElapsed <= min_load_time || scene_loading)
+    while (timeElapsed <= 15 || loading_resources) {
       update();
       draw();
 
