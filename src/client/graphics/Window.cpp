@@ -83,13 +83,14 @@ bool Window::initializeProgram(GLFWwindow* window) {
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
   start = new Start(Cam);
+  start->init();
   lob = new Lobby(Cam);
+  lob->init();
   game = new Scene(Cam);
   gameScene = start;
   loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
-  gameScene->init();
 
   glfwMakeContextCurrent(window);
   glfwShowWindow(window);
@@ -199,15 +200,17 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 
 // update and draw functions
 void Window::update(GLFWwindow* window, float deltaTime) {
-  if (dynamic_cast<Start*>(gameScene) &&
+  if (!dynamic_cast<Lobby*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
+    start->reset();
     resetCamera();
     gameScene = lob;
-    gameScene->init();
+    auto l = dynamic_cast<Lobby*>(gameScene);
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     lobby->receiveState(lobby_state);
   } else if (dynamic_cast<Lobby*>(gameScene) &&
              phase == GamePhase::Game) {  // lobby -> game
+    lob->reset();
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = game;
     glfwHideWindow(window);
@@ -220,9 +223,6 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     glfwMakeContextCurrent(window);
     glfwShowWindow(window);
     glfwFocusWindow(window);
-  } else if (!dynamic_cast<Start*>(gameScene) && phase == GamePhase::Start) {
-    resetCamera();
-    gameScene = start;
   } else {
     gameScene->update(deltaTime);
   }

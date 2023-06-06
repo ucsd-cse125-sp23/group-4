@@ -50,7 +50,11 @@ Player* Scene::createPlayer(int id) {
     myModel = am;
     player->pmodel = am;
   } else {
-    myModel = new Model(*sceneResources->models[skins[id]]);
+    if (sceneResources->models[skins[id]]) {
+      myModel = new Model(*sceneResources->models[skins[id]]);
+    } else {
+      myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
+    }
   }
   player->model = myModel;
   // TODO(matthew) set material here! if needed
@@ -103,6 +107,13 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
+void Scene::reset() {
+  time.time = 5.0f;
+  time.countdown = true;
+  gameStart = false;
+  timeOver = 0;
+}
+
 void Scene::update(float delta) {
   for (auto& thing : localGameThings) thing->update(delta);
   for (auto& [_, thing] : networkGameThings) thing->update(delta);
@@ -119,8 +130,9 @@ void Scene::update(float delta) {
     }
     if (Window::phase == GamePhase::GameOver) {
       if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-        Window::phase = GamePhase::Start;
-        init();
+        Window::phase = GamePhase::Lobby;
+        reset();
+        glEnable(GL_DEPTH_TEST);
       }
     }
   }
@@ -134,20 +146,22 @@ message::UserStateUpdate Scene::pollUpdate() {
 
 void Scene::receiveState(message::GameStateUpdate newState) {
   // update existing items, create new item if it doesn't exist
-  for (auto& [id, state] : newState.things) {
-    // TODO: handle items besides Player as well
-    if (!networkGameThings.count(id)) createPlayer(id);
+  if (Window::phase != GamePhase::Lobby) {
+    for (auto& [id, state] : newState.things) {
+      // TODO: handle items besides Player as well
+      if (!networkGameThings.count(id)) createPlayer(id);
 
-    auto thing = networkGameThings.at(id);
-    thing->updateFromState(state);
+      auto thing = networkGameThings.at(id);
+      thing->updateFromState(state);
+    }
+
+    // remove items that don't exist on the server anymore
+    std::vector<int> removedIds;
+    for (auto& [id, _] : networkGameThings)
+      if (!newState.things.count(id)) removedIds.push_back(id);
+
+    for (int id : removedIds) removePlayer(id);
   }
-
-  // remove items that don't exist on the server anymore
-  std::vector<int> removedIds;
-  for (auto& [id, _] : networkGameThings)
-    if (!newState.things.count(id)) removedIds.push_back(id);
-
-  for (int id : removedIds) removePlayer(id);
 }
 
 void Scene::draw() {

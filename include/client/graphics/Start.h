@@ -37,6 +37,21 @@ class Start : public Scene, public InputListener {
 
   ~Start() { delete fr; }
 
+  void init() {
+    Scene::init();
+  }
+
+  void reset() {
+    timeElapsed = 0.0f;
+    offset = 0.0f;
+    renderText = true;
+    camera->SetDistance(600.0);
+    camera->SetIncline(32.0);
+    camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
+    timeOnFrame = 0;
+    index = 0;
+  }
+
   void draw();
 
   void drawName();

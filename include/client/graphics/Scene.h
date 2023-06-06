@@ -175,6 +175,7 @@ class Scene {
   void setToUserFocus(GameThing* t);
   virtual void init(void);
   void init(std::map<int, message::LobbyPlayer> players);
+  virtual void reset();
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net

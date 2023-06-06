@@ -31,6 +31,7 @@ class Lobby : public Scene, public InputListener {
   ~Lobby();
 
   void init(void) override;
+  void reset(void) override;
   void update(float delta) override;
   void receiveState(message::LobbyUpdate newState);
   void buildSceneTree();
