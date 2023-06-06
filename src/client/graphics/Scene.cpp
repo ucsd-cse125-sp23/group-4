@@ -212,6 +212,7 @@ Settings settings;  // define extern var
 void Scene::gui() {
   settings.gui();
 
+
   ImGui::Begin("scene debug +++");
 
   ImGui::Checkbox("free camera", &camera->Fixed);
