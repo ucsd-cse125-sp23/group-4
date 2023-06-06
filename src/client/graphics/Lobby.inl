@@ -5,7 +5,7 @@ void Lobby::init(void) {
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
                   // resource)
-  sceneResources->meshes["player"]->init("assets/models/model-skeleton.obj");
+  sceneResources->meshes["player"]->init("assets/model/dev/model-skeleton.obj");
 
   sceneResources->models["playerRef"] = new Model;
   sceneResources->models["playerRef"]->mesh = sceneResources->meshes["player"];

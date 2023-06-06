@@ -36,7 +36,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
     dv *= std::clamp(
-        sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
+        std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
             (pObj->onGround ? pObj->lastSurfaceFriction *
                                   pObj->modifyValue(1, GRAVITY_MODIFIER) * 25
                             : 0.3f),
