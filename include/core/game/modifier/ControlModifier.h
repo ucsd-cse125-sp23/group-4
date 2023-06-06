@@ -8,8 +8,8 @@ struct ControlModifierData : ModifierData {
   vec3f horizontalVel;
   bool doJump;
   float jumpVel;
-  ControlModifierData();
-  explicit ControlModifierData(float jumpVel);
+  explicit ControlModifierData(Level* level);
+  explicit ControlModifierData(Level* level, float jumpVel);
 };
 class ControlModifier : public Modifier {
   void modify(Modifiable* obj, ModifierData* data) override;
