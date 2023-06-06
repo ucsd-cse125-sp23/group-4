@@ -36,7 +36,12 @@ Game::Game() {
   }
   for (auto spawn : mapData.spawnPoints) {
     map_spawn_points.push_back(spawn.point);
+    environment->addPlayerSpawnpoint(spawn.point);
   }
+  for (auto spawn : mapData.itemPoints) {
+    environment->addItemSpawnpoint(spawn.point);
+  }
+  environment->setDeathHeight(mapData.fallBoundY);
   level = initializeLevel(environment);
 }
 
