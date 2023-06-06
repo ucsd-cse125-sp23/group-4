@@ -74,13 +74,11 @@ float AssimpChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
   if (t < timeStart) {
     switch (extrapIn) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t + timeEnd - timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[0].val;
       case A_ANIM_EXTRAP::LINEAR:
         return keyframes[0].val + keyframes[0].tangent * (timeStart - t);
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
         t = std::fmod(t - timeStart, timeLen) + timeStart;
         if (t < timeStart) {
@@ -90,15 +88,12 @@ float AssimpChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
   } else if (t > timeEnd) {
     switch (extrapOut) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t - timeEnd + timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[keyframes.size() - 1].val;
       case A_ANIM_EXTRAP::LINEAR:
         return keyframes[keyframes.size() - 1].val +
-               keyframes[keyframes.size() - 1].tangent *
-                   (t - keyframes[keyframes.size() - 1].time);
+               keyframes[keyframes.size() - 1].tangent * (t - timeEnd);
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
         t = std::fmod(t - timeStart, timeLen) + timeStart;
     }
@@ -167,12 +162,10 @@ glm::vec4 AssimpRotChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
   if (t < timeStart) {
     switch (extrapIn) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t + timeEnd - timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[0].val;
+      case A_ANIM_EXTRAP::LINEAR:  // not supported
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::LINEAR:   // not supported
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
         t = std::fmod(t - timeStart, timeLen) + timeStart;
         if (t < timeStart) {
@@ -182,12 +175,10 @@ glm::vec4 AssimpRotChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
   } else if (t > timeEnd) {
     switch (extrapOut) {
       case A_ANIM_EXTRAP::CONSTANT:
-        return eval(t - timeEnd + timeStart, extrapIn,
-                    extrapOut);  // TODO(eddie): remove this line
         return keyframes[keyframes.size() - 1].val;
       case A_ANIM_EXTRAP::LINEAR:  // not supported
       case A_ANIM_EXTRAP::CYCLE:
-      case A_ANIM_EXTRAP::DEFAULT:  // TODO(eddie): default extrap impl
+      case A_ANIM_EXTRAP::DEFAULT:
       default:
         t = std::fmod(t - timeStart, timeLen) + timeStart;
     }
