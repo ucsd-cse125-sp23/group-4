@@ -3,9 +3,10 @@
 #include <boost/variant.hpp>
 #include <ctime>
 #include <magic_enum.hpp>
+#include <network/effect.hpp>
 #include <network/message.hpp>
-
-#include "core/game/event/Event.h"
+#include <string>
+#include <vector>
 
 namespace message {
 
@@ -74,28 +75,48 @@ std::string Greeting::to_string() const { return "    greeting: " + greeting; }
 
 std::string Notify::to_string() const { return "    message: " + message; }
 
+std::string effects_to_string(const std::vector<Effect>& effects) {
+  if (effects.empty()) return "[]";
+
+  std::string inside;
+  for (auto& e : effects) inside += std::string(magic_enum::enum_name(e)) + ",";
+
+  return "[" + inside + "]";
+}
+
 std::string GameStateUpdateItem::to_string() const {
   // clang-format off
     std::string str = std::string("") +
-      "      {"                                       "\n"
-      "        id: " + std::to_string(id) + "," +     "\n"
-      "        position: {" +                         "\n"
-      "          " + std::to_string(posx) + "," +     "\n"
-      "          " + std::to_string(posy) + "," +     "\n"
-      "          " + std::to_string(posz) + "," +     "\n"
-      "        }," +                                  "\n"
-      "        heading: " + std::to_string(heading) + "\n"
-      "      },"                                      "\n";
+      "      {"                                               "\n"
+      "        id: " + std::to_string(id) + "," +             "\n"
+      "        position: {" +                                 "\n"
+      "          " + std::to_string(posx) + "," +             "\n"
+      "          " + std::to_string(posy) + "," +             "\n"
+      "          " + std::to_string(posz) + "," +             "\n"
+      "        }," +                                          "\n"
+      "        heading: " + std::to_string(heading) +         "\n"
+      "        score: " + std::to_string(score) +             "\n"
+      "        speed: " + std::to_string(speed) +             "\n"
+      "        is_grounded: " + std::to_string(is_grounded) + "\n"
+      "        is_tagged: " + std::to_string(is_tagged) +     "\n"
+      "        effects: " + effects_to_string(effects) +      "\n"
+      "      },"                                              "\n";
   // clang-format on
   return str;
 }
 
 std::string GameStateUpdate::to_string() const {
-  std::string str = "    game_things: [\n";
-  for (auto& [_, thing] : things) {
-    str += thing.to_string();
-  }
-  str += "    ]";
+  std::string game_things = "    game_things: [\n";
+  for (auto& [_, thing] : things) game_things += thing.to_string();
+
+  game_things += "    ]";
+
+  // clang-format off
+  std::string str = std::string("") +
+    "      game_things: " + game_things + "," +               "\n"
+    "      tagged_player: " + std::to_string(tagged_player) + "\n"
+    "      round_time: " + std::to_string(round_time) +       "\n";
+  // clang-format on
 
   return str;
 }
