@@ -109,6 +109,21 @@ void Scene::update(float delta) {
   if (gameStart) {
     time.Update(delta);
   }
+
+  if (time.time == 0) {
+    timeOver += delta;
+    if (timeOver >= 3) {
+      Window::phase = GamePhase::GameOver;
+      // TODO: build new scene graph based on player rankings
+      node["world"]->childnodes.clear();
+    }
+    if (Window::phase == GamePhase::GameOver) {
+      if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
+        Window::phase = GamePhase::Start;
+        init();
+      }
+    }
+  }
 }
 
 message::UserStateUpdate Scene::pollUpdate() {
@@ -136,6 +151,9 @@ void Scene::receiveState(message::GameStateUpdate newState) {
 }
 
 void Scene::draw() {
+  if (Window::phase == GamePhase::GameOver) {
+    leaderboard.draw();
+  }
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
   camera->UpdateView();

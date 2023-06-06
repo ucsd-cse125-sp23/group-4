@@ -33,7 +33,12 @@ const char* Window::windowTitle = "tagguys :O";
 GamePhase Window::phase;
 message::LobbyUpdate Window::lobby_state;
 
+Camera* Cam;
+
 // Game stuff to render
+Start* Window::start;
+Scene* Window::lob;
+Scene* Window::game;
 Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;
@@ -41,7 +46,6 @@ HUD* Window::hud;
 std::unique_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
 
-Camera* Cam;
 
 std::atomic<bool> loading_resources{false};
 
@@ -78,8 +82,10 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
-  gameScene = new Start(Cam);
-  gameScene->init();
+  start = new Start(Cam);
+  lob = new Lobby(Cam);
+  game = new Scene(Cam);
+  gameScene = start;
   loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
@@ -132,7 +138,8 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
-  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
+                                        NULL, NULL);
 
   // Check if the window could not be created.
   if (!window) {
@@ -195,16 +202,15 @@ void Window::update(GLFWwindow* window, float deltaTime) {
   if (dynamic_cast<Start*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
     resetCamera();
-    gameScene = new Lobby(Cam);
+    gameScene = lob;
     gameScene->init();
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     lobby->receiveState(lobby_state);
   } else if (dynamic_cast<Lobby*>(gameScene) &&
              phase == GamePhase::Game) {  // lobby -> game
     auto lobby = dynamic_cast<Lobby*>(gameScene);
-    gameScene = new Scene(Cam);
+    gameScene = game;
     glfwHideWindow(window);
-    loading_resources = true;
     std::thread x(&Load::load, loadScreen, window);
     gameScene->init(lobby->players);
     hud = new HUD(gameScene);
@@ -214,6 +220,9 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     glfwMakeContextCurrent(window);
     glfwShowWindow(window);
     glfwFocusWindow(window);
+  } else if (!dynamic_cast<Start*>(gameScene) && phase == GamePhase::Start) {
+    resetCamera();
+    gameScene = start;
   } else {
     gameScene->update(deltaTime);
   }

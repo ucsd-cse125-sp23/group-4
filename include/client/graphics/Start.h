@@ -35,6 +35,8 @@ class Start : public Scene, public InputListener {
     }
   }
 
+  ~Start() { delete fr; }
+
   void draw();
 
   void drawName();

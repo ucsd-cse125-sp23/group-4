@@ -28,6 +28,7 @@
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
+#include "client/graphics/Leaderboard.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
@@ -116,15 +117,18 @@ class Scene {
 
   Timer time;
   bool gameStart;
+  float timeOver;
+  Leaderboard leaderboard;
 
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
     localGameThings.push_back(camera);
-    time.time = 300.0f;
+    time.time = 5.0f;
     time.countdown = true;
     gameStart = false;
+    timeOver = 0;
 
     sceneResources = new SceneResourceMap();
 
@@ -185,7 +189,9 @@ class Scene {
   ~Scene() {
     // nodes
     for (std::pair<std::string, Node*> entry : node) {
-      delete entry.second;
+      if (entry.second) {
+        delete entry.second;
+      }
     }
 
     delete sceneResources;

@@ -1,15 +1,7 @@
 #include "Leaderboard.h"
 
-Leaderboard::Leaderboard(Camera* camFromWindow) : Scene(camFromWindow) {
+Leaderboard::Leaderboard() {
   background.init("assets/image/backgrounds/blue.png");
-}
-
-void Leaderboard::init() {}
-
-void Leaderboard::update(float delta) {
-  if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
-    // switch to lobby
-  }
 }
 
 void Leaderboard::draw() {
@@ -38,6 +30,7 @@ void Leaderboard::draw() {
 
   glEnd();
 
+  glDisable(GL_DEPTH_TEST);
   glViewport(0, height - (100 * scale), width, 90 * scale);
   glColor3f(213.0f / 256.0f, 236.0f / 256.0f, 241.0f / 256.0f);
   glBegin(GL_QUADS);
@@ -61,4 +54,5 @@ void Leaderboard::draw() {
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
 }

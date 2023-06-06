@@ -35,6 +35,7 @@ Lobby::~Lobby() {
     delete entry.second;
   }
   delete sceneResources;
+  delete fr;
 }
 
 void Lobby::update(float delta) {
