@@ -1,7 +1,9 @@
 #pragma once
 
 #include <cstdint>
+class Level;
 struct ModifierData {
+  Level* level;
   bool markedRemove;
   std::uint64_t expire = -1;
   /*
@@ -9,7 +11,7 @@ struct ModifierData {
    * duration modifiers will never expire)
    *
    */
-  explicit ModifierData(std::uint64_t duration = 0);
+  explicit ModifierData(Level* level, std::uint64_t duration = 0);
   void markExpired();
 };
 class Modifiable;

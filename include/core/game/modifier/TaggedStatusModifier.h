@@ -6,8 +6,10 @@
 struct TaggedStatusModifierData : ModifierData {
   int taggedTime;
   bool isIt;
-  explicit TaggedStatusModifierData(bool isIt) : taggedTime(0), isIt(isIt) {}
-  TaggedStatusModifierData() : TaggedStatusModifierData(false) {}
+  explicit TaggedStatusModifierData(Level* level, bool isIt)
+      : ModifierData(level), taggedTime(0), isIt(isIt) {}
+  TaggedStatusModifierData(Level* level)
+      : TaggedStatusModifierData(level, false) {}
 };
 class TaggedStatusModifier : public Modifier {
  public:

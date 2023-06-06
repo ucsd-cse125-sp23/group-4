@@ -14,7 +14,7 @@ class HUD {
   Scene* scene;
   Texture map;
   std::vector<Texture> frames;
-  std::map<std::string, Texture> icons;
+  std::map<std::string, Texture> player_bars;
   int index;
   float offset;
   float timeOnFrame;
@@ -22,7 +22,7 @@ class HUD {
 
   explicit HUD(Scene* scn) {
     scene = scn;
-    map.init("assets/image/tagguys/frame_24_delay-0.08s.png");
+    map.init("assets/UI/IMG_2468.PNG");
     offset = 10;
     index = 0;
     lastTime = glfwGetTime();
@@ -37,12 +37,13 @@ class HUD {
       frames.push_back(frame);
     }
 
-    icons["neutral"].init("assets/icons/neutral.png");
-    icons["angry"].init("assets/icons/angry.png");
-    icons["blushing"].init("assets/icons/blushing.png");
-    icons["crying"].init("assets/icons/crying.png");
-    icons["heart"].init("assets/icons/heart.png");
-    icons["side_eye"].init("assets/icons/side_eye.png");
+    player_bars["trash panda"].init("assets/UI/bar-racoon.png");
+    player_bars["bee"].init("assets/UI/bar-bee.png");
+    player_bars["avocado"].init("assets/UI/bar-avocado.png");
+    player_bars["duck"].init("assets/UI/bar-duck.png");
+    player_bars["cat"].init("assets/UI/bar-cat.png");
+    player_bars["unicorn"].init("assets/UI/bar-unicorn.png");
+    player_bars["waffle"].init("assets/UI/bar-waffle.png");
   }
 
   void draw(GLFWwindow* window);
@@ -50,7 +51,7 @@ class HUD {
   void drawLeaderboard(GLFWwindow* window, float scale,
                        std::map<std::string, Player*> players);
 
-  void drawIcon(std::string icon);
+  void drawBar(std::string skin);
 
   void drawMinimap();
 

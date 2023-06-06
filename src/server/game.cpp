@@ -46,7 +46,7 @@ Game::Game() {
 }
 
 int Game::add_player() {
-  auto [player, control] = initializePlayer();
+  auto [player, control] = initializePlayer(level);
   game_things_.insert({player->pid, GameThing(player->pid, player, control)});
   if (map_spawn_points.size() > 0) player->setPos(map_spawn_points[0]);
   return player->pid;

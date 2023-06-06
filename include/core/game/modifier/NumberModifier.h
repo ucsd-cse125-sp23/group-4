@@ -10,8 +10,9 @@ enum Operation { ADD, ADDMULTIPLY, MULTIPLY };
 struct NumberModifierData : public ModifierData {
   Operation op;
   float val;
-  NumberModifierData(Operation op, float val, std::uint64_t duration = 0)
-      : ModifierData(duration), op(op), val(val) {}
+  NumberModifierData(Level* level, Operation op, float val,
+                     std::uint64_t duration = 0)
+      : ModifierData(level, duration), op(op), val(val) {}
 };
 class NumberModifier : public Modifier {
  public:

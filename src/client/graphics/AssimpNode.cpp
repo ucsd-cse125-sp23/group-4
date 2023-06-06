@@ -6,6 +6,17 @@
 
 AssimpNode::AssimpNode(unsigned int id) : id(id) {}
 
+AssimpNode::~AssimpNode() {
+  for (size_t i = 0; i < meshes.size(); i++) {
+    delete meshes[i];
+  }
+
+  name = "destructed";
+  children.clear();
+  joints.clear();
+  meshes.clear();
+}
+
 void AssimpNode::update(const glm::mat4& accWorldMtx) {
   matWorldTransform = accWorldMtx * this->animationTransform;
 

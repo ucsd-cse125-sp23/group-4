@@ -3,7 +3,10 @@
 #include <string>
 #include <vector>
 
+#include "Window.h"
 #include "client/graphics/Texture.h"
+
+extern std::atomic<bool> loading_resources;
 
 class Load {
  public:
@@ -109,7 +112,7 @@ class Load {
     loadFrames();
 
     glfwShowWindow(window);
-    while (timeElapsed <= 15) {
+    while (timeElapsed <= 15 || loading_resources) {
       update();
       draw();
 

@@ -10,9 +10,9 @@ Player::Player()
   this->pid = Player::maxId++;
   this->addModifierInstance(new ModifierInstance(
       GRAVITY_MODIFIER,
-      new NumberModifierData(Operation::MULTIPLY, GRAVITY_STRENGTH)));
+      new NumberModifierData(nullptr, Operation::MULTIPLY, GRAVITY_STRENGTH)));
   this->addModifierInstance(new ModifierInstance(
-      TAGGED_STATUS_MODIFIER, new TaggedStatusModifierData()));
+      TAGGED_STATUS_MODIFIER, new TaggedStatusModifierData(nullptr)));
 }
 
 Player::~Player() {}

@@ -26,23 +26,26 @@ void HUD::draw(GLFWwindow* window) {
                                   glm::vec2(width, height) +
                               glm::vec2(0.0f, 0.0f);
 
-      // Scale the size of the text based on camera distance
-      Camera* cam = scene->camera;
-      float deltaD = 10 - cam->GetDistance();
-      float size;
-      if (deltaD < 0) {
-        size = (0.5 * scale) / (0.5 * abs(deltaD));
-        if (size < 0.1 * scale)
-          size = 0.1 * scale;
-        else if (size > 0.5 * scale)
+      float view = 1;
+      if (normalizedSpace[2] >= -view && normalizedSpace[2] <= view) {
+        // Scale the size of the text based on camera distance
+        Camera* cam = scene->camera;
+        float deltaD = 10 - cam->GetDistance();
+        float size;
+        if (deltaD < 0) {
+          size = (0.5 * scale) / (0.5 * abs(deltaD));
+          if (size < 0.1 * scale)
+            size = 0.1 * scale;
+          else if (size > 0.5 * scale)
+            size = 0.5 * scale;
+        } else {
           size = 0.5 * scale;
-      } else {
-        size = 0.5 * scale;
+        }
+        glDisable(GL_DEPTH_TEST);
+        fr->RenderText(width, height, name, windowSpace[0], windowSpace[1],
+                       size, glm::vec3(0.0f, 0.0f, 1.0f));
+        glEnable(GL_DEPTH_TEST);
       }
-      glDisable(GL_DEPTH_TEST);
-      fr->RenderText(width, height, name, windowSpace[0], windowSpace[1], size,
-                     glm::vec3(0.0f, 0.0f, 1.0f));
-      glEnable(GL_DEPTH_TEST);
     }
   }
 
@@ -73,21 +76,28 @@ void HUD::draw(GLFWwindow* window) {
                  glm::vec3(1.0f, 0.0f, 0.0f));
 
   // minimap stuff
-  int map_size = (width / 5 > 250) ? 250 : width / 4;
-  glViewport(10, height - map_size + 10, map_size, map_size);
+  int map_height = (width / 5 > 250) ? 250 : width / 4;
+  int map_width = (map_height * 1920) / 1080;
+  glViewport(-(map_width / 4) + 10, height - map_height - 10,
+             (map_height * 1920) / 1080, map_height);
 
   drawMinimap();
 
-  for (auto& [_, e] : scene->networkGameThings) {
+  int world_height = 130;
+  int world_width = (world_height * 1920) / 1080;
+  for (auto& [i, e] : scene->networkGameThings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
-      glColor3f(0.0f, 0.0f, 1.0f);
+      if (i == scene->_myPlayerId) {
+        glColor3f(1.0f, 0.0f, 0.0f);
+      } else {
+        glColor3f(0.0f, 0.0f, 1.0f);
+      }
       glPointSize(10);
       glBegin(GL_POINTS);
-      glVertex3f(
-          position[0] / map_size, -position[2] / map_size,
-          0.0f);  // TODO: get minimap coordinates based off player position
+      glVertex2f(-(position[2] - 23) / world_width,
+                 -((position[0] - 33)) / world_height);
       glEnd();
     }
   }
@@ -108,73 +118,47 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
-  int size = (width / 10 > 250) ? 250 : width / 10;
-  int x = 10;
-  int y = 50;
+  int bar_width = (width / 4 > 800) ? 800 : width / 4;
+  int bar_height = (height / 5 > 200) ? 200 : height / 5;
+  int x = 0;
+  int y = 0;
 
   Player* player;
   std::string str;
-  for (auto p : players) {
-    str = p.first;
-    player = p.second;
-    Timer time = player->time;
-    str += " " + time.ToString();
+  for (auto it = scene->skins.rbegin(); it != scene->skins.rend(); it++) {
+    glViewport(x, y, bar_width, bar_height);
 
-    glViewport(x, y, size, size);
-
-    // Camera viewport;
-
-    glBegin(GL_TRIANGLES);
-    glColor4f(0.0, 0.0, 0.0, 0.5);
-    glVertex2f(-1, -1);
-    glVertex2f(1, -1);
-    glVertex2f(0, 1);
-    glEnd();
-
-    glViewport(x - (2 * scale), y - (10 * scale), size, size);
-    drawIcon("neutral");
+    drawBar(it->second);
 
     glViewport(0, 0, width, height);
 
-    // Draw highlight
-    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+    y += (bar_height / 1.5);
+  }
 
-    // screen coordinates
-    float x_left = x;
-    float x_right = x + size;
-    float y_top = y - 27 + (60 * 0.2 * scale);
-    float y_bot = y - 27;
-
-    // convert to normalized device coordinate
-    float x_leftNDC = (x_left / width * 2) - 1;
-    float x_rightNDC = (x_right / width * 2) - 1;
-    float y_topNDC = (y_top / height * 2) - 1;
-    float y_botNDC = (y_bot / height * 2) - 1;
-
-    // render the text background
-    glBegin(GL_QUADS);
-
-    glVertex2f(x_rightNDC, y_topNDC);
-    glVertex2f(x_leftNDC, y_topNDC);
-    glVertex2f(x_leftNDC, y_botNDC);
-    glVertex2f(x_rightNDC, y_botNDC);
-
-    glEnd();
+  x = bar_width / 2.5;
+  y = bar_height / 2;
+  for (auto it = players.rbegin(); it != players.rend(); it++) {
+    str = it->first;
+    player = it->second;
+    Timer time = player->time;
+    str += " " + time.ToString();
 
     glDisable(GL_DEPTH_TEST);
-    fr->RenderText(width, height, str, x + (4 * scale), y - 20, 0.2 * scale,
-                   glm::vec3(1.0, 1.0, 1.0));
+    fr->RenderText(width, height, str, x, y, 0.3 * scale,
+                   glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
     glEnable(GL_DEPTH_TEST);
 
-    x += (size + (25 * scale));
+    y += (bar_height / 1.5);
+
+    glViewport(0, 0, width, height);
   }
 }
 
-void HUD::drawIcon(std::string icon) {
+void HUD::drawBar(std::string skin) {
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  icons[icon].bindgl();
+  player_bars[skin].bindgl();
   glEnable(GL_TEXTURE_2D);
 
   glColor3f(1.0f, 1.0f, 1.0f);
