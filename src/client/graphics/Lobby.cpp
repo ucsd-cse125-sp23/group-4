@@ -9,6 +9,8 @@ Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
   is_ready = false;
   index = 0;
 
+  receiveState(Window::lobby_state);
+
   background.init("assets/image/character_select.png");
   flag.init("assets/image/flag.png");
 
@@ -39,6 +41,8 @@ Lobby::~Lobby() {
 void Lobby::reset() {
   is_ready = false;
   index = 0;
+
+  buildSceneTree();
 }
 
 void Lobby::update(float delta) {

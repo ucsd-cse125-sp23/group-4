@@ -139,10 +139,10 @@ GLFWwindow* Window::createWindow(int width, int height) {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-  // glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+  glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
   GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
-                                       glfwGetPrimaryMonitor(), NULL);
+                                       NULL/*glfwGetPrimaryMonitor()*/, NULL);
 
   // Check if the window could not be created.
   if (!window) {
@@ -209,17 +209,17 @@ void Window::update(GLFWwindow* window, float deltaTime) {
   if (!dynamic_cast<Lobby*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
     resetCamera();
+    lob->reset();
     gameScene = lob;
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     lobby->receiveState(lobby_state);
   } else if (dynamic_cast<Lobby*>(gameScene) &&
              phase == GamePhase::Game) {  // lobby -> game
     auto lobby = dynamic_cast<Lobby*>(gameScene);
-    lob->reset();
     gameScene = game;
     std::thread x(&Load::load, loadScreen, window);
     loading_resources = true;
-    // glfwHideWindow(window);
+    glfwHideWindow(window);
     gameScene->init(lobby->players);
     hud->reset();
     loading_resources = false;

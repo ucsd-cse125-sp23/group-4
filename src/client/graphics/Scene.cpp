@@ -124,6 +124,7 @@ void Scene::update(float delta) {
   }
 
   if (time.time == 0) {
+    gameStart = false;
     timeOver += delta;
     if (timeOver >= 3) {
       Window::phase = GamePhase::GameOver;

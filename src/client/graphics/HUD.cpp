@@ -221,7 +221,7 @@ void HUD::update() {
 }
 
 void HUD::drawCountdown() {
-  if (!scene->gameStart) {
+  if (!scene->gameStart && index < frames.size()) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
