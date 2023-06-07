@@ -47,7 +47,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
         0.0f, 1.0f);
     pObj->vel.x += dv.x;
     pObj->vel.z += dv.z;
-    if (pObj->onGround && cData->doJump) {
+    if (pObj->onGround && cData->doJump && !pObj->freeze) {
       vec3f dj = pObj->lastSurfaceNormal;
       if (dj.y < 0) {
         dj.x = 0;
