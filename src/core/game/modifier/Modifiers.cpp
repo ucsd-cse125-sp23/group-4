@@ -37,7 +37,30 @@ ControlModifierData::ControlModifierData(Level* level, float jumpVel)
 void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     ControlModifierData* cData = static_cast<ControlModifierData*>(data);
-    vec3f dv = (cData->horizontalVel * MOVE_VELOCITY - pObj->vel) * 0.6f;
+    vec3f targetHeading = cData->horizontalVel;
+    targetHeading.y = 0;
+    vec3f norm = pObj->lastSurfaceNormal;
+    if (norm != vec3f(0, 0, 0) && norm != vec3f(0, 1, 0)) {
+      vec3f uphillDir = normalize(tangent(vec3f(0, 1, 0), norm));
+      vec3f uphillHeading = normalize(tangent(uphillDir, vec3f(0, 1, 0)));
+      float fractionUphill = dot(normalize(targetHeading), uphillHeading);
+      float cosineSquared = norm.y * norm.y;
+      targetHeading -= uphillHeading * fractionUphill * (1 - cosineSquared);
+    }
+    vec3f targetVel = targetHeading * MOVE_VELOCITY;
+    vec3f dv = (targetVel - pObj->vel) * 0.6f;
+
+
+    /*
+    if (abs(cData->horizontalVel.x * MOVE_VELOCITY) - abs(pObj->vel.x) < 0)
+      dv.x = 0;
+    if (abs(cData->horizontalVel.y * MOVE_VELOCITY) - abs(pObj->vel.y) < 0)
+      dv.y = 0;
+    if (abs(cData->horizontalVel.z * MOVE_VELOCITY) - abs(pObj->vel.z) < 0)
+      dv.z = 0;
+    */
+
+
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
     float fFactor = std::clamp(
@@ -50,7 +73,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
     pObj->vel.x += dv.x;
     pObj->vel.z += dv.z;
     if (pObj->onGround && cData->doJump && !pObj->freeze) {
-      vec3f dj = pObj->lastSurfaceNormal;
+      vec3f dj = norm;
       if (dj.y < 0) {
         dj.x = 0;
         dj.z = 0;
