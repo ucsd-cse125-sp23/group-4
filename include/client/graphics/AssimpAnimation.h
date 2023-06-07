@@ -138,6 +138,7 @@ class AssimpAnimation {
     PLACE4_1,
     PLACE4_2
   };
+  static const std::string EMOTE_CYC_SUFFIX;
   static const std::map<PLAYER_AC, std::string> AC_TO_NAME;
   static const std::map<std::string, PLAYER_AC> NAME_TO_AC;
 
@@ -157,6 +158,7 @@ class AssimpAnimation {
   static const std::vector<std::string> NODES_TAG;
 
   void blendAnimation(const PLAYER_AC& ac);
+  void setEmote(const PLAYER_AC& ac);
 
   bool isPlayer = false;
   std::map<std::string, AssimpAnimationClip> animMap;
@@ -182,4 +184,7 @@ class AssimpAnimation {
   bool isTag = false, isTagReversed = false;
   float timeTag = 0.0f;
   std::vector<size_t> ind_tag;
+  
+  // Cycle emote props (winning animation)
+  bool isEmote = false, isEmoteCyc = false;
 };

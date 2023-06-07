@@ -345,6 +345,7 @@ const std::map<std::string, AssimpAnimation::PLAYER_AC>
         {"Armature|place3.1", AssimpAnimation::PLAYER_AC::PLACE3_2},
         {"Armature|place4.0", AssimpAnimation::PLAYER_AC::PLACE4_1},
         {"Armature|place4.1", AssimpAnimation::PLAYER_AC::PLACE4_2}};
+const std::string AssimpAnimation::EMOTE_CYC_SUFFIX = ".cycle";
 const float AssimpAnimation::MS_DISSOLVE = 0.5f;
 const float AssimpAnimation::MS_JUMP = 0.25f;
 const std::vector<std::string> AssimpAnimation::NODES_TAG(
@@ -425,7 +426,20 @@ void AssimpAnimation::update(float deltaTimeInMs) {
     return;
   }
 
-  // hmmm, it's a player!
+  /** hmmm, it's a player! */
+  // emote
+  if (isEmote) {
+    if (!isEmoteCyc && currTimeInMs * animMap[currAnimName].tps >=
+                           animMap[currAnimName].duration) {
+      currAnimName = currAnimName + EMOTE_CYC_SUFFIX;
+      currTimeInMs = 0.0f;
+      isEmoteCyc = true;
+    }
+
+    animMap[currAnimName].update(currTimeInMs, nodeMap);
+    return;
+  }
+
   bool doneDissolve = false;
   poseMap.clear();
   if (isJump) {
@@ -527,6 +541,10 @@ void AssimpAnimation::useAnimation(std::string animName) {
   }
 
   PLAYER_AC ac = NAME_TO_AC.at(animName);
+  if (ac >= PLAYER_AC::PLACE1_1 && ac <= PLAYER_AC::PLACE4_2) {
+    setEmote(ac);
+    return;
+  }
   blendAnimation(ac);
 }
 
@@ -534,6 +552,14 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   if (!isPlayer) {
     printf("Assimp: [WARNING] ignored blending on non-player model\n");
     return;
+  }
+
+  // TODO(Eddie): test this!
+  if (isEmote) {
+    currTimeInMs = 0.0f;
+    baseAnim = PLAYER_AC::IDLE;
+    currAnimName = AC_TO_NAME.at(PLAYER_AC::IDLE);
+    isEmote = false;
   }
 
   if (ac == PLAYER_AC::JUMP) {
@@ -582,4 +608,12 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
     isTagReversed = false;
     timeTag = 0.0f;
   }
+}
+
+void AssimpAnimation::setEmote(const PLAYER_AC& ac) {
+  currTimeInMs = 0.0f;
+  baseAnim = ac;
+  currAnimName = AC_TO_NAME.at(baseAnim);
+  isEmote = true;
+  isEmoteCyc = false;
 }
