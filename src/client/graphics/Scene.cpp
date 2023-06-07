@@ -114,18 +114,12 @@ void Scene::reset() {
   timeOver = 0;
 
   networkGameThings.clear();
-  /*for (auto& [id, g] : networkGameThings) {
-    if (dynamic_cast<Player*>(g) != nullptr) {
-      Player* player = dynamic_cast<Player*>(g);
-      player->time.time = 0;
-    }
-  }*/
 }
 
 void Scene::update(float delta) {
-  for (auto& thing : localGameThings) thing->update(delta);
-  for (auto& [_, thing] : networkGameThings) thing->update(delta);
   if (gameStart) {
+    for (auto& thing : localGameThings) thing->update(delta);
+    for (auto& [_, thing] : networkGameThings) thing->update(delta);
     time.Update(delta);
   }
 

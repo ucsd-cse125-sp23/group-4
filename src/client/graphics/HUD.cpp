@@ -277,4 +277,7 @@ void HUD::reset() {
   lastTime = glfwGetTime();
   index = 0;
   timeOnFrame = 0;
+
+  for (auto& thing : scene->localGameThings) thing->update(3);
+  for (auto& [_, thing] : scene->networkGameThings) thing->update(3);
 }

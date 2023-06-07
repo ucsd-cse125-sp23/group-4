@@ -107,11 +107,11 @@ class Load {
 
     GLFWwindow* window = glfwCreateWindow(width, height, "loading...",
                                           glfwGetPrimaryMonitor(), NULL);
+
     glfwMakeContextCurrent(window);
 
     loadFrames();
 
-    glfwSwapBuffers(window);
     glfwShowWindow(window);
     while (timeElapsed <= 15 || loading_resources) {
       update();

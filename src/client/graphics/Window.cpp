@@ -226,7 +226,7 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     x.join();
 
     glfwMakeContextCurrent(window);
-    glfwSwapBuffers(window);
+    //glfwSwapBuffers(window);
     glfwShowWindow(window);
     glfwFocusWindow(window);
   } else {
