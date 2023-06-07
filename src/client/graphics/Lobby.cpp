@@ -39,10 +39,6 @@ Lobby::~Lobby() {
 void Lobby::reset() {
   is_ready = false;
   index = 0;
-
-  models.clear();
-  player_models.clear();
-  receiveState(Window::lobby_state);
 }
 
 void Lobby::update(float delta) {

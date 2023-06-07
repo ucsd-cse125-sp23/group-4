@@ -105,12 +105,13 @@ class Load {
     int width, height;
     glfwGetWindowSize(win, &width, &height);
 
-    GLFWwindow* window =
-        glfwCreateWindow(width, height, "loading...", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, "loading...",
+                                          glfwGetPrimaryMonitor(), NULL);
     glfwMakeContextCurrent(window);
 
     loadFrames();
 
+    glfwSwapBuffers(window);
     glfwShowWindow(window);
     while (timeElapsed <= 15 || loading_resources) {
       update();
@@ -118,5 +119,11 @@ class Load {
 
       glfwSwapBuffers(window);
     }
+
+    index = 0;
+    timeOnFrame = 0;
+    forward = true;
+    lastTime = glfwGetTime();
+    timeElapsed = 0;
   }
 };

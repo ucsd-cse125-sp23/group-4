@@ -112,6 +112,14 @@ void Scene::reset() {
   time.countdown = true;
   gameStart = false;
   timeOver = 0;
+
+  networkGameThings.clear();
+  /*for (auto& [id, g] : networkGameThings) {
+    if (dynamic_cast<Player*>(g) != nullptr) {
+      Player* player = dynamic_cast<Player*>(g);
+      player->time.time = 0;
+    }
+  }*/
 }
 
 void Scene::update(float delta) {

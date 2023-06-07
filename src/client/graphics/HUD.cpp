@@ -270,3 +270,11 @@ void HUD::gameOver() {
     glDisable(GL_BLEND);
   }
 }
+
+void HUD::reset() {
+  offset = 10;
+  index = 0;
+  lastTime = glfwGetTime();
+  index = 0;
+  timeOnFrame = 0;
+}

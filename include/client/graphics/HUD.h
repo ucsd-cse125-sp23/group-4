@@ -60,4 +60,6 @@ class HUD {
   void drawCountdown();
 
   void gameOver();
+
+  void reset();
 };
