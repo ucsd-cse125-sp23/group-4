@@ -84,7 +84,7 @@ struct GameStateUpdateItem {
   float heading;
   int score;
   float speed;
-  bool is_grounded;
+  int is_grounded;
   bool is_tagged;
   std::vector<Effect> effects;
 
