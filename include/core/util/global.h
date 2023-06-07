@@ -10,6 +10,7 @@
 #include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
+#include "core/game/modifier/EffectStorageModifier.h"
 #include "core/math/shape/CapsuleShape.h"
 #include "core/math/shape/OffsetShape.h"
 #include "core/math/shape/SphereShape.h"
@@ -41,13 +42,14 @@ extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern AttractModifier* ATTRACT_MODIFIER;
 extern FreezeModifier* FREEZE_MODIFIER;
 
+extern EffectStorageModifier* EFFECT_STORAGE_MODIFIER;
+
 extern NumberModifier* FRICTION_MODIFIER;
 
 extern GlobalEffect* SPEEDBOOST_EFFECT;
 extern GlobalEffect* SLOWDOWN_EFFECT;
 extern GlobalEffect* FREEZE_EFFECT;
 extern GlobalEffect* REVERSE_EFFECT;
-extern GlobalEffect* LAUNCH_EFFECT;
 extern GlobalEffect* SLOW_FALL_EFFECT;
 extern GlobalEffect* FAST_FALL_EFFECT;
 extern GlobalEffect* SLIPPERY_EFFECT;
@@ -70,8 +72,6 @@ extern GlobalEffect* SLOWDOWN_NOT_SELF_TAG_STATUS_EFFECT;
 extern GlobalEffect* REVERSE_NOT_SELF_TAG_STATUS_EFFECT;
 
 /*Neutral*/
-extern GlobalEffect* LAUNCH_OTHER_EFFECT;
-extern GlobalEffect* LAUNCH_NOT_SELF_TAG_STATUS_EFFECT;
 extern GlobalEffect* SLOW_FALL_OTHER_EFFECT;
 extern GlobalEffect* FAST_FALL_OTHER_EFFECT;
 extern GlobalEffect* SWAP_POSITIONS_OTHER_EFFECT;

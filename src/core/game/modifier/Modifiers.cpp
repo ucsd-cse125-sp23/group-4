@@ -6,6 +6,7 @@
 #include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
+#include "core/game/modifier/EffectStorageModifier.h"
 #include "core/util/global.h"
 
 ModifierData::ModifierData(Level* level, std::uint64_t duration)
@@ -121,4 +122,34 @@ float NumberModifier::evaluate(
     }
   }
   return base * mul + add;
+}
+
+
+
+EffectStorageModifier::EffectStorageModifier() {}
+void EffectStorageModifier::modify(Modifiable* obj, ModifierData* data) {
+  auto* cData = static_cast<EffectStorageModifierData*>(data);
+  for (int i = 0; i < cData->effects.size(); i++) {
+    if (data->level->getAge() > cData->expire) {
+      cData->effects[i--] = cData->effects.back();
+      cData->effects.pop_back();
+    }
+  }
+}
+
+void EffectStorageModifier::addEffect(PObject* obj, Effect effect,
+                                    size_t duration) {
+  for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
+    static_cast<EffectStorageModifierData*>(m->get())->effects.push_back(
+        {effect, obj->level->getAge() + duration});
+  }
+}
+std::vector<Effect> queryEffects(PObject* obj) {
+  std::vector<Effect> ret;
+  for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
+    for (auto e : static_cast<EffectStorageModifierData*>(m->get())->effects)
+      ret.push_back(e.effect);
+    break;
+  }
+  return ret;
 }
