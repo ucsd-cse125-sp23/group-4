@@ -79,13 +79,13 @@ void PObject::tick() {
   this->vel.y -= std::max(0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
 
+  lastSurfaceNormal = vec3f(0, 0, 0);
   if (onGround) {
       if(this->vel.y > -0.1)
         ticksFallen = 0;
   }
   else {
     ticksFallen++;
-    lastSurfaceNormal = vec3f(0, 0, 0);
     lastSurfaceFriction = 0;
   }
 
@@ -146,10 +146,11 @@ void PObject::move(vec3f dPos) {
   }
 
   if (totalY < -0.01 &&
-      lastSurfaceNormal.y <=
+      lastSurfaceNormal.y <= 0.01 +
           0.1 * (std::abs(lastSurfaceNormal.x) + std::abs(lastSurfaceNormal.z)))
     if (onGround > 0)
       onGround--;
+  std::cout << "aaaaaaaaaaaaaaa:" << onGround << std::endl;
 
   Environment* environment = this->level->getEnvironment();
   std::pair<PObject*, vec4f> pair = environment->mtv(this);

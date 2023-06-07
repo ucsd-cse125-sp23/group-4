@@ -5,7 +5,7 @@
 
 #include "core/game/effect/AttractEffects.h"
 
-int COYOTE_TIME = 2;
+int COYOTE_TIME = 3;
 int TAG_COOLDOWN = 20;
 float MOVE_VELOCITY = 1.2f;
 float JUMP_VELOCITY = 1.7f;
