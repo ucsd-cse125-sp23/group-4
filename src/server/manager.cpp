@@ -52,5 +52,3 @@ void Manager::tick_game() { game_.tick(); }
 message::GameStateUpdate Manager::get_game_update() {
   return {game_.to_network()};
 }
-
-void Manager::restart_game() { game_.restart_game(); }

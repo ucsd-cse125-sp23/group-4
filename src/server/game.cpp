@@ -137,4 +137,4 @@ std::unordered_map<int, message::GameStateUpdateItem> Game::to_network() {
   return things;
 }
 
-void Game::restart_game() { level->restartGame(); }
+void Game::restart_game() { level_->restartGame(); }

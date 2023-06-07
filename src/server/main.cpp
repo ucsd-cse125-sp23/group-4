@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
           // if all clients are ready, start the game
           if (manager.check_ready()) {
             server.write_all<message::GameStart>();
-            manager.restart_game();
+            manager.game_.restart_game();
             server.start_tick();
           }
         };
