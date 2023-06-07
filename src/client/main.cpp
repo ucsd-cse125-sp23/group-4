@@ -103,11 +103,22 @@ void network_init() {
       Window::phase = GamePhase::Game;
     };
 
+    // TODO(eddie): add effects for different event messages
+    auto jump_event_handler = [](const message::JumpEvent& body) {};
+
+    auto land_event_handler = [](const message::LandEvent& body) {};
+
+    auto item_pickup_event_handler = [](const message::ItemPickupEvent& body) {
+    };
+
+    auto tag_event_handler = [](const message::TagEvent& body) {};
+
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, game_state_update_handler, lobby_update_handler,
-        game_start_handler, any_handler);
+        game_start_handler, jump_event_handler, land_event_handler,
+        item_pickup_event_handler, tag_event_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
