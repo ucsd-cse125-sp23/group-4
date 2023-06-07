@@ -7,7 +7,7 @@
 
 int COYOTE_TIME = 3;
 int TAG_COOLDOWN = 20;
-float MOVE_VELOCITY = 1.2f;
+float MOVE_VELOCITY = 1.8f;
 float JUMP_VELOCITY = 1.7f;
 float GRAVITY_STRENGTH = 0.2f;
 

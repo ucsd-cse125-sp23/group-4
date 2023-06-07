@@ -130,7 +130,7 @@ void PObject::move(vec3f dPos) {
       float baseMu = hit.first->getBounds()->friction;
       float modifiedMu = this->modifyValue(baseMu, FRICTION_MODIFIER);
       this->vel = this->vel * std::max(0.0f, 1.0f - w * modifiedMu);
-      rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
+      //rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
 
       this->lastSurfaceNormal = norm;
       this->lastSurfaceFriction = baseMu;
@@ -150,7 +150,6 @@ void PObject::move(vec3f dPos) {
           0.1 * (std::abs(lastSurfaceNormal.x) + std::abs(lastSurfaceNormal.z)))
     if (onGround > 0)
       onGround--;
-  std::cout << "aaaaaaaaaaaaaaa:" << onGround << std::endl;
 
   Environment* environment = this->level->getEnvironment();
   std::pair<PObject*, vec4f> pair = environment->mtv(this);

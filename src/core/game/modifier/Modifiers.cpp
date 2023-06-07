@@ -44,30 +44,20 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       vec3f uphillDir = normalize(tangent(vec3f(0, 1, 0), norm));
       vec3f uphillHeading = normalize(tangent(uphillDir, vec3f(0, 1, 0)));
       float fractionUphill = dot(normalize(targetHeading), uphillHeading);
-      float cosineSquared = norm.y * norm.y;
-      targetHeading -= uphillHeading * std::max(0.0f, fractionUphill) * (1 - cosineSquared);
+      float cosine = std::abs(norm.y);
+      targetHeading -=
+          uphillHeading * std::max(0.0f, fractionUphill) * (1 - cosine);
     }
     vec3f targetVel = targetHeading * MOVE_VELOCITY;
     vec3f dv = (targetVel - pObj->vel) * 0.6f;
-
-
-    /*
-    if (abs(cData->horizontalVel.x * MOVE_VELOCITY) - abs(pObj->vel.x) < 0)
-      dv.x = 0;
-    if (abs(cData->horizontalVel.y * MOVE_VELOCITY) - abs(pObj->vel.y) < 0)
-      dv.y = 0;
-    if (abs(cData->horizontalVel.z * MOVE_VELOCITY) - abs(pObj->vel.z) < 0)
-      dv.z = 0;
-    */
-
 
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
     float fFactor = std::clamp(
         std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
-            (pObj->onGround ? pObj->lastSurfaceFriction *
-                                  pObj->modifyValue(1, GRAVITY_MODIFIER) * 25
-                            : 0.3f),
+            (pObj->lastSurfaceNormal != vec3f(0,0,0) ? pObj->lastSurfaceFriction *
+                                  pObj->modifyValue(1, GRAVITY_MODIFIER) * 2
+                            : 0.1f),
         0.0f, 1.0f);
     dv *= fFactor;
     pObj->vel.x += dv.x;
