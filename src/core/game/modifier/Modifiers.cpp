@@ -45,7 +45,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       vec3f uphillHeading = normalize(tangent(uphillDir, vec3f(0, 1, 0)));
       float fractionUphill = dot(normalize(targetHeading), uphillHeading);
       float cosineSquared = norm.y * norm.y;
-      targetHeading -= uphillHeading * fractionUphill * (1 - cosineSquared);
+      targetHeading -= uphillHeading * std::max(0.0f, fractionUphill) * (1 - cosineSquared);
     }
     vec3f targetVel = targetHeading * MOVE_VELOCITY;
     vec3f dv = (targetVel - pObj->vel) * 0.6f;
