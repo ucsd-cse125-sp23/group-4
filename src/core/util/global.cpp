@@ -33,7 +33,7 @@ SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
 AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
 FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
 
-EffectStorageModifier* EFFECT_STORGAGE_MODIFIER = new EffectStorageModifier();
+EffectStorageModifier* EFFECT_STORAGE_MODIFIER = new EffectStorageModifier();
 
 NumberModifier* FRICTION_MODIFIER = new NumberModifier();
 
