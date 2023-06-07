@@ -55,7 +55,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       dv *= 0.6f;
     float fFactor = std::clamp(
         std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
-            (pObj->lastSurfaceNormal != vec3f(0,0,0) ? pObj->lastSurfaceFriction *
+            (pObj->onGround >= COYOTE_TIME ? pObj->lastSurfaceFriction *
                                   pObj->modifyValue(1, GRAVITY_MODIFIER) * 2
                             : 0.1f),
         0.0f, 1.0f);
@@ -76,9 +76,9 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       dj.y = 1.0f / (1.0f + std::exp(-15.0f * (c - 0.36f)));
       dj = normalize(dj);
       dj *= cData->jumpVel * sqrt(fFactor);
-      pObj->vel.x += dj.x;
+      pObj->vel.x += dj.x / 10;
       pObj->vel.y = dj.y;
-      pObj->vel.z += dj.z;
+      pObj->vel.z += dj.z / 10;
       pObj->onGround = 0;
       pObj->level->eventManager->fireJumpEvent(pObj);
     }
