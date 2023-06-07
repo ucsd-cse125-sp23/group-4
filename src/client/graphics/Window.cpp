@@ -34,6 +34,7 @@ GamePhase Window::phase;
 message::LobbyUpdate Window::lobby_state;
 
 Camera* Cam;
+Camera* lobbyCam;
 
 // Game stuff to render
 Start* Window::start;
@@ -84,7 +85,7 @@ bool Window::initializeObjects() {
   phase = GamePhase::Start;
   start = new Start(Cam);
   start->init();
-  lob = new Lobby(Cam);
+  lob = new Lobby(lobbyCam);
   lob->init();
   game = new Scene(Cam);
   gameScene = start;
@@ -171,6 +172,9 @@ GLFWwindow* Window::createWindow(int width, int height) {
   Cam = new Camera();
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
+  lobbyCam = new Camera();
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+
   // initialize the interaction variables
   LeftDown = RightDown = false;
   MouseX = MouseY = 0;
@@ -192,6 +196,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
   // ImGui::WindowSize(w, h)?
 }
@@ -202,9 +207,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::update(GLFWwindow* window, float deltaTime) {
   if (!dynamic_cast<Lobby*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
-    Cam->SetPositionTarget(glm::vec3(0.0f, 0.0f, 0.0f));
-    Cam->Reset();
-    Cam->UpdateView();
+    resetCamera();
     gameScene = lob;
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     lobby->receiveState(lobby_state);
