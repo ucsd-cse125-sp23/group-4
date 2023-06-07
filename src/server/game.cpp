@@ -46,7 +46,10 @@ Game::Game() {
   Environment* environment = new Environment();
   MapData mapData = MapDataImporter::Import(config["map_data_file"]);
   for (auto collider : mapData.colliders) {
-    environment->addConvex(collider.vertices, 0.2f);
+    environment->addConvex(collider.vertices, 2.0f);
+  }
+  for (auto zerof : mapData.groups["zerof"]) {
+    environment->addConvex(zerof.vertices, 0.0f);
   }
   for (auto spawn : mapData.spawnPoints) {
     map_spawn_points.push_back(spawn.point);

@@ -40,12 +40,13 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
     vec3f dv = (cData->horizontalVel * MOVE_VELOCITY - pObj->vel) * 0.6f;
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
-    dv *= std::clamp(
+    float fFactor = std::clamp(
         std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
             (pObj->onGround ? pObj->lastSurfaceFriction *
                                   pObj->modifyValue(1, GRAVITY_MODIFIER) * 25
                             : 0.3f),
         0.0f, 1.0f);
+    dv *= fFactor;
     pObj->vel.x += dv.x;
     pObj->vel.z += dv.z;
     if (pObj->onGround && cData->doJump && !pObj->freeze) {
@@ -61,7 +62,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       dj *= std::min(1.0f, d * d);
       dj.y = 1.0f / (1.0f + std::exp(-15.0f * (c - 0.36f)));
       dj = normalize(dj);
-      dj *= cData->jumpVel;
+      dj *= cData->jumpVel * sqrt(fFactor);
       pObj->vel.x += dj.x;
       pObj->vel.y = dj.y;
       pObj->vel.z += dj.z;

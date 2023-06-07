@@ -8,7 +8,7 @@
 
 uint32_t PObject::maxId = 1;
 
-#define VERT_PCNT 0.2
+#define VERT_PCNT 0.5
 
 void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
@@ -78,13 +78,16 @@ void PObject::tick() {
   Modifiable::tick();
   this->vel.y -= std::max(0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
-  lastSurfaceNormal = vec3f(0, 0, 0);
-  lastSurfaceFriction = 0;
 
-  if (onGround && this->vel.y > -0.1)
-    ticksFallen = 0;
-  else
+  if (onGround) {
+      if(this->vel.y > -0.1)
+        ticksFallen = 0;
+  }
+  else {
     ticksFallen++;
+    lastSurfaceNormal = vec3f(0, 0, 0);
+    lastSurfaceFriction = 0;
+  }
 
   move(this->vel);
   freeze = false;
