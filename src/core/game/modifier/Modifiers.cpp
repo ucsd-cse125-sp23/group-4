@@ -57,7 +57,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
         std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
             (pObj->onGround >= COYOTE_TIME ? pObj->lastSurfaceFriction *
                                   pObj->modifyValue(1, GRAVITY_MODIFIER) * 2
-                            : 0.1f),
+                            : 0.2f),
         0.0f, 1.0f);
     dv *= fFactor;
     pObj->vel.x += dv.x;
@@ -75,7 +75,7 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       dj *= std::min(1.0f, d * d);
       dj.y = 1.0f / (1.0f + std::exp(-15.0f * (c - 0.36f)));
       dj = normalize(dj);
-      dj *= cData->jumpVel * sqrt(fFactor);
+      dj *= cData->jumpVel * (pObj->onGround >= COYOTE_TIME ? sqrt(fFactor) : 1);
       pObj->vel.x += dj.x / 10;
       pObj->vel.y = dj.y;
       pObj->vel.z += dj.z / 10;
