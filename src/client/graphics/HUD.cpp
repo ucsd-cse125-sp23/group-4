@@ -1,5 +1,7 @@
 #include "HUD.h"
 
+#include "Window.h"
+
 void HUD::draw(GLFWwindow* window) {
   glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
@@ -47,6 +49,23 @@ void HUD::draw(GLFWwindow* window) {
         glEnable(GL_DEPTH_TEST);
       }
     }
+  }
+
+  if (Window::_debugmode) {
+    // draw FPS (probably can be shown in imgui instead tbh)
+    int top = 65;
+    std::string fps_text = std::to_string(Window::fps) + " FPS";
+    std::string ups_text = std::to_string(Window::ups) + " UPS";
+
+    glm::vec2 wpos = glm::vec2(width - 40, height - top);
+    float size = 0.2f;
+
+    glDisable(GL_DEPTH_TEST);
+    fr_dev->RenderText(width, height, fps_text, wpos.x, wpos.y, size,
+                       glm::vec3(1.0f, 0.0f, 0.0f));
+    fr_dev->RenderText(width, height, ups_text, wpos.x, wpos.y - 12, size,
+                       glm::vec3(1.0f, 0.0f, 0.0f));
+    glEnable(GL_DEPTH_TEST);
   }
 
   drawLeaderboard(window, scale, players);

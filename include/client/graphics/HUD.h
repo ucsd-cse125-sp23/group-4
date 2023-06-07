@@ -11,6 +11,8 @@
 class HUD {
  public:
   FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
+  FontRenderer* fr_dev = new FontRenderer("assets/fonts/Roboto-Black.ttf");
+
   Scene* scene;
   Texture map;
   std::vector<Texture> frames;

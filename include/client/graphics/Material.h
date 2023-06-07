@@ -10,11 +10,9 @@
 
 #include <glm/glm.hpp>
 
+#include "Settings.h"
 #include "client/graphics/Texture.h"
 #include "client/graphics/core.h"
-
-#ifndef __MATERIAL_H__
-#define __MATERIAL_H__
 
 struct Material {
   GLuint shader;  // points to the shader program we want to use
@@ -54,6 +52,9 @@ struct Material {
     }
     glUniform1i(glGetUniformLocation(shader, "renderMode"), mode);
 
+    float gamma = settings.gammaCorrection;  // Window::gammaCorrection;
+    glUniform1f(glGetUniformLocation(shader, "gamma"), gamma);
+
     // TODO: implement other shader cases + their uniform vars here! vvv
 
     /*
@@ -76,5 +77,3 @@ struct Material {
     // TODO(matthew)
   }
 };
-
-#endif

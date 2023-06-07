@@ -24,7 +24,6 @@ CapsuleShape* PLAYER_BASE_SHAPE =
 OffsetShape* PLAYER_BOUNDING_SHAPE =
     new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, PLAYER_HEIGHT/2, 0.0f));
 
-// Level* level = nullptr;
 
 ControlModifier* CONTROL_MODIFIER = new ControlModifier();
 TaggedStatusModifier* TAGGED_STATUS_MODIFIER = new TaggedStatusModifier();

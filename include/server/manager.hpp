@@ -26,6 +26,7 @@ class Manager {
   void restart_game();
 
   Status status_ = Status::Lobby;
+  Game game_;
 
  private:
   struct Player {
@@ -34,6 +35,5 @@ class Manager {
     bool is_ready;
   };
 
-  Game game_;
   std::unordered_map<int, Player> players_;
 };

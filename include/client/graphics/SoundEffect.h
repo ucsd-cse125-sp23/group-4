@@ -10,14 +10,27 @@
 
 class SoundEffect {
  public:
+  inline static float volumeGlobal = 1.0f;  // 0.0 to 1.0
+
   void load(std::string filename) {
     sound = loadSound(filename);
-    sound.setVolume(100);
+    setEffectVolume(1.0f);
   }
 
-  void play() { sound.play(); }
+  void setEffectVolume() { sound.setVolume(100 * volume * volumeGlobal); }
+  void setEffectVolume(float v) {
+    volume = v;
+    setEffectVolume();
+  }
+
+  void play() {
+    setEffectVolume();
+    sound.play();
+  }
 
  private:
+  float volume = 1.0f;
+
   sf::SoundBuffer buf;
   sf::Sound sound;
 

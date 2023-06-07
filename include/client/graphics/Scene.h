@@ -33,9 +33,9 @@
 #include "client/graphics/Model.h"
 #include "client/graphics/Node.h"
 #include "client/graphics/Obj.h"
+#include "client/graphics/ParticleSystem.h"
 #include "client/graphics/Player.h"
 #include "client/graphics/PlayerModel.h"
-#include "client/graphics/Skeleton.h"
 #include "client/graphics/Skybox.h"
 #include "client/graphics/SoundEffect.h"
 #include "client/graphics/Texture.h"
@@ -47,15 +47,14 @@ class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
   // referenced across the project.
-  std::map<std::string, Skeleton*> skeletons;
   std::map<std::string, Mesh*> meshes;
-  std::map<std::string, std::map<std::string, AnimationPlayer*>> animations;
   std::map<std::string, GLuint> shaderPrograms;
   std::map<std::string, Material*> materials;
   std::map<std::string, Texture*> textures;
   std::map<std::string, Model*>
       models;  // more complex; meshes + other info combined
   std::map<std::string, SoundEffect*> sounds;
+  std::map<std::string, GameThing*> prefabs;
   // std::map< std::string, Light* > light;
 
   SceneResourceMap() {}
@@ -63,10 +62,7 @@ class SceneResourceMap {
   ~SceneResourceMap() {
     // The containers of pointers own the object pointed to by the pointers.
     // All the objects should be deleted when the object palette ("prefab" list)
-    // is destructed. skeletons
-    for (auto entry : skeletons) {
-      delete entry.second;
-    }
+    // is destructed.
     // mesh geometry
     for (auto entry : meshes) {
       delete entry.second;
@@ -88,6 +84,10 @@ class SceneResourceMap {
     }
     // sounds
     for (auto entry : sounds) {
+      delete entry.second;
+    }
+    // prefabs
+    for (auto entry : prefabs) {
       delete entry.second;
     }
   }
@@ -151,6 +151,7 @@ class Scene {
         _globalSceneResources.materials["unlit"];
     _globalSceneResources.models["_gz-xyz"]->modelMtx =
         glm::scale(glm::vec3(1.0f));
+    _globalSceneResources.models["_gz-xyz"]->depthFunction = GL_ALWAYS;
 
     _globalSceneResources.models["_gz-cube"] = new Model;
     _globalSceneResources.models["_gz-cube"]->mesh =
@@ -159,6 +160,7 @@ class Scene {
         _globalSceneResources.materials["unlit"];
     _globalSceneResources.models["_gz-cube"]->modelMtx =
         glm::translate(glm::vec3(0.0f));
+    _globalSceneResources.models["_gz-cube"]->depthFunction = GL_ALWAYS;
     // --
 
     // the default scene graph already has one node named "world."
@@ -175,6 +177,7 @@ class Scene {
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
 
+  virtual void animate(float delta);
   virtual void update(float delta);
 
   virtual void draw();

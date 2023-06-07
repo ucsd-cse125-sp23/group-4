@@ -60,6 +60,10 @@ class GameThing : public Node {
   Transform transform;
   float azimuth = 0;  // for visuals only (aka heading)
 
+  virtual void animate(float dt) {
+    // override me
+  }
+
   virtual void update(float dt) {
     // --- example (spin spin) ---
     transform.rotation += glm::vec3(0, 30 * dt, 0);  // spin on y axis

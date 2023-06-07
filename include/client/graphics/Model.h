@@ -17,8 +17,7 @@ struct Model {
   GLenum depthFunction = GL_LESS;
 
   virtual void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-                    const glm::mat4& transformMtx,
-                    const bool ignoreDepth = false) {
+                    const glm::mat4& transformMtx) {
     if (!material || !mesh) return;
 
     GLuint shader = material->shader;

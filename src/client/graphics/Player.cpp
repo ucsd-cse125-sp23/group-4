@@ -10,11 +10,16 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
+void Player::animate(float dt) {
+  // traverse animation bones (SLOW)
+  if (pmodel) pmodel->update(dt);
+}
+
 void Player::update(float dt) {
   // interpolate between old to new state
   updateInterpolate(dt);
 
-  if (pmodel) pmodel->update(dt);
+  if (fx_jump) fx_jump->update(dt);
 
   if (tagged) time.Update(dt);
 }
@@ -43,6 +48,8 @@ message::UserStateUpdate Player::pollInput() {
   }
 
   if (Input::GetInputState(InputAction::MoveJump) != InputState::None) {
+    if (fx_jump) fx_jump->Emit(5);  // TODO(matthew) move this to jump event msg
+
     jumping = true;
   }
 
