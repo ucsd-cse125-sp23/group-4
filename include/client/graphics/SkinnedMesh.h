@@ -17,7 +17,7 @@
 
 class SkinnedMesh : public Mesh {
  public:
-  SkinnedMesh() { }
+  SkinnedMesh() { creategl(); }
   ~SkinnedMesh() { cleargl(); }
 
   virtual void init(const char* filename);

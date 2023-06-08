@@ -19,7 +19,7 @@ that loads an obj file.
 
 class Obj : public Mesh {
  public:
-  Obj() { }
+  Obj() { creategl(); }
   ~Obj() { cleargl(); }
 
   void init(const char* filename) {
