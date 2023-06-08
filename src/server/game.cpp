@@ -9,6 +9,7 @@
 
 #include "core/game/event/Event.h"
 #include "core/game/mode/GameMode.h"
+#include "core/game/modifier/EffectStorageModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 
@@ -33,6 +34,8 @@ message::Player GameThing::to_network() const {
   int score = level_->getAge() - TAG_COOLDOWN -
               level_->gameMode->queryScore(id_);  // number of ticks not tagged
 
+  auto effects = EffectStorageModifier::queryEffects(player_);
+
   return {
       id_,
       player_->getPos().x,
@@ -43,7 +46,7 @@ message::Player GameThing::to_network() const {
       length(player_->vel),
       player_->onGround,
       is_tagged(),
-      {}  // TODO: get player effects
+      effects,
   };
 }
 
