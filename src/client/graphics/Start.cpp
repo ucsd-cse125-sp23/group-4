@@ -20,6 +20,7 @@ void Start::update(float delta) {
   }
 
   camera->SetAzimuth(camera->GetAzimuth() + (5 * delta));
+  camera->update(delta);  // updates position interpolation
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
     Window::phase = GamePhase::Lobby;
   }
