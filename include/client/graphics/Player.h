@@ -46,6 +46,9 @@ class Player : public GameThing, InputListener {
 
   ~Player() {
     if (fx_jump) delete fx_jump;
+    if (fx_land) delete fx_land;
+    if (fx_item) delete fx_item;
+    if (fx_tag) delete fx_tag;
   }
 
   message::UserStateUpdate pollInput();
