@@ -84,6 +84,11 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
     }
   }
 }
+bool TaggedStatusModifier::isIt(Player* player) {
+  return static_cast<TaggedStatusModifierData*>(
+             player->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get())
+      ->isIt;
+}
 
 AttractModifier::AttractModifier() {}
 void AttractModifier::modify(Modifiable* obj, ModifierData* data) {
