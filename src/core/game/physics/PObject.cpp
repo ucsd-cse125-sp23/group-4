@@ -8,12 +8,15 @@
 
 uint32_t PObject::maxId = 1;
 
+#define VERT_PCNT 0.5
+
 void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
   /*If object is falling and mtv is atleast a little up, the we determine the
    * object to be onGround*/
-  if (self->vel.y < 0 && norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
-    self->onGround = true;
+  if (self->vel.y < 0 &&
+      norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
+    self->onGround = COYOTE_TIME;
     self->level->eventManager->fireLandEvent(self);
   }
   if (other->isStatic()) {
@@ -27,8 +30,8 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
     self->lastSurfaceFriction = other->getBounds()->friction;
   } else {
     if (other->vel.y < 0 &&
-        norm.y / (std::abs(norm.x) + std::abs(norm.z)) > -0.05) {
-      self->onGround = true;
+        norm.y > -0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
+      self->onGround = COYOTE_TIME;
       self->level->eventManager->fireLandEvent(self);
     }
 
@@ -63,7 +66,7 @@ PObject::PObject(BoundingShape* shape, unsigned int layer, float friction,
       pos(vec3f(0.0f, 0.0f, 0.0f)),
       oPos(vec3f(0.0f, 0.0f, 0.0f)),
       vel(vec3f(0.0f, 0.0f, 0.0f)),
-      onGround(false),
+      onGround(0),
       freeze(false),
       level(nullptr),
       lastSurfaceNormal(vec3f(0, 0, 0)),
@@ -76,7 +79,12 @@ void PObject::tick() {
   this->vel.y -= std::max(0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
   lastSurfaceNormal = vec3f(0, 0, 0);
-  lastSurfaceFriction = 0;
+  if (onGround) {
+    if (this->vel.y > -0.1) ticksFallen = 0;
+  } else {
+    ticksFallen++;
+    lastSurfaceFriction = 0;
+  }
 
   move(this->vel);
   freeze = false;
@@ -107,8 +115,8 @@ void PObject::move(vec3f dPos) {
     totalY += mDPos.y;
     if (norm != vec3f(0, 0, 0)) {
       if (this->vel.y < 0 &&
-          norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
-        this->onGround = true;
+          norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
+        this->onGround = COYOTE_TIME;
         this->level->eventManager->fireLandEvent(this);
       }
 
@@ -119,7 +127,7 @@ void PObject::move(vec3f dPos) {
       float baseMu = hit.first->getBounds()->friction;
       float modifiedMu = this->modifyValue(baseMu, FRICTION_MODIFIER);
       this->vel = this->vel * std::max(0.0f, 1.0f - w * modifiedMu);
-      rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
+      // rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
 
       this->lastSurfaceNormal = norm;
       this->lastSurfaceFriction = baseMu;
@@ -135,13 +143,13 @@ void PObject::move(vec3f dPos) {
   }
 
   if (totalY < -0.01 &&
-      lastSurfaceNormal.y <
-          0.1 * (std::abs(lastSurfaceNormal.x) + std::abs(lastSurfaceNormal.z)))
-    onGround = false;
+      lastSurfaceNormal.y <= 0.01 + 0.1 * (std::abs(lastSurfaceNormal.x) +
+                                           std::abs(lastSurfaceNormal.z)))
+    if (onGround > 0) onGround--;
 
   Environment* environment = this->level->getEnvironment();
   std::pair<PObject*, vec4f> pair = environment->mtv(this);
-  while (pair.first != nullptr) {
+  while (pair.first != nullptr && ite++ < 20) {
     response(this, pair.first, pair.second);
     pair = environment->mtv(this);
   }

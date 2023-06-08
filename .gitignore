@@ -5,6 +5,7 @@
 
 
 build
+ninja-build
 out
 compile_commands.json
 

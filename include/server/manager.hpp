@@ -13,7 +13,7 @@ class Manager {
     GameOver,
   };
 
-  static const std::size_t MAX_PLAYERS = 4;
+  static const std::size_t MAX_PLAYERS = 1;
 
   int add_player();
   void remove_player(int);
@@ -25,6 +25,7 @@ class Manager {
   message::GameStateUpdate get_game_update();
 
   Status status_ = Status::Lobby;
+  Game game_;
 
  private:
   struct Player {
@@ -33,6 +34,5 @@ class Manager {
     bool is_ready;
   };
 
-  Game game_;
   std::unordered_map<int, Player> players_;
 };

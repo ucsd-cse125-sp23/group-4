@@ -2,14 +2,20 @@
 
 #include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/variant.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
 #include <boost/variant.hpp>
 #include <ctime>
+#include <network/effect.hpp>
+#include <network/item.hpp>
 #include <ostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
+
+#include "core/game/event/Event.h"
 
 namespace message {
 
@@ -24,6 +30,10 @@ enum class Type {
   LobbyUpdate,
   LobbyPlayerUpdate,
   GameStart,
+  JumpEvent,
+  LandEvent,
+  ItemPickupEvent,
+  TagEvent,
 };
 
 struct Metadata {
@@ -72,22 +82,29 @@ struct GameStateUpdateItem {
   float posy;
   float posz;
   float heading;
+  int score;
+  float speed;
+  int is_grounded;
+  bool is_tagged;
+  std::vector<Effect> effects;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id& posx& posy& posz& heading;
+    ar& id& posx& posy& posz& heading& score& speed& is_grounded& is_tagged&
+        effects;
   }
 };
 
 struct GameStateUpdate {
   std::unordered_map<int, GameStateUpdateItem> things;
-  // add global params later
+  int tagged_player;
+  float time_elapsed;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& things;
+    ar& things& tagged_player& time_elapsed;
   }
 };
 
@@ -139,10 +156,53 @@ struct GameStart {
   }
 };
 
+struct JumpEvent {
+  int pid;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid;
+  }
+};
+
+struct LandEvent {
+  int pid;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid;
+  }
+};
+
+struct ItemPickupEvent {
+  int pid;
+  Item item;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid& item;
+  }
+};
+
+struct TagEvent {
+  int tagger;
+  int taggee;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& tagger& taggee;
+  }
+};
+
 struct Message {
   using Body =
       boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate,
-                     LobbyUpdate, LobbyPlayerUpdate, GameStart>;
+                     LobbyUpdate, LobbyPlayerUpdate, GameStart, JumpEvent,
+                     LandEvent, ItemPickupEvent, TagEvent>;
   Type type;
   Metadata metadata;
   Body body;
