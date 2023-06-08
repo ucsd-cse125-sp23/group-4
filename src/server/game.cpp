@@ -128,7 +128,7 @@ std::vector<message::LandEvent> Game::get_land_events() {
 
 std::vector<message::ItemPickupEvent> Game::get_item_pickup_events() {
   std::vector<message::ItemPickupEvent> events;
-  for (auto& e : land_events_)
+  for (auto& e : item_pickup_events_)
     events.push_back({get_pid(e.self), Item::RedGiftBox});
 
   return events;
