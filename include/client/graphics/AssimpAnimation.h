@@ -200,8 +200,4 @@ class AssimpAnimation {
 
   // Blending props - cycle emote (winning animations)
   bool isEmote = false, isEmoteCyc = false;
-
-  // Blending props - dissolve-play-dissolve emote (lobby animations)
-  bool isLobbyReversed = false;
-  float timeLobby = 0.0f;
 };

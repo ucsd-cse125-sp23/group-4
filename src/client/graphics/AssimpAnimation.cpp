@@ -440,18 +440,6 @@ void AssimpAnimation::update(float deltaTimeInMs) {
     return;
   }
 
-  if (isLobbyReversed) {
-    AssimpAnimationClip& lobby = animMap.at(AC_TO_NAME.at(baseAnim));
-    if (!isDissolve &&
-        (timeLobby + deltaTimeInMs) * lobby.tps <= lobby.duration) {
-      timeLobby += deltaTimeInMs;
-      animMap[currAnimName].update(currTimeInMs, nodeMap);
-      return;
-    } else {
-      isDissolve = true;
-    }
-  }
-
   bool doneDissolve = false;
   poseMap.clear();
   if (isPlayThenDissolve) {
@@ -461,7 +449,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       isDissolve = true;
       isDissolveReversed = false;
       timeDissolve = 0.0f;
-      timeDissolveMult = MS_JUMP;
+      timeDissolveMult = isALobbyEmote(dissolveAnim) ? 10.0f : MS_JUMP;
     } else {
       timePlayThenDissolve += deltaTimeInMs;
       play.update(timePlayThenDissolve, poseMap, true);
@@ -473,17 +461,13 @@ void AssimpAnimation::update(float deltaTimeInMs) {
     timeDissolve += !isDissolveReversed ? deltaTimeInMs * timeDissolveMult
                                         : -deltaTimeInMs * timeDissolveMult;
     if (timeDissolve >= 1.0f) {
-      if (isALobbyEmote(baseAnim)) {
-        isDissolve = false;
-        currAnimName = AC_TO_NAME.at(dissolveAnim);
+      if (isALobbyEmote(dissolveAnim)) {
+        baseAnim = dissolveAnim;
         dissolveAnim = PLAYER_AC::IDLE;
-        isLobbyReversed = true;
-        timeLobby = 0.0f;
-      } else if (isLobbyReversed) {
-        isLobbyReversed = false;
+        timePlayThenDissolve = 0.0f;
+        isPlayThenDissolve = true;
         isDissolve = false;
-        baseAnim = PLAYER_AC::IDLE;
-        currAnimName = AC_TO_NAME.at(baseAnim);
+        isDissolveReversed = false;
       } else {
         isDissolve = false;
         baseAnim = dissolveAnim;
@@ -496,12 +480,16 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       AssimpAnimationClip& clip0 = animMap.at(AC_TO_NAME.at(baseAnim));
       AssimpAnimationClip& clip1 = animMap.at(AC_TO_NAME.at(dissolveAnim));
 
-      if (isAPlayThenDissolve(baseAnim)) {
+      if (isAPlayThenDissolve(baseAnim) || isALobbyEmote(baseAnim)) {
         clip0.update(timePlayThenDissolve, poseMap, true);
       } else {
         clip0.update(currTimeInMs, poseMap, true);
       }
-      clip1.update(currTimeInMs, poseMap, false);
+      if (isALobbyEmote(dissolveAnim)) {
+        clip1.update(0.0f, poseMap, false);
+      } else {
+        clip1.update(currTimeInMs, poseMap, false);
+      }
       for (auto& kv : poseMap) {
         BlendPose& bp = kv.second;
         bp.pos1 = timeDissolve * bp.pos1 + (1.0f - timeDissolve) * bp.pos2;
@@ -638,6 +626,10 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 }
 
+// idea:
+//   dissolve from current idle pose to lobby emote (0.1 sec)
+//   use play then dissolve with lobby emote
+//   ends with idle emote
 void AssimpAnimation::setLobby(const PLAYER_AC& ac) {
   if (baseAnim != PLAYER_AC::IDLE) {
     reset();
@@ -648,7 +640,6 @@ void AssimpAnimation::setLobby(const PLAYER_AC& ac) {
   timeDissolve = 0.0f;
   timeDissolveMult = 10.0f;
   dissolveAnim = ac;
-  isLobbyReversed = false;
 }
 
 void AssimpAnimation::reset() {
@@ -665,8 +656,6 @@ void AssimpAnimation::reset() {
   timeTag = 0.0f;
   isEmote = false;
   isEmoteCyc = false;
-  isLobbyReversed = false;
-  timeLobby = 0.0f;
 }
 
 void AssimpAnimation::setEmote(const PLAYER_AC& ac) {
