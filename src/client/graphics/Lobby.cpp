@@ -42,6 +42,8 @@ void Lobby::reset() {
   is_ready = false;
   index = 0;
 
+  receiveState(Window::lobby_state);
+
   buildSceneTree();
 }
 
