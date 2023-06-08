@@ -183,7 +183,7 @@ void Lobby::init(void) {
 
   trash_panda->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
   trash_panda->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
-  trash_panda->model = sceneResources->models["trash_panda"];
+  trash_panda->model = sceneResources->models["trash panda"];
 
   bee->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
   bee->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
