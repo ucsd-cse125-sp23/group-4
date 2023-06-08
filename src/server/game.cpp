@@ -27,7 +27,7 @@ bool GameThing::is_tagged() const {
   return TaggedStatusModifier::isIt(player_);
 }
 
-message::GameStateUpdateItem GameThing::to_network() const {
+message::Player GameThing::to_network() const {
   int score = level_->getAge() - TAG_COOLDOWN -
               level_->gameMode->queryScore(id_);  // number of ticks not tagged
 
@@ -148,7 +148,7 @@ void Game::clear_events() {
 }
 
 message::GameStateUpdate Game::to_network() {
-  std::unordered_map<int, message::GameStateUpdateItem> things;
+  std::unordered_map<int, message::Player> things;
   for (const auto& [pid, thing] : game_things_)
     things.insert({pid, thing.to_network()});
 

@@ -76,7 +76,7 @@ struct Notify {
   }
 };
 
-struct GameStateUpdateItem {
+struct Player {
   int id;
   float posx;
   float posy;
@@ -97,14 +97,14 @@ struct GameStateUpdateItem {
 };
 
 struct GameStateUpdate {
-  std::unordered_map<int, GameStateUpdateItem> things;
+  std::unordered_map<int, Player> players;
   int tagged_player;
   float time_elapsed;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& things& tagged_player& time_elapsed;
+    ar& players& tagged_player& time_elapsed;
   }
 };
 

@@ -83,7 +83,7 @@ std::string effects_to_string(const std::vector<Effect>& effects) {
   return "[" + inside + "]";
 }
 
-std::string GameStateUpdateItem::to_string() const {
+std::string Player::to_string() const {
   // clang-format off
   std::string str = std::string("") +
     "      {"                                               "\n"
@@ -105,16 +105,16 @@ std::string GameStateUpdateItem::to_string() const {
 }
 
 std::string GameStateUpdate::to_string() const {
-  std::string game_things = "    game_things: [\n";
-  for (auto& [_, thing] : things) game_things += thing.to_string();
+  std::string _players = "    [\n";
+  for (auto& [_, player] : players) _players += player.to_string();
 
-  game_things += "    ]";
+  _players += "    ]";
 
   // clang-format off
   std::string str = std::string("") +
-    "      game_things: " + game_things + "," +               "\n"
+    "      players: " + _players + "," +                      "\n"
     "      tagged_player: " + std::to_string(tagged_player) + "\n"
-    "      round_time: " + std::to_string(time_elapsed) +       "\n";
+    "      round_time: " + std::to_string(time_elapsed) +     "\n";
   // clang-format on
 
   return str;
