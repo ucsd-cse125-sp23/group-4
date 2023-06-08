@@ -4,6 +4,7 @@
 #include <network/item.hpp>
 #include <network/message.hpp>
 #include <server/game.hpp>
+#include <server/manager.hpp>
 
 #include "core/game/event/Event.h"
 #include "core/game/mode/GameModes.h"
@@ -65,7 +66,7 @@ Game::Game() {
   }
   environment->setDeathHeight(mapData.fallBoundY);
   level_ = initializeLevel(environment);
-  applyGameMode(level_, new OneTaggerTimeGameMode());
+  applyGameMode(level_, new NTaggersTimeGameMode(Manager::MAX_PLAYERS - 1));
 
   // register event handlers
   auto jump_handler = [this](JumpEvent&& e) { jump_events_.push_back(e); };

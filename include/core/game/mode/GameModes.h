@@ -17,6 +17,11 @@ class ThreeTaggersTimeGameMode : public NTaggerGameMode, public TimeGameMode {
   ThreeTaggersTimeGameMode();
   void registerTrackers(Level* level) override;
 };
+class NTaggersTimeGameMode : public NTaggerGameMode, public TimeGameMode {
+ public:
+  NTaggersTimeGameMode(int n);
+  void registerTrackers(Level* level) override;
+};
 class TeamedTaggersTimeGameMode : public TeamedTaggerGameMode,
                                   public TimeGameMode {
  public:

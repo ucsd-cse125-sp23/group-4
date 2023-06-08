@@ -23,6 +23,13 @@ void ThreeTaggersTimeGameMode::registerTrackers(Level* level) {
   TimeGameMode::registerTrackers(level);
 }
 
+NTaggersTimeGameMode::NTaggersTimeGameMode(int n)
+    : NTaggerGameMode(n), GameMode(true) {}
+void ThreeTaggersTimeGameMode::registerTrackers(Level* level) {
+  GameMode::registerTrackers(level);
+  TimeGameMode::registerTrackers(level);
+}
+
 TeamedTaggersTimeGameMode::TeamedTaggersTimeGameMode()
     : TeamedTaggerGameMode(), GameMode(true) {}
 void TeamedTaggersTimeGameMode::registerTrackers(Level* l) {
