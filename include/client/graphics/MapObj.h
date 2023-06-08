@@ -25,19 +25,27 @@ struct MapObjSubmesh {
 
   Material* material = nullptr;
 
-  void trySetMaterial(std::string tag,
-                      std::map<std::string, Material*> resources) {
-    if (tag.length() == 0) return;
+  static std::string processTag(std::string tag) {
+    if (tag.length() == 0) return tag;
 
-    // process material string a bit
+    // process out any .* in the string
     size_t found = tag.find('.', 1);
     if (found != std::string::npos) {
       tag = tag.substr(0, found);
     }
+    return tag;
+  }
 
-    if (resources.count(tag) == 0) return;
+  bool trySetMaterial(std::string tag,
+                      std::map<std::string, Material*> resources) {
+    if (tag.length() == 0 || resources.size() == 0) return true;
+
+    processTag(tag);
+
+    if (resources.count(tag) == 0) return false;
 
     material = resources[tag];
+    return false;
   }
 };
 
@@ -45,16 +53,30 @@ class MapObj : public Model {
  public:
   std::vector<MapObjSubmesh> meshes;
 
-  std::vector<Material*> mapMtlMaterials;
+  std::map<std::string, Material*> mapMtlMaterials;
 
   ~MapObj() {
     for (auto mapmesh : meshes) {
       mapmesh.mesh.cleargl();
     }
 
-    for (auto mtl : mapMtlMaterials) {
-      delete mtl;
+    for (auto entry : mapMtlMaterials) {
+      delete entry.second;
     }
+  }
+
+  static std::string objToMtlFilename(std::string file) {
+    if (file.length() == 0) return file;
+
+    // process out any .* in the string (extension)
+    size_t found = file.find('.', 1);
+    if (found != std::string::npos) {
+      file = file.substr(0, found);
+    }
+
+    file += ".mtl";  // add extension
+
+    return file;
   }
 
   void init(std::string str, std::map<std::string, Material*> mr) {
@@ -86,6 +108,9 @@ class MapObj : public Model {
       return;
       // exit(-1);
     }
+
+    loadMTL(objToMtlFilename(std::to_string(filename)).c_str());
+
     std::cout << "\tLoading map obj visuals...";
 
     std::string currObjectName = "";
@@ -127,7 +152,9 @@ class MapObj : public Model {
           MapObjSubmesh sm = MapObjSubmesh();
           sm.name = currObjectName;
           sm.mesh = submesh;
-          sm.trySetMaterial(currMaterial, materialResources);
+          if (!sm.trySetMaterial(currMaterial, materialResources)) {
+            sm.trySetMaterial(currMaterial, mapMtlMaterials);
+          }
 
           meshes.push_back(sm);
 
@@ -205,8 +232,7 @@ class MapObj : public Model {
     std::cout << "MapObj " << filename << " loaded successfully." << std::endl;
   }
 
-  bool loadMTL(const char* filename,
-               std::map<std::string, Material*> materialResources) {
+  bool loadMTL(const char* filename) {
     unsigned int count = 0;
 
     std::cout << "MapObj: [MTL] Importing " << filename << "..." << std::endl;
@@ -236,10 +262,18 @@ class MapObj : public Model {
       if (res == EOF || strcmp(lineHeader, "newmtl") == 0) {
         // save previous material to memory
 
-        std::cout << "\t[MTL] Stored material data " << currMtl << "...";
-        // TODO
-        std::cout << "done." << std::endl;
-        
+        currMtl = MapObjSubmesh::processTag(currMtl);
+        if (currMtl.size() > 0) {
+          std::cout << "\t[MTL] Storing material data " << currMtl << "...";
+          Material* mtlMat = new Material();  // deleted in ~MapObj
+          mtlMat->ambient = glm::vec4(ambientColor, 1);
+          mtlMat->diffuse = glm::vec4(diffuseColor, 1);
+          mtlMat->specular = glm::vec4(specularColor, 1);
+          mtlMat->emission = glm::vec4(emissiveColor, 1);
+
+          mapMtlMaterials[currMtl] = mtlMat;
+          std::cout << "done." << std::endl;
+        }
 
         if (res == EOF) break;  // EOF = End Of File. Quit the loop.
         // started parsing material. save name
