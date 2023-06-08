@@ -440,6 +440,17 @@ void AssimpAnimation::update(float deltaTimeInMs) {
     return;
   }
 
+  if (isLobbyReversed) {
+    AssimpAnimationClip& lobby = animMap.at(AC_TO_NAME.at(baseAnim));
+    if (!isDissolve &&
+        (timeLobby + deltaTimeInMs) * lobby.tps <= lobby.duration) {
+      timeLobby += deltaTimeInMs;
+      animMap[currAnimName].update(currTimeInMs, nodeMap);
+    } else {
+      isDissolve = true;
+    }
+  }
+
   bool doneDissolve = false;
   poseMap.clear();
   if (isPlayThenDissolve) {
@@ -461,9 +472,22 @@ void AssimpAnimation::update(float deltaTimeInMs) {
     timeDissolve += !isDissolveReversed ? deltaTimeInMs * timeDissolveMult
                                         : -deltaTimeInMs * timeDissolveMult;
     if (timeDissolve >= 1.0f) {
-      isDissolve = false;
-      baseAnim = dissolveAnim;
-      currAnimName = AC_TO_NAME.at(baseAnim);
+      if (isALobbyEmote(baseAnim)) {
+        isDissolve = false;
+        currAnimName = AC_TO_NAME.at(dissolveAnim);
+        dissolveAnim = PLAYER_AC::WALK;
+        isLobbyReversed = true;
+        timeLobby = 0.0f;
+      } else if (isLobbyReversed) {
+        isLobbyReversed = false;
+        isDissolve = false;
+        baseAnim = PLAYER_AC::IDLE;
+        currAnimName = AC_TO_NAME.at(baseAnim);
+      } else {
+        isDissolve = false;
+        baseAnim = dissolveAnim;
+        currAnimName = AC_TO_NAME.at(baseAnim);
+      }
     } else if (timeDissolve <= 0.0f) {
       isDissolve = false;
     } else {
@@ -541,6 +565,10 @@ void AssimpAnimation::useAnimation(std::string animName) {
   }
 
   PLAYER_AC ac = NAME_TO_AC.at(animName);
+  if (isALobbyEmote(ac)) {
+    setLobby(ac);
+    return;
+  }
   if (isAEmote(ac)) {
     setEmote(ac);
     return;
@@ -555,11 +583,8 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 
   // TODO(Eddie): test this!
-  if (isEmote) {
-    currTimeInMs = 0.0f;
-    baseAnim = PLAYER_AC::IDLE;
-    currAnimName = AC_TO_NAME.at(PLAYER_AC::IDLE);
-    isEmote = false;
+  if (isEmote || isALobbyEmote(baseAnim) || isALobbyEmote(dissolveAnim)) {
+    reset();
   }
 
   if (isAPlayThenDissolve(ac)) {
@@ -608,6 +633,37 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
     isTagReversed = false;
     timeTag = 0.0f;
   }
+}
+
+void AssimpAnimation::setLobby(const PLAYER_AC& ac) {
+  if (baseAnim != PLAYER_AC::IDLE) {
+    reset();
+  }
+
+  isDissolve = true;
+  isDissolveReversed = false;
+  timeDissolve = 0.0f;
+  timeDissolveMult = 10.0f;
+  dissolveAnim = ac;
+  isLobbyReversed = false;
+}
+
+void AssimpAnimation::reset() {
+  currTimeInMs = 0.0f;
+  baseAnim = PLAYER_AC::IDLE;
+  dissolveAnim = PLAYER_AC::WALK;
+  currAnimName = AC_TO_NAME.at(PLAYER_AC::IDLE);
+  isDissolve = false;
+  isDissolveReversed = false;
+  timeDissolve = 0.0f;
+  timeDissolveMult = 1.0f;
+  isTag = false;
+  isTagReversed = false;
+  timeTag = 0.0f;
+  isEmote = false;
+  isEmoteCyc = false;
+  isLobbyReversed = false;
+  timeLobby = 0.0f;
 }
 
 void AssimpAnimation::setEmote(const PLAYER_AC& ac) {

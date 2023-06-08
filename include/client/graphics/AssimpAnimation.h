@@ -160,11 +160,16 @@ class AssimpAnimation {
   static bool isAPlayThenDissolve(const PLAYER_AC& ac) {
     return ac >= PLAYER_AC::JUMP && ac <= PLAYER_AC::TRIP;
   }
+  static bool isALobbyEmote(const PLAYER_AC& ac) {
+    return ac >= PLAYER_AC::LOBBY1 && ac <= PLAYER_AC::LOBBY4;
+  }
   static bool isAEmote(const PLAYER_AC& ac) {
     return ac >= PLAYER_AC::PLACE1_1 && ac <= PLAYER_AC::PLACE4_2;
   }
 
   void blendAnimation(const PLAYER_AC& ac);
+  void setLobby(const PLAYER_AC& ac);
+  void reset();
   void setEmote(const PLAYER_AC& ac);
 
   bool isPlayer = false;
@@ -195,4 +200,8 @@ class AssimpAnimation {
 
   // Blending props - cycle emote (winning animations)
   bool isEmote = false, isEmoteCyc = false;
+
+  // Blending props - dissolve-play-dissolve emote (lobby animations)
+  bool isLobbyReversed = false;
+  float timeLobby = 0.0f;
 };
