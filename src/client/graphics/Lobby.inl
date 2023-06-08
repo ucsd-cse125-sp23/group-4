@@ -78,8 +78,15 @@ void Lobby::init(void) {
   sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
   // Create a model palette
-  sceneResources->models["player"] = new Model;
-  sceneResources->models["player"]->mesh = sceneResources->meshes["player"];
+  AssimpModel* amBee = new AssimpModel();
+  if (!amBee->loadAssimp("assets/animation/withUV/Animation -Bee.fbx")) {
+    exit(EXIT_FAILURE);
+  }
+  amBee->setAnimation(
+      AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+  amBee->update(0.0f);
+  sceneResources->models["player"] = amBee;
+  sceneResources->models["player"]->mesh = amBee;
   sceneResources->models["player"]->material =
       sceneResources->materials["toon.blue"];
   player_models.push_back(sceneResources->models["player"]);
