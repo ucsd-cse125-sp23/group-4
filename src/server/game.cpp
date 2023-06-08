@@ -148,10 +148,11 @@ void Game::clear_events() {
 }
 
 message::GameStateUpdate Game::to_network() {
-  std::unordered_map<int, message::Player> things;
-  for (const auto& [pid, thing] : game_things_)
-    things.insert({pid, thing.to_network()});
+  std::unordered_map<int, message::Player> players;
+  for (const auto& [pid, player] : game_things_)
+    players.insert({pid, player.to_network()});
 
   float time_elapsed = (level_->getAge() - TAG_COOLDOWN) / 20.0;
-  return {things, {}, tagged_player_, time_elapsed};
+
+  return {players, {}, tagged_player_, time_elapsed};
 }
