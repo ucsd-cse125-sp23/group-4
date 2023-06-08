@@ -446,6 +446,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
         (timeLobby + deltaTimeInMs) * lobby.tps <= lobby.duration) {
       timeLobby += deltaTimeInMs;
       animMap[currAnimName].update(currTimeInMs, nodeMap);
+      return;
     } else {
       isDissolve = true;
     }
@@ -475,7 +476,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       if (isALobbyEmote(baseAnim)) {
         isDissolve = false;
         currAnimName = AC_TO_NAME.at(dissolveAnim);
-        dissolveAnim = PLAYER_AC::WALK;
+        dissolveAnim = PLAYER_AC::IDLE;
         isLobbyReversed = true;
         timeLobby = 0.0f;
       } else if (isLobbyReversed) {
@@ -589,7 +590,9 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
 
   if (isAPlayThenDissolve(ac)) {
     // play full jump animation first, then dissolve out jump's last frame
-    dissolveAnim = baseAnim;
+    if (!isAPlayThenDissolve(baseAnim)) {
+      dissolveAnim = baseAnim;
+    }
     baseAnim = ac;
     timePlayThenDissolve = 0.0f;
     isPlayThenDissolve = true;
@@ -667,6 +670,7 @@ void AssimpAnimation::reset() {
 }
 
 void AssimpAnimation::setEmote(const PLAYER_AC& ac) {
+  reset();
   currTimeInMs = 0.0f;
   baseAnim = ac;
   currAnimName = AC_TO_NAME.at(baseAnim);
