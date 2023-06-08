@@ -12,7 +12,7 @@ void AssimpChannel::prep() {
   glm::vec4 goal(0.0f);
 
   timeStart = keyframes[0].time;
-  timeEnd = keyframes[1].time;
+  timeEnd = keyframes[keyframes.size() - 1].time;
   timeLen = timeEnd - timeStart;
   if (keyframes.size() == 1) {
     AssimpKeyframe& kf = keyframes[0];
@@ -547,6 +547,7 @@ void AssimpAnimation::useAnimation(std::string animName) {
 
   if (!isPlayer || NAME_TO_AC.find(animName) == NAME_TO_AC.end()) {
     if (currAnimName.compare(animName) != 0) {
+      reset();
       currTimeInMs = 0.0f;
       currAnimName = animName;
     }
