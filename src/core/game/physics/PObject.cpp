@@ -9,6 +9,7 @@
 uint32_t PObject::maxId = 1;
 
 #define VERT_PCNT 0.5
+#define TICKS_FALLEN_LAND 6
 
 void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
@@ -17,7 +18,7 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   if (self->vel.y < 0 &&
       norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
     self->onGround = COYOTE_TIME;
-    if (self->ticksFallen > 8)
+    if (self->ticksFallen > TICKS_FALLEN_LAND)
       self->level->eventManager->fireLandEvent(self);
   }
   if (other->isStatic()) {
@@ -33,7 +34,7 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
     if (other->vel.y < 0 &&
         norm.y > -0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
       self->onGround = COYOTE_TIME;
-      if (self->ticksFallen > 8)
+      if (self->ticksFallen > TICKS_FALLEN_LAND)
         self->level->eventManager->fireLandEvent(self);
     }
 
@@ -119,7 +120,7 @@ void PObject::move(vec3f dPos) {
       if (this->vel.y < 0 &&
           norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
         this->onGround = COYOTE_TIME;
-        if (this->ticksFallen > 8)
+        if (this->ticksFallen > TICKS_FALLEN_LAND)
           this->level->eventManager->fireLandEvent(this);
       }
 
