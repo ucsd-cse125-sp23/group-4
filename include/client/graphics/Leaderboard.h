@@ -10,10 +10,9 @@ class Leaderboard {
   FontRenderer* fr = new FontRenderer("assets/fonts/Atma-SemiBold.ttf");
   Texture background;
 
-  explicit Leaderboard();
+  Leaderboard();
 
   ~Leaderboard() { delete fr; }
 
   void draw();
-
 };

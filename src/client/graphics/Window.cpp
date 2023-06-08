@@ -47,7 +47,6 @@ HUD* Window::hud;
 std::unique_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
 
-
 std::atomic<bool> loading_resources{false};
 
 // Interaction Variables
@@ -142,7 +141,7 @@ GLFWwindow* Window::createWindow(int width, int height) {
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
   GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
-                                       NULL/*glfwGetPrimaryMonitor()*/, NULL);
+                                        NULL /*glfwGetPrimaryMonitor()*/, NULL);
 
   // Check if the window could not be created.
   if (!window) {
@@ -228,7 +227,7 @@ void Window::update(GLFWwindow* window, float deltaTime) {
     x.join();
 
     glfwMakeContextCurrent(window);
-    //glfwSwapBuffers(window);
+    // glfwSwapBuffers(window);
     glfwShowWindow(window);
     glfwFocusWindow(window);
   } else {
@@ -344,7 +343,7 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset/* && phase == GamePhase::Game*/) {
+  if (yoffset /* && phase == GamePhase::Game*/) {
     Cam->CamZoom(yoffset);
   }
 }

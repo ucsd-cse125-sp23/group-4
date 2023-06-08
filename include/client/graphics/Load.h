@@ -105,8 +105,8 @@ class Load {
     int width, height;
     glfwGetWindowSize(win, &width, &height);
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "loading...",
-                                          NULL/*glfwGetPrimaryMonitor()*/, NULL);
+    GLFWwindow* window = glfwCreateWindow(
+        width, height, "loading...", NULL /*glfwGetPrimaryMonitor()*/, NULL);
 
     glfwMakeContextCurrent(window);
 
