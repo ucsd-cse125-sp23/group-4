@@ -343,7 +343,7 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset  && phase == GamePhase::Game) {
+  if (yoffset && phase == GamePhase::Game) {
     Cam->CamZoom(yoffset);
   }
 }
