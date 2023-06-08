@@ -37,6 +37,11 @@ class Player : public GameThing, InputListener {
   Player() {
     pmodel = nullptr;
     tagged = true;
+
+    fx_jump = nullptr;
+    fx_land = nullptr;
+    fx_item = nullptr;
+    fx_tag = nullptr;
   }
 
   ~Player() {
