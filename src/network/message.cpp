@@ -104,15 +104,37 @@ std::string Player::to_string() const {
   return str;
 }
 
+std::string Item::to_string() const {
+  // clang-format off
+  std::string str = std::string("") +
+    "      {"                                                           "\n"
+    "        id: " + std::to_string(id) + "," +                         "\n"
+    "        item: " + std::string(magic_enum::enum_name(item)) + "," + "\n"
+    "        position: {" +                                             "\n"
+    "          " + std::to_string(posx) + "," +                         "\n"
+    "          " + std::to_string(posy) + "," +                         "\n"
+    "          " + std::to_string(posz) + "," +                         "\n"
+    "        }," +                                                      "\n"
+    "      },"                                                          "\n";
+  // clang-format on
+  return str;
+}
+
 std::string GameStateUpdate::to_string() const {
   std::string _players = "    [\n";
   for (auto& [_, player] : players) _players += player.to_string();
 
   _players += "    ]";
 
+  std::string _items = "    [\n";
+  for (auto& [_, item] : items) _items += item.to_string();
+
+  _items += "    ]";
+
   // clang-format off
   std::string str = std::string("") +
     "      players: " + _players + "," +                      "\n"
+    "      items: " + _items + "," +                          "\n"
     "      tagged_player: " + std::to_string(tagged_player) + "\n"
     "      round_time: " + std::to_string(time_elapsed) +     "\n";
   // clang-format on

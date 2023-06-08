@@ -96,15 +96,30 @@ struct Player {
   }
 };
 
+struct Item {
+  int id;
+  ::Item item;
+  float posx;
+  float posy;
+  float posz;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& id& item& posx& posy& posz;
+  }
+};
+
 struct GameStateUpdate {
   std::unordered_map<int, Player> players;
+  std::unordered_map<int, Item> items;
   int tagged_player;
   float time_elapsed;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& players& tagged_player& time_elapsed;
+    ar& players& items& tagged_player& time_elapsed;
   }
 };
 
@@ -178,7 +193,7 @@ struct LandEvent {
 
 struct ItemPickupEvent {
   int pid;
-  Item item;
+  ::Item item;
 
   std::string to_string() const;
   template <typename Archive>

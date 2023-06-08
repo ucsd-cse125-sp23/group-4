@@ -153,5 +153,5 @@ message::GameStateUpdate Game::to_network() {
     things.insert({pid, thing.to_network()});
 
   float time_elapsed = (level_->getAge() - TAG_COOLDOWN) / 20.0;
-  return {things, tagged_player_, time_elapsed};
+  return {things, {}, tagged_player_, time_elapsed};
 }
