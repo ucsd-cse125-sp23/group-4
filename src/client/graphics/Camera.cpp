@@ -34,7 +34,7 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
   transform.updateMtx(&transformMtx);  // shouldn't be in draw but oh well
   if (!Fixed) {
     transformMtx = glm::mat4(1);
-    transformMtx[3][2] += Distance;
+    transformMtx[3][2] += GetDistance(true);
   }
   transformMtx = glm::eulerAngleY(glm::radians(-Azimuth)) *
                  glm::eulerAngleX(glm::radians(-Incline)) * transformMtx;
@@ -52,6 +52,14 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
   ViewProjectOriginMtx = project * glm::mat4(glm::mat3(view));
 }
 
+float Camera::GetDistance(bool raycast) {
+  float d = Distance;
+  if (raycast) {
+    // Raycast from player to camera viewpoint! TODO
+  }
+  return d;
+}
+
 void Camera::CamDrag(float a, float i) {
   if (Fixed) return;  // TODO(matthew) fix
 
@@ -64,8 +72,8 @@ void Camera::CamZoom(float y) {
   if (Fixed) return;
 
   const float rate = 0.05f;
-  float dist = glm::clamp(GetDistance() * (1.0f - static_cast<float>(y) * rate),
-                          0.01f, 1000.0f);
+  float dist = glm::clamp(Distance * (1.0f - static_cast<float>(y) * rate),
+                          6.0f, 150.0f);
   SetDistance(dist);
 }
 
@@ -107,7 +115,7 @@ void Camera::Reset() {
   FOV = 45.0f;
   Aspect = 1.33f;
   NearClip = 0.1f;
-  FarClip = 800.0f;
+  FarClip = 900.0f;
 
   Distance = 10.0f;
   Azimuth = -0.0f;
