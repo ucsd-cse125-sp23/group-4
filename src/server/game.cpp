@@ -10,6 +10,8 @@
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 
+int get_pid(PObject* p) { return static_cast<Player*>(p)->pid; }
+
 GameThing::GameThing(int id, Player* p, ControlModifierData* c, Level* l)
     : id_(id), player_(p), control_(c), heading_(0), level_(l) {}
 
@@ -73,8 +75,7 @@ Game::Game() {
     item_pickup_events_.push_back(e);
   };
   auto tag_handler = [this](TaggingEvent&& e) {
-    tagged_player_ =
-        static_cast<Player*>(e.tagee)->pid;  // changed tagged player
+    tagged_player_ = get_pid(e.tagee);  // changed tagged player
     tag_events_.push_back(e);
   };
   level_->eventManager->registerEventHandler(jump_handler);
@@ -110,20 +111,16 @@ void Game::restart() {
     if (thing.is_tagged()) tagged_player_ = pid;
 }
 
-// note: PObject.id != Player.pid in event handlers below :((
-
 std::vector<message::JumpEvent> Game::get_jump_events() {
   std::vector<message::JumpEvent> events;
-  for (auto& e : jump_events_)
-    events.push_back({static_cast<int>(static_cast<Player*>(e.self)->pid)});
+  for (auto& e : jump_events_) events.push_back({get_pid(e.self)});
 
   return events;
 }
 
 std::vector<message::LandEvent> Game::get_land_events() {
   std::vector<message::LandEvent> events;
-  for (auto& e : land_events_)
-    events.push_back({static_cast<int>(static_cast<Player*>(e.self)->pid)});
+  for (auto& e : land_events_) events.push_back({get_pid(e.self)});
 
   return events;
 }
@@ -131,8 +128,7 @@ std::vector<message::LandEvent> Game::get_land_events() {
 std::vector<message::ItemPickupEvent> Game::get_item_pickup_events() {
   std::vector<message::ItemPickupEvent> events;
   for (auto& e : land_events_)
-    events.push_back(
-        {static_cast<int>(static_cast<Player*>(e.self)->pid), Item::GiftBox});
+    events.push_back({get_pid(e.self), Item::GiftBox});
 
   return events;
 }
@@ -140,8 +136,7 @@ std::vector<message::ItemPickupEvent> Game::get_item_pickup_events() {
 std::vector<message::TagEvent> Game::get_tag_events() {
   std::vector<message::TagEvent> events;
   for (auto& e : tag_events_)
-    events.push_back({static_cast<int>(static_cast<Player*>(e.tagger)->pid),
-                      static_cast<int>(static_cast<Player*>(e.tagee)->pid)});
+    events.push_back({get_pid(e.tagger), get_pid(e.tagee)});
 
   return events;
 }
