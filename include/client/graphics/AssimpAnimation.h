@@ -175,9 +175,10 @@ class AssimpAnimation {
   bool isDissolveReversed = false;
   float timeDissolve = 0.0f;
   float timeDissolveMult = 1.0f;
-  // jump takes jump animation duration + MS_JUMP amount of time
-  bool isJump = false;
-  float timeJump = 0.0f;
+
+  // Blending props - play then dissolve
+  bool isPlayThenDissolve = false;
+  float timePlayThenDissolve = 0.0f;
 
   // Blending props - replace (tag)
   // tag takes tag animatio duration amount of time (no blending for now)
@@ -185,6 +186,6 @@ class AssimpAnimation {
   float timeTag = 0.0f;
   std::vector<size_t> ind_tag;
 
-  // Cycle emote props (winning animation)
+  // Blending props - cycle emote (winning animations)
   bool isEmote = false, isEmoteCyc = false;
 };
