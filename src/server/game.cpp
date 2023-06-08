@@ -5,6 +5,7 @@
 #include <network/message.hpp>
 #include <server/game.hpp>
 #include <server/manager.hpp>
+#include <unordered_map>
 
 #include "core/game/event/Event.h"
 #include "core/game/mode/GameMode.h"
@@ -154,7 +155,13 @@ message::GameStateUpdate Game::to_network() {
   for (const auto& [pid, player] : game_things_)
     players.insert({pid, player.to_network()});
 
+  std::unordered_map<int, message::Item> items;
+  for (auto& powerup : getPowerUps(level_))
+    items[powerup->id] = {static_cast<int>(powerup->id), powerup->item,
+                          powerup->getPos().x, powerup->getPos().y,
+                          powerup->getPos().z};
+
   float time_elapsed = (level_->getAge() - TAG_COOLDOWN) / 20.0;
 
-  return {players, {}, tagged_player_, time_elapsed};
+  return {players, items, tagged_player_, time_elapsed};
 }
