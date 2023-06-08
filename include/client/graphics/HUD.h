@@ -10,7 +10,7 @@
 
 class HUD {
  public:
-  FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
+  FontRenderer* fr = new FontRenderer("assets/fonts/Atma-SemiBold.ttf");
   FontRenderer* fr_dev = new FontRenderer("assets/fonts/Roboto-Black.ttf");
 
   Scene* scene;

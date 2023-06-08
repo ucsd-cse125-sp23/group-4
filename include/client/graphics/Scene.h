@@ -125,7 +125,7 @@ class Scene {
     node["_camera"] = camera;
     camera->name = "_camera";
     localGameThings.push_back(camera);
-    time.time = 5.0f;
+    time.time = 60.0f;
     time.countdown = true;
     gameStart = false;
     timeOver = 0;

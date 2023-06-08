@@ -161,18 +161,18 @@ void Lobby::drawPlayers() {
       glBegin(GL_QUADS);
 
       glTexCoord2f(1, 0);
-      glVertex2f(1.0f, 0.85f);
+      glVertex2f(1.0f, 0.75f);
       glTexCoord2f(0, 0);
-      glVertex2f(-1.0f, 0.85f);
+      glVertex2f(-1.0f, 0.75f);
       glTexCoord2f(0, 1);
-      glVertex2f(-1.0f, -0.75f);
+      glVertex2f(-1.0f, -0.85f);
       glTexCoord2f(1, 1);
-      glVertex2f(1.0f, -0.75f);
+      glVertex2f(1.0f, -0.85f);
 
       glEnd();
 
       glViewport(0, 0, width, height);
-      glViewport(x + (size / 2), y + (size * 0.95), size / 6, size / 6);
+      glViewport(x + (size / 2), y + (size * 0.85), size / 6, size / 6);
 
       point.bindgl();
       glBegin(GL_QUADS);
