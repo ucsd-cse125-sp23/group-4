@@ -27,6 +27,8 @@ Server::Server(int port, AcceptHandler accept_handler,
 
 void Server::start_tick() { tick(); }
 
+void Server::stop_tick() { timer_.cancel(); }
+
 void Server::tick() {
   auto prev_time = std::chrono::steady_clock::now();
   timer_.expires_from_now(TICK_RATE);

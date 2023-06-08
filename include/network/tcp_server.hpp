@@ -25,6 +25,7 @@ class Server {
          TickHandler);
 
   void start_tick();
+  void stop_tick();
   void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);
   template <typename T, typename... Args>
