@@ -72,6 +72,7 @@ Player* Scene::createPlayer(int id) {
   // sound effects
   SoundEffect* sfxRef =
       dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_jump"]);
+ 
   auto sfx = new SoundEffect(*sfxRef);
   player->sfx_jump = sfx;
 

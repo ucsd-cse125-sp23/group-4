@@ -72,7 +72,8 @@ void Camera::CamZoom(float y) {
 void Camera::update(float dt) {
   // interpolate camera
   position_prev = glm::lerp(position_prev, position_target, lerpSpeed * dt);
-
+  sf::Listener::setPosition(position_target.x, position_target.y,
+                            position_target.z);
   if (!Fixed) return;
 
   vec3 moveLocal = vec3(0);
@@ -97,7 +98,7 @@ void Camera::update(float dt) {
   moveLocal *= 12 * dt;
 
   if (length(moveLocal) > 0) move_local(moveLocal);
-  sf::Listener::setPosition(transform.position.x,transform.position.y,transform.position.z);
+  
   return;
 }
 

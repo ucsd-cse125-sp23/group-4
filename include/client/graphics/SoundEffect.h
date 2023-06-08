@@ -26,6 +26,10 @@ class SoundEffect {
   void play(glm::vec3 pos) {
     sound.setPosition(pos.x, pos.y, pos.z);
     setEffectVolume();
+    sf::Vector3f a = sound.getPosition();
+    sf::Vector3f b = sf::Listener::getPosition();
+    std::cerr << "sound pos" << a.x << " " << a.y << " " << a.z << std::endl;
+    std::cerr << "listner pos" << b.x << " " << b.y << " " << b.z << std::endl;
     sound.play();
   }
   void loop() { sound.setLoop(true); }
@@ -40,12 +44,13 @@ class SoundEffect {
 
   sf::Sound loadSound(std::string filename) {
     bool success = buf.loadFromFile(filename);
-
+    
     if (!success) {
       printf(("SoundEffect: Failed to load " + filename + ".\n").c_str());
       return sf::Sound(buf);
     }
-
+    sound.setRelativeToListener(false);
+    sound.setAttenuation(40.0f);
     return sf::Sound(buf);
   }
 };
