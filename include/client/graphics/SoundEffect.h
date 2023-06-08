@@ -27,6 +27,9 @@ class SoundEffect {
     setEffectVolume();
     sound.play();
   }
+  void loop() { sound.setLoop(true); }
+  
+  void stop() { sound.stop(); }
 
  private:
   float volume = 1.0f;

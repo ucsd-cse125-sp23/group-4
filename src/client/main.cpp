@@ -104,7 +104,12 @@ void network_init() {
     };
 
     // TODO(eddie): add effects for different event messages
-    auto jump_event_handler = [](const message::JumpEvent& body) {};
+    auto jump_event_handler = [](const message::JumpEvent& body) { 
+        if (body.pid == Window::my_pid) {
+        Window::gameScene->jumpSFX->play();
+        }
+        
+    };
 
     auto land_event_handler = [](const message::LandEvent& body) {};
 

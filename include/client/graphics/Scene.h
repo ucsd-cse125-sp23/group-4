@@ -42,7 +42,7 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
-
+#include "client/graphics/SoundEffect.h"
 class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
@@ -116,7 +116,8 @@ class Scene {
 
   Timer time;
   bool gameStart;
-
+  SoundEffect* gameTheme;
+  SoundEffect* jumpSFX;
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
