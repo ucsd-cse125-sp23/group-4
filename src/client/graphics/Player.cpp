@@ -20,6 +20,9 @@ void Player::update(float dt) {
   updateInterpolate(dt);
 
   if (fx_jump) fx_jump->update(dt);
+  if (fx_land) fx_land->update(dt);
+  if (fx_item) fx_item->update(dt);
+  if (fx_tag) fx_tag->update(dt);
 
   if (tagged) time.Update(dt);
 }
@@ -95,14 +98,16 @@ vec3 Player::move(vec3 movement) {
 // Event FX
 void Player::eventJump() {
   if (fx_jump) fx_jump->Emit(3);  // spew particles!
+
+  // SFX!
 }
 
 void Player::eventLand() {
-  if (fx_land) fx_land->Emit(5);
+  //if (fx_land) fx_land->Emit(5);
 }
 
 void Player::eventItem() {
-  if (fx_item) fx_item->Emit(10);
+  //if (fx_item) fx_item->Emit(10);
 }
 
 void Player::eventTag() {
