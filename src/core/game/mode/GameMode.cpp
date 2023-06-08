@@ -30,11 +30,14 @@ int NTaggersTimeGameMode::queryScore(uint32_t pid) {
 }
 std::vector<Player*> NTaggersTimeGameMode::initPlayers(
     std::map<uint32_t, Player*> players) {
+  if (n == 0) return {};
   std::vector<Player*> pPerm;
   for (auto pair : players) pPerm.push_back(pair.second);
-  std::random_device rd;
-  std::mt19937 g(rd());
-  std::shuffle(pPerm.begin(), pPerm.end(), g);
+  if (players.size() > 1) {
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(pPerm.begin(), pPerm.end(), g);
+  }
 
   level->spreadPlayers(pPerm);
   for (Player* p : pPerm) {
