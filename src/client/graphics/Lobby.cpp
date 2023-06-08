@@ -133,9 +133,15 @@ void Lobby::drawPlayers() {
   float scale_y = static_cast<float>(height) / static_cast<float>(600);
 
   int size = height/3;
+  
+  int num_players = players.size();
   float spacing = 10.0;
-  int x = spacing * scale_x;  
-  int y = spacing * scale_y;
+  if (num_players > 4) {
+    spacing = 10 * pow(0.25 * scale_x, (num_players - 4));
+  }
+  int x = spacing * scale_x;
+  int y = 20 * scale_y;
+
   int count = 0;
   for (auto player : players) {
     count++;
