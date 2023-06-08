@@ -15,8 +15,8 @@ class Manager {
     GameOver,
   };
 
-  static const std::size_t MAX_PLAYERS = 2;
-  static constexpr std::chrono::minutes TOTAL_GAME_DURATION{5};
+  static std::size_t MAX_PLAYERS;
+  static std::chrono::seconds TOTAL_GAME_DURATION;
 
   Manager();
 

@@ -1,10 +1,18 @@
 #include <boost/asio.hpp>
+#include <config/lib.hpp>
 #include <network/message.hpp>
 #include <server/manager.hpp>
 #include <unordered_map>
 
+std::size_t Manager::MAX_PLAYERS{0};
+std::chrono::seconds Manager::TOTAL_GAME_DURATION{0};
+
 Manager::Manager()
-    : io_context_(boost::asio::io_context()), timer_(io_context_) {}
+    : io_context_(boost::asio::io_context()), timer_(io_context_) {
+  auto config = get_config();
+  MAX_PLAYERS = config["player_count"];
+  TOTAL_GAME_DURATION = std::chrono::seconds{config["game_duration"]};
+}
 
 int Manager::add_player() {
   int pid = game_.add_player();
