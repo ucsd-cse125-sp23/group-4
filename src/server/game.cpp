@@ -32,13 +32,16 @@ bool GameThing::is_tagged() const {
 }
 
 message::GameStateUpdateItem GameThing::to_network() const {
+  int score = level_->getAge() - TAG_COOLDOWN -
+              level_->gameMode->queryScore(id_);  // number of ticks not tagged
+
   return {
       id_,
       player_->getPos().x,
       player_->getPos().y,
       player_->getPos().z,
       heading_,
-      level_->gameMode->queryScore(id_),
+      score,
       length(player_->vel),
       player_->onGround,
       is_tagged(),
