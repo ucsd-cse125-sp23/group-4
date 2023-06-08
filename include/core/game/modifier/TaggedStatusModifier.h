@@ -19,5 +19,3 @@ class TaggedStatusModifier : public Modifier {
 
   static bool isIt(Player* player);
 };
-
-
