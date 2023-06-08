@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/asio.hpp>
+#include <chrono>
 #include <network/message.hpp>
 #include <server/game.hpp>
 #include <string>
@@ -14,6 +16,9 @@ class Manager {
   };
 
   static const std::size_t MAX_PLAYERS = 2;
+  static constexpr std::chrono::minutes TOTAL_GAME_DURATION{5};
+
+  Manager();
 
   int add_player();
   void remove_player(int);
@@ -35,5 +40,7 @@ class Manager {
     bool is_ready;
   };
 
+  boost::asio::io_context io_context_;
+  boost::asio::steady_timer timer_;
   std::unordered_map<int, Player> players_;
 };

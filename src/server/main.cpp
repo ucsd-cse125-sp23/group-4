@@ -70,6 +70,11 @@ int main(int argc, char* argv[]) {
                           const message::Message& m, Server& server) {};
 
   auto tick_handler = [&manager](Server& server) {
+    if (manager.status_ == Manager::Status::GameOver) {
+      server.stop_tick();
+      // TODO: cleanup manager
+    }
+
     // advance game, send update to client
     manager.tick_game();
     auto update = manager.get_game_update();

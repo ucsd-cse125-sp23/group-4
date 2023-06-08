@@ -1,6 +1,10 @@
+#include <boost/asio.hpp>
 #include <network/message.hpp>
 #include <server/manager.hpp>
 #include <unordered_map>
+
+Manager::Manager()
+    : io_context_(boost::asio::io_context()), timer_(io_context_) {}
 
 int Manager::add_player() {
   int pid = game_.add_player();
@@ -49,7 +53,16 @@ void Manager::handle_game_update(const message::UserStateUpdate& update) {
 
 void Manager::tick_game() { game_.tick(); }
 
-void Manager::start_game() { game_.restart(); }
+void Manager::start_game() {
+  status_ = Status::InGame;
+  game_.restart();
+
+  // start game timer
+  timer_.expires_from_now(TOTAL_GAME_DURATION);
+  timer_.async_wait([this](const boost::system::error_code& _) {
+    status_ = Status::GameOver;
+  });
+}
 
 message::GameStateUpdate Manager::get_game_update() {
   return {game_.to_network()};
