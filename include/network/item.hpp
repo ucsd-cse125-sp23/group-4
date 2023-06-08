@@ -1,5 +1,7 @@
 #pragma once
 
 enum class Item {
-  GiftBox,
+  RedGiftBox,
+  YellowGiftBox,
+  BlueGiftBox,
 };
