@@ -32,7 +32,7 @@ Player* Scene::createPlayer(int id) {
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
 
   // creating a player to be rendered... TODO call this from state update!
-  std::string playername = "_player" + std::to_string(id);
+  std::string playername = "player " + std::to_string(id);
 
   Player* player = new Player();
   player->name = playername;
