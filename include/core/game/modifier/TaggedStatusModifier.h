@@ -3,6 +3,7 @@
 #include "core/game/modifier/Modifier.h"
 #include "core/game/physics/PObject.h"
 
+class Player;
 struct TaggedStatusModifierData : ModifierData {
   int taggedTime;
   bool isIt;
@@ -15,4 +16,8 @@ class TaggedStatusModifier : public Modifier {
  public:
   TaggedStatusModifier();
   void modify(Modifiable* obj, ModifierData* data) override;
+
+  static bool isIt(Player* player);
 };
+
+

@@ -28,9 +28,8 @@ void GameThing::update(const message::UserStateUpdate& update) {
 void GameThing::remove() { player_->markRemove(); }
 
 message::GameStateUpdateItem GameThing::to_network() const {
-  bool is_tagged = static_cast<TaggedStatusModifierData*>(
-                       player_->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get())
-                       ->isIt;
+  
+  bool is_tagged = TaggedStatusModifier::isIt(player_);
   return {
       id_,
       player_->getPos().x,
