@@ -157,6 +157,10 @@ class AssimpAnimation {
   static const float MS_DISSOLVE, MS_JUMP;
   static const std::vector<std::string> NODES_TAG;
 
+  static bool isAEmote(const PLAYER_AC& ac) {
+    return ac >= PLAYER_AC::PLACE1_1 && ac <= PLAYER_AC::PLACE4_2;
+  }
+
   void blendAnimation(const PLAYER_AC& ac);
   void setEmote(const PLAYER_AC& ac);
 

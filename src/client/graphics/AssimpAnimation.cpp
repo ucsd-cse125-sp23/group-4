@@ -541,7 +541,7 @@ void AssimpAnimation::useAnimation(std::string animName) {
   }
 
   PLAYER_AC ac = NAME_TO_AC.at(animName);
-  if (ac >= PLAYER_AC::PLACE1_1 && ac <= PLAYER_AC::PLACE4_2) {
+  if (isAEmote(ac)) {
     setEmote(ac);
     return;
   }
