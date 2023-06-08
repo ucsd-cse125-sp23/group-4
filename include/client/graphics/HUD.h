@@ -46,6 +46,7 @@ class HUD {
     player_bars["cat"].init("assets/UI/bar-cat.png");
     player_bars["unicorn"].init("assets/UI/bar-unicorn.png");
     player_bars["waffle"].init("assets/UI/bar-waffle.png");
+    player_bars["bear"].init("assets/UI/Group 6 (1).png");
   }
 
   void draw(GLFWwindow* window);

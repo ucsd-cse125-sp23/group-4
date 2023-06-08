@@ -29,6 +29,8 @@ Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
   ready_icons["unicorn"].init("assets/UI/IMG_2432.PNG");
   icons["waffle"].init("assets/UI/IMG_2436.PNG");
   ready_icons["waffle"].init("assets/UI/IMG_2437.PNG");
+  icons["bear"].init("assets/UI/IMG_2491.PNG");
+  ready_icons["bear"].init("assets/UI/IMG_2492.PNG");
 }
 
 Lobby::~Lobby() {

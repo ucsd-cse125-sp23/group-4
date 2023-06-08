@@ -18,7 +18,7 @@ class Lobby : public Scene, public InputListener {
   Texture highlight;
   Texture point;
   std::vector<std::string> skin_names{
-      "trash panda", "bee", "avocado", "duck", "cat", "unicorn", "waffle"};
+      "trash panda", "bee", "avocado", "duck", "cat", "unicorn", "waffle", "bear"};
   std::map<std::string, Texture> icons;
   std::map<std::string, Texture> ready_icons;
   std::map<int, message::LobbyPlayer> players;
