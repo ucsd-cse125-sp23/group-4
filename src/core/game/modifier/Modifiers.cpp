@@ -158,18 +158,16 @@ void EffectStorageModifier::modify(Modifiable* obj, ModifierData* data) {
 
 void EffectStorageModifier::addEffect(PObject* obj, Effect effect,
                                       size_t duration) {
-  std::uniform_int_distribution dist(0, 2);
-  int id = dist(obj->level->rng);
   for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
     static_cast<EffectStorageModifierData*>(m->get())->effects.push_back(
-        {effect, Item(id), obj->level->getAge() + duration});
+        {effect, obj->level->getAge() + duration});
   }
 }
-std::vector<std::pair<Item, Effect>> queryEffects(PObject* obj) {
-  std::vector<std::pair<Item, Effect>> ret;
+std::vector<Effect> queryEffects(PObject* obj) {
+  std::vector<Effect> ret;
   for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
     for (auto e : static_cast<EffectStorageModifierData*>(m->get())->effects)
-      ret.push_back(std::make_pair(e.item, e.effect));
+      ret.push_back(e.effect);
     break;
   }
   return ret;

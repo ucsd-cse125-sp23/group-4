@@ -16,6 +16,7 @@ class GlobalEffect;
 enum class CollisionType { NONE, COLLISION, TRIGGER };
 class Level {
  private:
+  std::mt19937 rng;
   std::uint64_t age;
   CollisionType collisionTypeLUT[10][10];
   Environment* environment;
@@ -29,9 +30,6 @@ class Level {
   int freeSpaces;
 
  public:
-  std::mt19937 rng;
-
-
   std::map<uint32_t, Player*> players;
   PObjectCollection objects;
 
