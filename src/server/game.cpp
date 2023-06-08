@@ -7,7 +7,7 @@
 #include <server/manager.hpp>
 
 #include "core/game/event/Event.h"
-#include "core/game/mode/GameModes.h"
+#include "core/game/mode/GameMode.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 

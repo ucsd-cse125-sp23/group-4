@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "core/game/mode/GameMode.h"
-#include "core/game/mode/GameModes.h"
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/physics/Player.h"
 #include "core/game/physics/PowerUp.h"
