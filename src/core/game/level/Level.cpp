@@ -90,9 +90,12 @@ void Level::tick() {
   // Respawn out of bounds Players
   for (size_t id : allIds) {
     PObject* obj = this->objects[id];
-    if (Player* player = dynamic_cast<Player*>(obj))
-      if (player->getPos().y < this->environment->getDeathHeight())
+    if (Player* player = dynamic_cast<Player*>(obj)) {
+      if (player->getPos().y < this->environment->getDeathHeight()) {
         this->environment->placePlayers(rng, {player});
+        player->vel = vec3f(0, 0, 0);
+      }
+    }
   }
 
   // Spawn Powerups
@@ -151,6 +154,7 @@ Level::~Level() {
   delete environment;
   delete eventManager;
   delete statisticManager;
+  if (gameMode != nullptr) delete gameMode;
 }
 void Level::setCollisionType(CollisionType type, int layer0, int layer1) {
   collisionTypeLUT[layer0][layer1] = type;
@@ -168,6 +172,14 @@ void Level::addPObject(PObject* obj) {
 }
 std::uint64_t Level::getAge() { return age; }
 Environment* Level::getEnvironment() { return environment; }
+
+void Level::spreadPlayers(std::vector<Player*> ps) {
+  this->environment->placePlayers(rng, ps);
+}
+void Level::restartGame() {
+  this->age = TAG_COOLDOWN;
+  if (gameMode != nullptr) this->gameMode->initPlayers(players);
+}
 
 void Level::definePowerupSpawn(GlobalEffect* power, int weight) {
   totalWeight += weight;

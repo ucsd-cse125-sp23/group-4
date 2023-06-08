@@ -84,7 +84,7 @@ struct GameStateUpdateItem {
   float heading;
   int score;
   float speed;
-  bool is_grounded;
+  int is_grounded;
   bool is_tagged;
   std::vector<Effect> effects;
 
@@ -99,12 +99,12 @@ struct GameStateUpdateItem {
 struct GameStateUpdate {
   std::unordered_map<int, GameStateUpdateItem> things;
   int tagged_player;
-  float round_time;
+  float time_elapsed;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& things& tagged_player& round_time;
+    ar& things& tagged_player& time_elapsed;
   }
 };
 
