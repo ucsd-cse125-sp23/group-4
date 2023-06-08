@@ -34,6 +34,7 @@ const char* Window::windowTitle = "tagguys :O";
 GamePhase Window::phase;
 message::LobbyUpdate Window::lobby_state;
 
+GLFWwindow *Window::loadingWindow, *Window::screenWindow;
 std::thread Window::subthread;
 
 // Game stuff to render
@@ -135,17 +136,18 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
-  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  screenWindow = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
 
   // Check if the window could not be created.
-  if (!window) {
+  if (!screenWindow) {
     std::cerr << "Failed to open GLFW window." << std::endl;
     glfwTerminate();
     return NULL;
   }
 
   // Make the context of the window.
-  glfwMakeContextCurrent(window);
+  glfwMakeContextCurrent(screenWindow);
 
 #ifndef __APPLE__
   // On Windows and Linux, we need GLEW to provide modern OpenGL functionality.
@@ -171,9 +173,9 @@ GLFWwindow* Window::createWindow(int width, int height) {
   MouseX = MouseY = 0;
 
   // Call the resize callback to make sure things get drawn immediately.
-  Window::resizeCallback(window, width, height);
+  Window::resizeCallback(screenWindow, width, height);
 
-  return window;
+  return screenWindow;
 }
 
 void Window::resizeCallback(GLFWwindow* window, int width, int height) {
@@ -214,13 +216,11 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
     HUD** hudPtr = &hud;
     subthread = std::thread([=](Scene* gameScene, HUD** hud) {
-          GLFWwindow* local = glfwCreateWindow(1, 1, "Loader", NULL, NULL);
-          glfwMakeContextCurrent(local);
+          glfwMakeContextCurrent(loadingWindow);
 
           gameScene->init(lobby->players);
           *hudPtr = new HUD(gameScene);
           loading_resources = false;
-          glfwTerminate();
       },
       std::ref(gameScene), std::ref(hudPtr));
   } else {

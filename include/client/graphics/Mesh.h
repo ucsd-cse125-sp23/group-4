@@ -28,13 +28,37 @@ class Mesh {
   virtual void init(const char* s) {}
 
   virtual void draw(void) {
-    glBindVertexArray(vao);
+    if (!vao) {
+      glGenVertexArrays(1, &vao);
+      glBindVertexArray(vao);
+
+      // 0th attribute: position
+      glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(0));
+
+      // 1st attribute: normal
+      glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+      glEnableVertexAttribArray(1);
+      glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(0));
+
+      // 2nd attribute: uv (textures)
+      glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+      glEnableVertexAttribArray(2);
+      glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(0));
+
+      // indices
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
+    } else {
+      glBindVertexArray(vao);
+    }
+    // unbind the buffers, vao
     glDrawElements(mode, count, type, 0);  // uses indices
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
   }
 
   void creategl() {
-    glGenVertexArrays(1, &vao);
     buffers.resize(4);
     glGenBuffers(4, &buffers[0]);
   }
@@ -46,8 +70,6 @@ class Mesh {
     count = n;
 
     if (count == 0) return;
-
-    glBindVertexArray(vao);
 
     // 0th attribute: position
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
@@ -78,7 +100,6 @@ class Mesh {
     // unbind the buffers, vao
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // don't unbuffer me!
-    glBindVertexArray(0);
   }
 
   void bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals,
@@ -93,7 +114,7 @@ class Mesh {
 
   void cleargl() {
     // Delete the VBOs and the VAO.
-    glDeleteBuffers(1, &vao);
+    if(vao) glDeleteBuffers(1, &vao);
     glDeleteBuffers(1, &buffers[0]);
     glDeleteBuffers(1, &buffers[1]);
     glDeleteBuffers(1, &buffers[2]);

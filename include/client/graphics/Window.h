@@ -38,6 +38,7 @@ class Window {
   static GamePhase phase;
   static message::LobbyUpdate lobby_state;
 
+  static GLFWwindow *loadingWindow, *screenWindow;
   static std::thread subthread;
 
   // Objects to render
