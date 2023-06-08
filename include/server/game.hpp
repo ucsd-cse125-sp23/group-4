@@ -16,6 +16,7 @@ class GameThing {
 
   void update(const message::UserStateUpdate& update);
   void remove();
+  bool is_tagged() const;
   message::GameStateUpdateItem to_network() const;
 
  private:

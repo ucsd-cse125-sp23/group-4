@@ -18,8 +18,6 @@ void GameThing::move(float x, float y, float z) {  // NOLINT
 }
 
 void GameThing::update(const message::UserStateUpdate& update) {
-  std::cout << "(GameThing::update) Updating GameThing " << update.id
-            << std::endl;
   control_->horizontalVel = vec3f(update.movx, update.movy, update.movz);
   control_->doJump = update.jump;
   heading_ = update.heading;
@@ -27,8 +25,11 @@ void GameThing::update(const message::UserStateUpdate& update) {
 
 void GameThing::remove() { player_->markRemove(); }
 
+bool GameThing::is_tagged() const {
+  return TaggedStatusModifier::isIt(player_);
+}
+
 message::GameStateUpdateItem GameThing::to_network() const {
-  bool is_tagged = TaggedStatusModifier::isIt(player_);
   return {
       id_,
       player_->getPos().x,
@@ -38,7 +39,7 @@ message::GameStateUpdateItem GameThing::to_network() const {
       level_->gameMode->queryScore(id_),
       length(player_->vel),
       player_->onGround,
-      is_tagged,
+      is_tagged(),
       {}  // TODO: get player effects
   };
 }
@@ -101,7 +102,13 @@ void Game::update(const message::UserStateUpdate& update) {
 
 void Game::tick() { level_->tick(); }
 
-void Game::restart() { level_->restartGame(); }
+void Game::restart() {
+  level_->restartGame();
+
+  // assign first tagged player
+  for (auto& [pid, thing] : game_things_)
+    if (thing.is_tagged()) tagged_player_ = pid;
+}
 
 // note: PObject.id != Player.pid in event handlers below :((
 
