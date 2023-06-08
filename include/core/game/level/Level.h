@@ -8,9 +8,9 @@
 #include "core/game/level/Environment.h"
 #include "core/game/level/PObjectCollection.h"
 #include "core/game/level/StatisticManager.h"
+#include "core/game/mode/GameMode.h"
 #include "core/game/physics/PObject.h"
 #include "core/game/physics/Player.h"
-#include "core/game/mode/GameMode.h"
 
 class GlobalEffect;
 enum class CollisionType { NONE, COLLISION, TRIGGER };

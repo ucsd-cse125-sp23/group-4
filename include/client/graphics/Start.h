@@ -34,7 +34,7 @@ class Start : public Scene, public InputListener {
       frames.push_back(frame);
     }
   }
-  
+
   void draw() override;
 
   void drawName();

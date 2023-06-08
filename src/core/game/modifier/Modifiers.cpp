@@ -2,11 +2,11 @@
 
 #include "core/game/modifier/AttractModifier.h"
 #include "core/game/modifier/ControlModifier.h"
+#include "core/game/modifier/EffectStorageModifier.h"
 #include "core/game/modifier/FreezeModifier.h"
 #include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
-#include "core/game/modifier/EffectStorageModifier.h"
 #include "core/util/global.h"
 
 ModifierData::ModifierData(Level* level, std::uint64_t duration)
@@ -53,12 +53,13 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
 
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
-    float fFactor = std::clamp(
-        std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
-            (pObj->onGround >= COYOTE_TIME ? pObj->lastSurfaceFriction *
+    float fFactor =
+        std::clamp(std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
+                       (pObj->onGround >= COYOTE_TIME
+                            ? pObj->lastSurfaceFriction *
                                   pObj->modifyValue(1, GRAVITY_MODIFIER) * 2
                             : 0.2f),
-        0.0f, 1.0f);
+                   0.0f, 1.0f);
     dv *= fFactor;
     pObj->vel.x += dv.x;
     pObj->vel.z += dv.z;
@@ -75,7 +76,8 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       dj *= std::min(1.0f, d * d);
       dj.y = 1.0f / (1.0f + std::exp(-15.0f * (c - 0.36f)));
       dj = normalize(dj);
-      dj *= cData->jumpVel * (pObj->onGround >= COYOTE_TIME ? sqrt(fFactor) : 1);
+      dj *=
+          cData->jumpVel * (pObj->onGround >= COYOTE_TIME ? sqrt(fFactor) : 1);
       pObj->vel.x += dj.x / 10;
       pObj->vel.y = dj.y;
       pObj->vel.z += dj.z / 10;
@@ -138,8 +140,6 @@ float NumberModifier::evaluate(
   return base * mul + add;
 }
 
-
-
 EffectStorageModifier::EffectStorageModifier() {}
 void EffectStorageModifier::modify(Modifiable* obj, ModifierData* data) {
   auto* cData = static_cast<EffectStorageModifierData*>(data);
@@ -152,7 +152,7 @@ void EffectStorageModifier::modify(Modifiable* obj, ModifierData* data) {
 }
 
 void EffectStorageModifier::addEffect(PObject* obj, Effect effect,
-                                    size_t duration) {
+                                      size_t duration) {
   for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
     static_cast<EffectStorageModifierData*>(m->get())->effects.push_back(
         {effect, obj->level->getAge() + duration});

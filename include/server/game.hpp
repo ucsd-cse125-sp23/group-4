@@ -42,7 +42,7 @@ class Game {
   std::vector<message::TagEvent> get_tag_events();
   void clear_events();
   std::unordered_map<int, message::GameStateUpdateItem> to_network();
-  
+
   void restart_game();
 
  private:

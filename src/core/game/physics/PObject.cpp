@@ -78,13 +78,10 @@ void PObject::tick() {
   Modifiable::tick();
   this->vel.y -= std::max(0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
-
   lastSurfaceNormal = vec3f(0, 0, 0);
   if (onGround) {
-      if(this->vel.y > -0.1)
-        ticksFallen = 0;
-  }
-  else {
+    if (this->vel.y > -0.1) ticksFallen = 0;
+  } else {
     ticksFallen++;
     lastSurfaceFriction = 0;
   }
@@ -130,7 +127,7 @@ void PObject::move(vec3f dPos) {
       float baseMu = hit.first->getBounds()->friction;
       float modifiedMu = this->modifyValue(baseMu, FRICTION_MODIFIER);
       this->vel = this->vel * std::max(0.0f, 1.0f - w * modifiedMu);
-      //rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
+      // rDPos = rDPos * std::max(0.0f, 1.0f - w * modifiedMu);
 
       this->lastSurfaceNormal = norm;
       this->lastSurfaceFriction = baseMu;
@@ -146,10 +143,9 @@ void PObject::move(vec3f dPos) {
   }
 
   if (totalY < -0.01 &&
-      lastSurfaceNormal.y <= 0.01 +
-          0.1 * (std::abs(lastSurfaceNormal.x) + std::abs(lastSurfaceNormal.z)))
-    if (onGround > 0)
-      onGround--;
+      lastSurfaceNormal.y <= 0.01 + 0.1 * (std::abs(lastSurfaceNormal.x) +
+                                           std::abs(lastSurfaceNormal.z)))
+    if (onGround > 0) onGround--;
 
   Environment* environment = this->level->getEnvironment();
   std::pair<PObject*, vec4f> pair = environment->mtv(this);

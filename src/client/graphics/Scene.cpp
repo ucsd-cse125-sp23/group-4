@@ -178,9 +178,9 @@ void Scene::draw() {
   while (!dfs_stack.empty()) {
     // Detect whether the search runs into infinite loop
     if (dfs_stack.size() > std::max(static_cast<int>(node.size()), 100)) {
-      //std::cerr << "Error: The scene graph probably has a closed loop."
-      //          << std::endl;
-      //exit(-1);
+      // std::cerr << "Error: The scene graph probably has a closed loop."
+      //           << std::endl;
+      // exit(-1);
     }
 
     // top-pop the stacks

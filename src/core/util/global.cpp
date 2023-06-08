@@ -22,7 +22,7 @@ SphereShape* POWERUP_BASE_SHAPE = new SphereShape(0.4);
 CapsuleShape* PLAYER_BASE_SHAPE =
     new CapsuleShape(PLAYER_HEIGHT, PLAYER_RADIUS);
 OffsetShape* PLAYER_BOUNDING_SHAPE =
-    new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, PLAYER_HEIGHT/2, 0.0f));
+    new OffsetShape(PLAYER_BASE_SHAPE, vec3f(0.0f, PLAYER_HEIGHT / 2, 0.0f));
 
 ControlModifier* CONTROL_MODIFIER = new ControlModifier();
 TaggedStatusModifier* TAGGED_STATUS_MODIFIER = new TaggedStatusModifier();
@@ -132,16 +132,6 @@ extern GlobalEffect* SLOW_FALL_OTHER_EFFECT = new ContextAwareGlobalEffect(
     SLOW_FALL_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
 extern GlobalEffect* FAST_FALL_OTHER_EFFECT = new ContextAwareGlobalEffect(
     FAST_FALL_EFFECT, ContextAwareGlobalEffect::Targets::OTHER);
-
-
-
-
-
-
-
-
-
-
 
 int swaptable2[1][2] = {{1, 0}};
 int swaptable3[2][3] = {{1, 2, 0}, {2, 0, 1}};
