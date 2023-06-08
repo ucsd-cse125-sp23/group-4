@@ -44,6 +44,8 @@ class Game {
   void clear_events();
   message::GameStateUpdate to_network();
 
+  void restart_game();
+
  private:
   std::unordered_map<int, GameThing> game_things_;
   std::vector<JumpEvent> jump_events_;

@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
           if (manager.check_ready()) {
             manager.game_.start();  // initialized tagged player
             server.write_all<message::GameStart>();
+            manager.game_.restart_game();
             server.start_tick();
           }
         };

@@ -49,7 +49,10 @@ Game::Game() {
   Environment* environment = new Environment();
   MapData mapData = MapDataImporter::Import(config["map_data_file"]);
   for (auto collider : mapData.colliders) {
-    environment->addConvex(collider.vertices, 0.2f);
+    environment->addConvex(collider.vertices, 2.4f);
+  }
+  for (auto zerof : mapData.groups["zerof"]) {
+    environment->addConvex(zerof.vertices, 0.0f);
   }
   for (auto spawn : mapData.spawnPoints) {
     map_spawn_points.push_back(spawn.point);
@@ -149,3 +152,5 @@ message::GameStateUpdate Game::to_network() {
   float time_elapsed = (level_->getAge() - TAG_COOLDOWN) / 20.0;
   return {things, tagged_player_, time_elapsed};
 }
+
+void Game::restart_game() { level_->restartGame(); }

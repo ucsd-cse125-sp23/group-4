@@ -18,3 +18,11 @@ Player::Player()
 Player::~Player() {}
 
 void Player::tick() { PObject::tick(); }
+
+void Player::onTrigger(PObject* other) {
+  if (Player* pOther = dynamic_cast<Player*>(other)) {
+    vec3f dp = this->getPos() - pOther->getPos();
+    float depth = PLAYER_RADIUS * 2 - length(dp);
+    this->vel += normalize(dp) * depth / 5.0f;
+  }
+}
