@@ -101,10 +101,7 @@ void Game::update(const message::UserStateUpdate& update) {
 
 void Game::tick() { level_->tick(); }
 
-void Game::start() {
-  // TODO(sean): initialize Game::tagged_player
-  // TODO(bill): initialize game
-}
+void Game::restart() { level_->restartGame(); }
 
 // note: PObject.id != Player.pid in event handlers below :((
 
@@ -157,5 +154,3 @@ message::GameStateUpdate Game::to_network() {
   float time_elapsed = (level_->getAge() - TAG_COOLDOWN) / 20.0;
   return {things, tagged_player_, time_elapsed};
 }
-
-void Game::restart_game() { level_->restartGame(); }

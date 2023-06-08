@@ -52,9 +52,8 @@ int main(int argc, char* argv[]) {
 
           // if all clients are ready, start the game
           if (manager.check_ready()) {
-            manager.game_.start();  // initialized tagged player
+            manager.game_.restart();
             server.write_all<message::GameStart>();
-            manager.game_.restart_game();
             server.start_tick();
           }
         };

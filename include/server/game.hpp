@@ -36,15 +36,13 @@ class Game {
   void remove_player(int);
   void update(const message::UserStateUpdate&);
   void tick();
-  void start();
+  void restart();
   std::vector<message::JumpEvent> get_jump_events();
   std::vector<message::LandEvent> get_land_events();
   std::vector<message::ItemPickupEvent> get_item_pickup_events();
   std::vector<message::TagEvent> get_tag_events();
   void clear_events();
   message::GameStateUpdate to_network();
-
-  void restart_game();
 
  private:
   std::unordered_map<int, GameThing> game_things_;
