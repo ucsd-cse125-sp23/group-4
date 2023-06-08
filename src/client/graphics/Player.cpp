@@ -48,8 +48,6 @@ message::UserStateUpdate Player::pollInput() {
   }
 
   if (Input::GetInputState(InputAction::MoveJump) != InputState::None) {
-    if (fx_jump) fx_jump->Emit(5);  // TODO(matthew) move this to jump event msg
-
     jumping = true;
   }
 
@@ -92,4 +90,25 @@ vec3 Player::move(vec3 movement) {
   // GameThing::move(movement);  // don't actually move. let the server do it
 
   return movement;  // send back the "world space" movement vector
+}
+
+// Event FX
+void Player::eventJump() {
+  if (fx_jump) fx_jump->Emit(3);  // spew particles!
+}
+
+void Player::eventLand() {
+  if (fx_land) fx_land->Emit(5);
+}
+
+void Player::eventItem() {
+  if (fx_item) fx_item->Emit(10);
+}
+
+void Player::eventTag() {
+  //
+}
+
+void Player::eventTagged() {
+  if (fx_tag) fx_tag->Emit(15);
 }

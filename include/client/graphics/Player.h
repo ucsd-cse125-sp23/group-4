@@ -27,7 +27,9 @@ class Player : public GameThing, InputListener {
   PlayerModel* pmodel;  // visual information
 
   ParticleSystem* fx_jump;
-  ParticleSystem* fx_tag;  // TODO(matthew)
+  ParticleSystem* fx_land;
+  ParticleSystem* fx_item;
+  ParticleSystem* fx_tag;
 
   Timer time;
   bool tagged;
@@ -42,6 +44,12 @@ class Player : public GameThing, InputListener {
   }
 
   message::UserStateUpdate pollInput();
+
+  void eventJump();
+  void eventLand();
+  void eventItem();
+  void eventTag();
+  void eventTagged();
 
   void animate(float dt) override;
   void update(float dt);

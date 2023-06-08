@@ -152,6 +152,51 @@ void Scene::receiveState(message::GameStateUpdate newState) {
   for (int id : removedIds) removePlayer(id);
 }
 
+#pragma region receiveEvent
+
+void Scene::receiveEvent_jump(message::JumpEvent e) {
+  if (!networkGameThings.count(e.pid)) return;
+
+  auto t = networkGameThings.at(e.pid);
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+
+    player->eventJump();
+  }
+}
+void Scene::receiveEvent_land(message::LandEvent e) {
+  if (!networkGameThings.count(e.pid)) return;
+
+  auto t = networkGameThings.at(e.pid);
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+
+    player->eventLand();
+  }
+}
+void Scene::receiveEvent_item(message::ItemPickupEvent e) {
+  if (!networkGameThings.count(e.pid)) return;
+
+  auto t = networkGameThings.at(e.pid);
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+
+    player->eventItem(/*TODO(matthew) add param?*/);
+  }
+}
+void Scene::receiveEvent_tag(message::TagEvent e) {
+  if (!networkGameThings.count(e.taggee)) return;
+
+  auto t1 = networkGameThings.at(e.taggee);
+  if (dynamic_cast<Player*>(t1) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t1);
+
+    player->eventTagged();
+  }
+}
+
+#pragma endregion
+
 void Scene::draw() {
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
