@@ -3,7 +3,7 @@
 ////////////////////////////////////////
 
 #include "Camera.h"
-
+#include <SFML/Audio.hpp>
 #include "Input.h"
 
 using glm::mat4x4;
@@ -97,7 +97,7 @@ void Camera::update(float dt) {
   moveLocal *= 12 * dt;
 
   if (length(moveLocal) > 0) move_local(moveLocal);
-
+  sf::Listener::setPosition(transform.position.x,transform.position.y,transform.position.z);
   return;
 }
 

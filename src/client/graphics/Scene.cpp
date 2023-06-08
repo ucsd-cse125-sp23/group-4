@@ -69,6 +69,12 @@ Player* Scene::createPlayer(int id) {
   // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
+  // sound effects
+  SoundEffect* sfxRef =
+      dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_jump"]);
+  auto sfx = new SoundEffect(*sfxRef);
+  player->sfx_jump = sfx;
+
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);

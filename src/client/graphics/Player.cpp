@@ -100,7 +100,7 @@ void Player::eventJump() {
   if (fx_jump) fx_jump->Emit(3);  // spew particles!
 
   // SFX!
-  // if (sfx_jump) sfx_jump->play(transform.position);
+  if (sfx_jump) sfx_jump->play(transform.position);
 }
 
 void Player::eventLand() {

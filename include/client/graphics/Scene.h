@@ -117,7 +117,7 @@ class Scene {
   Timer time;
   bool gameStart;
   SoundEffect* gameTheme;
-  SoundEffect* jumpSFX;
+  
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;

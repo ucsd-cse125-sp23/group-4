@@ -216,9 +216,11 @@ void Scene::init(void) {
 #pragma region Sounds
   // Sound palette
   SoundEffect* sfx = new SoundEffect();
+  sfx->load("assets/sounds/jump.wav");
   sceneResources->sounds["test"] = sfx;
+  sfx = new SoundEffect();
   sfx->load("assets/sounds/jump2.wav");
-  jumpSFX = sfx;
+  sceneResources->sounds["sfx_jump"] = sfx;
 #pragma endregion
 
   // Setup particle effects

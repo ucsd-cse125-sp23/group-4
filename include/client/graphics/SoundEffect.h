@@ -7,7 +7,7 @@
 
 #include <SFML/Audio.hpp>
 #include <string>
-
+#include "core.h"
 class SoundEffect {
  public:
   inline static float volumeGlobal = 1.0f;  // 0.0 to 1.0
@@ -23,7 +23,8 @@ class SoundEffect {
     setEffectVolume();
   }
 
-  void play() {
+  void play(glm::vec3 pos) {
+    sound.setPosition(pos.x, pos.y, pos.z);
     setEffectVolume();
     sound.play();
   }
