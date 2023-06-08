@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "client/graphics/core.h"
