@@ -4,6 +4,14 @@ Mesh is an abstract class for a 3D rendered object.
 
 #pragma once
 
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+#include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
@@ -23,29 +31,51 @@ class Mesh {
                                 // uv,
                                 // indices
 
+  bool buffersCreated = false, dataOnHost = false, dataOnDevice = false;
+  std::vector<glm::vec3> hostVertices;
+  std::vector<glm::vec3> hostNormals;
+  std::vector<glm::vec2> hostUvs;
+  std::vector<unsigned int> hostIndices;
+
   virtual void init() {}
   void init(std::string str) { init(str.c_str()); }
   virtual void init(const char* s) {}
 
   virtual void draw(void) {
+    if (!dataOnDevice) {
+      if (!dataOnHost) return;
+      bindgl(hostVertices, hostNormals, hostUvs, hostIndices);
+    }
     glBindVertexArray(vao);
     glDrawElements(mode, count, type, 0);  // uses indices
     glBindVertexArray(0);
   }
 
   void creategl() {
+    if (buffersCreated) return;
     glGenVertexArrays(1, &vao);
     buffers.resize(4);
     glGenBuffers(4, &buffers[0]);
+    buffersCreated = true;
   }
 
-  void bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals,
+  bool bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals,
               std::vector<glm::vec2> uvs, std::vector<unsigned int> indices) {
+    if (!dataOnHost) {
+      dataOnHost = true;
+      std::swap(vertices, hostVertices);
+      std::swap(normals, hostNormals);
+      std::swap(uvs, hostUvs);
+      std::swap(indices, hostIndices);
+      return false;
+    }
+    creategl();
+
     unsigned int n = indices.size();  // #(triangles)*3
 
     count = n;
 
-    if (count == 0) return;
+    if (count == 0) return true;
 
     glBindVertexArray(vao);
 
@@ -79,16 +109,23 @@ class Mesh {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // don't unbuffer me!
     glBindVertexArray(0);
+
+    dataOnDevice = true;
+    hostVertices.clear();
+    hostNormals.clear();
+    hostUvs.clear();
+    hostIndices.clear();
+    return true;
   }
 
-  void bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals,
+  bool bindgl(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals,
               std::vector<unsigned int> indices) {
     std::vector<glm::vec2> uvsDefault;
     for (auto v : vertices) {
       uvsDefault.push_back(glm::vec2(0));
     }
 
-    bindgl(vertices, normals, uvsDefault, indices);
+    return bindgl(vertices, normals, uvsDefault, indices);
   }
 
   void cleargl() {

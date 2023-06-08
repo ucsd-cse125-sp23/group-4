@@ -111,7 +111,6 @@ class MapObj : public Model {
 
           // setting up buffers
           Mesh submesh = Mesh();
-          submesh.creategl();
           if (hasUV)
             submesh.bindgl(vertices, normals, uvs, indices);
           else
