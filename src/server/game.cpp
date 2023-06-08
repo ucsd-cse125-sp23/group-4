@@ -15,10 +15,6 @@ int get_pid(PObject* p) { return static_cast<Player*>(p)->pid; }
 GameThing::GameThing(int id, Player* p, ControlModifierData* c, Level* l)
     : id_(id), player_(p), control_(c), heading_(0), level_(l) {}
 
-void GameThing::move(float x, float y, float z) {  // NOLINT
-  control_->horizontalVel = vec3f(x, y, z);
-}
-
 void GameThing::update(const message::UserStateUpdate& update) {
   control_->horizontalVel = vec3f(update.movx, update.movy, update.movz);
   control_->doJump = update.jump;

@@ -20,8 +20,6 @@ class GameThing {
   message::GameStateUpdateItem to_network() const;
 
  private:
-  void move(float, float, float);  // NOLINT
-
   Level* level_;
   int id_;
   float heading_;
