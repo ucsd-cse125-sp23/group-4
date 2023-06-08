@@ -32,7 +32,7 @@ Player* Scene::createPlayer(int id) {
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
 
   // creating a player to be rendered... TODO call this from state update!
-  std::string playername = "_player" + std::to_string(id);
+  std::string playername = "player " + std::to_string(id);
 
   Player* player = new Player();
   player->name = playername;
@@ -72,12 +72,37 @@ Player* Scene::createPlayer(int id) {
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
-  player->fx_jump = new ParticleSystem(*ptclRef);
-  player->fx_jump->Reset(false);  // important!!!
-  player->fx_jump->name += "." + playername;
-  player->fx_jump->transform.position = glm::vec3(0, 0, 0);
-  player->fx_jump->transform.updateMtx(&player->fx_jump->transformMtx);
-  player->childnodes.push_back(player->fx_jump);
+  auto fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_jump = fx;
+
+  fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_land = fx;
+
+  fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_item = fx;
+
+  fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_tag = fx;
 
   // ---
 
@@ -151,6 +176,51 @@ void Scene::receiveState(message::GameStateUpdate newState) {
 
   for (int id : removedIds) removePlayer(id);
 }
+
+#pragma region receiveEvent
+
+void Scene::receiveEvent_jump(message::JumpEvent e) {
+  if (!networkGameThings.count(e.pid)) return;
+
+  auto t = networkGameThings.at(e.pid);
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+
+    player->eventJump();
+  }
+}
+void Scene::receiveEvent_land(message::LandEvent e) {
+  if (!networkGameThings.count(e.pid)) return;
+
+  auto t = networkGameThings.at(e.pid);
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+
+    player->eventLand();
+  }
+}
+void Scene::receiveEvent_item(message::ItemPickupEvent e) {
+  if (!networkGameThings.count(e.pid)) return;
+
+  auto t = networkGameThings.at(e.pid);
+  if (dynamic_cast<Player*>(t) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t);
+
+    player->eventItem(/*TODO(matthew) add param?*/);
+  }
+}
+void Scene::receiveEvent_tag(message::TagEvent e) {
+  if (!networkGameThings.count(e.taggee)) return;
+
+  auto t1 = networkGameThings.at(e.taggee);
+  if (dynamic_cast<Player*>(t1) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t1);
+
+    player->eventTagged();
+  }
+}
+
+#pragma endregion
 
 void Scene::draw() {
   // Pre-draw sequence:
