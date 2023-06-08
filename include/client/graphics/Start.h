@@ -37,10 +37,6 @@ class Start : public Scene, public InputListener {
 
   ~Start() { delete fr; }
 
-  void init() {
-    Scene::init();
-  }
-
   void reset() {
     timeElapsed = 0.0f;
     offset = 0.0f;
@@ -52,7 +48,7 @@ class Start : public Scene, public InputListener {
     index = 0;
   }
 
-  void draw();
+  void draw() override;
 
   void drawName();
 

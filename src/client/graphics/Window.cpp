@@ -54,7 +54,7 @@ std::atomic<bool> loading_resources{false};
 bool LeftDown, RightDown;
 int MouseX, MouseY;
 
-bool _debugmode = false;
+bool Window::_debugmode = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -205,6 +205,8 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // update and draw functions
+void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
+
 void Window::update(GLFWwindow* window, float deltaTime) {
   if (!dynamic_cast<Lobby*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby

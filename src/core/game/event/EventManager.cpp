@@ -35,6 +35,18 @@ void EventManager::registerEventHandler(
     std::function<void(TaggingEvent)> handler) {
   this->taggingEventHandlers.push_back(handler);
 }
+void EventManager::registerEventHandler(
+    std::function<void(JumpEvent)> handler) {
+  this->jumpEventHandlers.push_back(handler);
+}
+void EventManager::registerEventHandler(
+    std::function<void(LandEvent)> handler) {
+  this->landEventHandlers.push_back(handler);
+}
+void EventManager::registerEventHandler(
+    std::function<void(PickupEvent)> handler) {
+  this->pickupEventHandlers.push_back(handler);
+}
 
 void EventManager::fireCollisionEvent(PObject* self, PObject* other) {
   this->onCollisionEvent({level, self, other});

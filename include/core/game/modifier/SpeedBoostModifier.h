@@ -8,8 +8,9 @@
 
 struct SpeedBoostModifierData : ModifierData {
   float factorIncrease;
-  SpeedBoostModifierData(std::uint64_t duration, float factorIncrease)
-      : ModifierData(duration), factorIncrease(factorIncrease) {}
+  SpeedBoostModifierData(Level* level, std::uint64_t duration,
+                         float factorIncrease)
+      : ModifierData(level, duration), factorIncrease(factorIncrease) {}
 };
 class SpeedBoostModifier : public Modifier {
  public:

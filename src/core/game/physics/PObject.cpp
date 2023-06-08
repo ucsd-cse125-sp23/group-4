@@ -13,8 +13,8 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   /*If object is falling and mtv is atleast a little up, the we determine the
    * object to be onGround*/
   if (self->vel.y < 0 && norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
+    if (!self->onGround) self->level->eventManager->fireLandEvent(self);
     self->onGround = true;
-    self->level->eventManager->fireLandEvent(self);
   }
   if (other->isStatic()) {
     self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
@@ -28,8 +28,8 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   } else {
     if (other->vel.y < 0 &&
         norm.y / (std::abs(norm.x) + std::abs(norm.z)) > -0.05) {
+      if (!self->onGround) self->level->eventManager->fireLandEvent(self);
       self->onGround = true;
-      self->level->eventManager->fireLandEvent(self);
     }
 
     self->addPos(vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
@@ -108,8 +108,8 @@ void PObject::move(vec3f dPos) {
     if (norm != vec3f(0, 0, 0)) {
       if (this->vel.y < 0 &&
           norm.y > 0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
+        if (!this->onGround) this->level->eventManager->fireLandEvent(this);
         this->onGround = true;
-        this->level->eventManager->fireLandEvent(this);
       }
 
       vec3f v = tangent(rDPos, norm);
@@ -141,7 +141,7 @@ void PObject::move(vec3f dPos) {
 
   Environment* environment = this->level->getEnvironment();
   std::pair<PObject*, vec4f> pair = environment->mtv(this);
-  while (pair.first != nullptr) {
+  while (pair.first != nullptr && ite++ < 20) {
     response(this, pair.first, pair.second);
     pair = environment->mtv(this);
   }

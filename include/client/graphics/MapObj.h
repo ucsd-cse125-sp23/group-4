@@ -200,7 +200,7 @@ class MapObj : public Model {
   }
 
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-            const glm::mat4& transformMtx, const bool ignoreDepth = false) {
+            const glm::mat4& transformMtx) override {
     if (!material) return;
 
     for (auto mapmesh : meshes) {

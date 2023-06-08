@@ -103,7 +103,7 @@ void Lobby::init(void) {
   player_models.push_back(sceneResources->models["player4"]);
 
   ///////////////////////////////////////////////////////
-  printf("\nScene: done loading resources!\n");
+  printf("\nLobby: done loading resources!\n");
   ///////////////////////////////////////////////////////
 
   GameThing* thing_player = new GameThing;

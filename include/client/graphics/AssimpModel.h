@@ -33,8 +33,8 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
    *   Current animation is not inherited
    */
   AssimpModel(const AssimpModel& am);
-  // TODO
-  // ~AssimpModel();
+  /** Destructor */
+  ~AssimpModel();
 
   /** Load a model file (displaying default pose).
    * Returns whether the model file is loaded properly.
@@ -44,9 +44,9 @@ class AssimpModel : public PlayerModel, public SkinnedMesh {
 
   // PlayerModel
   void setAnimation(std::string animName);
-  void update(float deltaTimeInMs);
+  void update(float dt) override;
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
-            const glm::mat4& transformMtx, const bool ignoreDepth = false);
+            const glm::mat4& transformMtx) override;
 
   // SkinnedMesh
   void init(const char* filename) {

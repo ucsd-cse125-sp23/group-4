@@ -35,7 +35,7 @@ struct AssimpChannel {
  private:
   static const A_ANIM_TANGENT TANGENT_MODE = A_ANIM_TANGENT::LINEAR;
 
-  float timeStart, timeEnd;
+  float timeStart, timeEnd, timeLen;
 };
 
 struct AssimpRotKeyframe {
@@ -67,7 +67,7 @@ struct AssimpRotChannel {
  private:
   static const A_ANIM_QUART_INTERP INTERP_MODE = A_ANIM_QUART_INTERP::SLERP;
 
-  float timeStart, timeEnd;
+  float timeStart, timeEnd, timeLen;
 };
 
 struct BlendPose {

@@ -9,8 +9,9 @@
 struct AttractModifierData : ModifierData {
   PObject* sink;
   float factor;
-  AttractModifierData(std::uint64_t duration, PObject* sink, float factor)
-      : ModifierData(duration), sink(sink), factor(factor) {}
+  AttractModifierData(Level* level, std::uint64_t duration, PObject* sink,
+                      float factor)
+      : ModifierData(level, duration), sink(sink), factor(factor) {}
 };
 class AttractModifier : public Modifier {
  public:

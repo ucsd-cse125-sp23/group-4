@@ -156,12 +156,14 @@ int main(int argc, char* argv[]) {
     std::cout << "(net_assigned: " << net_assigned << ") ";
     std::cout << "Waiting for server to assign pid..." << std::endl;
     Window::client->poll();
+    Window::draw(window);  // necessary otherwise window will hang
+
     std::this_thread::sleep_for(std::chrono::milliseconds(16));
   }
 
   // rate limit sending updates to network, credit:
   // https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step
-  const double min_time_between_updates = 1.0 / 60;
+  const double min_time_between_updates = 1.0 / 30;
   double prev_time = glfwGetTime();
   double num_updates_to_send = 0;
 
@@ -169,7 +171,7 @@ int main(int argc, char* argv[]) {
   int frame_count = 0;
   int update_count = 0;
 
-  // Loop while GLFW window should stay open.
+  // Main game loop
   while (!game_exit && !glfwWindowShouldClose(window)) {
     // check for updates from server
     Window::client->poll();
@@ -192,6 +194,8 @@ int main(int argc, char* argv[]) {
         if (user_update.id == Window::gameScene->_myPlayerId)
           Window::client->write<message::UserStateUpdate>(user_update);
 
+        Window::animate(min_time_between_updates);  // update player anims
+
         update_count++;
         num_updates_to_send--;
       }
@@ -211,9 +215,6 @@ int main(int argc, char* argv[]) {
     // update and render scene
     Window::update(window, time_since_prev_frame);
     Window::draw(window);
-
-    // prevent drawing too fast...
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 
   Window::cleanUp();

@@ -27,7 +27,7 @@ extern SphereShape* POWERUP_BASE_SHAPE;
 extern CapsuleShape* PLAYER_BASE_SHAPE;
 extern OffsetShape* PLAYER_BOUNDING_SHAPE;
 
-extern Level* level;
+// extern Level* level;
 
 extern ControlModifier* CONTROL_MODIFIER;
 extern NumberModifier* GRAVITY_MODIFIER;

@@ -5,6 +5,8 @@ adapted from CSE 167 - Matthew
 *****************************************************/
 #include "Scene.h"
 
+#include "Settings.h"
+
 // The scene init definition
 #include <Player.h>
 #include <stdint.h>
@@ -71,6 +73,16 @@ Player* Scene::createPlayer(int id) {
   // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
+  // particle emitters
+  ParticleSystem* ptclRef =
+      dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
+  player->fx_jump = new ParticleSystem(*ptclRef);
+  player->fx_jump->Reset(false);  // important!!!
+  player->fx_jump->name += "." + playername;
+  player->fx_jump->transform.position = glm::vec3(0, 0, 0);
+  player->fx_jump->transform.updateMtx(&player->fx_jump->transformMtx);
+  player->childnodes.push_back(player->fx_jump);
+
   // ---
 
   // position is set by server message
@@ -114,6 +126,11 @@ void Scene::reset() {
   timeOver = 0;
 
   networkGameThings.clear();
+}
+
+void Scene::animate(float delta) {
+  for (auto& thing : localGameThings) thing->animate(delta);
+  for (auto& [_, thing] : networkGameThings) thing->animate(delta);
 }
 
 void Scene::update(float delta) {
@@ -174,9 +191,10 @@ void Scene::draw() {
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
   camera->UpdateView();
 
-  glm::mat4 viewProjMtx = camera->GetViewProjectMtx();
-  glm::mat4 viewProjOriginMtx = camera->GetViewProjectMtx(true);
-  glm::mat4 viewMtx = camera->GetViewMtx();  // required for certain lighting
+  DrawInfo drawInfo = DrawInfo();
+  drawInfo.viewMtx = camera->GetViewMtx();  // required for certain lighting
+  drawInfo.viewProjMtx = camera->GetViewProjectMtx();
+  drawInfo.viewProjOrigMtx = camera->GetViewProjectMtx(true);
 
   // Define stacks for depth-first search (DFS)
   std::stack<Node*> dfs_stack;
@@ -193,7 +211,7 @@ void Scene::draw() {
 
   while (!dfs_stack.empty()) {
     // Detect whether the search runs into infinite loop
-    if (dfs_stack.size() > std::max(static_cast<int>(node.size()), 100)) {
+    if (dfs_stack.size() > std::max(static_cast<int>(node.size()), 10000)) {
       std::cerr << "Error: The scene graph probably has a closed loop."
                 << std::endl;
       exit(-1);
@@ -206,11 +224,9 @@ void Scene::draw() {
     matrix_stack.pop();
 
     // draw the visuals of our current node
-    glm::mat4 vp = viewProjMtx;
-    if (cur->skybox) vp = viewProjOriginMtx;  // not pretty oh well
-    cur->draw(vp, viewMtx, cur_MMtx);
+    cur->draw(drawInfo, cur_MMtx);
 
-    cur->draw_debug(viewProjMtx, cur_MMtx, Scene::_gizmos,
+    cur->draw_debug(drawInfo, cur_MMtx, Scene::_gizmos,
                     _globalSceneResources.models["_gz-xyz"],
                     _globalSceneResources.models["_gz-cube"]);
 
@@ -225,7 +241,11 @@ void Scene::draw() {
 
 #include <imgui.h>
 
+Settings settings;  // define extern var
+
 void Scene::gui() {
+  settings.gui();
+
   ImGui::Begin("scene debug +++");
 
   ImGui::Checkbox("free camera", &camera->Fixed);

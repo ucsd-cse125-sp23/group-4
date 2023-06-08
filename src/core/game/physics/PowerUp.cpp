@@ -10,5 +10,5 @@ PowerUp::PowerUp(vec3f pos, GlobalEffect* effect)
 void PowerUp::onTrigger(PObject* other) {
   effect->apply(level, other);
   this->markRemove();
-  this->level->eventManager->fireLandEvent(other);
+  this->level->eventManager->firePickupEvent(other);
 }

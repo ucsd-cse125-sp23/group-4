@@ -20,3 +20,16 @@ add_subdirectory(src/server)
 
 enable_testing()
 add_subdirectory(tests)
+
+# copy static assets to executable directory
+add_custom_target(
+  copy_static_files
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets
+          $<TARGET_FILE_DIR:client>/assets
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/config.json
+          $<TARGET_FILE_DIR:client>
+  COMMAND
+    ${CMAKE_COMMAND} -E copy
+    ${FETCHCONTENT_BASE_DIR}/sfml-src/extlibs/bin/x64/openal32.dll
+    $<TARGET_FILE_DIR:client>)
+add_dependencies(client copy_static_files)
