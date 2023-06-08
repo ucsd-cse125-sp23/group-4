@@ -178,9 +178,8 @@ void Level::spreadPlayers(std::vector<Player*> ps) {
 }
 std::vector<Player*> Level::restartGame() {
   this->age = TAG_COOLDOWN;
-  std::vector<Player*> ret;
-  if (gameMode != nullptr) ret = this->gameMode->initPlayers(players);
-  return ret;
+  if (gameMode != nullptr) return this->gameMode->initPlayers(players);
+  return {};
 }
 
 void Level::definePowerupSpawn(GlobalEffect* power, int weight) {

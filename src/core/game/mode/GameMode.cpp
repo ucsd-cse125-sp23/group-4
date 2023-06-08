@@ -44,6 +44,7 @@ std::vector<Player*> NTaggersTimeGameMode::initPlayers(
     p->level->statisticManager->setValue(p->pid, "ticks_it", 0);
     p->level->statisticManager->setValue(p->pid, "it_count", 0);
   }
+  std::vector<Player*> ret;
   for (int i = 0; i < n && i < players.size(); i++) {
     TaggedStatusModifierData* data = static_cast<TaggedStatusModifierData*>(
         pPerm[i]->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get());
@@ -51,7 +52,9 @@ std::vector<Player*> NTaggersTimeGameMode::initPlayers(
     data->taggedTime = pPerm[i]->level->getAge();
     pPerm[i]->level->statisticManager->setValue(pPerm[i]->pid, "ticks_it",
                                                 -TAG_COOLDOWN);
+    ret.push_back(pPerm[i]);
   }
+  return ret;
 }
 
 GameMode::GameMode(bool lowerScoreLead)
