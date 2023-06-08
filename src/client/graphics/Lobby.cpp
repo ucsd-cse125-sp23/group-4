@@ -50,6 +50,9 @@ void Lobby::reset() {
 void Lobby::update(float delta) {
   GameThing* display = models[index];
   display->update(delta);
+  if (auto* am = dynamic_cast<AssimpModel*>(display->model)) {
+    am->update(delta);
+  }
 
   if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
     is_ready = true;
