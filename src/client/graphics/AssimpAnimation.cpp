@@ -345,7 +345,7 @@ const std::map<std::string, AssimpAnimation::PLAYER_AC>
         {"Armature|place3.1", AssimpAnimation::PLAYER_AC::PLACE3_2},
         {"Armature|place4.0", AssimpAnimation::PLAYER_AC::PLACE4_1},
         {"Armature|place4.1", AssimpAnimation::PLAYER_AC::PLACE4_2}};
-const std::string AssimpAnimation::EMOTE_CYC_SUFFIX = ".cycle";
+const char AssimpAnimation::EMOTE_CYC_SUFFIX[] = ".cycle";
 const float AssimpAnimation::MS_DISSOLVE = 0.5f;
 const float AssimpAnimation::MS_JUMP = 0.25f;
 const std::vector<std::string> AssimpAnimation::NODES_TAG(
