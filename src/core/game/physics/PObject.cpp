@@ -17,7 +17,7 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   if (self->vel.y < 0 &&
       norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
     self->onGround = COYOTE_TIME;
-    if (self->ticksFallen == 8)
+    if (self->ticksFallen > 8)
       self->level->eventManager->fireLandEvent(self);
   }
   if (other->isStatic()) {
@@ -33,7 +33,7 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
     if (other->vel.y < 0 &&
         norm.y > -0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
       self->onGround = COYOTE_TIME;
-      if (self->ticksFallen == 8)
+      if (self->ticksFallen > 8)
         self->level->eventManager->fireLandEvent(self);
     }
 
@@ -82,7 +82,7 @@ void PObject::tick() {
 
   lastSurfaceNormal = vec3f(0, 0, 0);
   if (onGround) {
-    if (this->vel.y > -0.1) ticksFallen = 0;
+    ticksFallen = 0;
   } else {
     ticksFallen++;
     lastSurfaceFriction = 0;
@@ -119,7 +119,7 @@ void PObject::move(vec3f dPos) {
       if (this->vel.y < 0 &&
           norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
         this->onGround = COYOTE_TIME;
-        if (this->ticksFallen == 8)
+        if (this->ticksFallen > 8)
           this->level->eventManager->fireLandEvent(this);
       }
 
