@@ -103,15 +103,22 @@ void network_init() {
       Window::phase = GamePhase::Game;
     };
 
-    // TODO(eddie): add effects for different event messages
-    auto jump_event_handler = [](const message::JumpEvent& body) {};
-
-    auto land_event_handler = [](const message::LandEvent& body) {};
-
-    auto item_pickup_event_handler = [](const message::ItemPickupEvent& body) {
+    // event messages
+    auto jump_event_handler = [](const message::JumpEvent& body) {
+        Window::gameScene->receiveEvent_jump(body);
     };
 
-    auto tag_event_handler = [](const message::TagEvent& body) {};
+    auto land_event_handler = [](const message::LandEvent& body) {
+        Window::gameScene->receiveEvent_land(body);
+    };
+
+    auto item_pickup_event_handler = [](const message::ItemPickupEvent& body) {
+        Window::gameScene->receiveEvent_item(body);
+    };
+
+    auto tag_event_handler = [](const message::TagEvent& body) {
+        Window::gameScene->receiveEvent_tag(body);
+    };
 
     auto any_handler = [](const message::Message::Body&) {};
 
