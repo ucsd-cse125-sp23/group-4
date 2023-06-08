@@ -36,12 +36,15 @@ class Game {
   void remove_player(int);
   void update(const message::UserStateUpdate&);
   void tick();
+  void start();
   std::vector<message::JumpEvent> get_jump_events();
   std::vector<message::LandEvent> get_land_events();
   std::vector<message::ItemPickupEvent> get_item_pickup_events();
   std::vector<message::TagEvent> get_tag_events();
   void clear_events();
-  std::unordered_map<int, message::GameStateUpdateItem> to_network();
+  message::GameStateUpdate to_network();
+
+  void restart_game();
 
  private:
   std::unordered_map<int, GameThing> game_things_;
@@ -49,7 +52,7 @@ class Game {
   std::vector<LandEvent> land_events_;
   std::vector<PickupEvent> item_pickup_events_;
   std::vector<TaggingEvent> tag_events_;
-
+  int tagged_player_ = -1;
   Level* level_;
   std::vector<vec3f> map_spawn_points;
   // TODO: add other map things here...

@@ -3,8 +3,8 @@
 #include <map>
 #include <vector>
 
-#include "core/game/level/Level.h"
-
+class Player;
+class Level;
 class GameMode {
  protected:
   Level* level;

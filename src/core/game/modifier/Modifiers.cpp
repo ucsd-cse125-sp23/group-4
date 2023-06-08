@@ -2,6 +2,7 @@
 
 #include "core/game/modifier/AttractModifier.h"
 #include "core/game/modifier/ControlModifier.h"
+#include "core/game/modifier/EffectStorageModifier.h"
 #include "core/game/modifier/FreezeModifier.h"
 #include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
@@ -36,19 +37,34 @@ ControlModifierData::ControlModifierData(Level* level, float jumpVel)
 void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     ControlModifierData* cData = static_cast<ControlModifierData*>(data);
-    vec3f dv = (cData->horizontalVel * MOVE_VELOCITY - pObj->vel) * 0.6f;
+    vec3f targetHeading = cData->horizontalVel;
+    targetHeading.y = 0;
+    vec3f norm = pObj->lastSurfaceNormal;
+    if (norm != vec3f(0, 0, 0) && norm != vec3f(0, 1, 0)) {
+      vec3f uphillDir = normalize(tangent(vec3f(0, 1, 0), norm));
+      vec3f uphillHeading = normalize(tangent(uphillDir, vec3f(0, 1, 0)));
+      float fractionUphill = dot(normalize(targetHeading), uphillHeading);
+      float cosine = std::abs(norm.y);
+      targetHeading -=
+          uphillHeading * std::max(0.0f, fractionUphill) * (1 - cosine);
+    }
+    vec3f targetVel = targetHeading * MOVE_VELOCITY;
+    vec3f dv = (targetVel - pObj->vel) * 0.6f;
+
     if (length_squared(cData->horizontalVel) < length_squared(pObj->vel))
       dv *= 0.6f;
-    dv *= std::clamp(
-        std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
-            (pObj->onGround ? pObj->lastSurfaceFriction *
-                                  pObj->modifyValue(1, GRAVITY_MODIFIER) * 25
-                            : 0.3f),
-        0.0f, 1.0f);
+    float fFactor =
+        std::clamp(std::sqrt(pObj->modifyValue(1, FRICTION_MODIFIER)) *
+                       (pObj->onGround >= COYOTE_TIME
+                            ? pObj->lastSurfaceFriction *
+                                  pObj->modifyValue(1, GRAVITY_MODIFIER) * 2
+                            : 0.2f),
+                   0.0f, 1.0f);
+    dv *= fFactor;
     pObj->vel.x += dv.x;
     pObj->vel.z += dv.z;
-    if (pObj->onGround && cData->doJump) {
-      vec3f dj = pObj->lastSurfaceNormal;
+    if (pObj->onGround && cData->doJump && !pObj->freeze) {
+      vec3f dj = norm;
       if (dj.y < 0) {
         dj.x = 0;
         dj.z = 0;
@@ -60,11 +76,12 @@ void ControlModifier::modify(Modifiable* obj, ModifierData* data) {
       dj *= std::min(1.0f, d * d);
       dj.y = 1.0f / (1.0f + std::exp(-15.0f * (c - 0.36f)));
       dj = normalize(dj);
-      dj *= cData->jumpVel;
-      pObj->vel.x += dj.x;
+      dj *=
+          cData->jumpVel * (pObj->onGround >= COYOTE_TIME ? sqrt(fFactor) : 1);
+      pObj->vel.x += dj.x / 10;
       pObj->vel.y = dj.y;
-      pObj->vel.z += dj.z;
-      pObj->onGround = false;
+      pObj->vel.z += dj.z / 10;
+      pObj->onGround = 0;
       pObj->level->eventManager->fireJumpEvent(pObj);
     }
   }
@@ -83,6 +100,11 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
       pObj->addPos(lvl * 0.04f * pObj->vel * vec3f(1, 0, 1));
     }
   }
+}
+bool TaggedStatusModifier::isIt(Player* player) {
+  return static_cast<TaggedStatusModifierData*>(
+             player->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get())
+      ->isIt;
 }
 
 AttractModifier::AttractModifier() {}
@@ -121,4 +143,32 @@ float NumberModifier::evaluate(
     }
   }
   return base * mul + add;
+}
+
+EffectStorageModifier::EffectStorageModifier() {}
+void EffectStorageModifier::modify(Modifiable* obj, ModifierData* data) {
+  auto* cData = static_cast<EffectStorageModifierData*>(data);
+  for (int i = 0; i < cData->effects.size(); i++) {
+    if (data->level->getAge() > cData->expire) {
+      cData->effects[i--] = cData->effects.back();
+      cData->effects.pop_back();
+    }
+  }
+}
+
+void EffectStorageModifier::addEffect(PObject* obj, Effect effect,
+                                      size_t duration) {
+  for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
+    static_cast<EffectStorageModifierData*>(m->get())->effects.push_back(
+        {effect, obj->level->getAge() + duration});
+  }
+}
+std::vector<Effect> queryEffects(PObject* obj) {
+  std::vector<Effect> ret;
+  for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
+    for (auto e : static_cast<EffectStorageModifierData*>(m->get())->effects)
+      ret.push_back(e.effect);
+    break;
+  }
+  return ret;
 }

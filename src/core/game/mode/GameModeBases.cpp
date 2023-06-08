@@ -51,11 +51,16 @@ void NTaggerGameMode::initPlayers(std::map<uint32_t, Player*> players) {
   std::mt19937 g(rd());
   std::shuffle(pPerm.begin(), pPerm.end(), g);
 
-  for (int i = 0; i < n; i++) {
+  level->spreadPlayers(pPerm);
+  for (Player* p : pPerm) {
+    p->level->statisticManager->setValue(p->pid, "ticks_it", 0);
+    p->level->statisticManager->setValue(p->pid, "it_count", 0);
+  }
+  for (int i = 0; i < n && i < players.size(); i++) {
     TaggedStatusModifierData* data = static_cast<TaggedStatusModifierData*>(
         pPerm[i]->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get());
     data->isIt = true;
-    data->taggedTime = level->getAge();
+    data->taggedTime = pPerm[i]->level->getAge();
   }
 }
 
@@ -67,6 +72,11 @@ void TeamedTaggerGameMode::initPlayers(std::map<uint32_t, Player*> players) {
   std::mt19937 g(rd());
   std::shuffle(pPerm.begin(), pPerm.end(), g);
 
+  level->spreadPlayers(pPerm);
+  for (Player* p : pPerm) {
+    p->level->statisticManager->setValue(p->pid, "ticks_it", 0);
+    p->level->statisticManager->setValue(p->pid, "it_count", 0);
+  }
   for (int i = 0; i < players.size() / 2; i++) {
     teams[0].push_back(pPerm[i]->pid);
     TaggedStatusModifierData* data = static_cast<TaggedStatusModifierData*>(
