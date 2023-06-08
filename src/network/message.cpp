@@ -86,20 +86,20 @@ std::string effects_to_string(const std::vector<Effect>& effects) {
 std::string Player::to_string() const {
   // clang-format off
   std::string str = std::string("") +
-    "      {"                                               "\n"
-    "        id: " + std::to_string(id) + "," +             "\n"
-    "        position: {" +                                 "\n"
-    "          " + std::to_string(posx) + "," +             "\n"
-    "          " + std::to_string(posy) + "," +             "\n"
-    "          " + std::to_string(posz) + "," +             "\n"
-    "        }," +                                          "\n"
-    "        heading: " + std::to_string(heading) +         "\n"
-    "        score: " + std::to_string(score) +             "\n"
-    "        speed: " + std::to_string(speed) +             "\n"
-    "        is_grounded: " + std::to_string(is_grounded) + "\n"
-    "        is_tagged: " + std::to_string(is_tagged) +     "\n"
-    "        effects: " + effects_to_string(effects) +      "\n"
-    "      },"                                              "\n";
+    "      {"                                                     "\n"
+    "        id: " + std::to_string(id) + "," +                   "\n"
+    "        position: {" +                                       "\n"
+    "          " + std::to_string(posx) + "," +                   "\n"
+    "          " + std::to_string(posy) + "," +                   "\n"
+    "          " + std::to_string(posz) + "," +                   "\n"
+    "        }," +                                                "\n"
+    "        heading: " + std::to_string(heading) + "," +         "\n"
+    "        score: " + std::to_string(score) + "," +             "\n"
+    "        speed: " + std::to_string(speed) + "," +             "\n"
+    "        is_grounded: " + std::to_string(is_grounded) + "," + "\n"
+    "        is_tagged: " + std::to_string(is_tagged) + "," +     "\n"
+    "        effects: " + effects_to_string(effects) + "," +      "\n"
+    "      },"                                                    "\n";
   // clang-format on
   return str;
 }
