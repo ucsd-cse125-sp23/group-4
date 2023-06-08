@@ -72,12 +72,37 @@ Player* Scene::createPlayer(int id) {
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
-  player->fx_jump = new ParticleSystem(*ptclRef);
-  player->fx_jump->Reset(false);  // important!!!
-  player->fx_jump->name += "." + playername;
-  player->fx_jump->transform.position = glm::vec3(0, 0, 0);
-  player->fx_jump->transform.updateMtx(&player->fx_jump->transformMtx);
-  player->childnodes.push_back(player->fx_jump);
+  auto fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_jump = fx;
+
+  fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_land = fx;
+
+  fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_item = fx;
+
+  fx = new ParticleSystem(*ptclRef);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_tag = fx;
 
   // ---
 
