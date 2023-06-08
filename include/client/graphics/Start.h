@@ -11,16 +11,18 @@ class Start : public Scene, public InputListener {
  public:
   FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
   std::vector<Texture> frames;
+  Texture main;
+  Texture credits;
   float timeOnFrame;
   int index;
-  float timeElapsed;
-  float offset;
   bool renderText;
+  bool renderMain;
+  float alpha;
 
   explicit Start(Camera* camFromWindow) : Scene(camFromWindow) {
-    timeElapsed = 0.0f;
-    offset = 0.0f;
+    alpha = 0.0f;
     renderText = true;
+    renderMain = false;
     camera->SetDistance(600.0);
     camera->SetIncline(32.0);
     camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
@@ -33,13 +35,13 @@ class Start : public Scene, public InputListener {
       frame.init(filename.c_str());
       frames.push_back(frame);
     }
+
+    main.init("assets/UI/IMG_2510 2.PNG");
   }
 
   ~Start() { delete fr; }
 
   void reset() {
-    timeElapsed = 0.0f;
-    offset = 0.0f;
     renderText = true;
     camera->SetDistance(600.0);
     camera->SetIncline(32.0);
@@ -53,4 +55,8 @@ class Start : public Scene, public InputListener {
   void drawName();
 
   void update(float delta) override;
+
+  void drawMain();
+
+  void drawCredits();
 };

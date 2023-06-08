@@ -149,7 +149,7 @@ void Scene::update(float delta) {
       node["world"]->childnodes.clear();
     }
     if (Window::phase == GamePhase::GameOver) {
-      if (Input::GetInputState(InputAction::Enter) == InputState::Press) {
+      if (timeOver >= 8 && Input::GetInputState(InputAction::Enter) == InputState::Press) {
         Window::phase = GamePhase::Lobby;
         reset();
       }

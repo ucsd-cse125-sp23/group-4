@@ -82,7 +82,6 @@ void Lobby::init(void) {
   if (!amRacoon->loadAssimp("assets/animation/withUV/Animation -Racoon.fbx")) {
     exit(EXIT_FAILURE);
   }
-  amRacoon->update(0.0f);
   sceneResources->models["trash panda"] = amRacoon;
   sceneResources->models["trash panda"]->mesh = amRacoon;
   sceneResources->models["trash panda"]->material =
@@ -93,7 +92,6 @@ void Lobby::init(void) {
   if (!amBee->loadAssimp("assets/animation/withUV/Animation -Bee.fbx")) {
     exit(EXIT_FAILURE);
   }
-  amBee->update(0.0f);
   sceneResources->models["bee"] = amBee;
   sceneResources->models["bee"]->mesh = amBee;
   sceneResources->models["bee"]->material =
@@ -104,7 +102,6 @@ void Lobby::init(void) {
   if (!amAvocado->loadAssimp("assets/animation/withUV/Animation -Avocado.fbx")) {
     exit(EXIT_FAILURE);
   }
-  amAvocado->update(0.0f);
   sceneResources->models["avocado"] = amAvocado;
   sceneResources->models["avocado"]->mesh = amAvocado;
   sceneResources->models["avocado"]->material =
@@ -115,7 +112,6 @@ void Lobby::init(void) {
   if (!amDuck->loadAssimp("assets/animation/withUV/Animation -Duck.fbx")) {
     exit(EXIT_FAILURE);
   }
-  amDuck->update(0.0f);
   sceneResources->models["duck"] = amDuck;
   sceneResources->models["duck"]->mesh = amDuck;
   sceneResources->models["duck"]->material =
@@ -126,7 +122,6 @@ void Lobby::init(void) {
   if (!amCat->loadAssimp("assets/animation/withUV/Animation -Cat.fbx")) {
     exit(EXIT_FAILURE);
   }
-  amCat->update(0.0f);
   sceneResources->models["cat"] = amCat;
   sceneResources->models["cat"]->mesh = amCat;
   sceneResources->models["cat"]->material =
@@ -181,29 +176,33 @@ void Lobby::init(void) {
   node["cat"] = cat;
   node["unicorn"] = unicorn;
 
-  trash_panda->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  trash_panda->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  trash_panda->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
+  trash_panda->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
   trash_panda->model = sceneResources->models["trash panda"];
 
-  bee->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  bee->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  bee->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
+  bee->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
   bee->model = sceneResources->models["bee"];
 
-  avocado->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  avocado->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  avocado->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
+  avocado->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
   avocado->model = sceneResources->models["avocado"];
 
-  duck->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  duck->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  duck->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
+  duck->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
   duck->model = sceneResources->models["duck"];
 
-  cat->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  cat->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  cat->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
+  cat->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
   cat->model = sceneResources->models["cat"];
 
-  unicorn->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
-  unicorn->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  unicorn->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
+  unicorn->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
   unicorn->model = sceneResources->models["unicorn"];
+
+  for (auto m : models) {
+    m->update(0.0f);
+  }
 
   buildSceneTree();
 }

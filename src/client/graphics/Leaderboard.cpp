@@ -1,14 +1,15 @@
 #include "Leaderboard.h"
 
 Leaderboard::Leaderboard() {
-  background.init("assets/image/backgrounds/blue.png");
+  background.init("assets/UI/Group 14.png");
 }
 
 void Leaderboard::draw() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = static_cast<float>(width) / static_cast<float>(800);
+  float scale_x = static_cast<float>(width) / static_cast<float>(800);
+  float scale_y = static_cast<float>(height) / static_cast<float>(600);
 
   background.bindgl();
   glEnable(GL_TEXTURE_2D);
@@ -31,24 +32,15 @@ void Leaderboard::draw() {
   glEnd();
 
   glDisable(GL_DEPTH_TEST);
-  glViewport(0, height - (100 * scale), width, 90 * scale);
-  glColor3f(213.0f / 256.0f, 236.0f / 256.0f, 241.0f / 256.0f);
-  glBegin(GL_QUADS);
-
-  glVertex2f(1, 1);
-  glVertex2f(-1, 1);
-  glVertex2f(-1, -1);
-  glVertex2f(1, -1);
-
-  glEnd();
+  glViewport(0, height - (150 * scale_y), width, 90 * scale_y);
 
   glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
 
-  float leaderboard_width = fr->TextWidth("Leaderboard", 1.5 * scale);
-  fr->RenderText(width, 90 * scale, "Leaderboard",
+  float leaderboard_width = fr->TextWidth("Leaderboard", 1.5 * scale_y);
+  fr->RenderText(width, 90 * scale_y, "Leaderboard",
                  (static_cast<float>(width) / 2.0) - (leaderboard_width / 2.0),
-                 25 * scale, 1.5 * scale,
+                 25 * scale_y, 1.5 * scale_y,
                  glm::vec3(50.0 / 256.0, 65.0 / 256.0, 68.0 / 256.0));
   glViewport(0, 0, width, height);
 

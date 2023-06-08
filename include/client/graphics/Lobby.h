@@ -15,7 +15,8 @@ class Lobby : public Scene, public InputListener {
  public:
   FontRenderer* fr = new FontRenderer("assets/fonts/Roboto-Black.ttf");
   Texture background;
-  Texture flag;
+  Texture highlight;
+  Texture point;
   std::vector<std::string> skin_names{
       "trash panda", "bee", "avocado", "duck", "cat", "unicorn", "waffle"};
   std::map<std::string, Texture> icons;
