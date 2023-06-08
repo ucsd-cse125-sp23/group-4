@@ -105,19 +105,19 @@ void network_init() {
 
     // event messages
     auto jump_event_handler = [](const message::JumpEvent& body) {
-        Window::gameScene->receiveEvent_jump(body);
+      Window::gameScene->receiveEvent_jump(body);
     };
 
     auto land_event_handler = [](const message::LandEvent& body) {
-        Window::gameScene->receiveEvent_land(body);
+      Window::gameScene->receiveEvent_land(body);  // bug: fires cont.
     };
 
     auto item_pickup_event_handler = [](const message::ItemPickupEvent& body) {
-        Window::gameScene->receiveEvent_item(body);
+      Window::gameScene->receiveEvent_item(body);  // bug: fires cont.
     };
 
     auto tag_event_handler = [](const message::TagEvent& body) {
-        Window::gameScene->receiveEvent_tag(body);
+      Window::gameScene->receiveEvent_tag(body);
     };
 
     auto any_handler = [](const message::Message::Body&) {};

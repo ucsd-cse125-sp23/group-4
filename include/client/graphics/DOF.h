@@ -21,6 +21,7 @@ struct DOF {
   float max = 100000.0;
 
   DOF() {}
+  DOF(float v) { SetMinMax(v, v); }
   DOF(float lo, float hi) { SetMinMax(lo, hi); }
   DOF(float lo, float hi, float val) : DOF(lo, hi) { SetValue(val); }
 
@@ -60,6 +61,8 @@ struct DOFr : public DOF {
     initMin = initlo;
     initMax = inithi;
   }
+
+  DOFr(float v) { DOFr(v, v, v); }
 
   const float GetRandomValue(void) { return Tools::random(min, max); }
 
