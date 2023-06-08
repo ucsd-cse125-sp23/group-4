@@ -14,7 +14,24 @@ enum class InputAction {
   MoveJump,
   CameraZoomIn,
   CameraZoomOut,
-  Enter
+  Enter,
+  WALK,
+  IDLE,
+  TRIP,
+  FALL,
+  LOBBY1,
+  LOBBY2,
+  LOBBY3,
+  LOBBY4,
+  WINNING11,
+  WINNING12,
+  WINNING21,
+  WINNING22,
+  WINNING31,
+  WINNING32,
+  WINNING41,
+  WINNING42,
+  TAG
 };
 
 struct InputEvent {
