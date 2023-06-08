@@ -177,6 +177,12 @@ class Scene {
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
 
+  // received from net:
+  void receiveEvent_jump(message::JumpEvent e);
+  void receiveEvent_land(message::LandEvent e);
+  void receiveEvent_item(message::ItemPickupEvent e);
+  void receiveEvent_tag(message::TagEvent e);
+
   virtual void animate(float delta);
   virtual void update(float delta);
 

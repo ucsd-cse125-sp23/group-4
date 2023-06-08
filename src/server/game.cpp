@@ -106,16 +106,20 @@ void Game::start() {
   // TODO(bill): initialize game
 }
 
+// note: PObject.id != Player.pid in event handlers below :((
+
 std::vector<message::JumpEvent> Game::get_jump_events() {
   std::vector<message::JumpEvent> events;
-  for (auto& e : jump_events_) events.push_back({static_cast<int>(e.self->id)});
+  for (auto& e : jump_events_)
+    events.push_back({static_cast<int>(static_cast<Player*>(e.self)->pid)});
 
   return events;
 }
 
 std::vector<message::LandEvent> Game::get_land_events() {
   std::vector<message::LandEvent> events;
-  for (auto& e : land_events_) events.push_back({static_cast<int>(e.self->id)});
+  for (auto& e : land_events_)
+    events.push_back({static_cast<int>(static_cast<Player*>(e.self)->pid)});
 
   return events;
 }
@@ -123,7 +127,8 @@ std::vector<message::LandEvent> Game::get_land_events() {
 std::vector<message::ItemPickupEvent> Game::get_item_pickup_events() {
   std::vector<message::ItemPickupEvent> events;
   for (auto& e : land_events_)
-    events.push_back({static_cast<int>(e.self->id), Item::GiftBox});
+    events.push_back(
+        {static_cast<int>(static_cast<Player*>(e.self)->pid), Item::GiftBox});
 
   return events;
 }
@@ -131,8 +136,8 @@ std::vector<message::ItemPickupEvent> Game::get_item_pickup_events() {
 std::vector<message::TagEvent> Game::get_tag_events() {
   std::vector<message::TagEvent> events;
   for (auto& e : tag_events_)
-    events.push_back(
-        {static_cast<int>(e.tagger->id), static_cast<int>(e.tagee->id)});
+    events.push_back({static_cast<int>(static_cast<Player*>(e.tagger)->pid),
+                      static_cast<int>(static_cast<Player*>(e.tagee)->pid)});
 
   return events;
 }
