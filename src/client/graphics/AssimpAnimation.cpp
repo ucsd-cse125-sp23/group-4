@@ -346,8 +346,8 @@ const std::map<std::string, AssimpAnimation::PLAYER_AC>
         {"Armature|place4.0", AssimpAnimation::PLAYER_AC::PLACE4_1},
         {"Armature|place4.1", AssimpAnimation::PLAYER_AC::PLACE4_2}};
 const char AssimpAnimation::EMOTE_CYC_SUFFIX[] = ".cycle";
-const float AssimpAnimation::MS_DISSOLVE = 0.5f;
-const float AssimpAnimation::MS_JUMP = 0.25f;
+const float AssimpAnimation::MS_DISSOLVE = 2.0f;
+const float AssimpAnimation::MS_JUMP = 4.0f;
 const std::vector<std::string> AssimpAnimation::NODES_TAG(
     {"R.shoulder", "R.arm", "R.finger", "R.hand", "Body", "neck", "head",
      "eye"});
@@ -449,7 +449,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       isDissolve = true;
       isDissolveReversed = false;
       timeDissolve = 0.0f;
-      msCurrent = MS_JUMP;
+      timeDissolveMult = MS_JUMP;
     } else {
       timeJump += deltaTimeInMs;
       cJump.update(timeJump, poseMap, true);
@@ -458,8 +458,8 @@ void AssimpAnimation::update(float deltaTimeInMs) {
   }
 
   if (!doneDissolve && isDissolve) {
-    timeDissolve += !isDissolveReversed ? deltaTimeInMs / msCurrent
-                                        : -deltaTimeInMs / msCurrent;
+    timeDissolve += !isDissolveReversed ? deltaTimeInMs * timeDissolveMult
+                                        : -deltaTimeInMs * timeDissolveMult;
     if (timeDissolve >= 1.0f) {
       isDissolve = false;
       baseAnim = dissolveAnim;
@@ -594,7 +594,7 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
       isDissolve = true;
       isDissolveReversed = false;
       timeDissolve = 0.0f;
-      msCurrent = MS_DISSOLVE;
+      timeDissolveMult = MS_DISSOLVE;
       dissolveAnim =
           baseAnim == PLAYER_AC::IDLE ? PLAYER_AC::WALK : PLAYER_AC::IDLE;
     } else {

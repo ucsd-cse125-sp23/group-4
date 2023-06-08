@@ -174,7 +174,7 @@ class AssimpAnimation {
   bool isDissolve = false;
   bool isDissolveReversed = false;
   float timeDissolve = 0.0f;
-  float msCurrent = 1.0f;
+  float timeDissolveMult = 1.0f;
   // jump takes jump animation duration + MS_JUMP amount of time
   bool isJump = false;
   float timeJump = 0.0f;
