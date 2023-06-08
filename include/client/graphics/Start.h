@@ -18,9 +18,12 @@ class Start : public Scene, public InputListener {
   bool renderText;
   bool renderMain;
   float alpha;
+  float alpha2;
+  float offset;
 
   explicit Start(Camera* camFromWindow) : Scene(camFromWindow) {
     alpha = 0.0f;
+    alpha2 = 0.0f;
     renderText = true;
     renderMain = false;
     camera->SetDistance(600.0);
@@ -28,6 +31,7 @@ class Start : public Scene, public InputListener {
     camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
     timeOnFrame = 0;
     index = 0;
+    offset = 0;
     for (int i = 1; i < 33; i++) {
       Texture frame;
       std::string filename = "assets/image/tagguys_open/frame_" +
@@ -37,6 +41,7 @@ class Start : public Scene, public InputListener {
     }
 
     main.init("assets/UI/IMG_2510 2.PNG");
+    credits.init("assets/UI/IMG_2509 2.PNG");
   }
 
   ~Start() { delete fr; }

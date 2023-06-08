@@ -303,7 +303,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_R:
         resetCamera();
         break;
-      case GLFW_KEY_TAB:
+      case GLFW_KEY_LEFT_CONTROL:
         _debugmode = !_debugmode;
         break;
       case GLFW_KEY_C:

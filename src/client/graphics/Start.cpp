@@ -16,14 +16,40 @@ void Start::update(float delta) {
   }
 
   if (renderMain) {
-    alpha += (0.5 * delta);
+    alpha += (0.75 * delta);
     if (alpha > 1) {
       alpha = 1;
     }
   }
 
-  if (renderMain && Input::GetInputState(InputAction::Enter) == InputState::Press) {
+  if (renderMain &&
+      Input::GetInputState(InputAction::Enter) == InputState::Press) {
     Window::phase = GamePhase::Lobby;
+  }
+
+  if (alpha == 1 &&
+      Input::GetInputState(InputAction::Tab) == InputState::Press) {
+    alpha2 = 1;
+  }
+
+  if (alpha == 1 &&
+      Input::GetInputState(InputAction::Tab) == InputState::Release) {
+    alpha2 = 0;
+  }
+
+  if (alpha == 1 &&
+      Input::GetInputState(InputAction::MoveJump) == InputState::Hold) {
+    offset += (3 * delta);
+    if (offset > 2) {
+      offset = 2;
+    }
+  }
+
+  if (alpha == 1 && (Input::GetInputState(InputAction::MoveJump) == InputState::Release || Input::GetInputState(InputAction::MoveJump) == InputState::None)) {
+    offset -= (3 * delta);
+    if (offset < 0) {
+      offset = 0;
+    }
   }
 }
 
@@ -33,7 +59,9 @@ void Start::draw() {
     drawMain();
   }
   drawName();
-  
+  glDisable(GL_DEPTH_TEST);
+  drawCredits();
+  glEnable(GL_DEPTH_TEST);
 }
 
 void Start::drawName() {
@@ -72,23 +100,49 @@ void Start::drawMain() {
   glBegin(GL_QUADS);
 
   glTexCoord2f(0.0f, 1.0f);
-  glVertex2f(-1, -1);
+  glVertex2f(-1, -1 + offset);
 
   glTexCoord2f(1.0f, 1.0f);
-  glVertex2f(1, -1);
+  glVertex2f(1, -1 + offset);
 
   glTexCoord2f(1, 0);
-  glVertex2f(1, 1);
+  glVertex2f(1, 1 + offset);
 
   glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(-1, 1);
+  glVertex2f(-1, 1 + offset);
 
   glEnd();
 
   glDisable(GL_BLEND);
-  
+
   glDisable(GL_TEXTURE_2D);
 }
 
-void Start::drawCredits(){
+void Start::drawCredits() {
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  credits.bindgl();
+
+  glEnable(GL_TEXTURE_2D);
+
+  glColor4f(1.0f, 1.0f, 1.0f, alpha2);
+  glBegin(GL_QUADS);
+
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex2f(-1, -1 + offset);
+
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex2f(1, -1 + offset);
+
+  glTexCoord2f(1, 0);
+  glVertex2f(1, 1 + offset);
+
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex2f(-1, 1 + offset);
+
+  glEnd();
+
+  glDisable(GL_BLEND);
+
+  glDisable(GL_TEXTURE_2D);
 }
