@@ -11,9 +11,13 @@
 #include <sstream>
 #include <vector>
 
+#include "client/graphics/core.h"
+
+using glm::vec3;
+
 ////////////////////////////////////////////////////////////////////////////////
 
-// The DOF struct, holds info for posing joints.
+// The DOF struct, holds info for gui-editable values.
 
 struct DOF {
   float value = 0.0;
@@ -84,6 +88,38 @@ struct DOFr : public DOF {
 
   void Show(const char* name, const char* group) override {
     DOF::Show(name, group);
+  }
+};
+
+struct DOF3 {
+  std::vector<DOF> phi = {DOF(), DOF(), DOF()};
+
+  DOF3() {}
+  DOF3(DOF x, DOF y, DOF z) { phi = {x, y, z}; }
+
+  float x() { return phi[0].GetValue(); }
+  float y() { return phi[1].GetValue(); }
+  float z() { return phi[2].GetValue(); }
+
+  void show(std::string name) {
+    std::ostringstream def;
+    def << name << ".X";
+    std::string defstrX = def.str();
+
+    std::ostringstream def2;
+    def2 << name << ".Y";
+    std::string defstrY = def2.str();
+
+    std::ostringstream def3;
+    def3 << name << ".Z";
+    std::string defstrZ = def3.str();
+
+    // ImGui::SameLine();
+    phi[0].Show(defstrX.c_str(), name.c_str());
+
+    phi[1].Show(defstrY.c_str(), name.c_str());
+
+    phi[2].Show(defstrZ.c_str(), name.c_str());
   }
 };
 
