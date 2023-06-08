@@ -8,6 +8,7 @@
 #include "core/game/mode/GameModes.h"
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/physics/Player.h"
+#include "core/game/physics/PowerUp.h"
 #include "core/util/global.h"
 
 Level* initializeLevel(Environment* environment);
@@ -17,3 +18,5 @@ void applyGameMode(Level* level, GameMode* gamemode);
 int queryScore(Level* level, uint32_t pid);
 std::vector<std::vector<uint32_t>> queryPlacements(Level* level);
 void initPlayers(Level* level, std::map<uint32_t, Player*> players);
+
+std::vector<PowerUp*> getPowerUps(Level* level);
