@@ -104,6 +104,7 @@ void Game::update(const message::UserStateUpdate& update) {
 void Game::tick() { level_->tick(); }
 
 void Game::restart() {
+  clear_events();
   level_->restartGame();
 
   // assign first tagged player
