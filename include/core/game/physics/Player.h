@@ -13,5 +13,5 @@ class Player : public PObject {
   Player();
   ~Player();
   void tick();
-  virtual void onTrigger(PObject* other) override;
+  void onTrigger(PObject* other) override;
 };
