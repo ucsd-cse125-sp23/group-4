@@ -109,7 +109,7 @@ class MapObj : public Model {
       // exit(-1);
     }
 
-    loadMTL(objToMtlFilename(std::to_string(filename)).c_str());
+    loadMTL(objToMtlFilename(std::string(filename)).c_str());
 
     std::cout << "\tLoading map obj visuals...";
 
