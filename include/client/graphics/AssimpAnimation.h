@@ -121,10 +121,10 @@ class AssimpAnimation {
   enum class PLAYER_AC {
     IDLE = 0,
     WALK,
-    JUMP,
     TAG,
-    TRIP,
+    JUMP,
     FALL,
+    TRIP,
     LOBBY1,
     LOBBY2,
     LOBBY3,
@@ -157,6 +157,9 @@ class AssimpAnimation {
   static const float MS_DISSOLVE, MS_JUMP;
   static const std::vector<std::string> NODES_TAG;
 
+  static bool isAPlayThenDissolve(const PLAYER_AC& ac) {
+    return ac >= PLAYER_AC::JUMP && ac <= PLAYER_AC::TRIP;
+  }
   static bool isAEmote(const PLAYER_AC& ac) {
     return ac >= PLAYER_AC::PLACE1_1 && ac <= PLAYER_AC::PLACE4_2;
   }

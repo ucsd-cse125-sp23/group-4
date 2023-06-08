@@ -471,7 +471,7 @@ void AssimpAnimation::update(float deltaTimeInMs) {
       AssimpAnimationClip& clip0 = animMap.at(AC_TO_NAME.at(baseAnim));
       AssimpAnimationClip& clip1 = animMap.at(AC_TO_NAME.at(dissolveAnim));
 
-      if (baseAnim == PLAYER_AC::JUMP) {
+      if (isAPlayThenDissolve(baseAnim)) {
         clip0.update(timePlayThenDissolve, poseMap, true);
       } else {
         clip0.update(currTimeInMs, poseMap, true);
@@ -562,10 +562,10 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
     isEmote = false;
   }
 
-  if (ac == PLAYER_AC::JUMP) {
+  if (isAPlayThenDissolve(ac)) {
     // play full jump animation first, then dissolve out jump's last frame
     dissolveAnim = baseAnim;
-    baseAnim = PLAYER_AC::JUMP;
+    baseAnim = ac;
     timePlayThenDissolve = 0.0f;
     isPlayThenDissolve = true;
     isDissolve = false;
@@ -574,7 +574,7 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 
   if (ac == PLAYER_AC::IDLE || ac == PLAYER_AC::WALK) {
-    if (isPlayThenDissolve || baseAnim == PLAYER_AC::JUMP) {
+    if (isPlayThenDissolve || isAPlayThenDissolve(baseAnim)) {
       // No blending if player switch between idle & walk when jump is
       // dissolving out :(
       dissolveAnim = ac;
