@@ -137,7 +137,6 @@ void Scene::update(float delta) {
   if (gameStart) {
     for (auto& thing : localGameThings) thing->update(delta);
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
-    
   }
 
   if (time.time == 0) {
@@ -173,7 +172,7 @@ void Scene::receiveState(message::GameStateUpdate newState) {
       auto thing = networkGameThings.at(id);
       thing->updateFromState(state);
     }
-    time.Update(newState.time_elapsed* .003);
+    time.Update(newState.time_elapsed * .003);
     // remove items that don't exist on the server anymore
     std::vector<int> removedIds;
     for (auto& [id, _] : networkGameThings)
