@@ -40,12 +40,10 @@ struct MapObjSubmesh {
                       std::map<std::string, Material*> resources) {
     if (tag.length() == 0 || resources.size() == 0) return true;
 
-    processTag(tag);
-
     if (resources.count(tag) == 0) return false;
 
     material = resources[tag];
-    return false;
+    return true;
   }
 };
 
@@ -79,11 +77,12 @@ class MapObj : public Model {
     return file;
   }
 
-  void init(std::string str, std::map<std::string, Material*> mr) {
-    init(str.c_str(), mr);
+  void init(std::string str, std::map<std::string, Material*> mr, GLuint shdr) {
+    init(str.c_str(), mr, shdr);
   }
   void init(const char* filename,
-            std::map<std::string, Material*> materialResources) {
+            std::map<std::string, Material*> materialResources,
+            GLuint mapShader) {
     unsigned int count = 0;
 
     std::vector<glm::vec3> temp_vertices, vertices;
@@ -109,9 +108,9 @@ class MapObj : public Model {
       // exit(-1);
     }
 
-    loadMTL(objToMtlFilename(std::string(filename)).c_str());
+    loadMTL(objToMtlFilename(std::string(filename)).c_str(), mapShader);
 
-    std::cout << "\tLoading map obj visuals...";
+    std::cout << "\tLoading map obj visuals..." << std::endl;
 
     std::string currObjectName = "";
     std::string currMaterial = "None";
@@ -152,8 +151,17 @@ class MapObj : public Model {
           MapObjSubmesh sm = MapObjSubmesh();
           sm.name = currObjectName;
           sm.mesh = submesh;
-          if (!sm.trySetMaterial(currMaterial, materialResources)) {
-            sm.trySetMaterial(currMaterial, mapMtlMaterials);
+
+          bool matSet = true;
+          std::string materialTag = MapObjSubmesh::processTag(currMaterial);
+          if (!sm.trySetMaterial(materialTag, materialResources)) {
+            matSet = sm.trySetMaterial(materialTag, mapMtlMaterials);
+          }
+
+          if (matSet) {
+            std::cout << "MTL[" << materialTag << "]... ";
+          } else {
+            std::cout << "failed to use MTL[" << currMaterial << "]... ";
           }
 
           meshes.push_back(sm);
@@ -232,7 +240,7 @@ class MapObj : public Model {
     std::cout << "MapObj " << filename << " loaded successfully." << std::endl;
   }
 
-  bool loadMTL(const char* filename) {
+  bool loadMTL(const char* filename, GLuint mapShader) {
     unsigned int count = 0;
 
     std::cout << "MapObj: [MTL] Importing " << filename << "..." << std::endl;
@@ -245,7 +253,7 @@ class MapObj : public Model {
       return false;
       // exit(-1);
     }
-    std::cout << "\t[MTL] Parsing map obj MTL file...";
+    std::cout << "\t[MTL] Parsing map obj MTL file..." << std::endl;
 
     std::string currMtl = "";
     glm::vec3 ambientColor;
@@ -263,16 +271,25 @@ class MapObj : public Model {
         // save previous material to memory
 
         currMtl = MapObjSubmesh::processTag(currMtl);
-        if (currMtl.size() > 0) {
-          std::cout << "\t[MTL] Storing material data " << currMtl << "...";
-          Material* mtlMat = new Material();  // deleted in ~MapObj
-          mtlMat->ambient = glm::vec4(ambientColor, 1);
-          mtlMat->diffuse = glm::vec4(diffuseColor, 1);
-          mtlMat->specular = glm::vec4(specularColor, 1);
-          mtlMat->emission = glm::vec4(emissiveColor, 1);
+        if (currMtl.length() > 0) {
+          if (mapMtlMaterials.count(currMtl) > 0) {
+            std::cout << "\t[MTL] Ignoring duplicate material for " << currMtl
+                      << std::endl;
+          } else {
+            std::cout << "\t[MTL] Storing material data " << currMtl << "...";
+            Material* mtlMat = new Material();  // deleted in ~MapObj
+            mtlMat->shader = mapShader;
+            mtlMat->ambient = glm::vec4(ambientColor * 0.1f, 1);
+            mtlMat->diffuse = glm::vec4(diffuseColor, 1);
+            mtlMat->specular = glm::vec4(specularColor * 0.2f, 1);
+            mtlMat->emission = glm::vec4(emissiveColor, 1);
+            mtlMat->shininess = 100.0f;
 
-          mapMtlMaterials[currMtl] = mtlMat;
-          std::cout << "done." << std::endl;
+            count++;
+
+            mapMtlMaterials[currMtl] = mtlMat;
+            std::cout << "done." << std::endl;
+          }
         }
 
         if (res == EOF) break;  // EOF = End Of File. Quit the loop.
