@@ -120,7 +120,7 @@ void Scene::setToUserFocus(GameThing* t) {
 }
 
 void Scene::reset() {
-  time.time = 15.0f;
+  time.time = max_time;
   time.countdown = true;
   gameStart = false;
   timeOver = 0;
@@ -139,7 +139,7 @@ void Scene::update(float delta) {
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
   }
 
-  if (time.time == 0) {
+  if (time.time <= 0) {
     gameStart = false;
     timeOver += delta;
     if (timeOver >= 3) {
@@ -172,7 +172,7 @@ void Scene::receiveState(message::GameStateUpdate newState) {
       auto thing = networkGameThings.at(id);
       thing->updateFromState(state);
     }
-    time.Update(newState.time_elapsed * .003);
+    time.time = max_time - newState.time_elapsed;
     // remove items that don't exist on the server anymore
     std::vector<int> removedIds;
     for (auto& [id, _] : networkGameThings)

@@ -100,7 +100,7 @@ class Scene {
   static bool _freecam;
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
-
+  float max_time=30.0f; //this is temp until server changes
   SceneResourceMap* sceneResources;
 
   Camera* camera;
@@ -125,7 +125,7 @@ class Scene {
     node["_camera"] = camera;
     camera->name = "_camera";
     localGameThings.push_back(camera);
-    time.time = 5.0f;
+    time.time = max_time;
     time.countdown = true;
     gameStart = false;
     timeOver = 0;
