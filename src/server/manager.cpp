@@ -49,6 +49,8 @@ void Manager::handle_game_update(const message::UserStateUpdate& update) {
 
 void Manager::tick_game() { game_.tick(); }
 
+void Manager::start_game() { game_.restart(); }
+
 message::GameStateUpdate Manager::get_game_update() {
   return {game_.to_network()};
 }

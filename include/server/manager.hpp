@@ -22,6 +22,7 @@ class Manager {
   bool check_ready();
   void handle_game_update(const message::UserStateUpdate&);
   void tick_game();
+  void start_game();
   message::GameStateUpdate get_game_update();
 
   Status status_ = Status::Lobby;
