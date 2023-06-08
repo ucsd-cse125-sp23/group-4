@@ -81,15 +81,15 @@ int main(int argc, char* argv[]) {
     server.write_all<message::GameStateUpdate>(update);
 
     // notify clients of events
-    for (auto&& e : manager.game_.get_jump_events())
+    for (auto&& e : manager.game_->get_jump_events())
       server.write_all<message::JumpEvent>(e);
-    for (auto&& e : manager.game_.get_land_events())
+    for (auto&& e : manager.game_->get_land_events())
       server.write_all<message::LandEvent>(e);
-    for (auto&& e : manager.game_.get_item_pickup_events())
+    for (auto&& e : manager.game_->get_item_pickup_events())
       server.write_all<message::ItemPickupEvent>(e);
-    for (auto&& e : manager.game_.get_tag_events())
+    for (auto&& e : manager.game_->get_tag_events())
       server.write_all<message::TagEvent>(e);
-    manager.game_.clear_events();
+    manager.game_->clear_events();
   };
 
   auto config = get_config();

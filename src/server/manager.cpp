@@ -1,5 +1,6 @@
 #include <boost/asio.hpp>
 #include <config/lib.hpp>
+#include <memory>
 #include <network/message.hpp>
 #include <server/manager.hpp>
 #include <unordered_map>
@@ -12,10 +13,12 @@ Manager::Manager()
   auto config = get_config();
   MAX_PLAYERS = config["player_count"];
   TOTAL_GAME_DURATION = std::chrono::seconds{config["game_duration"]};
+
+  game_ = std::make_unique<Game>();
 }
 
 int Manager::add_player() {
-  int pid = game_.add_player();
+  int pid = game_->add_player();
   std::string default_skin = "trash panda";
   players_.insert({pid, {pid, default_skin, false}});
 
@@ -23,7 +26,7 @@ int Manager::add_player() {
 }
 
 void Manager::remove_player(int pid) {
-  game_.remove_player(pid);
+  game_->remove_player(pid);
   players_.erase(pid);
 }
 
@@ -56,14 +59,14 @@ bool Manager::check_ready() {
 }
 
 void Manager::handle_game_update(const message::UserStateUpdate& update) {
-  game_.update(update);
+  game_->update(update);
 }
 
-void Manager::tick_game() { game_.tick(); }
+void Manager::tick_game() { game_->tick(); }
 
 void Manager::start_game() {
   status_ = Status::InGame;
-  game_.restart();
+  game_->restart();
 
   // start game timer
   timer_.expires_from_now(TOTAL_GAME_DURATION);
@@ -73,5 +76,5 @@ void Manager::start_game() {
 }
 
 message::GameStateUpdate Manager::get_game_update() {
-  return {game_.to_network()};
+  return {game_->to_network()};
 }

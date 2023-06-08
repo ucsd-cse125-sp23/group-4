@@ -2,6 +2,7 @@
 
 #include <boost/asio.hpp>
 #include <chrono>
+#include <memory>
 #include <network/message.hpp>
 #include <server/game.hpp>
 #include <string>
@@ -31,7 +32,7 @@ class Manager {
   message::GameStateUpdate get_game_update();
 
   Status status_ = Status::Lobby;
-  Game game_;
+  std::unique_ptr<Game> game_;
 
  private:
   struct Player {
