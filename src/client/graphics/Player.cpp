@@ -103,11 +103,11 @@ void Player::eventJump() {
 }
 
 void Player::eventLand() {
-  //if (fx_land) fx_land->Emit(5);
+  // if (fx_land) fx_land->Emit(5);
 }
 
 void Player::eventItem() {
-  //if (fx_item) fx_item->Emit(10);
+  // if (fx_item) fx_item->Emit(10);
 }
 
 void Player::eventTag() {
