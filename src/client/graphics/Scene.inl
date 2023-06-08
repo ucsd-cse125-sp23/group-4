@@ -232,16 +232,24 @@ void Scene::init(void) {
   // node["particleTest"] = ptcl;
   // node["world"]->childnodes.push_back(node["particleTest"]);
 
+  /*
+  ptcl = new ParticleSystem();
+  ptcl->name = "GT_particle2";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
+  ptcl->transform.position = vec3(10, 9, 3);
+  ptcl->transform.updateMtx(&ptcl->transformMtx);
+  localGameThings.push_back(ptcl);
+  node["particleTest2"] = ptcl;
+  node["world"]->childnodes.push_back(node["particleTest2"]);*/
+
   ptcl = new ParticleSystem();
   ptcl->name = "GTptcl_jump";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
   ptcl->materialRef = sceneResources->materials["star1-ptcl"];
   ptcl->worldSpace = true;
   ptcl->creationRate = 0;
-  ptcl->initVelocity = {DOFr(0), DOFr(5), DOFr(0)};
-  ptcl->radialVelocity = DOF(4);
-  ptcl->drag.SetValue(0.3f);
-  ptcl->lifespan.SetValue(0.95f);
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-0, 0, 0), DOFr(-10, 10)};
   sceneResources->prefabs["ptcl_jump"] = ptcl;
 #pragma endregion
 
