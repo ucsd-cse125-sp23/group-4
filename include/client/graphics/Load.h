@@ -23,6 +23,18 @@ class Load {
     forward = true;
     lastTime = glfwGetTime();
     timeElapsed = 0;
+
+    loadFrames();
+  }
+
+  void loadFrames() {
+    for (int i = 0; i < 24; i++) {
+      Texture frame;
+      std::string filename = "assets/image/tagguys/frame_" + std::to_string(i) +
+                             "_delay-0.08s.png";
+      frame.init(filename.c_str());
+      frames.push_back(frame);
+    }
   }
 
   void update() {
@@ -91,32 +103,4 @@ class Load {
     glDisable(GL_BLEND);
   }
 
-  void loadFrames() {
-    for (int i = 0; i < 24; i++) {
-      Texture frame;
-      std::string filename = "assets/image/tagguys/frame_" + std::to_string(i) +
-                             "_delay-0.08s.png";
-      frame.init(filename.c_str());
-      frames.push_back(frame);
-    }
-  }
-
-  void load(GLFWwindow* win) {
-    int width, height;
-    glfwGetWindowSize(win, &width, &height);
-
-    GLFWwindow* window =
-        glfwCreateWindow(width, height, "loading...", NULL, NULL);
-    glfwMakeContextCurrent(window);
-
-    loadFrames();
-
-    glfwShowWindow(window);
-    while (timeElapsed <= 15 || loading_resources) {
-      update();
-      draw();
-
-      glfwSwapBuffers(window);
-    }
-  }
 };

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <chrono>
 
 #include "Camera.h"
 #include "Input.h"
@@ -32,6 +33,8 @@ int Window::height;
 const char* Window::windowTitle = "tagguys :O";
 GamePhase Window::phase;
 message::LobbyUpdate Window::lobby_state;
+
+std::thread Window::subthread;
 
 // Game stuff to render
 Scene* Window::gameScene;
@@ -194,7 +197,9 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
 
 void Window::update(GLFWwindow* window, float deltaTime) {
-  if (dynamic_cast<Start*>(gameScene) &&
+  if (loading_resources) {
+    loadScreen->update();
+  } else if (dynamic_cast<Start*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
     resetCamera();
     gameScene = new Lobby(Cam);
@@ -205,17 +210,19 @@ void Window::update(GLFWwindow* window, float deltaTime) {
              phase == GamePhase::Game) {  // lobby -> game
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = new Scene(Cam);
-    glfwHideWindow(window);
     loading_resources = true;
-    std::thread x(&Load::load, loadScreen, window);
-    gameScene->init(lobby->players);
-    hud = new HUD(gameScene);
-    loading_resources = false;
-    x.join();
 
-    glfwMakeContextCurrent(window);
-    glfwShowWindow(window);
-    glfwFocusWindow(window);
+    HUD** hudPtr = &hud;
+    subthread = std::thread([=](Scene* gameScene, HUD** hud) {
+          GLFWwindow* local = glfwCreateWindow(1, 1, "Loader", NULL, NULL);
+          glfwMakeContextCurrent(local);
+
+          gameScene->init(lobby->players);
+          *hudPtr = new HUD(gameScene);
+          loading_resources = false;
+          glfwTerminate();
+      },
+      std::ref(gameScene), std::ref(hudPtr));
   } else {
     gameScene->update(deltaTime);
   }
@@ -230,9 +237,13 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  // Render the objects.
-  gameScene->draw();
-  if (phase == GamePhase::Game) hud->draw(window);
+  if (loading_resources) {
+    loadScreen->draw();
+  } else {
+    // Render the objects.
+    gameScene->draw();
+    if (phase == GamePhase::Game) hud->draw(window);
+  }
 
   Input::handle(false);
   if (_debugmode) {

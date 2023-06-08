@@ -16,6 +16,7 @@
 using namespace glm;
 
 void Scene::init(void) {
+  loading++;
   auto config = get_config();
 
   // Create mesh palette
@@ -363,9 +364,12 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["map"]);
 
   // createPlayer(-1); // for testing
+  loading--;
 }
 
 void Scene::init(std::map<int, message::LobbyPlayer> players) {
+  //loading++;
+
   init();
 
   Model* racoon_prefab = new Model;
@@ -391,4 +395,6 @@ void Scene::init(std::map<int, message::LobbyPlayer> players) {
   for (auto& [i, p] : players) {
     skins[i] = p.skin;
   }
+
+  loading--;
 }

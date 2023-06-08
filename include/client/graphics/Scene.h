@@ -100,6 +100,7 @@ class Scene {
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
 
+  std::atomic<int> loading{1};
   SceneResourceMap* sceneResources;
 
   Camera* camera;

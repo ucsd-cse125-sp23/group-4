@@ -1,6 +1,7 @@
 #include "Lobby.h"
 
 void Lobby::init(void) {
+  //loading++;
   // Create a mesh palette
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
@@ -148,4 +149,6 @@ void Lobby::init(void) {
     model->update(0);
   }
   buildSceneTree();
+
+  loading--;
 }

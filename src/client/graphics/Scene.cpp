@@ -135,6 +135,8 @@ message::UserStateUpdate Scene::pollUpdate() {
 }
 
 void Scene::receiveState(message::GameStateUpdate newState) {
+  if (loading) return;
+
   // update existing items, create new item if it doesn't exist
   for (auto& [id, state] : newState.things) {
     // TODO: handle items besides Player as well

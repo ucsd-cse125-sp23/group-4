@@ -38,9 +38,12 @@ class Window {
   static GamePhase phase;
   static message::LobbyUpdate lobby_state;
 
+  static std::thread subthread;
+
   // Objects to render
-  static Scene* gameScene;
   static Load* loadScreen;
+
+  static Scene* gameScene;
   static HUD* hud;
 
   // network
