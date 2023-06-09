@@ -31,7 +31,7 @@ Player* Scene::createPlayer(int id, std::string skin) {
   bool isUser = false;
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
 
-  // creating a player to be rendered... TODO call this from state update!
+  // creating a player to be rendered
   std::string playername = "player " + std::to_string(id);
 
   Player* player = new Player();
@@ -208,7 +208,7 @@ void Scene::receiveState(message::GameStateUpdate newState) {
   // update existing items, create new item if it doesn't exist
   for (auto& [id, player] : newState.players) {
     // TODO: handle items besides Player as well
-    if (!networkGameThings.count(id)) createPlayer(id);
+    if (!networkGameThings.count(id)) createPlayer(id, skins[id]);
 
     auto thing = networkGameThings.at(id);
     thing->updateFromState(player);
