@@ -163,8 +163,28 @@ void Scene::setToUserFocus(GameThing* t) {
 }
 
 void Scene::animate(float delta) {
-  for (auto& thing : localGameThings) thing->animate(delta);
-  for (auto& [_, thing] : networkGameThings) thing->animate(delta);
+  // 2nd level animation process frame cap
+  double fpsMin = (1.0 / fpsCapParam);
+  num_updates_to_send += delta / fpsMin;
+
+  std::vector<GameThing*> animators;
+  GameThing* userAnim = nullptr;
+  for (auto& thing : localGameThings) animators.push_back(thing);
+  for (auto& [_, thing] : networkGameThings) {
+    if (thing->isUser)
+      userAnim = thing;
+    else
+      animators.push_back(thing);
+  }
+
+  if (userAnim) userAnim->animate(delta);  // always update user animations
+
+  if (num_updates_to_send < 1) return;
+  delta = fpsMin * num_updates_to_send;
+
+  for (auto& thing : animators) thing->animate(delta);
+
+  num_updates_to_send = 0;
 }
 
 void Scene::update(float delta) {
@@ -318,6 +338,10 @@ void Scene::gui() {
 
   ImGui::Checkbox("free camera", &camera->Fixed);
   ImGui::Checkbox("show gizmos", &_gizmos);
+
+  ImGui::Separator();
+
+  ImGui::SliderFloat("anim FPS cap (!!!)", &fpsCapParam, 5.0f, 30.0);
 
   ImGui::Separator();
 
