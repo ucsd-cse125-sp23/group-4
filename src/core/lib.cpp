@@ -47,3 +47,8 @@ std::vector<PowerUp*> getPowerUps(Level* level) {
       ret.push_back(p);
   return ret;
 }
+bool isMoving(Player* player) {
+  return length_squared(static_cast<ControlModifierData*>(
+                            player->getModifiers(CONTROL_MODIFIER)[0]->get())
+                            ->horizontalVel) > 0.1;
+}

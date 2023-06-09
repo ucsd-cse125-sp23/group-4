@@ -19,3 +19,4 @@ std::vector<std::vector<uint32_t>> queryPlacements(Level* level);
 void initPlayers(Level* level, std::map<uint32_t, Player*> players);
 
 std::vector<PowerUp*> getPowerUps(Level* level);
+bool isMoving(Player* player);
