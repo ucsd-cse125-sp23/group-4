@@ -71,7 +71,7 @@ message::UserStateUpdate Player::pollInput() {
 }
 
 void Player::updateFromState(message::Player p) {
-  if (fx_tagStatus) fx_tagStatus->creationRate = state.is_tagged ? 5.0f : 0.0f;
+  if (fx_tagStatus) fx_tagStatus->creationRate = p.is_tagged ? 5.0f : 0.0f;
 
   // animation
   if (pmodel) {
@@ -89,7 +89,7 @@ void Player::updateFromState(message::Player p) {
     }
   }
 
-  GameThing::updateFromState(state);
+  GameThing::updateFromState(p);
 }
 
 vec3 Player::move(vec3 movement) {

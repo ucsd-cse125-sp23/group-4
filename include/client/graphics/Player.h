@@ -63,9 +63,7 @@ class Player : public GameThing, InputListener {
   }
 
   message::UserStateUpdate pollInput();
-  void updateFromState(message::Player p);
-
-  void updateFromState(message::Player state) override;
+  void updateFromState(message::Player p) override;
 
   void eventJump();
   void eventLand();
