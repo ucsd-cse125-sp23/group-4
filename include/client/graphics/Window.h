@@ -20,7 +20,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum class GamePhase { Start, Lobby, Game, GameOver };
+enum class GamePhase { Start, Lobby, GameLoading, Game, GameOver };
 
 class Window {
  public:
@@ -38,16 +38,22 @@ class Window {
   static GamePhase phase;
   static message::LobbyUpdate lobby_state;
 
+  static GLFWwindow *loadingWindow, *screenWindow;
+  static std::thread subthread;
+  static std::atomic<bool> loading_resources;
+  static float remainingLoadBuffer;
+
   // Objects to render
   static Start* start;
   static Scene* lob;
   static Scene* game;
   static Scene* gameScene;
   static Load* loadScreen;
+
   static HUD* hud;
 
   // network
-  static std::unique_ptr<Client> client;
+  static std::shared_ptr<Client> client;
   static int my_pid;
 
   // Act as Constructors and desctructors

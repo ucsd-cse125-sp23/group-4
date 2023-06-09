@@ -50,19 +50,29 @@ int main(int argc, char* argv[]) {
           auto lobby_update = manager.handle_lobby_update(body);
           server.write_all<message::LobbyUpdate>(lobby_update);
 
-          // if all clients are ready, start the game
+          // if all clients are ready, notify clients
           if (manager.check_ready()) {
-            manager.start_game();
-            server.write_all<message::GameStart>();
-            server.start_tick();
+            server.write_all<message::LobbyReady>();
           }
         };
+
+    auto game_loaded_handler = [&manager,
+                                &server](const message::GameLoaded& body) {
+      manager.handle_game_loaded(body);
+
+      // if all clients are loaded, start the game
+      if (manager.check_loaded()) {
+        server.write_all<message::GameStart>();
+        manager.start_game();  // initialize physics, start countdown
+        server.start_tick();   // start sending updates to clients
+      }
+    };
 
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
         greeting_handler, user_state_update_handler,
-        lobby_player_update_handler, any_handler);
+        lobby_player_update_handler, game_loaded_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
@@ -74,7 +84,8 @@ int main(int argc, char* argv[]) {
 
     if (manager.status_ == Manager::Status::GameOver) {
       server.stop_tick();
-      server.write_all<message::GameOver>(manager.game_->get_scores());
+      auto scores = manager.game_->get_scores();
+      server.write_all<message::GameOver>(scores);
       return;
     }
 

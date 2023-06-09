@@ -29,9 +29,20 @@ struct Model {
 
     glDepthFunc(depthFunction);
 
+    if (!material->skybox) glEnable(GL_CULL_FACE);
+
+    if (material->blending) {
+      // Enable blending (transparency)
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
     mesh->draw();
 
     glDepthFunc(GL_LESS);
+
+    glDisable(GL_BLEND);
+    glDisable(GL_CULL_FACE);
 
     // deactivate the shader program    ---
     glUseProgram(0);

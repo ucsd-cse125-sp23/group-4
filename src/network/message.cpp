@@ -52,6 +52,8 @@ Type get_type(const Message::Body& body) {
   auto lobby_player_update = [](const LobbyPlayerUpdate&) {
     return Type::LobbyPlayerUpdate;
   };
+  auto lobby_ready = [](const LobbyReady&) { return Type::LobbyReady; };
+  auto game_loaded = [](const GameLoaded&) { return Type::GameLoaded; };
   auto game_start = [](const GameStart&) { return Type::GameStart; };
   auto jump_event = [](const JumpEvent&) { return Type::JumpEvent; };
   auto land_event = [](const LandEvent&) { return Type::LandEvent; };
@@ -62,8 +64,8 @@ Type get_type(const Message::Body& body) {
   auto game_over = [](const GameOver&) { return Type::GameOver; };
   auto overload = boost::make_overloaded_function(
       assign, greeting, notify, game_state, user_state, lobby_update,
-      lobby_player_update, game_start, jump_event, land_event,
-      item_pickup_event, tag_event, game_over);
+      lobby_player_update, lobby_ready, game_loaded, game_start, jump_event,
+      land_event, item_pickup_event, tag_event, game_over);
   return boost::apply_visitor(overload, body);
 }
 
@@ -180,6 +182,14 @@ std::string LobbyUpdate::to_string() const {
   str += "    ]";
 
   return str;
+}
+
+std::string LobbyReady::to_string() const {
+  return "    all_clients_ready: true";
+}
+
+std::string GameLoaded::to_string() const {
+  return "    player " + std::to_string(pid) + " loaded: true";
 }
 
 std::string GameStart::to_string() const { return "    game_start: true"; }

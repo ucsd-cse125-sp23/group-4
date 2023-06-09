@@ -24,7 +24,7 @@ void Start::update(float delta) {
     }
   }
 
-  if (renderMain &&
+  if (renderMain && alpha == 1 &&
       Input::GetInputState(InputAction::Enter) == InputState::Press) {
     Window::phase = GamePhase::Lobby;
   }
@@ -57,13 +57,27 @@ void Start::update(float delta) {
   }
 }
 
+void Start::init() {
+  Scene::init();
+  for (int i = 1; i < 33; i++) {
+    Texture frame;
+    std::string filename = "assets/image/tagguys_open/frame_" +
+                           std::to_string(i) + "_delay-0.1s.png";
+    frame.init(filename.c_str());
+    frames.push_back(frame);
+  }
+
+  main.init("assets/UI/IMG_2510 2.PNG");
+  credits.init("assets/UI/IMG_2728.PNG");
+}
+
 void Start::draw() {
   Scene::draw();
+  glDisable(GL_DEPTH_TEST);
+  drawName();
   if (renderMain) {
     drawMain();
   }
-  drawName();
-  glDisable(GL_DEPTH_TEST);
   drawCredits();
   glEnable(GL_DEPTH_TEST);
 }

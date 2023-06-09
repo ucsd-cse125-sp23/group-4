@@ -12,12 +12,19 @@ uniform sampler2D gSampler;
 uniform float gamma;
 
 // uniforms used for lighting
+uniform int nlights = 2;
 uniform vec3 LightDirections[] = {
-									normalize(vec3(1, 5, 2)),
-									normalize(vec3(-5, -1, -3))
+									normalize(vec3(-0.44, -0.47, 0.49)),
+									normalize(vec3(0.79, 1.3, -0.5)),
+									normalize(vec3(0.0, 0.2, 1.0))
 								 };
-uniform vec3 LightColors[] = { vec3(1), vec3(0.6, 0.7, 1) * 0.4 };
+uniform vec3 LightColors[] =     {
+									vec3(0.82, 0.64, 1.00),
+									vec3(0.89, 0.71, 0.38) * 1.2,
+									vec3(0.1, 0.2, 0.1) * 0.7
+								 };
 
+vec3 worldAmbient = vec3(0, 1, 2) * 0.05;
 uniform vec3 ambientColor;
 uniform vec3 diffuseColor;
 uniform vec3 specularColor;
@@ -39,13 +46,11 @@ void main()
 
 	vec3 lightsum = vec3(0.0);
 
-	for (int i = 0; i < 2; i++){
-        lightsum += LightColors[i] * max(0, dot(LightDirections[i], fragNormal));
+	for (int i = 0; i < nlights; i++){
+		vec3 halfwayv = normalize(viewdir + LightDirections[i]);  // hj
+		float spec = pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
+        lightsum += LightColors[i] * (max(0, dot(LightDirections[i], fragNormal)) + spec);
     }
-
-	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
-
-	lightsum += pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
 
 	vec3 color;
 
@@ -62,9 +67,11 @@ void main()
 		color = diffuseColor * 0.9;
 	}
 
+	color += lightsum * 0.3;
+
 
 	// Compute irradiance (sum of ambient & direct lighting)
-	vec3 irradiance = ambientColor + lightsum;
+	vec3 irradiance = ambientColor + worldAmbient + lightsum;
 
 	// Diffuse reflectance
 	vec3 reflectance = irradiance * color;
@@ -79,5 +86,5 @@ void main()
 	//fragColor = vec4(color, 1);
 
 	// Gamma correction
-	fragColor = vec4(pow(final.rgb, vec3(1.0/gamma)), 1);
+	fragColor = vec4(pow(final.rgb, vec3(1.0/(gamma + 0.2))), 1);
 }
