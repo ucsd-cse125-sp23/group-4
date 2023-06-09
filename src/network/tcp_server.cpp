@@ -2,7 +2,6 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <chrono>
-#include <config/lib.hpp>
 #include <iostream>
 #include <memory>
 #include <network/message.hpp>
@@ -26,10 +25,9 @@ Server::Server(int port, AcceptHandler accept_handler,
   io_context_.run();
 }
 
-void Server::start_tick() {
-  auto config = get_config();
-  // delay game start for client loading
-  timer_.expires_from_now(std::chrono::seconds{config["game_start_delay"]});
+void Server::start_tick(int delay) {
+  // add delay for client countdown
+  timer_.expires_after(std::chrono::milliseconds{delay});
   timer_.async_wait([this](const boost::system::error_code&) {
     should_tick_ = true;
     tick();
