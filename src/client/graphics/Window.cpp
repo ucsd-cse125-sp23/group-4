@@ -18,6 +18,7 @@
 #include <thread>
 
 #include "Camera.h"
+#include "GLFW/glfw3.h"
 #include "Input.h"
 #include "Scene.h"
 #include "config/lib.hpp"
@@ -155,8 +156,19 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
+
+  // TODO(ann): pick the right one
+
+  /* maximize window */
+  // glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
+  /* normal window */
   screenWindow = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
   loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+
+  /* full screen window */
+  // GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
+  // glfwGetPrimaryMonitor(), NULL);
 
   // Check if the window could not be created.
   if (!screenWindow) {
