@@ -13,6 +13,7 @@
 #include <chrono>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <network/message.hpp>
 #include <string>
 #include <thread>
 
@@ -262,14 +263,15 @@ void Window::update(GLFWwindow* window, float deltaTime) {
       glfwDestroyWindow(loadingWindow);
       loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
       subthread = std::thread(
-          [](Scene* gameScene, HUD* hud, Lobby* lobby) {
+          [](Scene* gameScene, HUD* hud, Lobby* lobby, int my_pid) {
             glfwMakeContextCurrent(loadingWindow);
 
             gameScene->init(lobby->players);
             hud->init();
             loading_resources = false;
+            Window::client->write<message::GameLoaded>(Window::my_pid);
           },
-          std::ref(gameScene), std::ref(hud), std::ref(lobby));
+          std::ref(gameScene), std::ref(hud), std::ref(lobby), Window::my_pid);
     } else {
       gameScene->update(deltaTime);
     }
@@ -277,7 +279,8 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 }
 
 void Window::draw(GLFWwindow* window) {
-  // Gets events, including input such as keyboard and mouse or window resizing.
+  // Gets events, including input such as keyboard and mouse or window
+  // resizing.
   glfwPollEvents();
 
   // Clear the color and depth buffers.                     ******
@@ -285,7 +288,8 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  if (loading_resources || remainingLoadBuffer > 0) {
+  if (loading_resources || remainingLoadBuffer > 0 ||
+      phase == GamePhase::GameLoading) {
     loadScreen->draw();
   } else {
     // Render the objects.

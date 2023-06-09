@@ -20,7 +20,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum class GamePhase { Start, Lobby, Game, GameOver };
+enum class GamePhase { Start, Lobby, GameLoading, Game, GameOver };
 
 class Window {
  public:

@@ -99,6 +99,10 @@ void network_init() {
       }
     };
 
+    auto lobby_ready_handler = [](const message::LobbyReady& body) {
+      Window::phase = GamePhase::GameLoading;
+    };
+
     auto game_start_handler = [](const message::GameStart& body) {
       Window::phase = GamePhase::Game;
     };
@@ -129,9 +133,9 @@ void network_init() {
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, game_state_update_handler, lobby_update_handler,
-        game_start_handler, jump_event_handler, land_event_handler,
-        item_pickup_event_handler, tag_event_handler, game_over_handler,
-        any_handler);
+        lobby_ready_handler, game_start_handler, jump_event_handler,
+        land_event_handler, item_pickup_event_handler, tag_event_handler,
+        game_over_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
