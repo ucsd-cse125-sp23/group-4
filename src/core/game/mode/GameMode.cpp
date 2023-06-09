@@ -51,8 +51,8 @@ std::vector<Player*> NTaggersTimeGameMode::initPlayers(
         pPerm[i]->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get());
     data->isIt = true;
     data->taggedTime = pPerm[i]->level->getAge();
-    pPerm[i]->level->statisticManager->setValue(pPerm[i]->pid, "ticks_it",
-                                                -TAG_COOLDOWN);
+    // pPerm[i]->level->statisticManager->setValue(pPerm[i]->pid, "ticks_it",
+    //                                             -TAG_COOLDOWN);
     ret.push_back(pPerm[i]);
   }
   return ret;
