@@ -333,21 +333,6 @@ void Scene::onGameOver() {
   }
 }
 
-void Scene::onGameOver() {
-  rankings = rankPlayers();
-  std::vector<std::pair<Player*, float>> player_times;
-  for (auto& [i, g] : networkGameThings) {
-    if (dynamic_cast<Player*>(g) != nullptr) {
-      Player* player = dynamic_cast<Player*>(g);
-      float time = player->score / 20.0;
-      player_times.push_back(std::make_pair(player, time));
-    }
-  }
-  std::sort(player_times.begin(), player_times.end(), cmpp);
-  rankings_ptr.clear();
-  for (auto p : player_times) rankings_ptr.push_back(p.first);
-}
-
 message::UserStateUpdate Scene::pollUpdate() {
   if (!networkGameThings.count(_myPlayerId)) return {};
 
