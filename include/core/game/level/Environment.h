@@ -35,6 +35,8 @@ class Environment {
   std::pair<PObject*, vec4f> ccd(PObject* self, vec3f dPos,
                                  std::set<PObject*> ignore = {});
 
+  float raycast(Ray ray, float maxDistance = 1);
+
   struct BVHNode {
     AABShape* bound;
     PObject* obj;

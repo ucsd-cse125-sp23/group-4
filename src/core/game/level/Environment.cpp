@@ -7,6 +7,7 @@
 #include "core/math/shape/ConvexMeshShape.h"
 #include "core/math/shape/ExpandedShape.h"
 #include "core/math/shape/MovementShape.h"
+#include "core/math/shape/PointShape.h"
 #include "core/util/global.h"
 
 using core::Player;
@@ -328,4 +329,47 @@ std::pair<PObject*, vec4f> Environment::ccd(PObject* self, vec3f dPos,
     }
   }
   return std::make_pair(lastHit, vec4f(norm, t));
+}
+
+float Environment::raycast(Ray ray, float maxDistance) {
+  PointShape* point = new PointShape(ray.src);
+  vec3f dPos = maxDistance * normalize(ray.dir);
+  MovementShape* moveShape = new MovementShape(point, dPos);
+  std::vector<PObject*> collisions = this->collides(moveShape);
+  if (collisions.empty()) return maxDistance;
+
+  float maxDistSqr = maxDistance * maxDistance;
+
+  size_t ite = 0;
+  vec3f movement = vec3f(0, 0, 0);
+  do {
+    float minT = 1;
+    for (int i = 0; i < collisions.size(); i++) {
+      const CollisionBounds* objBounds = collisions[i]->getBounds();
+      vec3f distV = point->distance(
+          objBounds->shape, translate(movement),
+          translate_scale(objBounds->getPos(), objBounds->getScale()));
+      if (length_squared(distV) == 0) {
+        minT = 0;
+        break;
+      }
+      float t = dot(distV, distV) / dot(dPos, distV);
+      if (0 <= t) {
+        if (t < minT) {
+          minT = t;
+        }
+      } else {
+        collisions[i--] = collisions.back();
+        collisions.pop_back();
+      }
+    }
+
+    vec3f diff = minT * dPos;
+    movement += diff;
+    dPos -= diff;
+
+    if (length_squared(diff) < TOLERANCE * TOLERANCE) break;
+  } while (maxDistSqr - length_squared(movement) > TOLERANCE * TOLERANCE &&
+           ++ite < MAX_ITERATIONS);
+  return std::min(1.0f, std::sqrt(dot(movement, movement) / maxDistSqr));
 }
