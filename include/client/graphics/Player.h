@@ -36,12 +36,12 @@ class Player : public GameThing, InputListener {
   SoundEffect* sfx_jump;
   SoundEffect* sfx_item;
   SoundEffect* sfx_tag;
-  Timer time;
+  int score;  // number of ticks not it
   bool tagged;
 
   Player() {
     pmodel = nullptr;
-    tagged = true;
+    tagged = false;
     sfx_jump = nullptr;
     sfx_item = nullptr;
     sfx_tag = nullptr;

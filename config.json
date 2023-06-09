@@ -1,7 +1,7 @@
 {
   "server_address": "localhost",
   "server_port": 2400,
-  "game_duration": 300,
+  "game_duration": 45,
   "game_mode": "single-tagger",
   "player_count": 1,
 
@@ -17,5 +17,6 @@
   "skin_duck": "demo-duck.fbx",
   "skin_trash panda": "demo-racoon.fbx",
   "skin_unicorn": "demo-unicorn.fbx",
-  "skin_waffle": "demo-waffle.fbx"
+  "skin_waffle": "demo-waffle.fbx",
+  "game_start_delay": 14
 }
