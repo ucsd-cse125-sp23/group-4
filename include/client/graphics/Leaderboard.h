@@ -1,7 +1,7 @@
 #pragma once
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "client/graphics/FontRenderer.h"
 #include "client/graphics/Texture.h"

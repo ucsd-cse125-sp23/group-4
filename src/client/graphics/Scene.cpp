@@ -32,7 +32,7 @@ bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
   return a.second < b.second;
 }
 bool cmpp(const std::pair<Player*, float>& a,
-         const std::pair<Player*, float>& b) {
+          const std::pair<Player*, float>& b) {
   return a.second < b.second;
 }
 
@@ -311,8 +311,6 @@ void Scene::update(float delta) {
       }
     }
 
-      
-
     if (music) {
       music->setEffectVolume();
     }
@@ -327,7 +325,7 @@ message::UserStateUpdate Scene::pollUpdate() {
 
 void Scene::receiveState(message::GameStateUpdate newState) {
   if (Window::loading_resources) return;
-  //if (Window::phase == GamePhase::GameOver) return;
+  // if (Window::phase == GamePhase::GameOver) return;
 
   // update existing items, create new item if it doesn't exist
   for (auto& [id, player] : newState.players) {
@@ -429,7 +427,7 @@ void Scene::draw() {
   if (Window::phase == GamePhase::GameOver) {
     glDisable(GL_DEPTH_TEST);
     leaderboard.draw();
-    //leaderboard.drawPlayers(rankings);
+    // leaderboard.drawPlayers(rankings);
     glEnable(GL_DEPTH_TEST);
   }
   // Pre-draw sequence:
