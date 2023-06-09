@@ -82,15 +82,16 @@ void PObject::tick() {
   this->vel.y -= std::max(0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
   lastSurfaceNormal = vec3f(0, 0, 0);
+
+  move(this->vel);
+  freeze = false;
+
   if (onGround) {
     ticksFallen = 0;
   } else {
     ticksFallen++;
     lastSurfaceFriction = 0;
   }
-
-  move(this->vel);
-  freeze = false;
 }
 void PObject::move(vec3f dPos) {
   oPos = pos;
