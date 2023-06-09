@@ -218,6 +218,9 @@ void Scene::init(void) {
   sfx = new SoundEffect();
   sfx->load("assets/sounds/coin.wav");
   sceneResources->sounds["sfx_item"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/fallsound.wav");
+  sceneResources->sounds["sfx_fall"] = sfx;
   /*music = new Music();
   music->load("assets/sounds/Dance_Powder.wav");*/
 
