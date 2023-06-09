@@ -74,7 +74,8 @@ int main(int argc, char* argv[]) {
 
     if (manager.status_ == Manager::Status::GameOver) {
       server.stop_tick();
-      server.write_all<message::GameOver>(manager.game_->get_scores());
+      auto scores = manager.game_->get_scores();
+      server.write_all<message::GameOver>(scores);
       return;
     }
 
