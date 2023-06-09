@@ -72,9 +72,10 @@ class Camera : public GameThing {
     return origin ? ViewProjectOriginMtx : ViewProjectMtx;
   }
 
+  float FOV;  // Field of View Angle (degrees)
  private:
   // Perspective controls
-  float FOV;       // Field of View Angle (degrees)
+  // float FOV;       // Field of View Angle (degrees)
   float Aspect;    // Aspect Ratio
   float NearClip;  // Near clipping plane distance
   float FarClip;   // Far clipping plane distance

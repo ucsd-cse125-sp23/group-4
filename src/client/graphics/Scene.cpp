@@ -305,7 +305,7 @@ void Scene::draw() {
 Settings settings;  // define extern var
 
 void Scene::gui() {
-  settings.gui();
+  settings.gui(&camera->FOV);
 
   ImGui::Begin("scene debug +++");
 
