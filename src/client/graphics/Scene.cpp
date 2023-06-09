@@ -17,6 +17,7 @@ adapted from CSE 167 - Matthew
 
 #include "Scene.inl"  // The scene init definition
 #include "client/graphics/Window.h"
+#include "config/lib.hpp"
 #include "network/item.hpp"
 
 using glm::mat4x4;
@@ -27,7 +28,6 @@ int Scene::_myPlayerId = -1;
 bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
-
 
 bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
   return a.second < b.second;
@@ -48,23 +48,13 @@ Player* Scene::createPlayer(int id, std::string skin) {
   }
 
   // LOAD PLAYER ASSETS ---
-  // copy into a new model object
-  Model* myModel;
-  if (dynamic_cast<AssimpModel*>(sceneResources->models[skins[id]])) {
-    AssimpModel* amRef =
-        dynamic_cast<AssimpModel*>(sceneResources->models[skins[id]]);
-    AssimpModel* am = new AssimpModel(*amRef);
-    myModel = am;
-    player->pmodel = am;
-  } else {
-    if (sceneResources->models[skins[id]]) {
-      myModel = new Model(*sceneResources->models[skins[id]]);
-    } else {
-      myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
-    }
-  }
+  AssimpModel* am = new AssimpModel();
+  am->loadAssimp(skin.c_str());
+  Model* myModel = am;
+  player->pmodel = am;
   player->model = myModel;
-  // TODO(matthew) set material here! if needed
+  myModel->mesh = am;
+  myModel->material = sceneResources->materials["toon"];
   sceneResources->models[playername + ".model"] = myModel;
 
   // skin/costume
@@ -75,8 +65,8 @@ Player* Scene::createPlayer(int id, std::string skin) {
     sceneResources->models[playername + ".costume"] = myCostume;
   }
 
-  // animations TODO(?)
-  // player->pmodel->setAnimation("walk");  // TODO: make this automated
+  // animations
+  //   for assimp model if it is recognized as a player it defaults to idle
 
   // sound effects
   SoundEffect* sfxRef =
@@ -262,7 +252,7 @@ void Scene::update(float delta) {
       node["world"]->childnodes.clear();
       rankings = rankPlayers();
     }
-    
+
     if (music) {
       music->setEffectVolume();
     }
@@ -278,9 +268,24 @@ message::UserStateUpdate Scene::pollUpdate() {
 void Scene::receiveState(message::GameStateUpdate newState) {
   // update existing items, create new item if it doesn't exist
   for (auto& [id, player] : newState.players) {
-    std::string skin = "bee";
-    if (skins.count(id)) skin = skins[id];
-    if (!networkGameThings.count(id)) createPlayer(id, skin);
+    if (!networkGameThings.count(id)) {
+      auto config = get_config();
+      std::string skin = "";
+      if (skins.count(id)) {
+        skin = std::string(config["skin_dir"]) +
+               std::string(config["skin_" + skins[id]]);
+      } else {
+        if (skins.empty()) {
+          printf("Scene: [WARNING] SKIN array is empty player %d\n", id);
+        } else {
+          printf("Scene: [WARNING] cannot find skin config of player %d\n", id);
+          auto itr = skins.begin();
+          skin = std::string(config["skin_dir"]) +
+                 std::string(config["skin_" + itr->second]);
+        }
+      }
+      createPlayer(id, skin);
+    }
 
     auto thing = networkGameThings.at(id);
     thing->updateFromState(player);
