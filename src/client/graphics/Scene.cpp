@@ -271,11 +271,11 @@ void Scene::receiveState(message::GameStateUpdate newState) {
     if (!networkGameThings.count(id)) {
       auto config = get_config();
       std::string skin = "";
-      if (skins.count(id))
+      if (skins.count(id)) {
         skin = std::string(config["skin_dir"]) +
                std::string(config["skin_" + skins[id]]);
-      else {
-        if (skin.empty()) {
+      } else {
+        if (skins.empty()) {
           printf("Scene: [WARNING] SKIN array is empty player %d\n", id);
         } else {
           printf("Scene: [WARNING] cannot find skin config of player %d\n", id);
