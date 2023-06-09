@@ -5,6 +5,8 @@
 
 #include "core/util/global.h"
 
+using core::Player;
+
 CountGameMode::CountGameMode() {}
 void CountGameMode::registerTrackers(Level* level) {
   level->statisticManager->registerStat("it_count", 0);

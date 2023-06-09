@@ -22,13 +22,14 @@ class Environment {
   void addItemSpawnpoint(vec3f pos);
   void setDeathHeight(float height);
 
-  void placePlayers(std::mt19937& rng, std::vector<Player*> players);
+  void placePlayers(std::mt19937& rng, std::vector<core::Player*> players);
   const std::vector<vec3f> getItemSpawns();
   float getDeathHeight();
 
   void constructBVH();
   std::vector<PObject*> collides(BoundingShape* shape);
   std::vector<PObject*> collides(PObject* self);
+  std::vector<PObject*> intersects(Ray ray, float* closest);
   std::pair<PObject*, vec4f> mtv(PObject* self);
   std::pair<PObject*, vec4f> ccd(PObject* self, vec3f dPos,
                                  std::set<PObject*> ignore = {});

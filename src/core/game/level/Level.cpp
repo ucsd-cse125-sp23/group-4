@@ -7,6 +7,8 @@
 #include "core/game/physics/PowerUp.h"
 #include "core/util/global.h"
 
+using core::Player;
+
 void Level::tick() {
   // Tick & remove POjbects
   std::vector<size_t> allIds = this->objects.getAllIds();

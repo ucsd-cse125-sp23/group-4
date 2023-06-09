@@ -23,11 +23,11 @@ class NTaggerGameMode : virtual public GameMode {
 
  public:
   explicit NTaggerGameMode(int n);
-  void initPlayers(std::map<uint32_t, Player*> players) override;
+  void initPlayers(std::map<uint32_t, core::Player*> players) override;
 };
 class TeamedTaggerGameMode : virtual public GameMode {
  public:
   std::vector<uint32_t> teams[2];
   TeamedTaggerGameMode();
-  void initPlayers(std::map<uint32_t, Player*> players) override;
+  void initPlayers(std::map<uint32_t, core::Player*> players) override;
 };

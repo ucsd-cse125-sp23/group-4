@@ -10,6 +10,8 @@
 #include "core/game/modifier/TaggedStatusModifier.h"
 #include "core/util/global.h"
 
+using core::Player;
+
 GameThing::GameThing(int id, Player* p, ControlModifierData* c, Level* l)
     : id_(id), player_(p), control_(c), heading_(0), level_(l) {}
 

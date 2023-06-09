@@ -12,7 +12,7 @@
 // TODO: figure out how to support items later on
 class GameThing {
  public:
-  GameThing(int, Player*, ControlModifierData*, Level*);
+  GameThing(int, core::Player*, ControlModifierData*, Level*);
 
   void update(const message::UserStateUpdate& update);
   void remove();
@@ -24,7 +24,7 @@ class GameThing {
   Level* level_;
   int id_;
   float heading_;
-  Player* player_;
+  core::Player* player_;
   ControlModifierData* control_;
 };
 
