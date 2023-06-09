@@ -1,6 +1,6 @@
 {
   "server_address": "localhost",
   "server_port": 2400,
-  "map_draw_file": "assets/model/map-visual.obj",
+  "map_draw_file": "assets/model/map-final-singlemap.obj",
   "map_data_file": "assets/model/map-data.obj"
 }
