@@ -24,7 +24,7 @@ struct Settings {
     ImGui::Checkbox("light config menu", &lightMenu);
     ImGui::End();
 
-    if(lightMenu) lightConfig.gui();
+    if (lightMenu) lightConfig.gui();
   }
 };
 
