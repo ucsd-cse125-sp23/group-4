@@ -8,7 +8,7 @@
 #include <SFML/Audio.hpp>
 #include <string>
 
-#include "core.h"
+#include "client/graphics/core.h"
 class SoundEffect {
  public:
   inline static float volumeGlobal = 1.0f;  // 0.0 to 1.0
