@@ -8,16 +8,24 @@ void HUD::draw(GLFWwindow* window) {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
-  std::map<std::string, Player*> players;
+  std::map<int, Player*> players;
 
   float scale_x = static_cast<float>(width) / static_cast<float>(800);
   float scale_y = static_cast<float>(height) / static_cast<float>(600);
 
-  for (auto& [_, e] : scene->networkGameThings) {
+  for (auto& [ind, e] : scene->networkGameThings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
-      std::string name = player->name;
-      players[name] = player;
+      glm::vec3 color;
+      if (ind == scene->_myPlayerId) {
+        color = glm::vec3(0.0f, 1.0f, 0.0f);
+      } else if (player->tagged) {
+        color = glm::vec3(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0);
+      } else {
+        color = glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0);
+      }
+      auto name = player->name;
+      players[ind] = player;
       const unsigned char* cname =
           reinterpret_cast<const unsigned char*>(name.c_str());
       glm::vec4 position = glm::vec4(player->transform.position, 1.0f);
@@ -46,7 +54,7 @@ void HUD::draw(GLFWwindow* window) {
         }
         glDisable(GL_DEPTH_TEST);
         fr->RenderText(width, height, name, windowSpace[0], windowSpace[1],
-                       size, glm::vec3(0.0f, 0.0f, 1.0f));
+                       size, color);
         glEnable(GL_DEPTH_TEST);
       }
     }
@@ -87,10 +95,13 @@ void HUD::draw(GLFWwindow* window) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
+
       if (i == scene->_myPlayerId) {
-        glColor3f(1.0f, 0.0f, 0.0f);
+        glColor3f(0.0f, 1.0f, 0.0f);
+      } else if (player->tagged) {
+        glColor3f(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0);
       } else {
-        glColor3f(0.0f, 0.0f, 1.0f);
+        glColor3f(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0);
       }
       glPointSize(10);
       glBegin(GL_POINTS);
@@ -155,7 +166,7 @@ void HUD::drawTime() {
 }
 
 void HUD::drawLeaderboard(GLFWwindow* window, float scale,
-                          std::map<std::string, Player*> players) {
+                          std::map<int, Player*> players) {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
@@ -179,16 +190,43 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
   x = 0;
   y = 0;
   for (auto it = players.rbegin(); it != players.rend(); it++) {
-    glViewport(x, y, bar_width, bar_height);
-    str = it->first;
     player = it->second;
+
+    glViewport(x, y, bar_width, bar_height);
+
+    /*int i, steps = 36;
+    float a = 0.0, b = 0.0, r = 1.0, phi, dphi = 2. * M_PI / (float)(steps);
+    if (it->first == scene->_myPlayerId) {
+      glViewport(x + bar_width / 5, y + bar_height / 3, bar_width / 5,
+                 bar_width / 5);
+      glColor3f(0.0f, 1.0f, 0.0f);
+      glEnable(GL_LINE_STIPPLE);
+      glLineStipple(1, 0xff);
+      glLineWidth(5);
+
+      glBegin(GL_LINE_LOOP);
+      for (i = 0, phi = 0.0; i < steps; i++, phi += dphi)
+        glVertex3f(a + r * cos(phi), b + r * sin(phi), 0.0);
+
+      glEnd();
+
+      glDisable(GL_LINE_STIPPLE);
+
+      glViewport(x, y, bar_width, bar_height);
+    }*/
+
+    str = player->name;
+
     int score_s = player->score / 20.0;
     str += " " + std::to_string(score_s) + "s";
 
     glDisable(GL_DEPTH_TEST);
 
     // change text color of tagged player
-    if (player->tagged)
+    if (it->first == scene->_myPlayerId)
+      fr->RenderText(bar_width, bar_height, str, bar_width / 2.5,
+                     bar_height / 2, 0.3 * scale, glm::vec3(0.0, 1.0, 0.0));
+    else if (player->tagged)
       fr->RenderText(
           bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
           0.3 * scale,
