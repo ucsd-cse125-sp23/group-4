@@ -36,6 +36,7 @@ message::LobbyUpdate Window::lobby_state;
 
 GLFWwindow *Window::loadingWindow, *Window::screenWindow;
 std::thread Window::subthread;
+float Window::remainingLoadBuffer;
 
 // Game stuff to render
 Scene* Window::gameScene;
@@ -92,7 +93,11 @@ bool Window::initializeObjects() {
 
   
   loading_resources = true;
+  remainingLoadBuffer = 5;
   gameScene = new Start(Cam);
+
+  glfwDestroyWindow(loadingWindow);
+  loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
   subthread = std::thread(
       [](Scene* gameScene) {
         glfwMakeContextCurrent(loadingWindow);
@@ -208,8 +213,9 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
 
 void Window::update(GLFWwindow* window, float deltaTime) {
-  if (loading_resources) {
+  if (loading_resources || remainingLoadBuffer > 0) {
     loadScreen->update();
+    remainingLoadBuffer -= deltaTime;
   } else {
     if (subthread.joinable()) subthread.join();
     if (dynamic_cast<Start*>(gameScene) &&
@@ -217,7 +223,11 @@ void Window::update(GLFWwindow* window, float deltaTime) {
       resetCamera();
 
       loading_resources = true;
+      remainingLoadBuffer = 5;
       gameScene = new Lobby(Cam);
+
+      glfwDestroyWindow(loadingWindow);
+      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
       subthread = std::thread(
           [](Scene* gameScene) {
             glfwMakeContextCurrent(loadingWindow);
@@ -232,8 +242,9 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
     } else if (dynamic_cast<Lobby*>(gameScene) &&
                phase == GamePhase::Game) {  // lobby -> game
-      loading_resources = true;
 
+      loading_resources = true;
+      remainingLoadBuffer = 10;
       auto lobby = dynamic_cast<Lobby*>(gameScene);
       std::map<int, message::LobbyPlayer> ps = lobby->players;
       gameScene = new Scene(Cam);
@@ -265,7 +276,7 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  if (loading_resources) {
+  if (loading_resources || remainingLoadBuffer > 0) {
     loadScreen->draw();
   } else {
     // Render the objects.
