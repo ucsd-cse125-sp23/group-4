@@ -49,6 +49,7 @@ message::Player GameThing::to_network() const {
       player_->ticksFallen,
       player_->onGround,
       is_tagged(),
+      false,
       effects,
   };
 }

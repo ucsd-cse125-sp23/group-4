@@ -100,6 +100,7 @@ std::string Player::to_string() const {
     "        ticks_fallen: " + std::to_string(ticks_fallen) + "," + "\n"
     "        is_grounded: " + std::to_string(is_grounded) + "," +   "\n"
     "        is_tagged: " + std::to_string(is_tagged) + "," +       "\n"
+    "        is_moving: " + std::to_string(is_moving) + "," +       "\n"
     "        effects: " + effects_to_string(effects) + "," +        "\n"
     "      },"                                                      "\n";
   // clang-format on
