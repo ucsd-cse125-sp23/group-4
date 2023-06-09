@@ -53,7 +53,7 @@ class Camera : public GameThing {
   void CamZoom(float y);
   void CamDrag(float a, float i);
 
-  float GetDistance() { return Distance; }
+  float GetDistance(bool raycast = false);
   float GetAzimuth() { return Azimuth; }
   float GetIncline() { return Incline; }
 
