@@ -15,6 +15,7 @@ class HUD {
 
   Scene* scene;
   Texture map;
+  Texture timer;
   std::vector<Texture> frames;
   std::map<std::string, Texture> player_bars;
   int index;
@@ -39,6 +40,8 @@ class HUD {
       frames.push_back(frame);
     }
 
+    timer.init("assets/UI/IMG_2658.PNG");
+
     player_bars["trash panda"].init("assets/UI/bar-racoon.png");
     player_bars["bee"].init("assets/UI/bar-bee.png");
     player_bars["avocado"].init("assets/UI/bar-avocado.png");
@@ -50,6 +53,8 @@ class HUD {
   }
 
   void draw(GLFWwindow* window);
+
+  void drawTime();
 
   void drawLeaderboard(GLFWwindow* window, float scale,
                        std::map<std::string, Player*> players);

@@ -45,9 +45,9 @@ Player* Scene::createPlayer(int id) {
   // copy into a new model object
   Model* myModel;
   if (dynamic_cast<AssimpModel*>(
-          sceneResources->models["PREFAB_player.model"])) {
+          sceneResources->models[skins[id]])) {
     AssimpModel* amRef = dynamic_cast<AssimpModel*>(
-        sceneResources->models["PREFAB_player.model"]);
+        sceneResources->models[skins[id]]);
     AssimpModel* am = new AssimpModel(*amRef);
     myModel = am;
     player->pmodel = am;

@@ -20,49 +20,11 @@ void Lobby::init(void) {
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 
   // Create a material palette
-  sceneResources->materials["wood"] = new Material;
-  sceneResources->materials["wood"]->shader =
-      sceneResources->shaderPrograms["basic"];
-  sceneResources->materials["wood"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  sceneResources->materials["wood"]->diffuse = vec4(0.4f, 0.15f, 0.1f, 1.0f);
-  sceneResources->materials["wood"]->specular = vec4(0.3f, 0.15f, 0.1f, 1.0f);
-  sceneResources->materials["wood"]->shininess = 100.0f;
-
-  sceneResources->materials["ceramic"] = new Material;
-  sceneResources->materials["ceramic"]->shader =
-      sceneResources->shaderPrograms["basic"];
-  sceneResources->materials["ceramic"]->ambient =
-      vec4(0.02f, 0.07f, 0.2f, 1.0f);
-  sceneResources->materials["ceramic"]->diffuse = vec4(0.1f, 0.25f, 0.7f, 1.0f);
-  sceneResources->materials["ceramic"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
-  sceneResources->materials["ceramic"]->shininess = 50.0f;
-
-  sceneResources->materials["silver"] = new Material;
-  sceneResources->materials["silver"]->shader =
-      sceneResources->shaderPrograms["basic"];
-  sceneResources->materials["silver"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  sceneResources->materials["silver"]->diffuse = vec4(0.2f, 0.2f, 0.2f, 1.0f);
-  sceneResources->materials["silver"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
-  sceneResources->materials["silver"]->shininess = 50.0f;
-
-  sceneResources->materials["marble"] = new Material;
-  sceneResources->materials["marble"]->shader =
-      sceneResources->shaderPrograms["basic"];
-  sceneResources->materials["marble"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  sceneResources->materials["marble"]->diffuse =
-      vec4(0.97f, 0.89f, 0.75f, 1.0f);
-  sceneResources->materials["marble"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
-  sceneResources->materials["marble"]->shininess = 50.0f;
-
-  sceneResources->textures["grid"] = new Texture;
-  sceneResources->textures["grid"]->init("assets/image/test_uv.png");
-
-  sceneResources->materials["grid"] = new Material;
-  sceneResources->materials["grid"]->shader =
-      sceneResources->shaderPrograms["basic"];
-  sceneResources->materials["grid"]->texture = sceneResources->textures["grid"];
-  sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  sceneResources->materials["grid"]->diffuse = vec4(0.3f, 0.3f, 0.3f, 1.0f);
+  Material* mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["toon"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.9f, 0.82f, 0.9f, 1.0f);
+  sceneResources->materials["toon"] = mtl;
 
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
@@ -85,7 +47,7 @@ void Lobby::init(void) {
   sceneResources->models["trash panda"] = amRacoon;
   sceneResources->models["trash panda"]->mesh = amRacoon;
   sceneResources->models["trash panda"]->material =
-      sceneResources->materials["toon.blue"];
+      sceneResources->materials["toon"];
   player_models.push_back(sceneResources->models["trash panda"]);
 
   AssimpModel* amBee = new AssimpModel();
@@ -95,7 +57,7 @@ void Lobby::init(void) {
   sceneResources->models["bee"] = amBee;
   sceneResources->models["bee"]->mesh = amBee;
   sceneResources->models["bee"]->material =
-      sceneResources->materials["toon.blue"];
+      sceneResources->materials["toon"];
   player_models.push_back(sceneResources->models["bee"]);
 
   AssimpModel* amAvocado = new AssimpModel();
@@ -105,7 +67,7 @@ void Lobby::init(void) {
   sceneResources->models["avocado"] = amAvocado;
   sceneResources->models["avocado"]->mesh = amAvocado;
   sceneResources->models["avocado"]->material =
-      sceneResources->materials["toon.blue"];
+      sceneResources->materials["toon"];
   player_models.push_back(sceneResources->models["avocado"]);
 
   AssimpModel* amDuck = new AssimpModel();
@@ -115,7 +77,7 @@ void Lobby::init(void) {
   sceneResources->models["duck"] = amDuck;
   sceneResources->models["duck"]->mesh = amDuck;
   sceneResources->models["duck"]->material =
-      sceneResources->materials["toon.blue"];
+      sceneResources->materials["toon"];
   player_models.push_back(sceneResources->models["duck"]);
 
   AssimpModel* amCat = new AssimpModel();
@@ -125,7 +87,7 @@ void Lobby::init(void) {
   sceneResources->models["cat"] = amCat;
   sceneResources->models["cat"]->mesh = amCat;
   sceneResources->models["cat"]->material =
-      sceneResources->materials["toon.blue"];
+      sceneResources->materials["toon"];
   player_models.push_back(sceneResources->models["cat"]);
 
   AssimpModel* amUnicorn = new AssimpModel();
@@ -136,7 +98,7 @@ void Lobby::init(void) {
   sceneResources->models["unicorn"] = amUnicorn;
   sceneResources->models["unicorn"]->mesh = amUnicorn;
   sceneResources->models["unicorn"]->material =
-      sceneResources->materials["toon.blue"];
+      sceneResources->materials["toon"];
   player_models.push_back(sceneResources->models["unicorn"]);
 
 
