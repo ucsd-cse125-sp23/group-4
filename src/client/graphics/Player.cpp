@@ -72,6 +72,7 @@ void Player::updateFromState(message::Player p) {
   if (fx_tagStatus) fx_tagStatus->creationRate = p.is_tagged ? 5.0f : 0.0f;
 
   score = p.score;
+  tagged = p.is_tagged;
 
   // animation
   if (pmodel) {
