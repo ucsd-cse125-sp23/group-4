@@ -7,12 +7,13 @@
 
   "map_draw_file": "assets/model/map-final-singlemap.obj",
   "map_data_file": "assets/model/map-data.obj",
-  "skin_dir": "assets/model/withUV/",
-  "skin_trash panda": "Animation -Racoon.fbx",
-  "skin_bee": "Animation -Bee.fbx",
-  "skin_avocado": "Animation -Avocado.fbx",
-  "skin_duck": "Animation -Duck.fbx",
-  "skin_cat": "Animation -Cat.fbx",
-  "skin_unicorn": "Animation -Unicorn.fbx",
-  "skin_waffle": "Animation -Bee.fbx"
+  "skin_dir": "assets/model/demo/",
+  "skin_avocado": "demo-avocado.fbx",
+  "skin_bear": "demo-bear.fbx",
+  "skin_bee": "demo-bee.fbx",
+  "skin_cat": "demo-cat.fbx",
+  "skin_duck": "demo-duck.fbx",
+  "skin_trash panda": "demo-racoon.fbx",
+  "skin_unicorn": "demo-unicorn.fbx",
+  "skin_waffle": "demo-waffle.fbx"
 }
