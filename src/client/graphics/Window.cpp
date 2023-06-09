@@ -249,7 +249,6 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
     } else if (dynamic_cast<Lobby*>(gameScene) &&
                phase == GamePhase::Game) {  // lobby -> game
-
       loading_resources = true;
       remainingLoadBuffer = 10;
       auto lobby = dynamic_cast<Lobby*>(gameScene);
