@@ -199,7 +199,7 @@ class Scene {
     for (std::pair<std::string, Node*> entry : node) {
       delete entry.second;
     }
-
+    if (music) delete music;
     delete sceneResources;
   }
 };

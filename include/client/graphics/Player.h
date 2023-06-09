@@ -54,6 +54,8 @@ class Player : public GameThing, InputListener {
     if (fx_item) delete fx_item;
     if (fx_tag) delete fx_tag;
     if (sfx_jump) delete sfx_jump;
+    if (sfx_tag) delete sfx_tag;
+    if (sfx_item) delete sfx_item;
   }
 
   message::UserStateUpdate pollInput();
