@@ -43,6 +43,7 @@
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
 #include "client/graphics/SoundEffect.h"
+#include "client/graphics/Music.h"
 class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
@@ -99,7 +100,7 @@ class Scene {
   static bool _freecam;
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
-
+  
   SceneResourceMap* sceneResources;
 
   Camera* camera;
@@ -116,7 +117,7 @@ class Scene {
 
   Timer time;
   bool gameStart;
-  SoundEffect* gameTheme;
+  Music* music;
   
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
@@ -126,7 +127,8 @@ class Scene {
     time.time = 300.0f;
     time.countdown = true;
     gameStart = false;
-
+    
+    
     sceneResources = new SceneResourceMap();
 
     // globals --
@@ -166,6 +168,8 @@ class Scene {
 
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
+    music = new Music();
+    music->load("assets/sounds/Dance_Powder.wav");
   }
 
   Player* createPlayer(int id);

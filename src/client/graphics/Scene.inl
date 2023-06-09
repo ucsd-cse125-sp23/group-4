@@ -221,6 +221,9 @@ void Scene::init(void) {
   sfx = new SoundEffect();
   sfx->load("assets/sounds/jump2.wav");
   sceneResources->sounds["sfx_jump"] = sfx;
+  /*music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");*/
+  
 #pragma endregion
 
   // Setup particle effects

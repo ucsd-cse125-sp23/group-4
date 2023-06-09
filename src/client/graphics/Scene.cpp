@@ -153,10 +153,14 @@ void Scene::animate(float delta) {
 }
 
 void Scene::update(float delta) {
+
   for (auto& thing : localGameThings) thing->update(delta);
   for (auto& [_, thing] : networkGameThings) thing->update(delta);
   if (gameStart) {
     time.Update(delta);
+    if (music) {
+      music->setEffectVolume();
+    }
   }
 }
 

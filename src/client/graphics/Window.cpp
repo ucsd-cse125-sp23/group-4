@@ -205,6 +205,8 @@ void Window::update(GLFWwindow* window, float deltaTime) {
              phase == GamePhase::Game) {  // lobby -> game
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = new Scene(Cam);
+
+    gameScene->music->play();
     glfwHideWindow(window);
     loading_resources = true;
     std::thread x(&Load::load, loadScreen, window);
