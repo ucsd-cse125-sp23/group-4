@@ -2,17 +2,38 @@
 
 #include "Window.h"
 
+void HUD::init() {
+  for (int i = 0; i < 40; i++) {
+    Texture frame;
+    std::string filename =
+        "assets/image/countdown/frame_" + std::to_string(i) + "_delay-0.1s.png";
+    frame.init(filename.c_str());
+    frames.push_back(frame);
+  }
+  timer.init("assets/UI/IMG_2658.PNG");
+
+  player_bars["trash panda"].init("assets/UI/bar-racoon.png");
+  player_bars["bee"].init("assets/UI/bar-bee.png");
+  player_bars["avocado"].init("assets/UI/bar-avocado.png");
+  player_bars["duck"].init("assets/UI/bar-duck.png");
+  player_bars["cat"].init("assets/UI/bar-cat.png");
+  player_bars["unicorn"].init("assets/UI/bar-unicorn.png");
+  player_bars["waffle"].init("assets/UI/bar-waffle.png");
+  player_bars["bear"].init("assets/UI/Group 6 (1).png");
+}
+
 void HUD::draw(GLFWwindow* window) {
   glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
-  std::map<std::string, Player*> players;
+  std::map<int, Player*> players;
 
-  float scale = static_cast<float>(width) / static_cast<float>(800);
+  float scale_x = static_cast<float>(width) / static_cast<float>(800);
+  float scale_y = static_cast<float>(height) / static_cast<float>(600);
 
-  for (auto& [_, e] : scene->networkGameThings) {
+  for (auto& [ind, e] : scene->networkGameThings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 color;
@@ -43,17 +64,17 @@ void HUD::draw(GLFWwindow* window) {
         float deltaD = 10 - cam->GetDistance();
         float size;
         if (deltaD < 0) {
-          size = (0.5 * scale) / (0.5 * abs(deltaD));
-          if (size < 0.1 * scale)
-            size = 0.1 * scale;
-          else if (size > 0.5 * scale)
-            size = 0.5 * scale;
+          size = (0.5 * scale_y) / (0.5 * abs(deltaD));
+          if (size < 0.1 * scale_y)
+            size = 0.1 * scale_y;
+          else if (size > 0.5 * scale_y)
+            size = 0.5 * scale_y;
         } else {
-          size = 0.5 * scale;
+          size = 0.5 * scale_y;
         }
         glDisable(GL_DEPTH_TEST);
         fr->RenderText(width, height, name, windowSpace[0], windowSpace[1],
-                       size, glm::vec3(0.0f, 0.0f, 1.0f));
+                       size, color);
         glEnable(GL_DEPTH_TEST);
       }
     }
@@ -76,31 +97,9 @@ void HUD::draw(GLFWwindow* window) {
     glEnable(GL_DEPTH_TEST);
   }
 
-  drawLeaderboard(window, scale, players);
+  drawLeaderboard(window, scale_x, players);
 
-  glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-  std::string game_time = scene->time.ToString();
-  float w = fr->TextWidth(game_time, 0.75 * scale);
-
-  float x_left = width - (130 * scale);
-  float x_leftNDC = (x_left / width * 2) - 1;
-
-  float y_bot = height - (60 * 0.75 * scale);
-  float y_botNDC = (y_bot / height * 2) - 1;
-
-  glBegin(GL_QUADS);
-
-  glVertex2f(1, 1);
-  glVertex2f(x_leftNDC, 1);
-  glVertex2f(x_leftNDC, y_botNDC);
-  glVertex2f(1, y_botNDC);
-
-  glEnd();
-
-  glDisable(GL_DEPTH_TEST);
-  fr->RenderText(width, height, game_time, width - (w + (15 * scale)),
-                 height - (48 * 0.75 * scale), 0.75f * scale,
-                 glm::vec3(1.0f, 0.0f, 0.0f));
+  if (scene->gameStart) drawTime();
 
   // minimap stuff
   int map_height = (width / 5 > 250) ? 250 : width / 4;
@@ -116,6 +115,7 @@ void HUD::draw(GLFWwindow* window) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
+
       if (i == scene->_myPlayerId) {
         glColor3f(255.0 / 256.0, 0.0f, 115.0 / 256.0);
       } else if (player->tagged) {
@@ -136,14 +136,57 @@ void HUD::draw(GLFWwindow* window) {
 
   drawCountdown();
 
-  gameOver();
+  if (scene->gameStart) gameOver();
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_BLEND);
 }
 
+void HUD::drawTime() {
+  glDisable(GL_DEPTH_TEST);
+  GLFWwindow* window = glfwGetCurrentContext();
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+  float scale_x = static_cast<float>(width) / static_cast<float>(800);
+  float scale_y = static_cast<float>(height) / static_cast<float>(600);
+
+  int timer_x = 0.7 * width;
+  int timer_y = 0.75 * height;
+  int size_x = width - timer_x;
+  int size_y = height - timer_y;
+  glViewport(timer_x, timer_y, size_x, size_y);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  timer.bindgl();
+  glEnable(GL_TEXTURE_2D);
+
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBegin(GL_QUADS);
+
+  glTexCoord2f(1, 0);
+  glVertex3f(1.0f, 1.0f, 0.0f);
+  glTexCoord2f(0, 0);
+  glVertex3f(-1.0f, 1.0f, 0.0f);
+  glTexCoord2f(0, 1);
+  glVertex3f(-1.0f, -1.0f, 0.0f);
+  glTexCoord2f(1, 1);
+  glVertex3f(1.0f, -1.0f, 0.0f);
+
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
+
+  std::string game_time = scene->time.ToString();
+
+  fr->RenderText(size_x, size_y, game_time, size_x / 6, size_y / 2.25,
+                 0.65f * scale_y, glm::vec3(1.0f, 0.0f, 0.0f));
+
+  glViewport(0, 0, width, height);
+}
+
 void HUD::drawLeaderboard(GLFWwindow* window, float scale,
-                          std::map<std::string, Player*> players) {
+                          std::map<int, Player*> players) {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
@@ -164,10 +207,9 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     y += (bar_height / 1.5);
   }
 
-  x = bar_width / 2.5;
-  y = bar_height / 2;
+  x = 0;
+  y = 0;
   for (auto it = players.rbegin(); it != players.rend(); it++) {
-    str = it->first;
     player = it->second;
 
     glViewport(x, y, bar_width, bar_height);
@@ -266,7 +308,8 @@ void HUD::update() {
 }
 
 void HUD::drawCountdown() {
-  if (!scene->gameStart) {
+  glDisable(GL_DEPTH_TEST);
+  if (!scene->gameStart && index < frames.size()) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -294,24 +337,37 @@ void HUD::drawCountdown() {
 
     update();
   }
+  glEnable(GL_DEPTH_TEST);
 }
 
 void HUD::gameOver() {
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
   glfwGetWindowSize(window, &width, &height);
-  float scale = static_cast<float>(width) / static_cast<float>(800);
-  if (scene->time.time <= 0.1) {
+  float scale_x = static_cast<float>(width) / static_cast<float>(800);
+  float scale_y = static_cast<float>(height) / static_cast<float>(600);
+  if (Window::phase == GamePhase::GameOver) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
-    float w = fr->TextWidth("Time's Up!", offset * scale);
+    float w = fr->TextWidth("Time's Up!", offset * scale_y);
     glDisable(GL_DEPTH_TEST);
     fr->RenderText(width, height, "Time's Up!", (width / 2) - (w / 2),
-                   height / 2, offset * scale, glm::vec3(1, 0, 0));
+                   height / 2, offset * scale_y, glm::vec3(1, 0, 0));
     glEnable(GL_DEPTH_TEST);
     offset--;
     if (offset < 1) offset = 1;
     glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
   }
+}
+
+void HUD::reset() {
+  offset = 10;
+  index = 0;
+  lastTime = glfwGetTime();
+  index = 0;
+  timeOnFrame = 0;
+
+  for (auto& thing : scene->localGameThings) thing->update(3);
+  for (auto& [_, thing] : scene->networkGameThings) thing->update(3);
 }

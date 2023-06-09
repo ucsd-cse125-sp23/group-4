@@ -17,6 +17,8 @@
 #include "PlayerModel.h"
 #include "Timer.h"
 
+namespace client {
+
 class Player : public GameThing, InputListener {
  public:
   float speed = 10;
@@ -27,21 +29,47 @@ class Player : public GameThing, InputListener {
   PlayerModel* pmodel;  // visual information
 
   ParticleSystem* fx_jump;
-  ParticleSystem* fx_tag;  // TODO(matthew)
-
-  Timer time;
+  ParticleSystem* fx_land;
+  ParticleSystem* fx_item;
+  ParticleSystem* fx_tag;
+  ParticleSystem* fx_tagStatus;
+  SoundEffect* sfx_jump;
+  SoundEffect* sfx_item;
+  SoundEffect* sfx_tag;
+  int score;  // number of ticks not it
   bool tagged;
 
   Player() {
     pmodel = nullptr;
-    tagged = true;
+    tagged = false;
+    sfx_jump = nullptr;
+    sfx_item = nullptr;
+    sfx_tag = nullptr;
+    fx_jump = nullptr;
+    fx_land = nullptr;
+    fx_item = nullptr;
+    fx_tag = nullptr;
+    fx_tagStatus = nullptr;
   }
 
   ~Player() {
     if (fx_jump) delete fx_jump;
+    if (fx_land) delete fx_land;
+    if (fx_item) delete fx_item;
+    if (fx_tag) delete fx_tag;
+    if (sfx_jump) delete sfx_jump;
+    if (sfx_tag) delete sfx_tag;
+    if (sfx_item) delete sfx_item;
   }
 
   message::UserStateUpdate pollInput();
+  void updateFromState(message::Player p) override;
+
+  void eventJump();
+  void eventLand();
+  void eventItem();
+  void eventTag();
+  void eventTagged();
 
   void animate(float dt) override;
   void update(float dt);
@@ -49,3 +77,5 @@ class Player : public GameThing, InputListener {
 
   void faceDirection(glm::vec3 direction);
 };
+
+}  // namespace client

@@ -9,6 +9,8 @@
 #include "core/math/shape/MovementShape.h"
 #include "core/util/global.h"
 
+using core::Player;
+
 void Environment::addPObject(PObject* obj) {
   collisions.push_back(obj);
   obj->static_ = true;
@@ -173,6 +175,49 @@ std::vector<PObject*> Environment::collides(PObject* self) {
       }
     }
   }
+  return hits;
+}
+std::vector<PObject*> Environment::intersects(Ray ray, float* closest) {
+  std::vector<PObject*> hits;
+  float currd = 200.0f;
+  if (this->root != nullptr) {
+    std::stack<BVHNode*> stack;
+    stack.push(this->root);
+    while (!stack.empty()) {
+      BVHNode* curr = stack.top();
+      stack.pop();
+      float d = curr->bound->intersects(ray);
+      if (d >= 0) {
+        if (curr->obj == nullptr) {
+          stack.push(curr->left);
+          stack.push(curr->right);
+        } else {
+          auto self = curr->obj;
+          d = self->getBounds()->intersects(ray);
+          if (d >= 0) {
+            if (d < currd) currd = d;
+            hits.push_back(curr->obj);
+          }
+        }
+      }
+    }
+  }
+
+  if (closest) *closest = currd;
+  return hits;
+}
+std::vector<PObject*> Environment::intersectsLoop(Ray ray, float* closest) {
+  std::vector<PObject*> hits;
+  float currd = 200.0f;
+  for (auto curr : collisions) {
+    float d = curr->getBounds()->intersects(ray);
+    if (d >= 0) {
+      if (d < currd) currd = d;
+      hits.push_back(curr);
+    }
+  }
+
+  if (closest) *closest = currd;
   return hits;
 }
 std::pair<PObject*, vec4f> Environment::mtv(PObject* self) {

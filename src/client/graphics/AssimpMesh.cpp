@@ -27,16 +27,16 @@ void AssimpMesh::gl_load() {
   glBindVertexArray(VAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBOP);
-  glBufferData(GL_ARRAY_BUFFER, outPos.size() * sizeof(glm::vec3), &outPos[0],
-               GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, outPos.size() * sizeof(glm::vec4), &outPos[0],
+               GL_DYNAMIC_DRAW);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(0));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 16, static_cast<void*>(0));
 
   glBindBuffer(GL_ARRAY_BUFFER, VBON);
-  glBufferData(GL_ARRAY_BUFFER, outNorm.size() * sizeof(glm::vec3), &outNorm[0],
-               GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, outNorm.size() * sizeof(glm::vec4), &outNorm[0],
+               GL_DYNAMIC_DRAW);
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(0));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 16, static_cast<void*>(0));
 
   glBindBuffer(GL_ARRAY_BUFFER, VBOUV);
   glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0],
@@ -57,11 +57,11 @@ void AssimpMesh::gl_update() {
   glBindVertexArray(VAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBOP);
-  glBufferData(GL_ARRAY_BUFFER, outPos.size() * sizeof(glm::vec3), &outPos[0],
+  glBufferData(GL_ARRAY_BUFFER, outPos.size() * sizeof(glm::vec4), &outPos[0],
                GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBON);
-  glBufferData(GL_ARRAY_BUFFER, outNorm.size() * sizeof(glm::vec3), &outNorm[0],
+  glBufferData(GL_ARRAY_BUFFER, outNorm.size() * sizeof(glm::vec4), &outNorm[0],
                GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
