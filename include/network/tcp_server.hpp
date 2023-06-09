@@ -24,7 +24,7 @@ class Server {
   Server(int port, AcceptHandler, CloseHandler, ReadHandler, WriteHandler,
          TickHandler);
 
-  void start_tick(int = 0);
+  void start_tick();
   void stop_tick();
   void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);

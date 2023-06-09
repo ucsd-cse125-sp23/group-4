@@ -25,13 +25,9 @@ Server::Server(int port, AcceptHandler accept_handler,
   io_context_.run();
 }
 
-void Server::start_tick(int delay) {
-  // add delay for client countdown
-  timer_.expires_after(std::chrono::milliseconds{delay});
-  timer_.async_wait([this](const boost::system::error_code&) {
-    should_tick_ = true;
-    tick();
-  });
+void Server::start_tick() {
+  should_tick_ = true;
+  tick();
 }
 
 void Server::stop_tick() {
