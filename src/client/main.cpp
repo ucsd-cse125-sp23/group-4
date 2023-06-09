@@ -215,7 +215,7 @@ int main(int argc, char* argv[]) {
         //Window::animate(min_time_between_updates);  // update player anims
 
         update_count++;
-        num_updates_to_send--;
+        num_updates_to_send = 0;
       }
     }
 
