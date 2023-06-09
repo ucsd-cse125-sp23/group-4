@@ -46,12 +46,15 @@ class AssimpMesh {
   /** indicates whether vertex data needs to be renewed to GL */
   bool isUpdated = false;
   std::vector<unsigned int> indices;
-  std::vector<glm::vec4> outPos;
-  std::vector<glm::vec4> outNorm;
+  std::vector<glm::vec3> outPos;
+  std::vector<glm::vec3> outNorm;
   std::vector<glm::vec2> uvs;
   /** vertex relative to world space (default pose) */
   std::vector<glm::vec4> pos;
   std::vector<glm::vec4> norm;
+  /** temporary vertex info */
+  std::vector<glm::vec4> animPos;
+  std::vector<glm::vec4> animNorm;
 
   // Rendering - Material & Texture
   /** holds texture of the mesh */

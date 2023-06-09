@@ -28,12 +28,9 @@
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
-#include "client/graphics/ItemBox.h"
-#include "client/graphics/Leaderboard.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
-#include "client/graphics/Music.h"
 #include "client/graphics/Node.h"
 #include "client/graphics/Obj.h"
 #include "client/graphics/ParticleSystem.h"
@@ -45,9 +42,6 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
-// #include "core/game/level/Environment.h"
-
-using namespace client;  // NOLINT
 
 class SceneResourceMap {
  public:
@@ -108,8 +102,6 @@ class Scene {
 
   SceneResourceMap* sceneResources;
 
-  Environment* coreEnv;
-
   Camera* camera;
   Player* myPlayer = nullptr;
 
@@ -121,58 +113,69 @@ class Scene {
   std::vector<GameThing*> localGameThings;
   std::unordered_map<int, GameThing*> networkGameThings;
   std::map<int, std::string> skins;
-  std::vector<std::pair<int, std::string>> rankings;
-  std::vector<Player*> rankings_ptr;
 
   Timer time;
-  float overtime;
   bool gameStart;
-  Leaderboard leaderboard;
-  Music* music;
 
   explicit Scene(Camera* camFromWindow) {
-    coreEnv = new Environment();
-    // initializeLevel(coreEnv);    // not needed
-
     camera = camFromWindow;
-    // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
-    camera->SetPositionTarget(glm::vec3(0, 1, 1) *
-                              240.0f);  // before player spawns
-    camera->SetAzimuth(10);
     localGameThings.push_back(camera);
-
+    time.time = 300.0f;
+    time.countdown = true;
     gameStart = false;
 
     sceneResources = new SceneResourceMap();
+
+    // globals --
+    _globalSceneResources.meshes["_gz-cube"] = new Cube();
+
+    _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
+    _globalSceneResources.meshes["_gz-xyz"]->init(
+        "assets/model/dev/_gizmo.obj");
+
+    _globalSceneResources.shaderPrograms["unlit"] =
+        LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
+
+    _globalSceneResources.materials["unlit"] = new Material;
+    _globalSceneResources.materials["unlit"]->shader =
+        _globalSceneResources.shaderPrograms["unlit"];
+    _globalSceneResources.materials["unlit"]->diffuse =
+        glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+
+    _globalSceneResources.models["_gz-xyz"] = new Model;
+    _globalSceneResources.models["_gz-xyz"]->mesh =
+        _globalSceneResources.meshes["_gz-xyz"];
+    _globalSceneResources.models["_gz-xyz"]->material =
+        _globalSceneResources.materials["unlit"];
+    _globalSceneResources.models["_gz-xyz"]->modelMtx =
+        glm::scale(glm::vec3(1.0f));
+    _globalSceneResources.models["_gz-xyz"]->depthFunction = GL_ALWAYS;
+
+    _globalSceneResources.models["_gz-cube"] = new Model;
+    _globalSceneResources.models["_gz-cube"]->mesh =
+        _globalSceneResources.meshes["_gz-cube"];
+    _globalSceneResources.models["_gz-cube"]->material =
+        _globalSceneResources.materials["unlit"];
+    _globalSceneResources.models["_gz-cube"]->modelMtx =
+        glm::translate(glm::vec3(0.0f));
+    _globalSceneResources.models["_gz-cube"]->depthFunction = GL_ALWAYS;
+    // --
+
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
-    music = new Music();
-    music->load("assets/sounds/Dance_Powder.wav");
   }
 
-  Player* createPlayer(int id, std::string skin);
+  Player* createPlayer(int id);
   void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
-  ItemBox* createItemBox(int id, Item iEnum);
-  void removeItemBox(int id);
   virtual void init(void);
   void init(std::map<int, message::LobbyPlayer> players);
-  virtual void reset();
-  std::vector<std::pair<int, std::string>> rankPlayers();
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
-
-  // received from net:
-  void receiveEvent_jump(message::JumpEvent e);
-  void receiveEvent_land(message::LandEvent e);
-  void receiveEvent_item(message::ItemPickupEvent e);
-  void receiveEvent_tag(message::TagEvent e);
-
-  void onGameOver();
 
   virtual void animate(float delta);
   virtual void update(float delta);
@@ -187,14 +190,7 @@ class Scene {
     for (std::pair<std::string, Node*> entry : node) {
       delete entry.second;
     }
-    if (music) delete music;
+
     delete sceneResources;
-
-    delete coreEnv;
   }
-
- private:
-  const double min_time_between_animate = 1.0 / 15;
-  float fpsCapParam = 15;
-  double num_updates_to_send = 0;
 };

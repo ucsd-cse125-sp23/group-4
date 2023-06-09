@@ -4,9 +4,22 @@
 class Timer {
  public:
   float time;
-  Timer() { time = 300.0f; }
+  bool countdown;
+  Timer() {
+    time = 0.0f;
+    countdown = false;
+  }
 
-  void Update(float seconds_remaining) { time = seconds_remaining; }
+  void Update(float deltaTime) {
+    if (!countdown) {
+      time += deltaTime;
+    } else {
+      time -= deltaTime;
+      if (time < 0) {
+        time = 0.0f;
+      }
+    }
+  }
 
   std::string ToString() {
     int minutes = floor(time / 60);

@@ -7,12 +7,8 @@
 
 #pragma once
 
-#include <functional>
-
 #include "client/graphics/GameThing.h"
 #include "client/graphics/core.h"
-#include "core/game/level/Environment.h"
-#include "core/math/Ray.h"
 #include "glm/gtx/euler_angles.hpp"
 
 #ifdef __APPLE__
@@ -34,9 +30,6 @@ class Camera : public GameThing {
  public:
   bool Fixed;
 
-  Environment* env;
-  // std::function<float(Ray)> raycastFunction;
-
   Camera();
 
   void update(float dt);
@@ -57,10 +50,10 @@ class Camera : public GameThing {
   void SetAzimuth(float a) { Azimuth = a; }
   void SetIncline(float i) { Incline = i; }
 
-  void CamZoom(float y, float max = 1.0f);
+  void CamZoom(float y);
   void CamDrag(float a, float i);
 
-  float GetDistance(bool raycast = false, glm::mat4* rootMtxPtr = nullptr);
+  float GetDistance() { return Distance; }
   float GetAzimuth() { return Azimuth; }
   float GetIncline() { return Incline; }
 
@@ -72,20 +65,17 @@ class Camera : public GameThing {
     return origin ? ViewProjectOriginMtx : ViewProjectMtx;
   }
 
-  float FOV;  // Field of View Angle (degrees)
-
  private:
   // Perspective controls
-  // float FOV;       // Field of View Angle (degrees)
+  float FOV;       // Field of View Angle (degrees)
   float Aspect;    // Aspect Ratio
   float NearClip;  // Near clipping plane distance
   float FarClip;   // Far clipping plane distance
 
   // Polar controls
   float Distance;  // Distance of the camera eye position to the origin (meters)
-  float maxDist = 150.0f;
-  float Azimuth;  // Rotation of the camera eye position around the Y axis
-                  // (degrees)
+  float Azimuth;   // Rotation of the camera eye position around the Y axis
+                   // (degrees)
   float
       Incline;  // Angle of the camera eye position over the XZ plane (degrees)
 

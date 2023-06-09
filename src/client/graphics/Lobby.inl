@@ -22,11 +22,49 @@ void Lobby::init(void) {
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/toon.frag");
 
   // Create a material palette
-  Material* mtl = new Material;
-  mtl->shader = sceneResources->shaderPrograms["toon"];
-  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mtl->diffuse = vec4(0.9f, 0.82f, 0.9f, 1.0f);
-  sceneResources->materials["toon"] = mtl;
+  sceneResources->materials["wood"] = new Material;
+  sceneResources->materials["wood"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["wood"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["wood"]->diffuse = vec4(0.4f, 0.15f, 0.1f, 1.0f);
+  sceneResources->materials["wood"]->specular = vec4(0.3f, 0.15f, 0.1f, 1.0f);
+  sceneResources->materials["wood"]->shininess = 100.0f;
+
+  sceneResources->materials["ceramic"] = new Material;
+  sceneResources->materials["ceramic"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["ceramic"]->ambient =
+      vec4(0.02f, 0.07f, 0.2f, 1.0f);
+  sceneResources->materials["ceramic"]->diffuse = vec4(0.1f, 0.25f, 0.7f, 1.0f);
+  sceneResources->materials["ceramic"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["ceramic"]->shininess = 50.0f;
+
+  sceneResources->materials["silver"] = new Material;
+  sceneResources->materials["silver"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["silver"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["silver"]->diffuse = vec4(0.2f, 0.2f, 0.2f, 1.0f);
+  sceneResources->materials["silver"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["silver"]->shininess = 50.0f;
+
+  sceneResources->materials["marble"] = new Material;
+  sceneResources->materials["marble"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["marble"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["marble"]->diffuse =
+      vec4(0.97f, 0.89f, 0.75f, 1.0f);
+  sceneResources->materials["marble"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  sceneResources->materials["marble"]->shininess = 50.0f;
+
+  sceneResources->textures["grid"] = new Texture;
+  sceneResources->textures["grid"]->init("assets/image/test_uv.png");
+
+  sceneResources->materials["grid"] = new Material;
+  sceneResources->materials["grid"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["grid"]->texture = sceneResources->textures["grid"];
+  sceneResources->materials["grid"]->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["grid"]->diffuse = vec4(0.3f, 0.3f, 0.3f, 1.0f);
 
   sceneResources->materials["toon.blue"] = new Material;
   sceneResources->materials["toon.blue"]->shader =
@@ -71,12 +109,13 @@ void Lobby::init(void) {
   ///////////////////////////////////////////////////////
   printf("\nLobby: done loading resources!\n");
   ///////////////////////////////////////////////////////
-
   for (auto m : models) {
     m->update(0.0f);
   }
 
-  buildSceneTree();
+  thing_player->transform.position = glm::vec3(0.0f, -1.5f, 0.0f);
+  thing_player->transform.rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+  thing_player->model = sceneResources->models["player"];
 
   background.init("assets/UI/Group 8.png");
   highlight.init("assets/UI/Vector 15 (1).png");

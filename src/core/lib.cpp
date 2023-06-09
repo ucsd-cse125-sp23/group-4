@@ -7,8 +7,6 @@
 #include "core/game/physics/PowerUp.h"
 #include "core/math/shape/LineShape.h"
 
-using core::Player;
-
 Level* initializeLevel(Environment* environment) {
   Level* level = new Level(environment);
   level->setCollisionType(CollisionType::COLLISION, PLAYER_LAYER,
@@ -40,18 +38,4 @@ std::vector<std::vector<uint32_t>> queryPlacements(Level* level) {
 }
 void initPlayers(Level* level, std::map<uint32_t, Player*> players) {
   level->gameMode->initPlayers(players);
-}
-
-std::vector<PowerUp*> getPowerUps(Level* level) {
-  std::vector<PowerUp*> ret;
-  for (size_t id : level->objects.getAllIds())
-    if (PowerUp* p = dynamic_cast<PowerUp*>(level->objects[id]))
-      ret.push_back(p);
-  return ret;
-}
-
-bool isMoving(Player* player) {
-  return length_squared(static_cast<ControlModifierData*>(
-                            player->getModifiers(CONTROL_MODIFIER)[0]->get())
-                            ->horizontalVel) > 0.1;
 }

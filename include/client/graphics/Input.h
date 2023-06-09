@@ -121,9 +121,8 @@ class Input {
 
     // edge cases
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-      // NOTE: only handle this in window!!!
       // Close the window. This causes the program to also terminate.
-      // glfwSetWindowShouldClose(win, GL_TRUE);
+      glfwSetWindowShouldClose(win, GL_TRUE);
     }
   }
 };

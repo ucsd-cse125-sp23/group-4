@@ -7,8 +7,6 @@
 #include "core/game/physics/PowerUp.h"
 #include "core/util/global.h"
 
-using core::Player;
-
 void Level::tick() {
   // Tick & remove POjbects
   std::vector<size_t> allIds = this->objects.getAllIds();
@@ -178,10 +176,9 @@ Environment* Level::getEnvironment() { return environment; }
 void Level::spreadPlayers(std::vector<Player*> ps) {
   this->environment->placePlayers(rng, ps);
 }
-std::vector<Player*> Level::restartGame() {
+void Level::restartGame() {
   this->age = TAG_COOLDOWN;
-  if (gameMode != nullptr) return this->gameMode->initPlayers(players);
-  return {};
+  if (gameMode != nullptr) this->gameMode->initPlayers(players);
 }
 
 void Level::definePowerupSpawn(GlobalEffect* power, int weight) {

@@ -8,7 +8,6 @@
 #include <SFML/Audio.hpp>
 #include <string>
 
-#include "client/graphics/core.h"
 class SoundEffect {
  public:
   inline static float volumeGlobal = 1.0f;  // 0.0 to 1.0
@@ -24,16 +23,10 @@ class SoundEffect {
     setEffectVolume();
   }
 
-  void play(glm::vec3 pos) {
-    sound.setPosition(pos.x, pos.y, pos.z);
+  void play() {
     setEffectVolume();
-    if (sound.getStatus() != sf::Sound::Status::Playing) {
-      sound.play();
-    }
+    sound.play();
   }
-  void loop() { sound.setLoop(true); }
-
-  void stop() { sound.stop(); }
 
  private:
   float volume = 1.0f;
@@ -48,8 +41,7 @@ class SoundEffect {
       printf(("SoundEffect: Failed to load " + filename + ".\n").c_str());
       return sf::Sound(buf);
     }
-    sound.setRelativeToListener(false);
-    sound.setAttenuation(40.0f);
+
     return sf::Sound(buf);
   }
 };
