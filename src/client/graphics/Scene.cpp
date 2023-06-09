@@ -75,7 +75,12 @@ Player* Scene::createPlayer(int id) {
  
   auto sfx = new SoundEffect(*sfxRef);
   player->sfx_jump = sfx;
-
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_item"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_item = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_tag"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_tag = sfx;
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);

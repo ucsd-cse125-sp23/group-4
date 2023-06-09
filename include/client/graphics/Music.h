@@ -3,7 +3,7 @@
 #pragma once 
 class Music {
  public:
-  inline static float volumeGlobal = 1.0f;  // 0.0 to 1.0
+  inline static float volumeGlobal = 0.2f;  // 0.0 to 1.0
 
   void load(std::string filename) {
     if (!loadSound(filename)) {
@@ -27,7 +27,7 @@ class Music {
   void stop() { music.stop(); }
 
  private:
-  float volume = .1f;
+  float volume = .05f;
   // sf::Sound sound;
   sf::Music music;
 

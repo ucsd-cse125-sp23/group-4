@@ -31,6 +31,8 @@ class Player : public GameThing, InputListener {
   ParticleSystem* fx_item;
   ParticleSystem* fx_tag;
   SoundEffect* sfx_jump;
+  SoundEffect* sfx_item;
+  SoundEffect* sfx_tag;
   Timer time;
   bool tagged;
 
@@ -38,6 +40,8 @@ class Player : public GameThing, InputListener {
     pmodel = nullptr;
     tagged = true;
     sfx_jump = nullptr;
+    sfx_item = nullptr;
+    sfx_tag = nullptr;
     fx_jump = nullptr;
     fx_land = nullptr;
     fx_item = nullptr;
