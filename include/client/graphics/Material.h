@@ -62,10 +62,10 @@ struct Material {
     if (settings.lightConfig.enableLights) {
       int nLights = settings.lightConfig.GetLightDirections().size();
       glUniform1i(glGetUniformLocation(shader, "nlights"), nLights);
-      glUniform4fv(glGetUniformLocation(shader, "LightDirections"),
+      glUniform3fv(glGetUniformLocation(shader, "LightDirections"),
                    GLsizei(nLights),
                    &settings.lightConfig.GetLightDirections()[0][0]);
-      glUniform4fv(glGetUniformLocation(shader, "LightColors"),
+      glUniform3fv(glGetUniformLocation(shader, "LightColors"),
                    GLsizei(nLights),
                    &settings.lightConfig.GetLightColors()[0][0]);
     }
