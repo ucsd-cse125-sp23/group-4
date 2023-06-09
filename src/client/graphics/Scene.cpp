@@ -243,19 +243,14 @@ void Scene::update(float delta) {
     time.Update(delta);
   }
 
-  if (time.time == 0) {
-    gameStart = false;
-    timeOver += delta;
-    if (timeOver >= 3 && Window::phase != GamePhase::GameOver) {
-      Window::phase = GamePhase::GameOver;
-      // TODO: build new scene graph based on player rankings
-      node["world"]->childnodes.clear();
-      rankings = rankPlayers();
-    }
+  if (Window::phase == GamePhase::GameOver) {
+    // TODO: build new scene graph based on player rankings
+    node["world"]->childnodes.clear();
+    rankings = rankPlayers();
+  }
 
-    if (music) {
-      music->setEffectVolume();
-    }
+  if (music) {
+    music->setEffectVolume();
   }
 }
 
