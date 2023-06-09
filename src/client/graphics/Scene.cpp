@@ -202,14 +202,7 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-void Scene::reset() {
-  time.time = 5.0f;
-  time.countdown = true;
-  gameStart = false;
-  timeOver = 0;
-
-  networkGameThings.clear();
-}
+void Scene::reset() { networkGameThings.clear(); }
 
 void Scene::animate(float delta) {
   // 2nd level animation process frame cap
