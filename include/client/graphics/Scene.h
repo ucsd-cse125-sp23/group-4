@@ -28,6 +28,7 @@
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
+#include "client/graphics/ItemBox.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
@@ -181,10 +182,12 @@ class Scene {
     music->load("assets/sounds/Dance_Powder.wav");
   }
 
-  Player* createPlayer(int id);
+  Player* createPlayer(int id, std::string skin);
   void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
+  ItemBox* createItemBox(int id, Item iEnum);
+  void removeItemBox(int id);
   virtual void init(void);
   void init(std::map<int, message::LobbyPlayer> players);
 
