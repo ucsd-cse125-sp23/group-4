@@ -95,7 +95,7 @@ class Load {
     for (int i = 0; i < 24; i++) {
       Texture frame;
       std::string filename = "assets/image/tagguys/frame_" + std::to_string(i) +
-                             "_delay-0.08s.png";
+                             "_delay-0.08s.PNG";
       frame.init(filename.c_str());
       frames.push_back(frame);
     }
@@ -105,8 +105,9 @@ class Load {
     int width, height;
     glfwGetWindowSize(win, &width, &height);
 
-    GLFWwindow* window =
-        glfwCreateWindow(width, height, "loading...", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(
+        width, height, "loading...", NULL /*glfwGetPrimaryMonitor()*/, NULL);
+
     glfwMakeContextCurrent(window);
 
     loadFrames();
@@ -118,5 +119,11 @@ class Load {
 
       glfwSwapBuffers(window);
     }
+
+    index = 0;
+    timeOnFrame = 0;
+    forward = true;
+    lastTime = glfwGetTime();
+    timeElapsed = 0;
   }
 };

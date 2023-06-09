@@ -18,6 +18,7 @@ adapted from CSE 167 - Matthew
 #include "Scene.inl"  // The scene init definition
 #include "client/graphics/Window.h"
 #include "config/lib.hpp"
+#include "network/item.hpp"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -27,6 +28,10 @@ int Scene::_myPlayerId = -1;
 bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
+
+bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
+  return a.second < b.second;
+}
 
 Player* Scene::createPlayer(int id, std::string skin) {
   bool isUser = false;
@@ -142,6 +147,47 @@ void Scene::removePlayer(int id) {
   delete player;
 }
 
+ItemBox* Scene::createItemBox(int id, Item iEnum) {
+  // creating a player to be rendered
+  std::string name = "item " + std::to_string(id);
+
+  ItemBox* itemBox = new ItemBox();
+  itemBox->name = name;
+  itemBox->id = id;
+
+  // Set model (TODO use asset)
+  itemBox->model = sceneResources->models["cubeBoxTest"];
+
+  ParticleSystem* ptclRef2 =
+      dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_isTagged"]);
+  auto fx = new ParticleSystem(*ptclRef2);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + name;
+  fx->transform.position = glm::vec3(0, 0.5f, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  itemBox->childnodes.push_back(fx);
+  itemBox->fx = fx;
+
+  // position is set by server message
+
+  networkGameThings.insert({id, itemBox});
+  node["world"]->childnodes.push_back(itemBox);
+
+  return itemBox;
+}
+
+void Scene::removeItemBox(int id) {
+  auto i = networkGameThings.at(id);
+
+  // remove from world
+  auto& nodes = node["world"]->childnodes;
+  auto it = std::find(nodes.begin(), nodes.end(), i);
+  nodes.erase(it);
+
+  networkGameThings.erase(id);
+  delete i;
+}
+
 void Scene::initFromServer(int myid) { _myPlayerId = myid; }
 
 void Scene::setToUserFocus(GameThing* t) {
@@ -154,6 +200,15 @@ void Scene::setToUserFocus(GameThing* t) {
     myPlayer = player;
   }
   t->childnodes.push_back(camera);  // parent camera to player
+}
+
+void Scene::reset() {
+  time.time = 5.0f;
+  time.countdown = true;
+  gameStart = false;
+  timeOver = 0;
+
+  networkGameThings.clear();
 }
 
 void Scene::animate(float delta) {
@@ -182,10 +237,22 @@ void Scene::animate(float delta) {
 }
 
 void Scene::update(float delta) {
-  for (auto& thing : localGameThings) thing->update(delta);
-  for (auto& [_, thing] : networkGameThings) thing->update(delta);
   if (gameStart) {
+    for (auto& thing : localGameThings) thing->update(delta);
+    for (auto& [_, thing] : networkGameThings) thing->update(delta);
     time.Update(delta);
+  }
+
+  if (time.time == 0) {
+    gameStart = false;
+    timeOver += delta;
+    if (timeOver >= 3 && Window::phase != GamePhase::GameOver) {
+      Window::phase = GamePhase::GameOver;
+      // TODO: build new scene graph based on player rankings
+      node["world"]->childnodes.clear();
+      rankings = rankPlayers();
+    }
+    
     if (music) {
       music->setEffectVolume();
     }
@@ -225,7 +292,10 @@ void Scene::receiveState(message::GameStateUpdate newState) {
   }
 
   for (auto& [id, item] : newState.items) {
-    // TODO(matthew)
+    if (!networkGameThings.count(id)) createItemBox(id, item.item);
+
+    auto thing = networkGameThings.at(id);
+    thing->updateFromState(item);
   }
 
   // remove items that don't exist on the server anymore
@@ -288,7 +358,32 @@ void Scene::receiveEvent_tag(message::TagEvent e) {
 
 #pragma endregion
 
+std::vector<std::string> Scene::rankPlayers() {
+  std::vector<std::pair<int, float>> player_times;
+  for (auto& [i, g] : networkGameThings) {
+    if (dynamic_cast<Player*>(g) != nullptr) {
+      Player* player = dynamic_cast<Player*>(g);
+      int p_id = player->id;
+      float time = player->time.time;
+      player_times.push_back(std::make_pair(p_id, time));
+    }
+  }
+  std::sort(player_times.begin(), player_times.end(), cmp);
+
+  std::vector<std::string> rankings;
+  for (auto& [i, _] : player_times) {
+    rankings.push_back(skins[i]);
+  }
+  return rankings;
+}
+
 void Scene::draw() {
+  if (Window::phase == GamePhase::GameOver) {
+    glDisable(GL_DEPTH_TEST);
+    leaderboard.draw();
+    leaderboard.drawPlayers(rankings);
+    glEnable(GL_DEPTH_TEST);
+  }
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
   camera->UpdateView();

@@ -28,6 +28,8 @@
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
+#include "client/graphics/Leaderboard.h"
+#include "client/graphics/ItemBox.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
@@ -119,9 +121,12 @@ class Scene {
   std::vector<GameThing*> localGameThings;
   std::unordered_map<int, GameThing*> networkGameThings;
   std::map<int, std::string> skins;
+  std::vector<std::string> rankings;
 
   Timer time;
   bool gameStart;
+  float timeOver;
+  Leaderboard leaderboard;
   Music* music;
 
   explicit Scene(Camera* camFromWindow) {
@@ -134,9 +139,10 @@ class Scene {
     camera->name = "_camera";
     localGameThings.push_back(camera);
 
-    time.time = 300.0f;
+    time.time = 5.0f;
     time.countdown = true;
     gameStart = false;
+    timeOver = 0;
 
     sceneResources = new SceneResourceMap();
 
@@ -185,8 +191,12 @@ class Scene {
   void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);
+  ItemBox* createItemBox(int id, Item iEnum);
+  void removeItemBox(int id);
   virtual void init(void);
   void init(std::map<int, message::LobbyPlayer> players);
+  virtual void reset();
+  std::vector<std::string> rankPlayers();
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
