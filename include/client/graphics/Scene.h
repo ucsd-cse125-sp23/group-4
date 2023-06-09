@@ -32,6 +32,7 @@
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
+#include "client/graphics/Music.h"
 #include "client/graphics/Node.h"
 #include "client/graphics/Obj.h"
 #include "client/graphics/ParticleSystem.h"
@@ -43,6 +44,9 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
+// #include "core/game/level/Environment.h"
+
+using namespace client;  // NOLINT
 
 class SceneResourceMap {
  public:
@@ -103,6 +107,8 @@ class Scene {
 
   SceneResourceMap* sceneResources;
 
+  Environment* coreEnv;
+
   Camera* camera;
   Player* myPlayer = nullptr;
 
@@ -114,18 +120,25 @@ class Scene {
   std::vector<GameThing*> localGameThings;
   std::unordered_map<int, GameThing*> networkGameThings;
   std::map<int, std::string> skins;
+  std::vector<std::string> rankings;
 
   Timer time;
   bool gameStart;
   float timeOver;
   Leaderboard leaderboard;
+  Music* music;
 
   explicit Scene(Camera* camFromWindow) {
+    coreEnv = new Environment();
+    // initializeLevel(coreEnv);    // not needed
+
     camera = camFromWindow;
+    // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
     localGameThings.push_back(camera);
-    time.time = 60.0f;
+
+    time.time = 5.0f;
     time.countdown = true;
     gameStart = false;
     timeOver = 0;
@@ -169,6 +182,8 @@ class Scene {
 
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
+    music = new Music();
+    music->load("assets/sounds/Dance_Powder.wav");
   }
 
   Player* createPlayer(int id);
@@ -178,6 +193,7 @@ class Scene {
   virtual void init(void);
   void init(std::map<int, message::LobbyPlayer> players);
   virtual void reset();
+  std::vector<std::string> rankPlayers();
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
@@ -199,11 +215,11 @@ class Scene {
   ~Scene() {
     // nodes
     for (std::pair<std::string, Node*> entry : node) {
-      if (entry.second) {
-        delete entry.second;
-      }
+      delete entry.second;
     }
-
+    if (music) delete music;
     delete sceneResources;
+
+    delete coreEnv;
   }
 };

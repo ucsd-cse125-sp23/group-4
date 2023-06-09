@@ -203,7 +203,7 @@ int main(int argc, char* argv[]) {
     if (Window::phase == GamePhase::Game) {
       // handle updates to server
       num_updates_to_send += time_since_prev_frame / min_time_between_updates;
-      while (num_updates_to_send >= 1.0) {
+      if (num_updates_to_send >= 1.0) {
         message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
 
         // check if update if valid
@@ -215,7 +215,7 @@ int main(int argc, char* argv[]) {
         Window::animate(min_time_between_updates);  // update player anims
 
         update_count++;
-        num_updates_to_send--;
+        num_updates_to_send = 0;
       }
     }
 

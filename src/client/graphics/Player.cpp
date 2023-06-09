@@ -10,6 +10,8 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
+using namespace client;  // NOLINT
+
 void Player::animate(float dt) {
   // traverse animation bones (SLOW)
   if (pmodel) pmodel->update(dt);
@@ -23,6 +25,7 @@ void Player::update(float dt) {
   if (fx_land) fx_land->update(dt);
   if (fx_item) fx_item->update(dt);
   if (fx_tag) fx_tag->update(dt);
+  if (fx_tagStatus) fx_tagStatus->update(dt);
 
   if (tagged) time.Update(dt);
 }
@@ -62,25 +65,31 @@ message::UserStateUpdate Player::pollInput() {
 
   if (moving) {
     moveWorld = move(moveLocal);
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
-    }
-  } else {
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
-    }
-  }
-
-  if (jumping) {
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
-    }
   }
 
   return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
+}
+
+void Player::updateFromState(message::Player p) {
+  if (fx_tagStatus) fx_tagStatus->creationRate = p.is_tagged ? 5.0f : 0.0f;
+
+  // animation
+  if (pmodel) {
+    if (p.posy < 97.0f) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::FALL));
+    } else {
+      if (p.is_moving) {
+        pmodel->setAnimation(
+            AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+      } else {
+        pmodel->setAnimation(
+            AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+      }
+    }
+  }
+
+  GameThing::updateFromState(p);
 }
 
 vec3 Player::move(vec3 movement) {
@@ -100,7 +109,13 @@ void Player::eventJump() {
   if (fx_jump) fx_jump->Emit(3);  // spew particles!
 
   // SFX!
-  // if (sfx_jump) sfx_jump->play(transform.position);
+  if (sfx_jump) sfx_jump->play(transform.position);
+
+  // animation
+  if (pmodel) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
+  }
 }
 
 void Player::eventLand() {
@@ -109,12 +124,28 @@ void Player::eventLand() {
 
 void Player::eventItem() {
   // if (fx_item) fx_item->Emit(10);
+
+  // SFX! turning this off for now because item pick up is broken and spamed
+  // if (sfx_item) sfx_item->play(transform.position);
 }
 
 void Player::eventTag() {
-  //
+  // SFX!
+  if (sfx_tag) sfx_tag->play(transform.position);
+
+  // animation
+  if (pmodel) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TAG));
+  }
 }
 
 void Player::eventTagged() {
   if (fx_tag) fx_tag->Emit(15);
+
+  // animation
+  if (pmodel) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TRIP));
+  }
 }

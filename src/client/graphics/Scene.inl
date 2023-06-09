@@ -144,6 +144,13 @@ void Scene::init(void) {
   sceneResources->materials["star1-ptcl"] = mtl;
 
   mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["unlitx"];
+  mtl->texture = sceneResources->textures["star1-ptcl"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.1f, 0.4f, 0.9f, 1.0f);
+  sceneResources->materials["star1.blue-ptcl"] = mtl;
+
+  mtl = new Material;
   mtl->shader = sceneResources->shaderPrograms["toon"];
   mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   mtl->diffuse = vec4(0.9f, 0.82f, 0.9f, 1.0f);
@@ -181,14 +188,26 @@ void Scene::init(void) {
 #pragma region Sounds
   // Sound palette
   SoundEffect* sfx = new SoundEffect();
+  sfx->load("assets/sounds/jump.wav");
   sceneResources->sounds["test"] = sfx;
-  sfx->load("assets/sounds/sound_test.wav");
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/jump2.wav");
+  sceneResources->sounds["sfx_jump"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/hurt.wav");
+  sceneResources->sounds["sfx_tag"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/coin.wav");
+  sceneResources->sounds["sfx_item"] = sfx;
+  /*music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");*/
+
 #pragma endregion
 
   // Setup particle effects
 #pragma region Particles
   ParticleSystem* ptcl = new ParticleSystem();
-  ptcl->name = "GT_particle1";
+  ptcl->name = "GT_particle_test";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
   ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
@@ -197,16 +216,14 @@ void Scene::init(void) {
   // node["particleTest"] = ptcl;
   // node["world"]->childnodes.push_back(node["particleTest"]);
 
-  /*
   ptcl = new ParticleSystem();
-  ptcl->name = "GT_particle2";
+  ptcl->name = "GTptcl_stars";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
-  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
-  ptcl->transform.position = vec3(10, 9, 3);
-  ptcl->transform.updateMtx(&ptcl->transformMtx);
-  localGameThings.push_back(ptcl);
-  node["particleTest2"] = ptcl;
-  node["world"]->childnodes.push_back(node["particleTest2"]);*/
+  ptcl->materialRef = sceneResources->materials["star1-ptcl"];
+  ptcl->worldSpace = true;
+  ptcl->creationRate = 0;
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-10, 10), DOFr(-10, 10)};
+  sceneResources->prefabs["ptcl_stars"] = ptcl;
 
   ptcl = new ParticleSystem();
   ptcl->name = "GTptcl_jump";
@@ -214,8 +231,21 @@ void Scene::init(void) {
   ptcl->materialRef = sceneResources->materials["star1-ptcl"];
   ptcl->worldSpace = true;
   ptcl->creationRate = 0;
-  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-0, 0, 0), DOFr(-10, 10)};
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(12), DOFr(-10, 10)};
+  ptcl->gravity.SetValue(-0.01f);
+  ptcl->drag.SetValue(5.0f);
+  ptcl->lifespan.SetMinMax(0.9f, 0.95f);
   sceneResources->prefabs["ptcl_jump"] = ptcl;
+
+  ptcl = new ParticleSystem();
+  ptcl->name = "GTptcl_isTagged";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["star1.blue-ptcl"];
+  ptcl->worldSpace = true;
+  ptcl->creationRate = 0;
+  ptcl->lifespan.SetMinMax(0.6f, 0.8f);
+  ptcl->gravity.SetValue(-0.1f);
+  sceneResources->prefabs["ptcl_isTagged"] = ptcl;
 #pragma endregion
 
   // Skybox setup
@@ -257,10 +287,13 @@ void Scene::init(void) {
   node["collision"] = new Node("_colliders");
   for (auto c : mapData.colliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
+
+    if (coreEnv) coreEnv->addConvex(c.vertices);  // used by camera raycasts
   }
+  if (coreEnv) coreEnv->constructBVH();
 #pragma endregion
 
-  // Setup player/gameplay prefabs
+    // Setup player/gameplay prefabs
 #pragma region Prefabs
   Model* m_prefab = new Model;
   sceneResources->models["PREFAB_player.model3"] = m_prefab;
@@ -269,7 +302,7 @@ void Scene::init(void) {
   m_prefab->material = sceneResources->materials["toon.blue"];
 
   AssimpModel* am = new AssimpModel();
-  am->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
+  am->loadAssimp("assets/animation/AnimExtra-BeeTest.fbx");
   am->setAnimation("walk");
   sceneResources->models["PREFAB_player.model"] = am;
   sceneResources->models["PREFAB_player.model"]->mesh = am;
@@ -287,8 +320,15 @@ void Scene::init(void) {
   bee_prefab->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
   bee_prefab->setAnimation("walk");
   sceneResources->models["bee"] = bee_prefab;
-  sceneResources->models["bee"]->mesh = bee_prefab;
   sceneResources->models["bee"]->material = sceneResources->materials["toon"];
+  sceneResources->models["bee"]->mesh = bee_prefab;
+
+  AssimpModel* cat_prefab = new AssimpModel();
+  cat_prefab->loadAssimp("assets/animation/withUV/Animation -Cat.fbx");
+  cat_prefab->setAnimation("walk");
+  sceneResources->models["cat"] = cat_prefab;
+  sceneResources->models["cat"]->material = sceneResources->materials["toon"];
+  sceneResources->models["cat"]->mesh = bee_prefab;
 
   AssimpModel* avocado_prefab = new AssimpModel();
   avocado_prefab->loadAssimp("assets/animation/withUV/Animation -Avocado.fbx");

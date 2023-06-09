@@ -27,6 +27,10 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
+bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
+  return a.second < b.second;
+}
+
 Player* Scene::createPlayer(int id) {
   bool isUser = false;
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
@@ -73,6 +77,18 @@ Player* Scene::createPlayer(int id) {
   // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
+  // sound effects
+  SoundEffect* sfxRef =
+      dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_jump"]);
+
+  auto sfx = new SoundEffect(*sfxRef);
+  player->sfx_jump = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_item"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_item = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_tag"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_tag = sfx;
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
@@ -95,7 +111,7 @@ Player* Scene::createPlayer(int id) {
   fx = new ParticleSystem(*ptclRef);
   fx->Reset(false);
   fx->name += "." + playername;
-  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.position = glm::vec3(0, 0.5f, 0);
   fx->transform.updateMtx(&fx->transformMtx);
   player->childnodes.push_back(fx);
   player->fx_item = fx;
@@ -103,10 +119,20 @@ Player* Scene::createPlayer(int id) {
   fx = new ParticleSystem(*ptclRef);
   fx->Reset(false);  // important!!!
   fx->name += "." + playername;
-  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.position = glm::vec3(0, 0.5f, 0);
   fx->transform.updateMtx(&fx->transformMtx);
   player->childnodes.push_back(fx);
   player->fx_tag = fx;
+
+  ParticleSystem* ptclRef2 =
+      dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_isTagged"]);
+  fx = new ParticleSystem(*ptclRef2);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 1.0f, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_tagStatus = fx;
 
   // ---
 
@@ -168,16 +194,15 @@ void Scene::update(float delta) {
   if (time.time == 0) {
     gameStart = false;
     timeOver += delta;
-    if (timeOver >= 3) {
+    if (timeOver >= 3 && Window::phase != GamePhase::GameOver) {
       Window::phase = GamePhase::GameOver;
       // TODO: build new scene graph based on player rankings
       node["world"]->childnodes.clear();
+      rankings = rankPlayers();
     }
-    if (Window::phase == GamePhase::GameOver) {
-      if (timeOver >= 8 && Input::GetInputState(InputAction::Enter) == InputState::Press) {
-        Window::phase = GamePhase::Lobby;
-        reset();
-      }
+    
+    if (music) {
+      music->setEffectVolume();
     }
   }
 }
@@ -189,23 +214,21 @@ message::UserStateUpdate Scene::pollUpdate() {
 }
 
 void Scene::receiveState(message::GameStateUpdate newState) {
-  if (Window::phase == GamePhase::Game) {
-    // update existing items, create new item if it doesn't exist
-    for (auto& [id, state] : newState.things) {
-      // TODO: handle items besides Player as well
-      if (!networkGameThings.count(id)) createPlayer(id);
+  // update existing items, create new item if it doesn't exist
+  for (auto& [id, player] : newState.players) {
+    // TODO: handle items besides Player as well
+    if (!networkGameThings.count(id)) createPlayer(id);
 
-      auto thing = networkGameThings.at(id);
-      thing->updateFromState(state);
-    }
-
-    // remove items that don't exist on the server anymore
-    std::vector<int> removedIds;
-    for (auto& [id, _] : networkGameThings)
-      if (!newState.things.count(id)) removedIds.push_back(id);
-
-    for (int id : removedIds) removePlayer(id);
+    auto thing = networkGameThings.at(id);
+    thing->updateFromState(player);
   }
+
+  // remove items that don't exist on the server anymore
+  std::vector<int> removedIds;
+  for (auto& [id, _] : networkGameThings)
+    if (!newState.players.count(id)) removedIds.push_back(id);
+
+  for (int id : removedIds) removePlayer(id);
 }
 
 #pragma region receiveEvent
@@ -249,13 +272,42 @@ void Scene::receiveEvent_tag(message::TagEvent e) {
 
     player->eventTagged();
   }
+
+  auto t2 = networkGameThings.at(e.tagger);
+  if (dynamic_cast<Player*>(t2) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t2);
+
+    player->eventTag();
+  }
 }
 
 #pragma endregion
 
+std::vector<std::string> Scene::rankPlayers() {
+  std::vector<std::pair<int, float>> player_times;
+  for (auto& [i, g] : networkGameThings) {
+    if (dynamic_cast<Player*>(g) != nullptr) {
+      Player* player = dynamic_cast<Player*>(g);
+      int p_id = player->id;
+      float time = player->time.time;
+      player_times.push_back(std::make_pair(p_id, time));
+    }
+  }
+  std::sort(player_times.begin(), player_times.end(), cmp);
+
+  std::vector<std::string> rankings;
+  for (auto& [i, _] : player_times) {
+    rankings.push_back(skins[i]);
+  }
+  return rankings;
+}
+
 void Scene::draw() {
   if (Window::phase == GamePhase::GameOver) {
+    glDisable(GL_DEPTH_TEST);
     leaderboard.draw();
+    leaderboard.drawPlayers(rankings);
+    glEnable(GL_DEPTH_TEST);
   }
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
@@ -314,7 +366,7 @@ void Scene::draw() {
 Settings settings;  // define extern var
 
 void Scene::gui() {
-  settings.gui();
+  settings.gui(&camera->FOV);
 
   ImGui::Begin("scene debug +++");
 

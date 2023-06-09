@@ -3,8 +3,8 @@
 #include <imgui.h>
 
 #include "Lights.h"
+#include "Music.h"
 #include "SoundEffect.h"
-
 // Runtime variables. For client only.
 struct Settings {
   float gammaCorrection = 1.5f;
@@ -12,15 +12,14 @@ struct Settings {
 
   SettingsStructs::Lights lightConfig = SettingsStructs::Lights();
 
-  void gui() {
+  void gui(float* fov) {
     ImGui::Begin("game settings +++");
-
-    ImGui::DragFloat("volume", &SoundEffect::volumeGlobal, 0.2f, 0.0f, 1.5f);
-
+    ImGui::SliderFloat("FOV", fov, 30.0f, 200.0f);
+    ImGui::DragFloat("gamma", &gammaCorrection, 0.1f, 0.01f, 5.0f);
     ImGui::Separator();
-
-    ImGui::DragFloat("gamma", &gammaCorrection, 0.2f, 0.01f, 5.0f);
-
+    ImGui::SliderFloat("sfx  volume", &SoundEffect::volumeGlobal, 0.0f, 4.0f);
+    ImGui::Separator();
+    ImGui::SliderFloat("song volume", &Music::volumeGlobal, 0.0f, 4.0f);
     ImGui::End();
 
     lightConfig.gui();
