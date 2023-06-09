@@ -210,7 +210,8 @@ void Scene::init(void) {
   mtl->shader = sceneResources->shaderPrograms["unlitx"];
   mtl->texture = sceneResources->textures["star1-ptcl"];
   mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mtl->diffuse = vec4(0.1f, 0.4f, 0.9f, 1.0f);
+  mtl->diffuse = vec4(0.1f, 0.4f, 0.95f, 1.0f);
+  mtl->emission = vec4(0.0f, 0.0f, 0.2f, 1.0f);
   sceneResources->materials["star1.blue-ptcl"] = mtl;
 
   mtl = new Material;
