@@ -186,9 +186,18 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     str += " " + std::to_string(score_s) + "s";
 
     glDisable(GL_DEPTH_TEST);
-    fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
-                   0.3 * scale,
-                   glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
+
+    // change text color of tagged player
+    if (player->tagged)
+      fr->RenderText(
+          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+          0.3 * scale,
+          glm::vec3(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0));  // orange
+    else
+      fr->RenderText(
+          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+          0.3 * scale,
+          glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));  // gray
     glEnable(GL_DEPTH_TEST);
 
     y += (bar_height / 1.5);
