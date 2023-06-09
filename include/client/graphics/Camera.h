@@ -7,8 +7,11 @@
 
 #pragma once
 
+#include <functional>
+
 #include "client/graphics/GameThing.h"
 #include "client/graphics/core.h"
+#include "core/math/Ray.h"
 #include "glm/gtx/euler_angles.hpp"
 
 #ifdef __APPLE__
@@ -29,6 +32,8 @@ class Camera : public GameThing {
 
  public:
   bool Fixed;
+
+  std::function<float(Ray)> raycastFunction;    // set this!!!
 
   Camera();
 
@@ -53,7 +58,7 @@ class Camera : public GameThing {
   void CamZoom(float y);
   void CamDrag(float a, float i);
 
-  float GetDistance(bool raycast = false);
+  float GetDistance(bool raycast = false, glm::mat4* rootMtxPtr = nullptr);
   float GetAzimuth() { return Azimuth; }
   float GetIncline() { return Incline; }
 

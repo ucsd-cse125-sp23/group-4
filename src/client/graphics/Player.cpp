@@ -10,6 +10,8 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
+using namespace client;  // NOLINT
+
 void Player::animate(float dt) {
   // traverse animation bones (SLOW)
   if (pmodel) pmodel->update(dt);

@@ -42,6 +42,9 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
+#include "core/game/level/Environment.h"
+
+using namespace client;  // NOLINT
 
 class SceneResourceMap {
  public:
@@ -102,6 +105,8 @@ class Scene {
 
   SceneResourceMap* sceneResources;
 
+  Environment* coreEnv;
+
   Camera* camera;
   Player* myPlayer = nullptr;
 
@@ -118,10 +123,19 @@ class Scene {
   bool gameStart;
 
   explicit Scene(Camera* camFromWindow) {
+    coreEnv = new Environment();
+    //initializeLevel(coreEnv);
+
     camera = camFromWindow;
     node["_camera"] = camera;
     camera->name = "_camera";
+    camera->raycastFunction = [this](Ray r) {
+      float dOut = 100;
+      coreEnv->intersects(r, &dOut);
+      return dOut;
+    };
     localGameThings.push_back(camera);
+
     time.time = 300.0f;
     time.countdown = true;
     gameStart = false;
@@ -198,5 +212,7 @@ class Scene {
     }
 
     delete sceneResources;
+
+    delete coreEnv;
   }
 };

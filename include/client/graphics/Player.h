@@ -17,6 +17,8 @@
 #include "PlayerModel.h"
 #include "Timer.h"
 
+namespace client {
+
 class Player : public GameThing, InputListener {
  public:
   float speed = 10;
@@ -65,3 +67,5 @@ class Player : public GameThing, InputListener {
 
   void faceDirection(glm::vec3 direction);
 };
+
+}  // namespace client

@@ -257,10 +257,13 @@ void Scene::init(void) {
   node["collision"] = new Node("_colliders");
   for (auto c : mapData.colliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
+
+    if (coreEnv) coreEnv->addConvex(c.vertices);  // used by camera raycasts
   }
+  if (coreEnv) coreEnv->constructBVH();
 #pragma endregion
 
-  // Setup player/gameplay prefabs
+    // Setup player/gameplay prefabs
 #pragma region Prefabs
   Model* m_prefab = new Model;
   sceneResources->models["PREFAB_player.model3"] = m_prefab;

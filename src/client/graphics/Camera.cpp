@@ -5,6 +5,7 @@
 #include "Camera.h"
 
 #include "Input.h"
+#include "core/game/level/Environment.h"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -34,7 +35,7 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
   transform.updateMtx(&transformMtx);  // shouldn't be in draw but oh well
   if (!Fixed) {
     transformMtx = glm::mat4(1);
-    transformMtx[3][2] += GetDistance(true);
+    transformMtx[3][2] += GetDistance(true, &rootMtx);
   }
   transformMtx = glm::eulerAngleY(glm::radians(-Azimuth)) *
                  glm::eulerAngleX(glm::radians(-Incline)) * transformMtx;
@@ -52,12 +53,27 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
   ViewProjectOriginMtx = project * glm::mat4(glm::mat3(view));
 }
 
-float Camera::GetDistance(bool raycast) {
+float Camera::GetDistance(bool raycast, glm::mat4* rootMtxPtr) {
   float d = Distance;
-  if (raycast) {
-    // Raycast from player to camera viewpoint! TODO
+  if (raycast && rootMtxPtr) {
+    // Raycast from player to camera viewpoint!
+    Ray plyrToCam = Ray();
+    plyrToCam.src = vec3f(position_prev.x, position_prev.y, position_prev.z);
+
+    glm::mat4 camMtx = glm::mat4(1);
+    camMtx[3][2] += d + 2.0f;
+
+    camMtx = glm::eulerAngleY(glm::radians(-Azimuth)) *
+             glm::eulerAngleX(glm::radians(-Incline)) * camMtx;
+    camMtx = *rootMtxPtr * camMtx;
+    glm::vec3 camPos = glm::vec3(camMtx[3]);
+
+    plyrToCam.dir = plyrToCam.src - vec3f(camPos.x, camPos.y, camPos.z);
+
+    d = raycastFunction(plyrToCam);
+    //gameEnv->intersects(plyrToCam, &d);
   }
-  return d;
+  return std::min(Distance, d);
 }
 
 void Camera::CamDrag(float a, float i) {
