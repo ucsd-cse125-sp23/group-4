@@ -402,7 +402,7 @@ void Scene::receiveEvent_tag(message::TagEvent e) {
 
 #pragma endregion
 
-std::vector<std::string> Scene::rankPlayers() {
+std::vector<std::pair<int, std::string>> Scene::rankPlayers() {
   std::vector<std::pair<int, float>> player_times;
   for (auto& [i, g] : networkGameThings) {
     if (dynamic_cast<Player*>(g) != nullptr) {
@@ -414,9 +414,9 @@ std::vector<std::string> Scene::rankPlayers() {
   }
   std::sort(player_times.begin(), player_times.end(), cmp);
 
-  std::vector<std::string> rankings;
+  std::vector<std::pair<int, std::string>> rankings;
   for (auto& [i, _] : player_times) {
-    rankings.push_back(skins[i]);
+    rankings.push_back(std::make_pair(i, skins[i]));
   }
   return rankings;
 }
