@@ -27,7 +27,7 @@ void Player::update(float dt) {
   if (fx_tag) fx_tag->update(dt);
   if (fx_tagStatus) fx_tagStatus->update(dt);
 
-  if (tagged) time.Update(dt);
+  
 }
 
 message::UserStateUpdate Player::pollInput() {
@@ -72,7 +72,7 @@ message::UserStateUpdate Player::pollInput() {
 
 void Player::updateFromState(message::Player p) {
   if (fx_tagStatus) fx_tagStatus->creationRate = p.is_tagged ? 5.0f : 0.0f;
-
+  time.time = (p.score-20) * .052f;
   // animation
   if (pmodel) {
     if (p.posy < 97.0f) {
