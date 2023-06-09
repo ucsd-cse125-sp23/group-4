@@ -275,6 +275,7 @@ void Scene::update(float delta) {
         rankings_ptr[i]->transform.rotation = rot;
         rankings_ptr[i]->transform.updateMtx(&(rankings_ptr[i]->transformMtx));
         rankings_ptr[i]->model->modelMtx = glm::mat4(1);
+        rankings_ptr[i]->pmodel->update(delta);
       }
     }
   }
@@ -296,7 +297,32 @@ void Scene::onGameOver() {
   }
   std::sort(player_times.begin(), player_times.end(), cmpp);
   rankings_ptr.clear();
-  for (auto p : player_times) rankings_ptr.push_back(p.first);
+  for (size_t i = 0; i < player_times.size(); i++) {
+    Player* p = player_times[i].first;
+    rankings_ptr.push_back(p);
+    if (i >= 4) {
+      continue;
+    }
+    bool useFirst =
+        static_cast<float>(rand()) / static_cast<float>(RAND_MAX) > 0.5f;
+    if (i == 0) {
+      p->pmodel->setAnimation(AssimpAnimation::AC_TO_NAME.at(
+          useFirst ? AssimpAnimation::PLAYER_AC::PLACE1_1
+                   : AssimpAnimation::PLAYER_AC::PLACE1_2));
+    } else if (i == 1) {
+      p->pmodel->setAnimation(AssimpAnimation::AC_TO_NAME.at(
+          useFirst ? AssimpAnimation::PLAYER_AC::PLACE2_1
+                   : AssimpAnimation::PLAYER_AC::PLACE2_2));
+    } else if (i == 2) {
+      p->pmodel->setAnimation(AssimpAnimation::AC_TO_NAME.at(
+          useFirst ? AssimpAnimation::PLAYER_AC::PLACE3_1
+                   : AssimpAnimation::PLAYER_AC::PLACE3_2));
+    } else if (i == 4) {
+      p->pmodel->setAnimation(AssimpAnimation::AC_TO_NAME.at(
+          useFirst ? AssimpAnimation::PLAYER_AC::PLACE4_1
+                   : AssimpAnimation::PLAYER_AC::PLACE4_2));
+    }
+  }
 }
 
 message::UserStateUpdate Scene::pollUpdate() {
