@@ -218,5 +218,6 @@ class Scene {
 
  private:
   const double min_time_between_animate = 1.0 / 15;
+  float fpsCapParam = 15;
   double num_updates_to_send = 0;
 };
