@@ -57,7 +57,7 @@ class Camera : public GameThing {
   void SetAzimuth(float a) { Azimuth = a; }
   void SetIncline(float i) { Incline = i; }
 
-  void CamZoom(float y);
+  void CamZoom(float y, float max = 1.0f);
   void CamDrag(float a, float i);
 
   float GetDistance(bool raycast = false, glm::mat4* rootMtxPtr = nullptr);

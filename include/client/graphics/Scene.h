@@ -137,6 +137,9 @@ class Scene {
     // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
+    camera->SetPositionTarget(glm::vec3(0, 1, 1) *
+                              240.0f);  // before player spawns
+    camera->SetAzimuth(10);
     localGameThings.push_back(camera);
 
     gameStart = false;

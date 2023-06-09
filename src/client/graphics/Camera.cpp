@@ -45,6 +45,8 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
 
   // Compute view matrix (inverse of world matrix)
   glm::mat4 view = glm::inverse(rootMtx * transformMtx);
+  glm::mat4 view2 = glm::inverse(
+      rootMtx * glm::eulerAngleY(glm::radians(180.0f)) * transformMtx);
 
   // Compute perspective projection matrix
   glm::mat4 project =
@@ -53,7 +55,7 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
   // Compute final view-projection matrix
   ViewMtx = view;
   ViewProjectMtx = project * view;
-  ViewProjectOriginMtx = project * glm::mat4(glm::mat3(view));
+  ViewProjectOriginMtx = project * glm::mat4(glm::mat3(view2));
 }
 
 float Camera::GetDistance(bool raycast, glm::mat4* rootMtxPtr) {
@@ -94,12 +96,12 @@ void Camera::CamDrag(float a, float i) {
   SetIncline(glm::clamp(GetIncline() - i * rate, -90.0f, 90.0f));
 }
 
-void Camera::CamZoom(float y) {
+void Camera::CamZoom(float y, float max) {
   if (Fixed) return;
 
   const float rate = 0.05f;
   float dist = glm::clamp(Distance * (1.0f - static_cast<float>(y) * rate),
-                          6.0f, maxDist);
+                          6.0f, std::max(maxDist, max));
   SetDistance(dist);
 }
 
@@ -142,7 +144,7 @@ void Camera::Reset() {
   FOV = 45.0f;
   Aspect = 16.0f/9.0f;
   NearClip = 0.1f;
-  FarClip = 900.0f;
+  FarClip = 1500.0f;
 
   Distance = 10.0f;
   Azimuth = -0.0f;
