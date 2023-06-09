@@ -12,11 +12,15 @@ uniform sampler2D gSampler;
 uniform float gamma;
 
 // uniforms used for lighting
+uniform int nlights = 2;
 uniform vec3 LightDirections[] = {
-									normalize(vec3(1, 5, 2)),
-									normalize(vec3(-5, -1, -3))
+									normalize(vec3(-0.44, -0.47, 0.49)),
+									normalize(vec3(-0.79, 1.0, -0.5))
 								 };
-uniform vec3 LightColors[] = { vec3(1), vec3(0.6, 0.7, 1) * 0.4 };
+uniform vec3 LightColors[] =     {
+									vec3(0.82, 0.64, 1.00),
+									vec3(0.89, 0.71, 0.38)
+								 };
 
 uniform vec3 ambientColor;
 uniform vec3 diffuseColor;
@@ -39,7 +43,7 @@ void main()
 
 	vec3 lightsum = vec3(0.0);
 
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < nlights; i++){
         lightsum += LightColors[i] * max(0, dot(LightDirections[i], fragNormal));
     }
 
