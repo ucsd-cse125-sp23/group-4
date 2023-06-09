@@ -44,6 +44,7 @@ message::Player GameThing::to_network() const {
       heading_,
       score,
       length(player_->vel),
+      player_->ticksFallen,
       player_->onGround,
       is_tagged(),
       effects,

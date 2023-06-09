@@ -84,6 +84,7 @@ struct Player {
   float heading;
   int score;
   float speed;
+  int ticks_fallen;
   int is_grounded;
   bool is_tagged;
   std::vector<Effect> effects;
@@ -91,8 +92,8 @@ struct Player {
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id& posx& posy& posz& heading& score& speed& is_grounded& is_tagged&
-        effects;
+    ar& id& posx& posy& posz& heading& score& speed& ticks_fallen& is_grounded&
+        is_tagged& effects;
   }
 };
 
