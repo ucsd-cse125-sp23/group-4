@@ -161,7 +161,7 @@ class Scene {
   virtual void init(void);
   void init(std::map<int, message::LobbyPlayer> players);
   virtual void reset();
-  std::vector<std::string> rankPlayers();
+  std::vector<std::pair<int, std::string>> rankPlayers();
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net

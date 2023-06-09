@@ -40,7 +40,7 @@ class HUD {
   void drawTime();
 
   void drawLeaderboard(GLFWwindow* window, float scale,
-                       std::map<std::string, Player*> players);
+                       std::map<int, Player*> players);
 
   void drawBar(std::string skin);
 
