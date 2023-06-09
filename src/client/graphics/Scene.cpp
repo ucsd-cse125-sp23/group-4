@@ -17,6 +17,7 @@ adapted from CSE 167 - Matthew
 
 #include "Scene.inl"  // The scene init definition
 #include "client/graphics/Window.h"
+#include "network/item.hpp"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -148,6 +149,47 @@ void Scene::removePlayer(int id) {
   delete player;
 }
 
+ItemBox* Scene::createItemBox(int id, Item iEnum) {
+  // creating a player to be rendered
+  std::string name = "item " + std::to_string(id);
+
+  ItemBox* itemBox = new ItemBox();
+  itemBox->name = name;
+  itemBox->id = id;
+
+  // Set model (TODO use asset)
+  itemBox->model = sceneResources->models["cubeBoxTest"];
+
+  ParticleSystem* ptclRef2 =
+      dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_isTagged"]);
+  auto fx = new ParticleSystem(*ptclRef2);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + name;
+  fx->transform.position = glm::vec3(0, 0.5f, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  itemBox->childnodes.push_back(fx);
+  itemBox->fx = fx;
+
+  // position is set by server message
+
+  networkGameThings.insert({id, itemBox});
+  node["world"]->childnodes.push_back(itemBox);
+
+  return itemBox;
+}
+
+void Scene::removeItemBox(int id) {
+  auto i = networkGameThings.at(id);
+
+  // remove from world
+  auto& nodes = node["world"]->childnodes;
+  auto it = std::find(nodes.begin(), nodes.end(), i);
+  nodes.erase(it);
+
+  networkGameThings.erase(id);
+  delete i;
+}
+
 void Scene::initFromServer(int myid) { _myPlayerId = myid; }
 
 void Scene::setToUserFocus(GameThing* t) {
@@ -216,7 +258,10 @@ void Scene::receiveState(message::GameStateUpdate newState) {
   }
 
   for (auto& [id, item] : newState.items) {
-    // TODO(matthew)
+    if (!networkGameThings.count(id)) createItemBox(id, item.item);
+
+    auto thing = networkGameThings.at(id);
+    thing->updateFromState(item);
   }
 
   // remove items that don't exist on the server anymore
