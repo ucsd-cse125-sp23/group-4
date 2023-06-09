@@ -47,7 +47,6 @@ class Window {
   static Scene* gameScene;
   static Load* loadScreen;
 
-  static Scene* gameScene;
   static HUD* hud;
 
   // network
