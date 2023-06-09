@@ -52,7 +52,6 @@ int main(int argc, char* argv[]) {
 
           // if all clients are ready, notify clients
           if (manager.check_ready()) {
-            manager.start_game();  // setup physics, don't tick yet
             server.write_all<message::LobbyReady>();
           }
         };
@@ -64,8 +63,8 @@ int main(int argc, char* argv[]) {
       // if all clients are loaded, start the game
       if (manager.check_loaded()) {
         server.write_all<message::GameStart>();
-        int COUNTDOWN_TIME = 3200;  // ms
-        server.start_tick(COUNTDOWN_TIME);
+        manager.start_game();  // initialize physics, start countdown
+        server.start_tick();   // start sending updates to clients
       }
     };
 
@@ -73,7 +72,7 @@ int main(int argc, char* argv[]) {
 
     auto message_handler = boost::make_overloaded_function(
         greeting_handler, user_state_update_handler,
-        lobby_player_update_handler, any_handler);
+        lobby_player_update_handler, game_loaded_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 

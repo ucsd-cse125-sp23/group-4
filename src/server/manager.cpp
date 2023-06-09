@@ -77,16 +77,25 @@ void Manager::handle_game_update(const message::UserStateUpdate& update) {
   game_->update(update);
 }
 
-void Manager::tick_game() { game_->tick(); }
+void Manager::tick_game() {
+  // only tick during game, don't tick during countdown
+  if (status_ == Status::InGame) game_->tick();
+}
 
 void Manager::start_game() {
-  status_ = Status::InGame;
+  status_ = Status::GameCountdown;
   game_->restart();
 
-  // start game timer
-  timer_.expires_from_now(TOTAL_GAME_DURATION);
+  // start countdown timer
+  timer_.expires_after(COUNTDOWN_DURATION);
   timer_.async_wait([this](const boost::system::error_code& _) {
-    status_ = Status::GameOver;
+    status_ = Status::InGame;
+
+    // start game timer
+    timer_.expires_after(TOTAL_GAME_DURATION);
+    timer_.async_wait([this](const boost::system::error_code& _) {
+      status_ = Status::GameOver;
+    });
   });
 }
 

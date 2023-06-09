@@ -13,12 +13,14 @@ class Manager {
   enum class Status {
     Lobby,
     GameLoading,
+    GameCountdown,
     InGame,
     GameOver,
   };
 
   static std::size_t MAX_PLAYERS;
   static std::chrono::seconds TOTAL_GAME_DURATION;
+  static constexpr std::chrono::milliseconds COUNTDOWN_DURATION{3200};
 
   Manager();
 
