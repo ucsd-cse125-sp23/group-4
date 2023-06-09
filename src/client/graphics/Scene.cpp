@@ -17,6 +17,7 @@ adapted from CSE 167 - Matthew
 
 #include "Scene.inl"  // The scene init definition
 #include "client/graphics/Window.h"
+#include "network/item.hpp"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -27,15 +28,16 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
+
 bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
   return a.second < b.second;
 }
 
-Player* Scene::createPlayer(int id) {
+Player* Scene::createPlayer(int id, std::string skin) {
   bool isUser = false;
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
 
-  // creating a player to be rendered... TODO call this from state update!
+  // creating a player to be rendered
   std::string playername = "player " + std::to_string(id);
 
   Player* player = new Player();
@@ -155,6 +157,47 @@ void Scene::removePlayer(int id) {
   delete player;
 }
 
+ItemBox* Scene::createItemBox(int id, Item iEnum) {
+  // creating a player to be rendered
+  std::string name = "item " + std::to_string(id);
+
+  ItemBox* itemBox = new ItemBox();
+  itemBox->name = name;
+  itemBox->id = id;
+
+  // Set model (TODO use asset)
+  itemBox->model = sceneResources->models["cubeBoxTest"];
+
+  ParticleSystem* ptclRef2 =
+      dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_isTagged"]);
+  auto fx = new ParticleSystem(*ptclRef2);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + name;
+  fx->transform.position = glm::vec3(0, 0.5f, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  itemBox->childnodes.push_back(fx);
+  itemBox->fx = fx;
+
+  // position is set by server message
+
+  networkGameThings.insert({id, itemBox});
+  node["world"]->childnodes.push_back(itemBox);
+
+  return itemBox;
+}
+
+void Scene::removeItemBox(int id) {
+  auto i = networkGameThings.at(id);
+
+  // remove from world
+  auto& nodes = node["world"]->childnodes;
+  auto it = std::find(nodes.begin(), nodes.end(), i);
+  nodes.erase(it);
+
+  networkGameThings.erase(id);
+  delete i;
+}
+
 void Scene::initFromServer(int myid) { _myPlayerId = myid; }
 
 void Scene::setToUserFocus(GameThing* t) {
@@ -179,8 +222,28 @@ void Scene::reset() {
 }
 
 void Scene::animate(float delta) {
-  for (auto& thing : localGameThings) thing->animate(delta);
-  for (auto& [_, thing] : networkGameThings) thing->animate(delta);
+  // 2nd level animation process frame cap
+  double fpsMin = (1.0 / fpsCapParam);
+  num_updates_to_send += delta / fpsMin;
+
+  std::vector<GameThing*> animators;
+  GameThing* userAnim = nullptr;
+  for (auto& thing : localGameThings) animators.push_back(thing);
+  for (auto& [_, thing] : networkGameThings) {
+    if (thing->isUser)
+      userAnim = thing;
+    else
+      animators.push_back(thing);
+  }
+
+  if (userAnim) userAnim->animate(delta);  // always update user animations
+
+  if (num_updates_to_send < 1) return;
+  delta = fpsMin * num_updates_to_send;
+
+  for (auto& thing : animators) thing->animate(delta);
+
+  num_updates_to_send = 0;
 }
 
 void Scene::update(float delta) {
@@ -215,11 +278,19 @@ message::UserStateUpdate Scene::pollUpdate() {
 void Scene::receiveState(message::GameStateUpdate newState) {
   // update existing items, create new item if it doesn't exist
   for (auto& [id, player] : newState.players) {
-    // TODO: handle items besides Player as well
-    if (!networkGameThings.count(id)) createPlayer(id);
+    std::string skin = "bee";
+    if (skins.count(id)) skin = skins[id];
+    if (!networkGameThings.count(id)) createPlayer(id, skin);
 
     auto thing = networkGameThings.at(id);
     thing->updateFromState(player);
+  }
+
+  for (auto& [id, item] : newState.items) {
+    if (!networkGameThings.count(id)) createItemBox(id, item.item);
+
+    auto thing = networkGameThings.at(id);
+    thing->updateFromState(item);
   }
 
   // remove items that don't exist on the server anymore
@@ -371,6 +442,10 @@ void Scene::gui() {
 
   ImGui::Checkbox("free camera", &camera->Fixed);
   ImGui::Checkbox("show gizmos", &_gizmos);
+
+  ImGui::Separator();
+
+  ImGui::SliderFloat("anim FPS cap (!!!)", &fpsCapParam, 5.0f, 30.0);
 
   ImGui::Separator();
 

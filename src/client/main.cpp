@@ -217,7 +217,8 @@ int main(int argc, char* argv[]) {
         if (user_update.id == Window::gameScene->_myPlayerId)
           Window::client->write<message::UserStateUpdate>(user_update);
 
-        Window::animate(min_time_between_updates);  // update player anims
+        // update player anims (SLOW)
+        Window::animate(min_time_between_updates * num_updates_to_send);
 
         update_count++;
         num_updates_to_send = 0;

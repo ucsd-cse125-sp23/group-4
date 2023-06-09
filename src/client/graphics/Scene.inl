@@ -113,6 +113,19 @@ void Scene::init(void) {
   sceneResources->materials["pyramid"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
   sceneResources->materials["pyramid"]->shininess = 50.0f;
 
+  sceneResources->materials["shine.red"] = new Material;
+  sceneResources->materials["shine.red"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["shine.red"]->ambient =
+      vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["shine.red"]->diffuse =
+      vec4(0.9f, 0.2f, 0.0f, 1.0f);
+  sceneResources->materials["shine.red"]->specular =
+      vec4(0.0f, 0.95f, 0.0f, 1.0f);
+  sceneResources->materials["shine.red"]->emission =
+      vec4(0.5f, 0.0f, 0.0f, 1.0f);
+  sceneResources->materials["shine.red"]->shininess = 50.0f;
+
   sceneResources->materials["marble"] = new Material;
   sceneResources->materials["marble"]->shader =
       sceneResources->shaderPrograms["basic"];
@@ -183,6 +196,12 @@ void Scene::init(void) {
       sceneResources->meshes["cubeUV"];
   sceneResources->models["cubeTextured"]->material =
       sceneResources->materials["grid"];
+
+  sceneResources->models["cubeBoxTest"] = new Model;
+  sceneResources->models["cubeBoxTest"]->mesh =
+      sceneResources->meshes["cubeUV"];
+  sceneResources->models["cubeBoxTest"]->material =
+      sceneResources->materials["shine.red"];
 #pragma endregion
 
 #pragma region Sounds
@@ -406,6 +425,8 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["map"]);
 
   // createPlayer(-1); // for testing
+
+  // createItemBox(-1, Item::YellowGiftBox);  // for testing
 }
 
 void Scene::init(std::map<int, message::LobbyPlayer> players) {
