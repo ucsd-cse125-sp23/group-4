@@ -58,6 +58,8 @@ struct AssimpRotKeyframe {
 
 struct AssimpRotChannel {
  public:
+  static A_ANIM_QUART_INTERP INTERP_MODE;
+
   std::vector<AssimpRotKeyframe> keyframes;
 
   void prep();
@@ -65,8 +67,6 @@ struct AssimpRotChannel {
                  const A_ANIM_EXTRAP& extrapOut) const;
 
  private:
-  static const A_ANIM_QUART_INTERP INTERP_MODE = A_ANIM_QUART_INTERP::NONE;
-
   float timeStart, timeEnd, timeLen;
 };
 

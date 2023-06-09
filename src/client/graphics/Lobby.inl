@@ -1,3 +1,5 @@
+#include <config/lib.hpp>
+
 #include "Lobby.h"
 
 void Lobby::init(void) {
@@ -41,135 +43,41 @@ void Lobby::init(void) {
   sceneResources->materials["toon.blue"]->shininess = 50.0f;
 
   // Create a model palette
-  AssimpModel* amRacoon = new AssimpModel();
-  if (!amRacoon->loadAssimp("assets/animation/withUV/Animation -Racoon.fbx")) {
-    exit(EXIT_FAILURE);
+  auto config = get_config();
+
+  for (auto& skName : skin_names) {
+    AssimpModel* am = new AssimpModel();
+    std::string path =
+        std::string(config["skin_dir"]) + std::string(config["skin_" + skName]);
+    if (!am->loadAssimp(path.c_str())) {
+      exit(EXIT_FAILURE);
+    }
+
+    sceneResources->models[skName] = am;
+    sceneResources->models[skName]->mesh = am;
+    sceneResources->models[skName]->material =
+        sceneResources->materials["toon"];
+    player_models.push_back(sceneResources->models[skName]);
+
+    GameThing* skThing = new GameThing;
+    skThing->name = skName;
+    models.push_back(skThing);
+
+    node[skName] = skThing;
+    skThing->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
+    skThing->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
+    skThing->model = sceneResources->models[skName];
   }
-  sceneResources->models["trash panda"] = amRacoon;
-  sceneResources->models["trash panda"]->mesh = amRacoon;
-  sceneResources->models["trash panda"]->material =
-      sceneResources->materials["toon"];
-  player_models.push_back(sceneResources->models["trash panda"]);
-
-  AssimpModel* amBee = new AssimpModel();
-  if (!amBee->loadAssimp("assets/animation/withUV/Animation -Bee.fbx")) {
-    exit(EXIT_FAILURE);
-  }
-  sceneResources->models["bee"] = amBee;
-  sceneResources->models["bee"]->mesh = amBee;
-  sceneResources->models["bee"]->material =
-      sceneResources->materials["toon"];
-  player_models.push_back(sceneResources->models["bee"]);
-
-  AssimpModel* amAvocado = new AssimpModel();
-  if (!amAvocado->loadAssimp("assets/animation/withUV/Animation -Avocado.fbx")) {
-    exit(EXIT_FAILURE);
-  }
-  sceneResources->models["avocado"] = amAvocado;
-  sceneResources->models["avocado"]->mesh = amAvocado;
-  sceneResources->models["avocado"]->material =
-      sceneResources->materials["toon"];
-  player_models.push_back(sceneResources->models["avocado"]);
-
-  AssimpModel* amDuck = new AssimpModel();
-  if (!amDuck->loadAssimp("assets/animation/withUV/Animation -Duck.fbx")) {
-    exit(EXIT_FAILURE);
-  }
-  sceneResources->models["duck"] = amDuck;
-  sceneResources->models["duck"]->mesh = amDuck;
-  sceneResources->models["duck"]->material =
-      sceneResources->materials["toon"];
-  player_models.push_back(sceneResources->models["duck"]);
-
-  AssimpModel* amCat = new AssimpModel();
-  if (!amCat->loadAssimp("assets/animation/withUV/Animation -Cat.fbx")) {
-    exit(EXIT_FAILURE);
-  }
-  sceneResources->models["cat"] = amCat;
-  sceneResources->models["cat"]->mesh = amCat;
-  sceneResources->models["cat"]->material =
-      sceneResources->materials["toon"];
-  player_models.push_back(sceneResources->models["cat"]);
-
-  AssimpModel* amUnicorn = new AssimpModel();
-  if (!amUnicorn->loadAssimp("assets/animation/withUV/Animation -Unicorn.fbx")) {
-    exit(EXIT_FAILURE);
-  }
-  amUnicorn->update(0.0f);
-  sceneResources->models["unicorn"] = amUnicorn;
-  sceneResources->models["unicorn"]->mesh = amUnicorn;
-  sceneResources->models["unicorn"]->material =
-      sceneResources->materials["toon"];
-  player_models.push_back(sceneResources->models["unicorn"]);
-
-
+  
   ///////////////////////////////////////////////////////
   printf("\nLobby: done loading resources!\n");
   ///////////////////////////////////////////////////////
-
-  GameThing* trash_panda = new GameThing;
-  trash_panda->name = "trash panda";
-  models.push_back(trash_panda);
-
-  GameThing* bee = new GameThing;
-  bee->name = "bee";
-  models.push_back(bee);
-
-  GameThing* avocado = new GameThing;
-  avocado->name = "avocado";
-  models.push_back(avocado);
-
-  GameThing* duck = new GameThing;
-  duck->name = "duck";
-  models.push_back(duck);
-
-  GameThing* cat = new GameThing;
-  cat->name = "cat";
-  models.push_back(cat);
-
-  GameThing* unicorn = new GameThing;
-  unicorn->name = "unicorn";
-  models.push_back(unicorn);
-
-  // Build the scene graph
-  node["trash panda"] = trash_panda;
-  node["bee"] = bee;
-  node["avocado"] = avocado;
-  node["duck"] = duck;
-  node["cat"] = cat;
-  node["unicorn"] = unicorn;
-
-  trash_panda->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
-  trash_panda->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
-  trash_panda->model = sceneResources->models["trash panda"];
-
-  bee->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
-  bee->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
-  bee->model = sceneResources->models["bee"];
-
-  avocado->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
-  avocado->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
-  avocado->model = sceneResources->models["avocado"];
-
-  duck->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
-  duck->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
-  duck->model = sceneResources->models["duck"];
-
-  cat->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
-  cat->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
-  cat->model = sceneResources->models["cat"];
-
-  unicorn->transform.position = glm::vec3(0.0f, -3.0f, 0.0f);
-  unicorn->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
-  unicorn->model = sceneResources->models["unicorn"];
 
   for (auto m : models) {
     m->update(0.0f);
   }
 
   buildSceneTree();
-
-
 
   background.init("assets/UI/Group 8.png");
   highlight.init("assets/UI/Vector 15 (1).png");
