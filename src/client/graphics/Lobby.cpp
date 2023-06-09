@@ -8,7 +8,9 @@
 Lobby::Lobby(Camera* camFromWindow) : Scene(camFromWindow) {
   is_ready = false;
   index = 0;
-
+  music = new Music();
+  music->setEffectVolume(1.4);
+  music->load("assets/sounds/Lobby_Time.wav");
   receiveState(Window::lobby_state);
 }
 
