@@ -149,6 +149,7 @@ class Scene {
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
     music = new Music();
+    music->setEffectVolume(.9);
     music->load("assets/sounds/Dance_Powder.wav");
   }
 
