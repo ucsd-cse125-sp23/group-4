@@ -28,7 +28,6 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-
 bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
   return a.second < b.second;
 }
@@ -253,19 +252,14 @@ void Scene::update(float delta) {
     time.Update(delta);
   }
 
-  if (time.time == 0) {
-    gameStart = false;
-    timeOver += delta;
-    if (timeOver >= 3 && Window::phase != GamePhase::GameOver) {
-      Window::phase = GamePhase::GameOver;
-      // TODO: build new scene graph based on player rankings
-      node["world"]->childnodes.clear();
-      rankings = rankPlayers();
-    }
-    
-    if (music) {
-      music->setEffectVolume();
-    }
+  if (Window::phase == GamePhase::GameOver) {
+    // TODO: build new scene graph based on player rankings
+    node["world"]->childnodes.clear();
+    rankings = rankPlayers();
+  }
+
+  if (music) {
+    music->setEffectVolume();
   }
 }
 
