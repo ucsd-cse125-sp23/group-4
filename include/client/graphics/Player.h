@@ -41,7 +41,7 @@ class Player : public GameThing, InputListener {
 
   Player() {
     pmodel = nullptr;
-    tagged = true;
+    tagged = false;
     sfx_jump = nullptr;
     sfx_item = nullptr;
     sfx_tag = nullptr;
