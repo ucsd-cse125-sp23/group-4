@@ -112,6 +112,8 @@ float AssimpChannel::eval(float t, const A_ANIM_EXTRAP& extrapIn,
   return uTime * (uTime * (uTime * kf.a + kf.b) + kf.c) + kf.d;
 }
 
+A_ANIM_QUART_INTERP AssimpRotChannel::INTERP_MODE = A_ANIM_QUART_INTERP::LERP;
+
 void AssimpRotChannel::prep() {
   if (keyframes.empty()) {
     return;
@@ -685,6 +687,7 @@ void AssimpAnimation::setLobby(const PLAYER_AC& ac) {
   timeDissolve = 0.0f;
   timeDissolveMult = 10.0f;
   dissolveAnim = ac;
+  AssimpRotChannel::INTERP_MODE = A_ANIM_QUART_INTERP::NONE;
 }
 
 void AssimpAnimation::reset() {
@@ -704,6 +707,7 @@ void AssimpAnimation::reset() {
   isFall = false;
   isFallRecovering = false;
   timeFall = 0.0f;
+  AssimpRotChannel::INTERP_MODE = A_ANIM_QUART_INTERP::LERP;
 }
 
 void AssimpAnimation::setEmote(const PLAYER_AC& ac) {
@@ -713,4 +717,5 @@ void AssimpAnimation::setEmote(const PLAYER_AC& ac) {
   currAnimName = AC_TO_NAME.at(baseAnim);
   isEmote = true;
   isEmoteCyc = false;
+  AssimpRotChannel::INTERP_MODE = A_ANIM_QUART_INTERP::NONE;
 }
