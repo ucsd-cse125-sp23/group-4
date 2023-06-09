@@ -6,4 +6,5 @@
   "player_count": 2,
   "game_duration": 300
   "game_mode": "multi-tagger"
+  "game_mode": "single-tagger"
 }
