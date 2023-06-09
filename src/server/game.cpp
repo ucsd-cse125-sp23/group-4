@@ -8,9 +8,9 @@
 #include <server/manager.hpp>
 #include <unordered_map>
 
-int get_pid(PObject* p) { return static_cast<Player*>(p)->pid; }
-
 using core::Player;
+
+int get_pid(PObject* p) { return static_cast<Player*>(p)->pid; }
 
 GameThing::GameThing(int id, Player* p, ControlModifierData* c, Level* l)
     : id_(id), player_(p), control_(c), heading_(0), level_(l) {}

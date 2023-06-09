@@ -86,7 +86,7 @@ message::UserStateUpdate Player::pollInput() {
   return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
 }
 
-void Player::updateFromState(message::GameStateUpdateItem state) {
+void Player::updateFromState(message::Player state) {
   if (fx_tagStatus) fx_tagStatus->creationRate = state.is_tagged ? 5.0f : 0.0f;
 
   GameThing::updateFromState(state);
