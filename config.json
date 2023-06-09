@@ -6,7 +6,7 @@
   "player_count": 1,
 
   "map_draw_file": "assets/model/map-final-singlemap.obj",
-  "map_data_file": "assets/model/map-data.obj",
+  "map_data_file": "assets/model/newmap-data.obj",
   "skin_dir": "assets/model/demo/",
   "skin_avocado": "demo-avocado.fbx",
   "skin_bear": "demo-bear.fbx",
