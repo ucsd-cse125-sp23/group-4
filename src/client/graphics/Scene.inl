@@ -302,7 +302,7 @@ void Scene::init(void) {
   m_prefab->material = sceneResources->materials["toon.blue"];
 
   AssimpModel* am = new AssimpModel();
-  am->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
+  am->loadAssimp("assets/animation/AnimExtra-BeeTest.fbx");
   am->setAnimation("walk");
   sceneResources->models["PREFAB_player.model"] = am;
   sceneResources->models["PREFAB_player.model"]->mesh = am;

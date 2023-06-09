@@ -243,6 +243,13 @@ void Scene::receiveEvent_tag(message::TagEvent e) {
 
     player->eventTagged();
   }
+
+  auto t2 = networkGameThings.at(e.tagger);
+  if (dynamic_cast<Player*>(t2) != nullptr) {
+    Player* player = dynamic_cast<Player*>(t2);
+
+    player->eventTag();
+  }
 }
 
 #pragma endregion

@@ -19,7 +19,7 @@ inline glm::vec4 aiQuaternionToVec4(const aiQuaternion& q) {
 // References:
 // http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
 // https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/index.htm
-const float SLERP_THRESHOLD = 0.9995;
+const float SLERP_THRESHOLD = 1e-6;
 /** tInvLerp is in (0,1)
  * LinearLerp is recommended if q0 and q1 have small time difference.
  */
