@@ -180,7 +180,8 @@ void LaunchModifier::modify(Modifiable* obj, ModifierData* data) {
   if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
     LaunchModifierData* cData = static_cast<LaunchModifierData*>(data);
     if (!cData->boosted) {
-      pObj->vel.y += cData->boost;
+      vec3f force = normalize(pObj->getPos() - cData->pos) * cData->boost;
+      pObj->vel += force;
       cData->boosted = true;
     }
   }

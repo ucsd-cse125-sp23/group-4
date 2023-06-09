@@ -4,7 +4,7 @@
 
 class Mushroom : public PObject {
  public:
-  Mushroom();
+  Mushroom(std::vector<vec3f> vertices);
   ~Mushroom();
   void onTrigger(PObject* other) override;
 };

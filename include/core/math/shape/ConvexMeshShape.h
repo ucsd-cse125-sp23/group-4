@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "core/math/shape/ConvexShape.h"
+#include "core/math/shape/AABShape.h"
 
 class ConvexMeshShape : public ConvexShape {
  private:

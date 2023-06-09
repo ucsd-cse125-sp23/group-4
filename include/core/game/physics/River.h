@@ -4,7 +4,7 @@
 
 class River : public PObject {
  public:
-  River();
+  River(std::vector<vec3f> vertices);
   ~River();
   void onTrigger(PObject* other) override;
 };

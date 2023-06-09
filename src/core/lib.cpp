@@ -15,6 +15,8 @@ Level* initializeLevel(Environment* environment) {
                           ENVIRONMENT_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER, PLAYER_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, POWER_LAYER, PLAYER_LAYER);
+  level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER,
+                          ENVIRONMENTAL_EFFECT_LAYER);
 
   return level;
 }

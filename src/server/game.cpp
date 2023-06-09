@@ -70,6 +70,25 @@ Game::Game() {
   }
   environment->setDeathHeight(mapData.fallBoundY);
   level_ = initializeLevel(environment);
+  for (auto river : mapData.groups["river"]) {
+    vec3f avg = vec3f(0, 0, 0);
+    for (vec3f pt : river.vertices) avg += pt;
+    avg /= (float)river.vertices.size();
+    for (int i = 0; i < river.vertices.size(); i++) river.vertices[i] -= avg;
+    River* r = new River(river.vertices);
+    r->setPos(avg);
+    level_->addPObject(r);
+  }
+  for (auto mushroom : mapData.groups["mushroom"]) {
+    vec3f avg = vec3f(0, 0, 0);
+    for (vec3f pt : mushroom.vertices) avg += pt;
+    avg /= (float)mushroom.vertices.size();
+    for (int i = 0; i < mushroom.vertices.size(); i++)
+      mushroom.vertices[i] -= avg;
+    Mushroom* m = new Mushroom(mushroom.vertices);
+    m ->setPos(avg);
+    level_->addPObject(m);
+  }
   if (config["game_mode"] == "single-tagger")
     applyGameMode(level_, new NTaggersTimeGameMode(1));
   else if (config["game_mode"] == "multi-tagger")

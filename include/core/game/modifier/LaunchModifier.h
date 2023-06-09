@@ -9,8 +9,9 @@
 struct LaunchModifierData : ModifierData {
   bool boosted;
   float boost;
-  LaunchModifierData(Level* level, float boost)
-      : ModifierData(level, 3), boosted(false), boost(boost) {}
+  vec3f pos;
+  LaunchModifierData(Level* level, float boost, vec3f pos)
+      : ModifierData(level, 3), boosted(false), boost(boost), pos(pos) {}
 };
 class LaunchModifier : public Modifier {
  public:

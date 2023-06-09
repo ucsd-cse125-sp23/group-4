@@ -28,6 +28,7 @@ extern float PLAYER_HEIGHT;
 extern int PLAYER_LAYER;       // = 0;
 extern int ENVIRONMENT_LAYER;  // = 1;
 extern int POWER_LAYER;        // = 2;
+extern int ENVIRONMENTAL_EFFECT_LAYER;  // = 3;
 
 extern SphereShape* POWERUP_BASE_SHAPE;
 extern CapsuleShape* PLAYER_BASE_SHAPE;
