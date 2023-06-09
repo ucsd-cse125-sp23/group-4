@@ -359,7 +359,7 @@ std::vector<std::string> Scene::rankPlayers() {
     if (dynamic_cast<Player*>(g) != nullptr) {
       Player* player = dynamic_cast<Player*>(g);
       int p_id = player->id;
-      float time = player->time.time;
+      float time = player->score / 20.0;  // ticks to seconds
       player_times.push_back(std::make_pair(p_id, time));
     }
   }
