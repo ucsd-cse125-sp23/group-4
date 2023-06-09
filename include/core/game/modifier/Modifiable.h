@@ -16,7 +16,9 @@ class Modifiable {
   void addModifierInstance(ModifierInstance* instance) {
     if (modifiers.count(instance->getModifier()) == 0)
       modifiers[instance->getModifier()] = std::map<size_t,ModifierInstance*>();
-    modifiers[instance->getModifier()][instance->id()] = instance;
+    if (modifiers[instance->getModifier()].find(instance->id()) !=
+        modifiers[instance->getModifier()].end())
+      modifiers[instance->getModifier()][instance->id()] = instance;
   }
   bool hasModifier(Modifier* modifier) {
     return modifiers.count(modifier) != 0 && modifiers[modifier].size() > 0;
