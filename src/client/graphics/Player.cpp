@@ -26,8 +26,6 @@ void Player::update(float dt) {
   if (fx_item) fx_item->update(dt);
   if (fx_tag) fx_tag->update(dt);
   if (fx_tagStatus) fx_tagStatus->update(dt);
-
-  if (tagged) time.Update(dt);
 }
 
 message::UserStateUpdate Player::pollInput() {
@@ -73,11 +71,15 @@ message::UserStateUpdate Player::pollInput() {
 void Player::updateFromState(message::Player p) {
   if (fx_tagStatus) fx_tagStatus->creationRate = p.is_tagged ? 5.0f : 0.0f;
 
+  score = p.score;
+  tagged = p.is_tagged;
+
   // animation
   if (pmodel) {
     if (p.posy < 97.0f) {
       pmodel->setAnimation(
           AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::FALL));
+      if (sfx_fall) sfx_fall->play(transform.position);
     } else {
       if (p.is_moving) {
         pmodel->setAnimation(

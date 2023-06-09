@@ -7,6 +7,7 @@
 #include "client/graphics/MapDataImporter.h"
 #include "client/graphics/MapObj.h"
 #include "client/graphics/Scene.h"
+#include "client/graphics/Window.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -16,6 +17,44 @@
 using namespace glm;
 
 void Scene::init(void) {
+  music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");
+
+  // globals --
+  _globalSceneResources.meshes["_gz-cube"] = new Cube();
+
+  _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
+  _globalSceneResources.meshes["_gz-xyz"]->init("assets/model/dev/_gizmo.obj");
+
+  _globalSceneResources.shaderPrograms["unlit"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
+
+  _globalSceneResources.materials["unlit"] = new Material;
+  _globalSceneResources.materials["unlit"]->shader =
+      _globalSceneResources.shaderPrograms["unlit"];
+  _globalSceneResources.materials["unlit"]->diffuse =
+      glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+
+  _globalSceneResources.models["_gz-xyz"] = new Model;
+  _globalSceneResources.models["_gz-xyz"]->mesh =
+      _globalSceneResources.meshes["_gz-xyz"];
+  _globalSceneResources.models["_gz-xyz"]->material =
+      _globalSceneResources.materials["unlit"];
+  _globalSceneResources.models["_gz-xyz"]->modelMtx =
+      glm::scale(glm::vec3(1.0f));
+  _globalSceneResources.models["_gz-xyz"]->depthFunction = GL_ALWAYS;
+
+  _globalSceneResources.models["_gz-cube"] = new Model;
+  _globalSceneResources.models["_gz-cube"]->mesh =
+      _globalSceneResources.meshes["_gz-cube"];
+  _globalSceneResources.models["_gz-cube"]->material =
+      _globalSceneResources.materials["unlit"];
+  _globalSceneResources.models["_gz-cube"]->modelMtx =
+      glm::translate(glm::vec3(0.0f));
+  _globalSceneResources.models["_gz-cube"]->depthFunction = GL_ALWAYS;
+  // --
+
+
   auto config = get_config();
 
   // Create mesh palette
@@ -218,6 +257,9 @@ void Scene::init(void) {
   sfx = new SoundEffect();
   sfx->load("assets/sounds/coin.wav");
   sceneResources->sounds["sfx_item"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/fallsound.wav");
+  sceneResources->sounds["sfx_fall"] = sfx;
   /*music = new Music();
   music->load("assets/sounds/Dance_Powder.wav");*/
 
@@ -333,7 +375,8 @@ void Scene::init(void) {
   racoon_prefab->setAnimation("walk");
   sceneResources->models["trash panda"] = racoon_prefab;
   sceneResources->models["trash panda"]->mesh = racoon_prefab;
-  sceneResources->models["trash panda"]->material = sceneResources->materials["toon"];
+  sceneResources->models["trash panda"]->material =
+      sceneResources->materials["toon"];
 
   AssimpModel* bee_prefab = new AssimpModel();
   bee_prefab->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
@@ -378,35 +421,14 @@ void Scene::init(void) {
   ///////////////////////////////////////////////////////
 
   // Add local game things
+  /**
   GameThing* thing_example = new GameThing;
   thing_example->name = "GT_teapot";
-  localGameThings.push_back(thing_example);
-
-  GameThing* thing_cube = new GameThing;
-  thing_cube->name = "GT_cube";
-  localGameThings.push_back(thing_cube);
-
-  GameThing* thing_modeltest = new GameThing;
-  thing_modeltest->name = "GT_playerTest";
-  localGameThings.push_back(thing_modeltest);
-
-  GameThing* thing_modeltestB = new GameThing;
-  thing_modeltestB->name = "GT_playerTestB";
-  localGameThings.push_back(thing_modeltestB);
+  localGameThings.push_back(thing_example);*/
 
   // Build the scene graph
-  node["teapot1"] = thing_example;
-  node["cubeTest"] = thing_cube;
-
   node["map"] = new Node("_map");
   node["map"]->model = sceneResources->models["map"];
-
-  thing_example->transform.position = vec3(-2.0f, 2.0f, 5.0f);  // gt only
-  node["teapot1"]->model = sceneResources->models["teapot1"];
-
-  thing_cube->transform.position = vec3(2.0f, 2.0f, 5.0f);
-  node["cubeTest"]->model = sceneResources->models["cubeTextured"];
-  node["cubeTest"]->transformMtx = translate(vec3(2, 2, 5));  // node translate
 
   node["skybox"] = new Node("_skybox");
   node["skybox"]->model = sceneResources->models["skybox"];
@@ -418,7 +440,7 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["skybox"]);
 
   // node["world"]->childnodes.push_back(node["teapot1"]);
-  node["world"]->childnodes.push_back(node["cubeTest"]);
+  // node["world"]->childnodes.push_back(node["cubeTest"]);
 
   node["world"]->childnodes.push_back(node["collision"]);
 
@@ -430,9 +452,12 @@ void Scene::init(void) {
 }
 
 void Scene::init(std::map<int, message::LobbyPlayer> players) {
+  //loading++;
+
   init();
 
   for (auto& [i, p] : players) {
     skins[i] = p.skin;
   }
+
 }

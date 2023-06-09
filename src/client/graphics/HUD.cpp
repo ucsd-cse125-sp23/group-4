@@ -2,22 +2,50 @@
 
 #include "Window.h"
 
+void HUD::init() {
+  for (int i = 0; i < 40; i++) {
+    Texture frame;
+    std::string filename =
+        "assets/image/countdown/frame_" + std::to_string(i) + "_delay-0.1s.png";
+    frame.init(filename.c_str());
+    frames.push_back(frame);
+  }
+  timer.init("assets/UI/IMG_2658.PNG");
+
+  player_bars["trash panda"].init("assets/UI/bar-racoon.png");
+  player_bars["bee"].init("assets/UI/bar-bee.png");
+  player_bars["avocado"].init("assets/UI/bar-avocado.png");
+  player_bars["duck"].init("assets/UI/bar-duck.png");
+  player_bars["cat"].init("assets/UI/bar-cat.png");
+  player_bars["unicorn"].init("assets/UI/bar-unicorn.png");
+  player_bars["waffle"].init("assets/UI/bar-waffle.png");
+  player_bars["bear"].init("assets/UI/Group 6 (1).png");
+}
+
 void HUD::draw(GLFWwindow* window) {
   glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
-  std::map<std::string, Player*> players;
+  std::map<int, Player*> players;
 
   float scale_x = static_cast<float>(width) / static_cast<float>(800);
   float scale_y = static_cast<float>(height) / static_cast<float>(600);
 
-  for (auto& [_, e] : scene->networkGameThings) {
+  for (auto& [ind, e] : scene->networkGameThings) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
-      std::string name = player->name;
-      players[name] = player;
+      glm::vec3 color;
+      if (ind == scene->_myPlayerId) {
+        color = glm::vec3(0.0f, 1.0f, 0.0f);
+      } else if (player->tagged) {
+        color = glm::vec3(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0);
+      } else {
+        color = glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0);
+      }
+      auto name = player->name;
+      players[ind] = player;
       const unsigned char* cname =
           reinterpret_cast<const unsigned char*>(name.c_str());
       glm::vec4 position = glm::vec4(player->transform.position, 1.0f);
@@ -46,7 +74,7 @@ void HUD::draw(GLFWwindow* window) {
         }
         glDisable(GL_DEPTH_TEST);
         fr->RenderText(width, height, name, windowSpace[0], windowSpace[1],
-                       size, glm::vec3(0.0f, 0.0f, 1.0f));
+                       size, color);
         glEnable(GL_DEPTH_TEST);
       }
     }
@@ -71,7 +99,7 @@ void HUD::draw(GLFWwindow* window) {
 
   drawLeaderboard(window, scale_x, players);
 
-  drawTime();
+  if (scene->gameStart) drawTime();
 
   // minimap stuff
   int map_height = (width / 5 > 250) ? 250 : width / 4;
@@ -87,10 +115,13 @@ void HUD::draw(GLFWwindow* window) {
     if (dynamic_cast<Player*>(e) != nullptr) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
+
       if (i == scene->_myPlayerId) {
-        glColor3f(1.0f, 0.0f, 0.0f);
+        glColor3f(0.0f, 1.0f, 0.0f);
+      } else if (player->tagged) {
+        glColor3f(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0);
       } else {
-        glColor3f(0.0f, 0.0f, 1.0f);
+        glColor3f(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0);
       }
       glPointSize(10);
       glBegin(GL_POINTS);
@@ -105,7 +136,7 @@ void HUD::draw(GLFWwindow* window) {
 
   drawCountdown();
 
-  gameOver();
+  if (scene->gameStart) gameOver();
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_BLEND);
@@ -155,7 +186,7 @@ void HUD::drawTime() {
 }
 
 void HUD::drawLeaderboard(GLFWwindow* window, float scale,
-                          std::map<std::string, Player*> players) {
+                          std::map<int, Player*> players) {
   int width, height;
   glfwGetWindowSize(window, &width, &height);
 
@@ -179,16 +210,52 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
   x = 0;
   y = 0;
   for (auto it = players.rbegin(); it != players.rend(); it++) {
-    glViewport(x, y, bar_width, bar_height);
-    str = it->first;
     player = it->second;
-    Timer time = player->time;
-    str += " " + time.ToString();
+
+    glViewport(x, y, bar_width, bar_height);
+
+    /*int i, steps = 36;
+    float a = 0.0, b = 0.0, r = 1.0, phi, dphi = 2. * M_PI / (float)(steps);
+    if (it->first == scene->_myPlayerId) {
+      glViewport(x + bar_width / 5, y + bar_height / 3, bar_width / 5,
+                 bar_width / 5);
+      glColor3f(0.0f, 1.0f, 0.0f);
+      glEnable(GL_LINE_STIPPLE);
+      glLineStipple(1, 0xff);
+      glLineWidth(5);
+
+      glBegin(GL_LINE_LOOP);
+      for (i = 0, phi = 0.0; i < steps; i++, phi += dphi)
+        glVertex3f(a + r * cos(phi), b + r * sin(phi), 0.0);
+
+      glEnd();
+
+      glDisable(GL_LINE_STIPPLE);
+
+      glViewport(x, y, bar_width, bar_height);
+    }*/
+
+    str = player->name;
+
+    int score_s = player->score / 20.0;
+    str += " " + std::to_string(score_s) + "s";
 
     glDisable(GL_DEPTH_TEST);
-    fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
-                   0.3 * scale,
-                   glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
+
+    // change text color of tagged player
+    if (it->first == scene->_myPlayerId)
+      fr->RenderText(bar_width, bar_height, str, bar_width / 2.5,
+                     bar_height / 2, 0.3 * scale, glm::vec3(0.0, 1.0, 0.0));
+    else if (player->tagged)
+      fr->RenderText(
+          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+          0.3 * scale,
+          glm::vec3(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0));  // orange
+    else
+      fr->RenderText(
+          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+          0.3 * scale,
+          glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));  // gray
     glEnable(GL_DEPTH_TEST);
 
     y += (bar_height / 1.5);
@@ -302,7 +369,7 @@ void HUD::gameOver() {
   glfwGetWindowSize(window, &width, &height);
   float scale_x = static_cast<float>(width) / static_cast<float>(800);
   float scale_y = static_cast<float>(height) / static_cast<float>(600);
-  if (scene->time.time <= 0.1) {
+  if (Window::phase == GamePhase::GameOver) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     float w = fr->TextWidth("Time's Up!", offset * scale_y);

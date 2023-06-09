@@ -26,7 +26,7 @@ struct Light {
 
 // Simple light data to be passed to shaders.
 struct Lights {
-  bool enableLights = true;
+  bool enableLights = false;
 
   std::vector<Light> lights;
 
