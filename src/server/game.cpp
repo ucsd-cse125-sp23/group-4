@@ -8,12 +8,6 @@
 #include <server/manager.hpp>
 #include <unordered_map>
 
-#include "core/game/event/Event.h"
-#include "core/game/mode/GameMode.h"
-#include "core/game/modifier/EffectStorageModifier.h"
-#include "core/game/modifier/TaggedStatusModifier.h"
-#include "core/util/global.h"
-
 int get_pid(PObject* p) { return static_cast<Player*>(p)->pid; }
 
 GameThing::GameThing(int id, Player* p, ControlModifierData* c, Level* l)
@@ -49,7 +43,7 @@ message::Player GameThing::to_network() const {
       player_->ticksFallen,
       player_->onGround,
       is_tagged(),
-      false,
+      isMoving(player_),
       effects,
   };
 }
