@@ -138,7 +138,6 @@ class Scene {
     // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
-    this->setDefaultCamPos();
     localGameThings.push_back(camera);
 
     gameStart = false;
