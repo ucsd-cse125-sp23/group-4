@@ -10,6 +10,7 @@ struct Settings {
   float gammaCorrection = 1.5f;
   // float volume;   // controlled via SoundEffect static var
 
+  bool lightMenu = false;
   SettingsStructs::Lights lightConfig = SettingsStructs::Lights();
 
   void gui(float* fov) {
@@ -20,9 +21,10 @@ struct Settings {
     ImGui::SliderFloat("sfx  volume", &SoundEffect::volumeGlobal, 0.0f, 4.0f);
     ImGui::Separator();
     ImGui::SliderFloat("song volume", &Music::volumeGlobal, 0.0f, 4.0f);
+    ImGui::Checkbox("light config menu", &lightMenu);
     ImGui::End();
 
-    lightConfig.gui();
+    if (lightMenu) lightConfig.gui();
   }
 };
 
