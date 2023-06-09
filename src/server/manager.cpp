@@ -20,7 +20,7 @@ Manager::Manager()
 int Manager::add_player() {
   int pid = game_->add_player();
   std::string default_skin = "trash panda";
-  players_.insert({pid, {pid, default_skin, false}});
+  players_.insert({pid, {pid, default_skin, false, false}});
 
   return pid;
 }
@@ -53,9 +53,24 @@ bool Manager::check_ready() {
     if (player.is_ready) ready_count++;
 
   bool is_ready = ready_count == MAX_PLAYERS;
-  if (is_ready) status_ = Status::InGame;
+  if (is_ready) status_ = Status::GameLoading;
 
   return is_ready;
+}
+
+void Manager::handle_game_loaded(const message::GameLoaded& body) {
+  players_.at(body.pid).is_loaded = true;
+}
+
+bool Manager::check_loaded() {
+  int loaded_count = 0;
+  for (auto& [_, player] : players_)
+    if (player.is_loaded) loaded_count++;
+
+  bool is_loaded = loaded_count == MAX_PLAYERS;
+  if (is_loaded) status_ = Status::InGame;
+
+  return is_loaded;
 }
 
 void Manager::handle_game_update(const message::UserStateUpdate& update) {

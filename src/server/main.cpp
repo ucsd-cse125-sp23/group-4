@@ -50,13 +50,24 @@ int main(int argc, char* argv[]) {
           auto lobby_update = manager.handle_lobby_update(body);
           server.write_all<message::LobbyUpdate>(lobby_update);
 
-          // if all clients are ready, start the game
+          // if all clients are ready, notify clients
           if (manager.check_ready()) {
-            manager.start_game();
-            server.write_all<message::GameStart>();
-            server.start_tick();
+            manager.start_game();  // setup physics, don't tick yet
+            server.write_all<message::LobbyReady>();
           }
         };
+
+    auto game_loaded_handler = [&manager,
+                                &server](const message::GameLoaded& body) {
+      manager.handle_game_loaded(body);
+
+      // if all clients are loaded, start the game
+      if (manager.check_loaded()) {
+        server.write_all<message::GameStart>();
+        int COUNTDOWN_TIME = 3200;  // ms
+        server.start_tick(COUNTDOWN_TIME);
+      }
+    };
 
     auto any_handler = [](const message::Message::Body&) {};
 
