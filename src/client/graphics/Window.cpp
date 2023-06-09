@@ -52,7 +52,7 @@ Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;
 
-std::unique_ptr<Client> Window::client = nullptr;
+std::shared_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
 
 std::atomic<bool> Window::loading_resources{false};
@@ -264,9 +264,9 @@ void Window::update(GLFWwindow* window, float deltaTime) {
           std::ref(gameScene));
 
     } else if (dynamic_cast<Lobby*>(gameScene) &&
-               phase == GamePhase::Game) {  // lobby -> game
+               phase == GamePhase::GameLoading) {  // lobby -> game
       loading_resources = true;
-      remainingLoadBuffer = 10;
+      // remainingLoadBuffer = 10;
       auto lobby = dynamic_cast<Lobby*>(gameScene);
       std::map<int, message::LobbyPlayer> ps = lobby->players;
       gameScene = new Scene(Cam);
@@ -281,9 +281,9 @@ void Window::update(GLFWwindow* window, float deltaTime) {
             gameScene->init(lobby->players);
             hud->init();
             loading_resources = false;
-            Window::client->write<message::GameLoaded>(Window::my_pid);
+            client->write<message::GameLoaded>(my_pid);
           },
-          std::ref(gameScene), std::ref(hud), std::ref(lobby), Window::my_pid);
+          std::ref(gameScene), std::ref(hud), std::ref(lobby), my_pid);
     } else {
       gameScene->update(deltaTime);
     }

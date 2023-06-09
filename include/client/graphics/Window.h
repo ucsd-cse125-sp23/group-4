@@ -53,7 +53,7 @@ class Window {
   static HUD* hud;
 
   // network
-  static std::unique_ptr<Client> client;
+  static std::shared_ptr<Client> client;
   static int my_pid;
 
   // Act as Constructors and desctructors

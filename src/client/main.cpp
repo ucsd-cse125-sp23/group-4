@@ -142,7 +142,7 @@ void network_init() {
   auto write_handler = [](std::size_t bytes_transferred,
                           const message::Message& m, Client& client) {};
 
-  Window::client = std::make_unique<Client>(server_addr, connect_handler,
+  Window::client = std::make_shared<Client>(server_addr, connect_handler,
                                             read_handler, write_handler);
 }
 
