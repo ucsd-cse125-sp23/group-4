@@ -578,12 +578,17 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 
   if (isAPlayThenDissolve(ac)) {
+    if (baseAnim == PLAYER_AC::TRIP ||
+        (baseAnim == PLAYER_AC::FALL && ac == PLAYER_AC::JUMP)) {
+      return;
+    }
+
     // play full jump animation first, then dissolve out jump's last frame
     if (!isAPlayThenDissolve(baseAnim)) {
       dissolveAnim = baseAnim;
     }
     baseAnim = ac;
-    timePlayThenDissolve = 0.0f;
+    timePlayThenDissolve = ac == PLAYER_AC::JUMP ? 0.1f : 0.0f;
     isPlayThenDissolve = true;
     isDissolve = false;
     isDissolveReversed = false;
