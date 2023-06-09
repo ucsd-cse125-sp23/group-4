@@ -74,7 +74,7 @@ class GameThing : public Node {
     return message::UserStateUpdate();
   }
 
-  void updateFromState(message::Player p) {
+  virtual void updateFromState(message::Player p) {
     // update self from server input
     glm::vec3 pos = glm::vec3(p.posx, p.posy, p.posz);
     setPositionTarget(pos);

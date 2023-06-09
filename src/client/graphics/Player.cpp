@@ -67,19 +67,19 @@ message::UserStateUpdate Player::pollInput() {
   return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
 }
 
-void Player::updateFromState(message::GameStateUpdateItem state) {
-  // same as GameThing - update self from server input
-  glm::vec3 pos = glm::vec3(state.posx, state.posy, state.posz);
+void Player::updateFromState(message::Player p) {
+  // same as game thing - update self from server input
+  glm::vec3 pos = glm::vec3(p.posx, p.posy, p.posz);
   setPositionTarget(pos);
-  setHeading(state.heading);
+  setHeading(p.heading);
 
   // animation
   if (pmodel) {
-    if (state.posy < 97.0f) {
+    if (p.posy < 97.0f) {
       pmodel->setAnimation(
           AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::FALL));
     } else {
-      if (state.speed > 0.05f) {
+      if (p.is_moving) {
         pmodel->setAnimation(
             AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
       } else {
