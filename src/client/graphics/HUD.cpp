@@ -71,7 +71,7 @@ void HUD::draw(GLFWwindow* window) {
 
   drawLeaderboard(window, scale_x, players);
 
-  drawTime();
+  if (scene->gameStart) drawTime();
 
   // minimap stuff
   int map_height = (width / 5 > 250) ? 250 : width / 4;
@@ -105,7 +105,7 @@ void HUD::draw(GLFWwindow* window) {
 
   drawCountdown();
 
-  gameOver();
+  if (scene->gameStart) gameOver();
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_BLEND);
