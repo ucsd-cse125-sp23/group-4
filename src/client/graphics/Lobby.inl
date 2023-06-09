@@ -2,6 +2,7 @@
 
 void Lobby::init(void) {
   // Create a mesh palette
+
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
                   // resource)

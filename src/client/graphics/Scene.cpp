@@ -84,6 +84,10 @@ Player* Scene::createPlayer(int id, std::string skin) {
   sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_tag"]);
   sfx = new SoundEffect(*sfxRef);
   player->sfx_tag = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_fall"]);
+  sfx = new SoundEffect(*sfxRef);
+  sfx->setEffectVolume(.025f);
+  player->sfx_fall = sfx;
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
@@ -238,7 +242,7 @@ void Scene::update(float delta) {
     for (auto& thing : localGameThings) thing->update(delta);
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
   }
-
+  if (music) music->setEffectVolume();
   if (Window::phase == GamePhase::GameOver) {
     overtime += delta;
     if (overtime > 4) {
