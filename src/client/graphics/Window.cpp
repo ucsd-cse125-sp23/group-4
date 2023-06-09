@@ -18,6 +18,7 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Scene.h"
+#include "config/lib.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -287,12 +288,15 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
   // Check for a key presses
   Input::keyListener(window, key, scancode, action, mods);
 
+  auto config = get_config();
   // Check for a key press.
   if (action == GLFW_PRESS) {
     switch (key) {
       case GLFW_KEY_ESCAPE:
-        // Close the window. This causes the program to also terminate.
-        glfwSetWindowShouldClose(window, GL_TRUE);
+        if (config["escape_to_exit"]) {
+          // Close the window. This causes the program to also terminate.
+          glfwSetWindowShouldClose(window, GL_TRUE);
+        }
         break;
 
       case GLFW_KEY_ENTER:
@@ -306,11 +310,15 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
         _debugmode = !_debugmode;
         break;
       case GLFW_KEY_C:
-        Cam->Fixed = !(Cam->Fixed);
+        if (_debugmode) {
+          Cam->Fixed = !(Cam->Fixed);
+        }
         break;
       case GLFW_KEY_X:
-        gameScene->sceneResources->sounds["test"]->play(
-            glm::vec3(0.0, 0.0, 0.0));  // temporary
+        if (_debugmode) {
+          gameScene->sceneResources->sounds["test"]->play(
+              glm::vec3(0.0, 0.0, 0.0));
+        }
         break;
       default:
         break;
