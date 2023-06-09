@@ -3,8 +3,6 @@
 #include "core/game/physics/PObject.h"
 #include "core/math/vector.h"
 
-namespace core {
-
 class Player : public PObject {
  private:
   static uint32_t maxId;
@@ -17,5 +15,3 @@ class Player : public PObject {
   void tick();
   void onTrigger(PObject* other) override;
 };
-
-}  // namespace core

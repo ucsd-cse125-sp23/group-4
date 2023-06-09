@@ -1,8 +1,5 @@
 #pragma once
 
-#include <boost/asio.hpp>
-#include <chrono>
-#include <memory>
 #include <network/message.hpp>
 #include <server/game.hpp>
 #include <string>
@@ -16,10 +13,7 @@ class Manager {
     GameOver,
   };
 
-  static std::size_t MAX_PLAYERS;
-  static std::chrono::seconds TOTAL_GAME_DURATION;
-
-  Manager();
+  static const std::size_t MAX_PLAYERS = 1;
 
   int add_player();
   void remove_player(int);
@@ -28,12 +22,10 @@ class Manager {
   bool check_ready();
   void handle_game_update(const message::UserStateUpdate&);
   void tick_game();
-  void start_game();
-  void poll();
   message::GameStateUpdate get_game_update();
 
   Status status_ = Status::Lobby;
-  std::unique_ptr<Game> game_;
+  Game game_;
 
  private:
   struct Player {
@@ -42,7 +34,5 @@ class Manager {
     bool is_ready;
   };
 
-  boost::asio::io_context io_context_;
-  boost::asio::steady_timer timer_;
   std::unordered_map<int, Player> players_;
 };

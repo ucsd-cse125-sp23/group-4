@@ -16,6 +16,8 @@ set(_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/game/level/StatisticManager.cpp
 
     ${PROJECT_SOURCE_DIR}/game/mode/GameMode.cpp
+    ${PROJECT_SOURCE_DIR}/game/mode/GameModeBases.cpp
+    ${PROJECT_SOURCE_DIR}/game/mode/GameModes.cpp
 
     ${PROJECT_SOURCE_DIR}/game/modifier/Modifiers.cpp
 

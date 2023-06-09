@@ -21,5 +21,5 @@ set(_NETWORK_SOURCES
 add_library(network ${_NETWORK_SOURCES})
 target_include_directories(network PUBLIC ${tagguys_SOURCE_DIR}/include)
 target_link_libraries(
-  network PUBLIC config Boost::variant Boost::asio Boost::serialization
-                 Boost::uuid magic_enum::magic_enum)
+  network PUBLIC Boost::variant Boost::asio Boost::serialization Boost::uuid
+                 magic_enum::magic_enum)

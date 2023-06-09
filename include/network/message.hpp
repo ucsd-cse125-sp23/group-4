@@ -34,7 +34,6 @@ enum class Type {
   LandEvent,
   ItemPickupEvent,
   TagEvent,
-  GameOver,
 };
 
 struct Metadata {
@@ -77,7 +76,7 @@ struct Notify {
   }
 };
 
-struct Player {
+struct GameStateUpdateItem {
   int id;
   float posx;
   float posy;
@@ -85,44 +84,27 @@ struct Player {
   float heading;
   int score;
   float speed;
-  int ticks_fallen;
   int is_grounded;
   bool is_tagged;
-  bool is_moving;
   std::vector<Effect> effects;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& id& posx& posy& posz& heading& score& speed& ticks_fallen& is_grounded&
-        is_tagged& is_moving& effects;
-  }
-};
-
-struct Item {
-  int id;
-  ::Item item;
-  float posx;
-  float posy;
-  float posz;
-
-  std::string to_string() const;
-  template <typename Archive>
-  void serialize(Archive& ar, unsigned int) {
-    ar& id& item& posx& posy& posz;
+    ar& id& posx& posy& posz& heading& score& speed& is_grounded& is_tagged&
+        effects;
   }
 };
 
 struct GameStateUpdate {
-  std::unordered_map<int, Player> players;
-  std::unordered_map<int, Item> items;
+  std::unordered_map<int, GameStateUpdateItem> things;
+  int tagged_player;
   float time_elapsed;
-  float time_remaining;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& players& items& time_elapsed& time_remaining;
+    ar& things& tagged_player& time_elapsed;
   }
 };
 
@@ -196,7 +178,7 @@ struct LandEvent {
 
 struct ItemPickupEvent {
   int pid;
-  ::Item item;
+  Item item;
 
   std::string to_string() const;
   template <typename Archive>
@@ -216,21 +198,11 @@ struct TagEvent {
   }
 };
 
-struct GameOver {
-  std::unordered_map<int, int> client_scores;
-
-  std::string to_string() const;
-  template <typename Archive>
-  void serialize(Archive& ar, unsigned int) {
-    ar& client_scores;
-  }
-};
-
 struct Message {
   using Body =
       boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate,
                      LobbyUpdate, LobbyPlayerUpdate, GameStart, JumpEvent,
-                     LandEvent, ItemPickupEvent, TagEvent, GameOver>;
+                     LandEvent, ItemPickupEvent, TagEvent>;
   Type type;
   Metadata metadata;
   Body body;

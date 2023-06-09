@@ -59,11 +59,10 @@ Type get_type(const Message::Body& body) {
     return Type::ItemPickupEvent;
   };
   auto tag_event = [](const TagEvent&) { return Type::TagEvent; };
-  auto game_over = [](const GameOver&) { return Type::GameOver; };
   auto overload = boost::make_overloaded_function(
       assign, greeting, notify, game_state, user_state, lobby_update,
       lobby_player_update, game_start, jump_event, land_event,
-      item_pickup_event, tag_event, game_over);
+      item_pickup_event, tag_event);
   return boost::apply_visitor(overload, body);
 }
 
@@ -84,62 +83,38 @@ std::string effects_to_string(const std::vector<Effect>& effects) {
   return "[" + inside + "]";
 }
 
-std::string Player::to_string() const {
+std::string GameStateUpdateItem::to_string() const {
   // clang-format off
   std::string str = std::string("") +
-    "      {"                                                       "\n"
-    "        id: " + std::to_string(id) + "," +                     "\n"
-    "        position: {" +                                         "\n"
-    "          " + std::to_string(posx) + "," +                     "\n"
-    "          " + std::to_string(posy) + "," +                     "\n"
-    "          " + std::to_string(posz) + "," +                     "\n"
-    "        }," +                                                  "\n"
-    "        heading: " + std::to_string(heading) + "," +           "\n"
-    "        score: " + std::to_string(score) + "," +               "\n"
-    "        speed: " + std::to_string(speed) + "," +               "\n"
-    "        ticks_fallen: " + std::to_string(ticks_fallen) + "," + "\n"
-    "        is_grounded: " + std::to_string(is_grounded) + "," +   "\n"
-    "        is_tagged: " + std::to_string(is_tagged) + "," +       "\n"
-    "        is_moving: " + std::to_string(is_moving) + "," +       "\n"
-    "        effects: " + effects_to_string(effects) + "," +        "\n"
-    "      },"                                                      "\n";
-  // clang-format on
-  return str;
-}
-
-std::string Item::to_string() const {
-  // clang-format off
-  std::string str = std::string("") +
-    "      {"                                                           "\n"
-    "        id: " + std::to_string(id) + "," +                         "\n"
-    "        item: " + std::string(magic_enum::enum_name(item)) + "," + "\n"
-    "        position: {" +                                             "\n"
-    "          " + std::to_string(posx) + "," +                         "\n"
-    "          " + std::to_string(posy) + "," +                         "\n"
-    "          " + std::to_string(posz) + "," +                         "\n"
-    "        }," +                                                      "\n"
-    "      },"                                                          "\n";
+    "      {"                                               "\n"
+    "        id: " + std::to_string(id) + "," +             "\n"
+    "        position: {" +                                 "\n"
+    "          " + std::to_string(posx) + "," +             "\n"
+    "          " + std::to_string(posy) + "," +             "\n"
+    "          " + std::to_string(posz) + "," +             "\n"
+    "        }," +                                          "\n"
+    "        heading: " + std::to_string(heading) +         "\n"
+    "        score: " + std::to_string(score) +             "\n"
+    "        speed: " + std::to_string(speed) +             "\n"
+    "        is_grounded: " + std::to_string(is_grounded) + "\n"
+    "        is_tagged: " + std::to_string(is_tagged) +     "\n"
+    "        effects: " + effects_to_string(effects) +      "\n"
+    "      },"                                              "\n";
   // clang-format on
   return str;
 }
 
 std::string GameStateUpdate::to_string() const {
-  std::string _players = "[\n";
-  for (auto& [_, player] : players) _players += player.to_string();
+  std::string game_things = "    game_things: [\n";
+  for (auto& [_, thing] : things) game_things += thing.to_string();
 
-  _players += "    ]";
-
-  std::string _items = "[\n";
-  for (auto& [_, item] : items) _items += item.to_string();
-
-  _items += "    ]";
+  game_things += "    ]";
 
   // clang-format off
   std::string str = std::string("") +
-    "    players: " + _players + "," +                               "\n"
-    "    items: " + _items + "," +                                   "\n"
-    "    time_elapsed: " + std::to_string(time_elapsed) + "s,"       "\n"
-    "    time_remaining: " + std::to_string(time_remaining) + "s," + "\n";
+    "      game_things: " + game_things + "," +               "\n"
+    "      tagged_player: " + std::to_string(tagged_player) + "\n"
+    "      round_time: " + std::to_string(time_elapsed) +       "\n";
   // clang-format on
 
   return str;
@@ -207,22 +182,6 @@ std::string TagEvent::to_string() const {
     "      tagger: " + std::to_string(tagger) + "," +     "\n"
     "      taggee: " + std::to_string(taggee) + "\n";
   // clang-format on
-  return str;
-}
-
-std::string GameOver::to_string() const {
-  std::string scores = "[\n";
-  for (auto& [pid, score] : client_scores)
-    scores +=
-        "      {" + std::to_string(pid) + ", " + std::to_string(score) + "},\n";
-
-  scores += "    ]";
-
-  // clang-format off
-  std::string str = std::string("") +
-    "    client_scores: " + scores + "," + "\n";
-  // clang-format on
-
   return str;
 }
 

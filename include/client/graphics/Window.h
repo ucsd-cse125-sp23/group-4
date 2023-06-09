@@ -38,18 +38,9 @@ class Window {
   static GamePhase phase;
   static message::LobbyUpdate lobby_state;
 
-  static GLFWwindow *loadingWindow, *screenWindow;
-  static std::thread subthread;
-  static std::atomic<bool> loading_resources;
-  static float remainingLoadBuffer;
-
   // Objects to render
-  static Start* start;
-  static Scene* lob;
-  static Scene* game;
   static Scene* gameScene;
   static Load* loadScreen;
-
   static HUD* hud;
 
   // network

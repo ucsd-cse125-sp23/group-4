@@ -103,35 +103,22 @@ void network_init() {
       Window::phase = GamePhase::Game;
     };
 
-    // event messages
-    auto jump_event_handler = [](const message::JumpEvent& body) {
-      Window::gameScene->receiveEvent_jump(body);
-    };
+    // TODO(eddie): add effects for different event messages
+    auto jump_event_handler = [](const message::JumpEvent& body) {};
 
-    auto land_event_handler = [](const message::LandEvent& body) {
-      Window::gameScene->receiveEvent_land(body);  // bug: fires cont.
-    };
+    auto land_event_handler = [](const message::LandEvent& body) {};
 
     auto item_pickup_event_handler = [](const message::ItemPickupEvent& body) {
-      Window::gameScene->receiveEvent_item(body);  // bug: fires cont.
     };
 
-    auto tag_event_handler = [](const message::TagEvent& body) {
-      Window::gameScene->receiveEvent_tag(body);
-    };
-
-    auto game_over_handler = [](const message::GameOver& body) {
-      Window::phase = GamePhase::GameOver;
-      Window::gameScene->onGameOver();
-    };
+    auto tag_event_handler = [](const message::TagEvent& body) {};
 
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, game_state_update_handler, lobby_update_handler,
         game_start_handler, jump_event_handler, land_event_handler,
-        item_pickup_event_handler, tag_event_handler, game_over_handler,
-        any_handler);
+        item_pickup_event_handler, tag_event_handler, any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
@@ -209,7 +196,7 @@ int main(int argc, char* argv[]) {
     if (Window::phase == GamePhase::Game) {
       // handle updates to server
       num_updates_to_send += time_since_prev_frame / min_time_between_updates;
-      if (num_updates_to_send >= 1.0) {
+      while (num_updates_to_send >= 1.0) {
         message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
 
         // check if update if valid
@@ -218,11 +205,10 @@ int main(int argc, char* argv[]) {
         if (user_update.id == Window::gameScene->_myPlayerId)
           Window::client->write<message::UserStateUpdate>(user_update);
 
-        // update player anims (SLOW)
-        Window::animate(min_time_between_updates * num_updates_to_send);
+        Window::animate(min_time_between_updates);  // update player anims
 
         update_count++;
-        num_updates_to_send = 0;
+        num_updates_to_send--;
       }
     }
 
