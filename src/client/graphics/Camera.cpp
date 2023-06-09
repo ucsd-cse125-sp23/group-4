@@ -45,6 +45,8 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
 
   // Compute view matrix (inverse of world matrix)
   glm::mat4 view = glm::inverse(rootMtx * transformMtx);
+  glm::mat4 view2 = glm::inverse(
+      rootMtx * glm::eulerAngleY(glm::radians(180.0f)) * transformMtx);
 
   // Compute perspective projection matrix
   glm::mat4 project =
@@ -53,7 +55,7 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
   // Compute final view-projection matrix
   ViewMtx = view;
   ViewProjectMtx = project * view;
-  ViewProjectOriginMtx = project * glm::mat4(glm::mat3(view));
+  ViewProjectOriginMtx = project * glm::mat4(glm::mat3(view2));
 }
 
 float Camera::GetDistance(bool raycast, glm::mat4* rootMtxPtr) {
