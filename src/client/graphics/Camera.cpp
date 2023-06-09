@@ -94,12 +94,12 @@ void Camera::CamDrag(float a, float i) {
   SetIncline(glm::clamp(GetIncline() - i * rate, -90.0f, 90.0f));
 }
 
-void Camera::CamZoom(float y) {
+void Camera::CamZoom(float y, float max) {
   if (Fixed) return;
 
   const float rate = 0.05f;
   float dist = glm::clamp(Distance * (1.0f - static_cast<float>(y) * rate),
-                          6.0f, maxDist);
+                          6.0f, std::max(maxDist, max));
   SetDistance(dist);
 }
 

@@ -351,8 +351,8 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset && phase == GamePhase::Game) {
-    Cam->CamZoom(yoffset);
+  if (yoffset && (phase == GamePhase::Game || _debugmode)) {
+    Cam->CamZoom(yoffset, _debugmode ? 500.0f : 1.0f);
   }
 }
 
@@ -371,7 +371,7 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
 
   // Rotate camera
   if ((RightDown || LeftDown) &&
-      (phase == GamePhase::Lobby || phase == GamePhase::Game)) {
+      (phase == GamePhase::Lobby || phase == GamePhase::Game || _debugmode)) {
     Cam->CamDrag(dx, dy);
   }
 }
