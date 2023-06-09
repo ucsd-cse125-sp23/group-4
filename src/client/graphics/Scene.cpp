@@ -30,7 +30,7 @@ bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
 bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
-  return a.second < b.second;
+  return a.second > b.second;
 }
 
 Player* Scene::createPlayer(int id, std::string skin) {
