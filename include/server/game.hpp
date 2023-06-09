@@ -38,6 +38,7 @@ class Game {
   void update(const message::UserStateUpdate&);
   void tick();
   void restart();
+  void update_start();
   std::vector<message::JumpEvent> get_jump_events();
   std::vector<message::LandEvent> get_land_events();
   std::vector<message::ItemPickupEvent> get_item_pickup_events();

@@ -90,6 +90,7 @@ void Manager::start_game() {
   timer_.expires_after(COUNTDOWN_DURATION);
   timer_.async_wait([this](const boost::system::error_code& _) {
     status_ = Status::InGame;
+    game_->update_start();
 
     // start game timer
     timer_.expires_after(TOTAL_GAME_DURATION);
