@@ -25,19 +25,25 @@ struct MapObjSubmesh {
 
   Material* material = nullptr;
 
-  void trySetMaterial(std::string tag,
-                      std::map<std::string, Material*> resources) {
-    if (tag.length() == 0) return;
+  static std::string processTag(std::string tag) {
+    if (tag.length() == 0) return tag;
 
-    // process material string a bit
+    // process out any .* in the string
     size_t found = tag.find('.', 1);
     if (found != std::string::npos) {
       tag = tag.substr(0, found);
     }
+    return tag;
+  }
 
-    if (resources.count(tag) == 0) return;
+  bool trySetMaterial(std::string tag,
+                      std::map<std::string, Material*> resources) {
+    if (tag.length() == 0 || resources.size() == 0) return true;
+
+    if (resources.count(tag) == 0) return false;
 
     material = resources[tag];
+    return true;
   }
 };
 
@@ -45,17 +51,38 @@ class MapObj : public Model {
  public:
   std::vector<MapObjSubmesh> meshes;
 
+  std::map<std::string, Material*> mapMtlMaterials;
+
   ~MapObj() {
     for (auto mapmesh : meshes) {
       mapmesh.mesh.cleargl();
     }
+
+    for (auto entry : mapMtlMaterials) {
+      delete entry.second;
+    }
   }
 
-  void init(std::string str, std::map<std::string, Material*> mr) {
-    init(str.c_str(), mr);
+  static std::string objToMtlFilename(std::string file) {
+    if (file.length() == 0) return file;
+
+    // process out any .* in the string (extension)
+    size_t found = file.find('.', 1);
+    if (found != std::string::npos) {
+      file = file.substr(0, found);
+    }
+
+    file += ".mtl";  // add extension
+
+    return file;
+  }
+
+  void init(std::string str, std::map<std::string, Material*> mr, GLuint shdr) {
+    init(str.c_str(), mr, shdr);
   }
   void init(const char* filename,
-            std::map<std::string, Material*> materialResources) {
+            std::map<std::string, Material*> materialResources,
+            GLuint mapShader) {
     unsigned int count = 0;
 
     std::vector<glm::vec3> temp_vertices, vertices;
@@ -80,7 +107,10 @@ class MapObj : public Model {
       return;
       // exit(-1);
     }
-    std::cout << "\tLoading map obj visuals...";
+
+    loadMTL(objToMtlFilename(std::string(filename)).c_str(), mapShader);
+
+    std::cout << "\tLoading map obj visuals..." << std::endl;
 
     std::string currObjectName = "";
     std::string currMaterial = "None";
@@ -121,7 +151,18 @@ class MapObj : public Model {
           MapObjSubmesh sm = MapObjSubmesh();
           sm.name = currObjectName;
           sm.mesh = submesh;
-          sm.trySetMaterial(currMaterial, materialResources);
+
+          bool matSet = true;
+          std::string materialTag = MapObjSubmesh::processTag(currMaterial);
+          if (!sm.trySetMaterial(materialTag, materialResources)) {
+            matSet = sm.trySetMaterial(materialTag, mapMtlMaterials);
+          }
+
+          if (matSet) {
+            std::cout << "MTL[" << materialTag << "]... ";
+          } else {
+            std::cout << "failed to use MTL[" << currMaterial << "]... ";
+          }
 
           meshes.push_back(sm);
 
@@ -197,6 +238,100 @@ class MapObj : public Model {
     std::cout << "\tLoaded " << std::to_string(count) << " submeshes total."
               << std::endl;
     std::cout << "MapObj " << filename << " loaded successfully." << std::endl;
+  }
+
+  bool loadMTL(const char* filename, GLuint mapShader) {
+    unsigned int count = 0;
+
+    std::cout << "MapObj: [MTL] Importing " << filename << "..." << std::endl;
+    // load obj file
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+      perror("fopen() failed");
+      std::cerr << "Cannot open MTL file: " << filename << std::endl;
+      std::cerr << "continuing anyways!" << std::endl;
+      return false;
+      // exit(-1);
+    }
+    std::cout << "\t[MTL] Parsing map obj MTL file..." << std::endl;
+
+    std::string currMtl = "";
+    glm::vec3 ambientColor;
+    glm::vec3 diffuseColor;
+    glm::vec3 specularColor;
+    glm::vec3 emissiveColor;
+
+    while (!feof(file)) {
+      char lineHeader[128];
+      // read the first word of the line
+      int res = fscanf(file, "%s", lineHeader);
+
+      // else : parse lineHeader
+      if (res == EOF || strcmp(lineHeader, "newmtl") == 0) {
+        // save previous material to memory
+
+        currMtl = MapObjSubmesh::processTag(currMtl);
+        if (currMtl.length() > 0) {
+          if (mapMtlMaterials.count(currMtl) > 0) {
+            std::cout << "\t[MTL] Ignoring duplicate material for " << currMtl
+                      << std::endl;
+          } else {
+            std::cout << "\t[MTL] Storing material data " << currMtl << "...";
+            Material* mtlMat = new Material();  // deleted in ~MapObj
+            mtlMat->shader = mapShader;
+            mtlMat->ambient = glm::vec4(ambientColor * 0.1f, 1);
+            mtlMat->diffuse = glm::vec4(diffuseColor, 1);
+            mtlMat->specular = glm::vec4(specularColor * 0.2f, 1);
+            mtlMat->emission = glm::vec4(emissiveColor, 1);
+            mtlMat->shininess = 100.0f;
+
+            count++;
+
+            mapMtlMaterials[currMtl] = mtlMat;
+            std::cout << "done." << std::endl;
+          }
+        }
+
+        if (res == EOF) break;  // EOF = End Of File. Quit the loop.
+        // started parsing material. save name
+
+        currMtl = "";
+        char temp_str[60];
+        fscanf(file, "%s", temp_str);
+        currMtl = std::string(temp_str);
+
+        // initialize to defaults
+        ambientColor = glm::vec3(0);
+        diffuseColor = glm::vec3(1);
+        specularColor = glm::vec3(0);
+        emissiveColor = glm::vec3(0);
+
+      } else if (strcmp(lineHeader, "Ka") == 0) {
+        glm::vec3 v;
+        fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
+        ambientColor = v;
+      } else if (strcmp(lineHeader, "Kd") == 0) {
+        glm::vec3 v;
+        fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
+        diffuseColor = v;
+      } else if (strcmp(lineHeader, "Ks") == 0) {
+        glm::vec3 v;
+        fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
+        specularColor = v;
+      } else if (strcmp(lineHeader, "Ke") == 0) {
+        glm::vec3 v;
+        fscanf(file, "%f %f %f\n", &v.x, &v.y, &v.z);
+        emissiveColor = v;
+      }
+    }
+    std::cout << "done." << std::endl;
+
+    std::cout << "\t[MTL] Loaded " << std::to_string(count)
+              << " run-time materials total." << std::endl;
+    std::cout << "MapObj [MTL] " << filename << " parsed successfully."
+              << std::endl;
+
+    return true;
   }
 
   void draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,

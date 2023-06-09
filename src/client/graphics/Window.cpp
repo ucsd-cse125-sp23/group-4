@@ -10,6 +10,7 @@
 #include <imgui_impl_opengl3.h>
 #include <stddef.h>
 
+#include <chrono>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <string>
@@ -18,6 +19,7 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Scene.h"
+#include "config/lib.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -33,7 +35,17 @@ const char* Window::windowTitle = "tagguys :O";
 GamePhase Window::phase;
 message::LobbyUpdate Window::lobby_state;
 
+GLFWwindow *Window::loadingWindow, *Window::screenWindow;
+std::thread Window::subthread;
+float Window::remainingLoadBuffer;
+
+Camera* Cam;
+Camera* lobbyCam;
+
 // Game stuff to render
+Start* Window::start;
+Scene* Window::lob;
+Scene* Window::game;
 Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;
@@ -41,9 +53,7 @@ HUD* Window::hud;
 std::unique_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
 
-Camera* Cam;
-
-std::atomic<bool> loading_resources{false};
+std::atomic<bool> Window::loading_resources{false};
 
 // Interaction Variables
 bool LeftDown, RightDown;
@@ -78,16 +88,28 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
-  gameScene = new Start(Cam);
-  gameScene->init();
-  loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
-  gameScene->init();
 
   glfwMakeContextCurrent(window);
   glfwShowWindow(window);
   glfwFocusWindow(window);
+  loadScreen = new Load();
+
+  loading_resources = true;
+  remainingLoadBuffer = 5;
+  gameScene = new Start(Cam);
+
+  glfwDestroyWindow(loadingWindow);
+  loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+  subthread = std::thread(
+      [](Scene* gameScene) {
+        glfwMakeContextCurrent(loadingWindow);
+
+        gameScene->init();
+        loading_resources = false;
+      },
+      std::ref(gameScene));
 
   return true;
 }
@@ -132,17 +154,18 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
-  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  screenWindow = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
 
   // Check if the window could not be created.
-  if (!window) {
+  if (!screenWindow) {
     std::cerr << "Failed to open GLFW window." << std::endl;
     glfwTerminate();
     return NULL;
   }
 
   // Make the context of the window.
-  glfwMakeContextCurrent(window);
+  glfwMakeContextCurrent(screenWindow);
 
 #ifndef __APPLE__
   // On Windows and Linux, we need GLEW to provide modern OpenGL functionality.
@@ -163,14 +186,17 @@ GLFWwindow* Window::createWindow(int width, int height) {
   Cam = new Camera();
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
+  lobbyCam = new Camera();
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+
   // initialize the interaction variables
   LeftDown = RightDown = false;
   MouseX = MouseY = 0;
 
   // Call the resize callback to make sure things get drawn immediately.
-  Window::resizeCallback(window, width, height);
+  Window::resizeCallback(screenWindow, width, height);
 
-  return window;
+  return screenWindow;
 }
 
 void Window::resizeCallback(GLFWwindow* window, int width, int height) {
@@ -184,6 +210,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
   // ImGui::WindowSize(w, h)?
 }
@@ -194,30 +221,59 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
 
 void Window::update(GLFWwindow* window, float deltaTime) {
-  if (dynamic_cast<Start*>(gameScene) &&
-      phase == GamePhase::Lobby) {  // start -> lobby
-    resetCamera();
-    gameScene = new Lobby(Cam);
-    gameScene->init();
-    auto lobby = dynamic_cast<Lobby*>(gameScene);
-    lobby->receiveState(lobby_state);
-  } else if (dynamic_cast<Lobby*>(gameScene) &&
-             phase == GamePhase::Game) {  // lobby -> game
-    auto lobby = dynamic_cast<Lobby*>(gameScene);
-    gameScene = new Scene(Cam);
-    glfwHideWindow(window);
-    loading_resources = true;
-    std::thread x(&Load::load, loadScreen, window);
-    gameScene->init(lobby->players);
-    hud = new HUD(gameScene);
-    loading_resources = false;
-    x.join();
-
-    glfwMakeContextCurrent(window);
-    glfwShowWindow(window);
-    glfwFocusWindow(window);
+  if (loading_resources || remainingLoadBuffer > 0) {
+    loadScreen->update();
+    remainingLoadBuffer -= deltaTime;
   } else {
-    gameScene->update(deltaTime);
+    if (subthread.joinable()) subthread.join();
+    if (dynamic_cast<Start*>(gameScene) &&
+        phase == GamePhase::Lobby) {  // start -> lobby
+      resetCamera();
+
+      loading_resources = true;
+      remainingLoadBuffer = 5;
+      gameScene = new Lobby(lobbyCam);
+      gameScene->music->play();
+      glfwDestroyWindow(loadingWindow);
+      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+      subthread = std::thread(
+          [](Scene* gameScene) {
+            glfwMakeContextCurrent(loadingWindow);
+
+            gameScene->init();
+            // TODO: (Ask AJ music)
+            // gameScene->music->play();
+
+            auto lobby = dynamic_cast<Lobby*>(gameScene);
+            loading_resources = false;
+            lobby->receiveState(lobby_state);
+          },
+          std::ref(gameScene));
+
+    } else if (dynamic_cast<Lobby*>(gameScene) &&
+               phase == GamePhase::Game) {  // lobby -> game
+      gameScene->music->stop();
+      loading_resources = true;
+      remainingLoadBuffer = 10;
+      auto lobby = dynamic_cast<Lobby*>(gameScene);
+      std::map<int, message::LobbyPlayer> ps = lobby->players;
+      gameScene = new Scene(Cam);
+      hud = new HUD(gameScene);
+      gameScene->music->play();
+      glfwDestroyWindow(loadingWindow);
+      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+      subthread = std::thread(
+          [](Scene* gameScene, HUD* hud, Lobby* lobby) {
+            glfwMakeContextCurrent(loadingWindow);
+
+            gameScene->init(lobby->players);
+            hud->init();
+            loading_resources = false;
+          },
+          std::ref(gameScene), std::ref(hud), std::ref(lobby));
+    } else {
+      gameScene->update(deltaTime);
+    }
   }
 }
 
@@ -230,9 +286,14 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  // Render the objects.
-  gameScene->draw();
-  if (phase == GamePhase::Game) hud->draw(window);
+  if (loading_resources || remainingLoadBuffer > 0) {
+    loadScreen->draw();
+  } else {
+    // Render the objects.
+    gameScene->draw();
+    if (phase == GamePhase::Game || phase == GamePhase::GameOver)
+      hud->draw(window);
+  }
 
   Input::handle(false);
   if (_debugmode) {
@@ -274,12 +335,15 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
   // Check for a key presses
   Input::keyListener(window, key, scancode, action, mods);
 
+  auto config = get_config();
   // Check for a key press.
   if (action == GLFW_PRESS) {
     switch (key) {
       case GLFW_KEY_ESCAPE:
-        // Close the window. This causes the program to also terminate.
-        glfwSetWindowShouldClose(window, GL_TRUE);
+        if (config["escape_to_exit"]) {
+          // Close the window. This causes the program to also terminate.
+          glfwSetWindowShouldClose(window, GL_TRUE);
+        }
         break;
 
       case GLFW_KEY_ENTER:
@@ -289,14 +353,19 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_R:
         resetCamera();
         break;
-      case GLFW_KEY_TAB:
+      case GLFW_KEY_LEFT_CONTROL:
         _debugmode = !_debugmode;
         break;
       case GLFW_KEY_C:
-        Cam->Fixed = !(Cam->Fixed);
+        if (_debugmode) {
+          Cam->Fixed = !(Cam->Fixed);
+        }
         break;
       case GLFW_KEY_X:
-        gameScene->sceneResources->sounds["test"]->play();  // temporary
+        if (_debugmode) {
+          gameScene->sceneResources->sounds["test"]->play(
+              glm::vec3(0.0, 0.0, 0.0));
+        }
         break;
       default:
         break;
@@ -329,8 +398,8 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset,
   if (_debugmode && ImGui::GetIO().WantCaptureMouse) return;
 
   // Zoom camera
-  if (yoffset && phase == GamePhase::Game) {
-    Cam->CamZoom(yoffset);
+  if (yoffset && (phase == GamePhase::Game || _debugmode)) {
+    Cam->CamZoom(yoffset, _debugmode ? 500.0f : 1.0f);
   }
 }
 
@@ -348,7 +417,8 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && phase == GamePhase::Game) {
+  if ((RightDown || LeftDown) &&
+      (phase == GamePhase::Lobby || phase == GamePhase::Game || _debugmode)) {
     Cam->CamDrag(dx, dy);
   }
 }

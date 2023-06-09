@@ -171,15 +171,11 @@ bool AssimpModel::populateMesh(const aiScene* const scene,
       mesh->pos.push_back(glm::vec4(aiMesh->mVertices[i].x,
                                     aiMesh->mVertices[i].y,
                                     aiMesh->mVertices[i].z, 1.0f));
-      mesh->outPos.push_back(
-          glm::vec3(mesh->pos[i].x, mesh->pos[i].y, mesh->pos[i].z));
-      mesh->animPos.push_back(glm::vec4(0.0f));
+      mesh->outPos.push_back(mesh->pos[i]);
       mesh->norm.push_back(glm::vec4(aiMesh->mNormals[i].x,
                                      aiMesh->mNormals[i].y,
                                      aiMesh->mNormals[i].z, 0.0f));
-      mesh->outNorm.push_back(
-          glm::vec3(mesh->norm[i].x, mesh->norm[i].y, mesh->norm[i].z));
-      mesh->animNorm.push_back(glm::vec4(0.0f));
+      mesh->outNorm.push_back(mesh->norm[i]);
       mesh->uvs.push_back(glm::vec2(aiMesh->mTextureCoords[0][i].x,
                                     aiMesh->mTextureCoords[0][i].y));
     }
@@ -190,22 +186,16 @@ bool AssimpModel::populateMesh(const aiScene* const scene,
       mesh->pos.push_back(glm::vec4(aiMesh->mVertices[i].x,
                                     aiMesh->mVertices[i].y,
                                     aiMesh->mVertices[i].z, 1.0f));
-      mesh->outPos.push_back(
-          glm::vec3(mesh->pos[i].x, mesh->pos[i].y, mesh->pos[i].z));
-      mesh->animPos.push_back(glm::vec4(0.0f));
+      mesh->outPos.push_back(mesh->pos[i]);
       mesh->norm.push_back(glm::vec4(aiMesh->mNormals[i].x,
                                      aiMesh->mNormals[i].y,
                                      aiMesh->mNormals[i].z, 0.0f));
-      mesh->outNorm.push_back(
-          glm::vec3(mesh->norm[i].x, mesh->norm[i].y, mesh->norm[i].z));
-      mesh->animNorm.push_back(glm::vec4(0.0f));
+      mesh->outNorm.push_back(mesh->norm[i]);
       mesh->uvs.push_back(glm::vec2(0.0f));
     }
   }
   if (mesh->pos.size() != mesh->outPos.size() ||
-      mesh->pos.size() != mesh->animPos.size() ||
       mesh->norm.size() != mesh->outNorm.size() ||
-      mesh->norm.size() != mesh->animNorm.size() ||
       mesh->pos.size() != mesh->norm.size() ||
       mesh->pos.size() != mesh->uvs.size()) {
     return false;
@@ -326,21 +316,15 @@ void AssimpModel::update(float dt) {
 
   for (unsigned int i = 0; i < meshes.size(); i++) {
     for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {
-      meshes[i]->animPos[v] = glm::vec4(0.0f);
-      meshes[i]->animNorm[v] = glm::vec4(0.0f);
+      meshes[i]->outPos[v] = glm::vec4(0.0f);
+      meshes[i]->outNorm[v] = glm::vec4(0.0f);
     }
   }
   rootNode->update(glm::mat4(1.0f));
   for (unsigned int i = 0; i < meshes.size(); i++) {
     for (unsigned int v = 0; v < meshes[i]->pos.size(); v++) {
-      meshes[i]->animPos[v] /= meshes[i]->animPos[v][3];
-      meshes[i]->animNorm[v] = glm::normalize(meshes[i]->animNorm[v]);
-      meshes[i]->outPos[v] =
-          glm::vec3(meshes[i]->animPos[v].x, meshes[i]->animPos[v].y,
-                    meshes[i]->animPos[v].z);
-      meshes[i]->outNorm[v] =
-          glm::vec3(meshes[i]->animNorm[v].x, meshes[i]->animNorm[v].y,
-                    meshes[i]->animNorm[v].z);
+      meshes[i]->outPos[v] /= meshes[i]->outPos[v][3];
+      meshes[i]->outNorm[v] = glm::normalize(meshes[i]->outNorm[v]);
     }
   }
 }
@@ -353,6 +337,12 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
 
   GLuint shader = material->shader;
   glUseProgram(shader);
+
+  glm::vec4 tempDiffuse = material->diffuse;
+  glm::vec4 tempSpecular = material->specular;
+  /*glm::vec4 tempAmbient = material->ambient;
+  glm::vec4 tempEmission = material->emission;
+  float tempShininess = material->shininess;*/
 
   for (int i = 0; i < meshes.size(); i++) {
     material->diffuse = meshes[i]->diffuse;
@@ -372,6 +362,12 @@ void AssimpModel::draw(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
 
     meshes[i]->draw();
   }
+
+  material->diffuse = tempDiffuse;
+  material->specular = tempSpecular;
+  /*material->ambient = tempAmbient;
+  material->emission = tempEmission;
+  material->shininess = tempShininess;*/
 
   glUseProgram(0);
 }

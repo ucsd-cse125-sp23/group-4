@@ -7,6 +7,7 @@
 #include "client/graphics/MapDataImporter.h"
 #include "client/graphics/MapObj.h"
 #include "client/graphics/Scene.h"
+#include "client/graphics/Window.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -16,6 +17,44 @@
 using namespace glm;
 
 void Scene::init(void) {
+  music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");
+
+  // globals --
+  _globalSceneResources.meshes["_gz-cube"] = new Cube();
+
+  _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
+  _globalSceneResources.meshes["_gz-xyz"]->init("assets/model/dev/_gizmo.obj");
+
+  _globalSceneResources.shaderPrograms["unlit"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
+
+  _globalSceneResources.materials["unlit"] = new Material;
+  _globalSceneResources.materials["unlit"]->shader =
+      _globalSceneResources.shaderPrograms["unlit"];
+  _globalSceneResources.materials["unlit"]->diffuse =
+      glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+
+  _globalSceneResources.models["_gz-xyz"] = new Model;
+  _globalSceneResources.models["_gz-xyz"]->mesh =
+      _globalSceneResources.meshes["_gz-xyz"];
+  _globalSceneResources.models["_gz-xyz"]->material =
+      _globalSceneResources.materials["unlit"];
+  _globalSceneResources.models["_gz-xyz"]->modelMtx =
+      glm::scale(glm::vec3(1.0f));
+  _globalSceneResources.models["_gz-xyz"]->depthFunction = GL_ALWAYS;
+
+  _globalSceneResources.models["_gz-cube"] = new Model;
+  _globalSceneResources.models["_gz-cube"]->mesh =
+      _globalSceneResources.meshes["_gz-cube"];
+  _globalSceneResources.models["_gz-cube"]->material =
+      _globalSceneResources.materials["unlit"];
+  _globalSceneResources.models["_gz-cube"]->modelMtx =
+      glm::translate(glm::vec3(0.0f));
+  _globalSceneResources.models["_gz-cube"]->depthFunction = GL_ALWAYS;
+  // --
+
+
   auto config = get_config();
 
   // Create mesh palette
@@ -40,6 +79,11 @@ void Scene::init(void) {
 #pragma region Shaders
   sceneResources->shaderPrograms["basic"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["map"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["water"] =
+      LoadShaders("assets/shaders/shader.vert",
+                  "assets/shaders/shaderx.frag");  // TODO(gfx team?)
   sceneResources->shaderPrograms["unlitx"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlitx.frag");
   sceneResources->shaderPrograms["toon"] =
@@ -75,53 +119,13 @@ void Scene::init(void) {
   sceneResources->materials["wood"]->specular = vec4(0.3f, 0.15f, 0.1f, 1.0f);
   sceneResources->materials["wood"]->shininess = 100.0f;
 
-  mat = new Material;  // leaf
+  mat = new Material;  // custom configured map material
   mat->shader = sceneResources->shaderPrograms["basic"];
   mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   mat->diffuse = vec4(0.3f, 0.6f, 0.3f, 1.0f);
   mat->specular = vec4(0.15f, 0.15f, 0.1f, 1.0f);
   mat->shininess = 100.0f;
-  sceneResources->materials["l"] = mat;
-
-  mat = new Material;  // stem
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.66f, 0.77f, 0.6f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["stem"] = mat;
-
-  mat = new Material;  // tree trunk wood
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.46f, 0.15f, 0.1f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["treetrunk"] = mat;
-
-  mat = new Material;  // river water
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.16f, 0.15f, 0.9f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["river"] = mat;
-
-  mat = new Material;  // cloud
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.99f, 0.9f, 0.9f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 200.0f;
-  sceneResources->materials["Cloud"] = mat;
-
-  mat = new Material;  // ground
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.99f, 0.6f, 0.3f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["ground"] = mat;
+  sceneResources->materials["mapMaterialExample"] = mat;
 
   sceneResources->materials["ceramic"] = new Material;
   sceneResources->materials["ceramic"]->shader =
@@ -147,6 +151,19 @@ void Scene::init(void) {
   sceneResources->materials["pyramid"]->diffuse = vec4(0.7f, 0.7f, 0.2f, 1.0f);
   sceneResources->materials["pyramid"]->specular = vec4(0.9f, 0.9f, 0.9f, 1.0f);
   sceneResources->materials["pyramid"]->shininess = 50.0f;
+
+  sceneResources->materials["shine.red"] = new Material;
+  sceneResources->materials["shine.red"]->shader =
+      sceneResources->shaderPrograms["basic"];
+  sceneResources->materials["shine.red"]->ambient =
+      vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  sceneResources->materials["shine.red"]->diffuse =
+      vec4(0.9f, 0.2f, 0.0f, 1.0f);
+  sceneResources->materials["shine.red"]->specular =
+      vec4(0.0f, 0.95f, 0.0f, 1.0f);
+  sceneResources->materials["shine.red"]->emission =
+      vec4(0.5f, 0.0f, 0.0f, 1.0f);
+  sceneResources->materials["shine.red"]->shininess = 50.0f;
 
   sceneResources->materials["marble"] = new Material;
   sceneResources->materials["marble"]->shader =
@@ -177,6 +194,13 @@ void Scene::init(void) {
   mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   mtl->diffuse = vec4(0.9f, 0.82f, 0.0f, 1.0f);
   sceneResources->materials["star1-ptcl"] = mtl;
+
+  mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["unlitx"];
+  mtl->texture = sceneResources->textures["star1-ptcl"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.1f, 0.4f, 0.9f, 1.0f);
+  sceneResources->materials["star1.blue-ptcl"] = mtl;
 
   mtl = new Material;
   mtl->shader = sceneResources->shaderPrograms["toon"];
@@ -211,19 +235,40 @@ void Scene::init(void) {
       sceneResources->meshes["cubeUV"];
   sceneResources->models["cubeTextured"]->material =
       sceneResources->materials["grid"];
+
+  sceneResources->models["cubeBoxTest"] = new Model;
+  sceneResources->models["cubeBoxTest"]->mesh =
+      sceneResources->meshes["cubeUV"];
+  sceneResources->models["cubeBoxTest"]->material =
+      sceneResources->materials["shine.red"];
 #pragma endregion
 
 #pragma region Sounds
   // Sound palette
   SoundEffect* sfx = new SoundEffect();
+  sfx->load("assets/sounds/jump.wav");
   sceneResources->sounds["test"] = sfx;
-  sfx->load("assets/sounds/sound_test.wav");
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/jump2.wav");
+  sceneResources->sounds["sfx_jump"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/hurt.wav");
+  sceneResources->sounds["sfx_tag"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/coin.wav");
+  sceneResources->sounds["sfx_item"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/fallsound.wav");
+  sceneResources->sounds["sfx_fall"] = sfx;
+  /*music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");*/
+
 #pragma endregion
 
   // Setup particle effects
 #pragma region Particles
   ParticleSystem* ptcl = new ParticleSystem();
-  ptcl->name = "GT_particle1";
+  ptcl->name = "GT_particle_test";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
   ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
@@ -232,16 +277,14 @@ void Scene::init(void) {
   // node["particleTest"] = ptcl;
   // node["world"]->childnodes.push_back(node["particleTest"]);
 
-  /*
   ptcl = new ParticleSystem();
-  ptcl->name = "GT_particle2";
+  ptcl->name = "GTptcl_stars";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
-  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
-  ptcl->transform.position = vec3(10, 9, 3);
-  ptcl->transform.updateMtx(&ptcl->transformMtx);
-  localGameThings.push_back(ptcl);
-  node["particleTest2"] = ptcl;
-  node["world"]->childnodes.push_back(node["particleTest2"]);*/
+  ptcl->materialRef = sceneResources->materials["star1-ptcl"];
+  ptcl->worldSpace = true;
+  ptcl->creationRate = 0;
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-10, 10), DOFr(-10, 10)};
+  sceneResources->prefabs["ptcl_stars"] = ptcl;
 
   ptcl = new ParticleSystem();
   ptcl->name = "GTptcl_jump";
@@ -249,8 +292,21 @@ void Scene::init(void) {
   ptcl->materialRef = sceneResources->materials["star1-ptcl"];
   ptcl->worldSpace = true;
   ptcl->creationRate = 0;
-  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-0, 0, 0), DOFr(-10, 10)};
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(12), DOFr(-10, 10)};
+  ptcl->gravity.SetValue(-0.01f);
+  ptcl->drag.SetValue(5.0f);
+  ptcl->lifespan.SetMinMax(0.9f, 0.95f);
   sceneResources->prefabs["ptcl_jump"] = ptcl;
+
+  ptcl = new ParticleSystem();
+  ptcl->name = "GTptcl_isTagged";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["star1.blue-ptcl"];
+  ptcl->worldSpace = true;
+  ptcl->creationRate = 0;
+  ptcl->lifespan.SetMinMax(0.6f, 0.8f);
+  ptcl->gravity.SetValue(-0.1f);
+  sceneResources->prefabs["ptcl_isTagged"] = ptcl;
 #pragma endregion
 
   // Skybox setup
@@ -282,7 +338,8 @@ void Scene::init(void) {
   ///// maps:
   MapObj* mapVisuals = new MapObj();
   sceneResources->models["map"] = mapVisuals;
-  mapVisuals->init(config["map_draw_file"], sceneResources->materials);
+  mapVisuals->init(config["map_draw_file"], sceneResources->materials,
+                   sceneResources->shaderPrograms["map"]);
   mapVisuals->material = sceneResources->materials["marble"];
 
   ///// map data (collisions, fx, etc.):
@@ -291,10 +348,13 @@ void Scene::init(void) {
   node["collision"] = new Node("_colliders");
   for (auto c : mapData.colliders) {
     node["collision"]->childnodes.push_back(new Collider(c));
+
+    if (coreEnv) coreEnv->addConvex(c.vertices);  // used by camera raycasts
   }
+  if (coreEnv) coreEnv->constructBVH();
 #pragma endregion
 
-  // Setup player/gameplay prefabs
+    // Setup player/gameplay prefabs
 #pragma region Prefabs
   Model* m_prefab = new Model;
   sceneResources->models["PREFAB_player.model3"] = m_prefab;
@@ -303,11 +363,56 @@ void Scene::init(void) {
   m_prefab->material = sceneResources->materials["toon.blue"];
 
   AssimpModel* am = new AssimpModel();
-  am->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
+  am->loadAssimp("assets/animation/AnimExtra-BeeTest.fbx");
   am->setAnimation("walk");
   sceneResources->models["PREFAB_player.model"] = am;
   sceneResources->models["PREFAB_player.model"]->mesh = am;
   sceneResources->models["PREFAB_player.model"]->material =
+      sceneResources->materials["toon"];
+
+  AssimpModel* racoon_prefab = new AssimpModel();
+  racoon_prefab->loadAssimp("assets/animation/withUV/Animation -Racoon.fbx");
+  racoon_prefab->setAnimation("walk");
+  sceneResources->models["trash panda"] = racoon_prefab;
+  sceneResources->models["trash panda"]->mesh = racoon_prefab;
+  sceneResources->models["trash panda"]->material =
+      sceneResources->materials["toon"];
+
+  AssimpModel* bee_prefab = new AssimpModel();
+  bee_prefab->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
+  bee_prefab->setAnimation("walk");
+  sceneResources->models["bee"] = bee_prefab;
+  sceneResources->models["bee"]->material = sceneResources->materials["toon"];
+  sceneResources->models["bee"]->mesh = bee_prefab;
+
+  AssimpModel* cat_prefab = new AssimpModel();
+  cat_prefab->loadAssimp("assets/animation/withUV/Animation -Cat.fbx");
+  cat_prefab->setAnimation("walk");
+  sceneResources->models["cat"] = cat_prefab;
+  sceneResources->models["cat"]->material = sceneResources->materials["toon"];
+  sceneResources->models["cat"]->mesh = bee_prefab;
+
+  AssimpModel* avocado_prefab = new AssimpModel();
+  avocado_prefab->loadAssimp("assets/animation/withUV/Animation -Avocado.fbx");
+  avocado_prefab->setAnimation("walk");
+  sceneResources->models["avocado"] = avocado_prefab;
+  sceneResources->models["avocado"]->mesh = avocado_prefab;
+  sceneResources->models["avocado"]->material =
+      sceneResources->materials["toon"];
+
+  AssimpModel* duck_prefab = new AssimpModel();
+  duck_prefab->loadAssimp("assets/animation/withUV/Animation -Duck.fbx");
+  duck_prefab->setAnimation("walk");
+  sceneResources->models["duck"] = duck_prefab;
+  sceneResources->models["duck"]->mesh = duck_prefab;
+  sceneResources->models["duck"]->material = sceneResources->materials["toon"];
+
+  AssimpModel* unicorn_prefab = new AssimpModel();
+  unicorn_prefab->loadAssimp("assets/animation/withUV/Animation - Unicorn.fbx");
+  unicorn_prefab->setAnimation("walk");
+  sceneResources->models["unicorn"] = unicorn_prefab;
+  sceneResources->models["unicorn"]->mesh = unicorn_prefab;
+  sceneResources->models["unicorn"]->material =
       sceneResources->materials["toon"];
 #pragma endregion
 
@@ -316,35 +421,14 @@ void Scene::init(void) {
   ///////////////////////////////////////////////////////
 
   // Add local game things
+  /**
   GameThing* thing_example = new GameThing;
   thing_example->name = "GT_teapot";
-  localGameThings.push_back(thing_example);
-
-  GameThing* thing_cube = new GameThing;
-  thing_cube->name = "GT_cube";
-  localGameThings.push_back(thing_cube);
-
-  GameThing* thing_modeltest = new GameThing;
-  thing_modeltest->name = "GT_playerTest";
-  localGameThings.push_back(thing_modeltest);
-
-  GameThing* thing_modeltestB = new GameThing;
-  thing_modeltestB->name = "GT_playerTestB";
-  localGameThings.push_back(thing_modeltestB);
+  localGameThings.push_back(thing_example);*/
 
   // Build the scene graph
-  node["teapot1"] = thing_example;
-  node["cubeTest"] = thing_cube;
-
   node["map"] = new Node("_map");
   node["map"]->model = sceneResources->models["map"];
-
-  thing_example->transform.position = vec3(-2.0f, 2.0f, 5.0f);  // gt only
-  node["teapot1"]->model = sceneResources->models["teapot1"];
-
-  thing_cube->transform.position = vec3(2.0f, 2.0f, 5.0f);
-  node["cubeTest"]->model = sceneResources->models["cubeTextured"];
-  node["cubeTest"]->transformMtx = translate(vec3(2, 2, 5));  // node translate
 
   node["skybox"] = new Node("_skybox");
   node["skybox"]->model = sceneResources->models["skybox"];
@@ -356,39 +440,24 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["skybox"]);
 
   // node["world"]->childnodes.push_back(node["teapot1"]);
-  node["world"]->childnodes.push_back(node["cubeTest"]);
+  // node["world"]->childnodes.push_back(node["cubeTest"]);
 
   node["world"]->childnodes.push_back(node["collision"]);
 
   node["world"]->childnodes.push_back(node["map"]);
 
   // createPlayer(-1); // for testing
+
+  // createItemBox(-1, Item::YellowGiftBox);  // for testing
 }
 
 void Scene::init(std::map<int, message::LobbyPlayer> players) {
+  //loading++;
+
   init();
-
-  Model* racoon_prefab = new Model;
-  sceneResources->models["trash panda"] = racoon_prefab;
-  racoon_prefab->mesh = sceneResources->meshes["playermodel"];
-  racoon_prefab->material = sceneResources->materials["toon.blue"];
-
-  Model* bee_prefab = new Model;
-  sceneResources->models["bee"] = bee_prefab;
-  bee_prefab->mesh = sceneResources->meshes["playermodel"];
-  bee_prefab->material = sceneResources->materials["marble"];
-
-  Model* avocado_prefab = new Model;
-  sceneResources->models["avocado"] = avocado_prefab;
-  avocado_prefab->mesh = sceneResources->meshes["playermodel"];
-  avocado_prefab->material = sceneResources->materials["ceramic"];
-
-  Model* duck_prefab = new Model;
-  sceneResources->models["duck"] = duck_prefab;
-  duck_prefab->mesh = sceneResources->meshes["playermodel"];
-  duck_prefab->material = sceneResources->materials["silver"];
 
   for (auto& [i, p] : players) {
     skins[i] = p.skin;
   }
+
 }

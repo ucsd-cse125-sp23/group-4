@@ -39,9 +39,9 @@ void AssimpNode::update(const glm::mat4& accWorldMtx) {
         }, nj.vertexWeights.size(), 1024);*/
     for (unsigned int n = 0; n < nj.vertexWeights.size(); n++) {
       VertexWeight& vw = nj.vertexWeights[n];
-      mesh->animPos[vw.vertexInd] +=
+      mesh->outPos[vw.vertexInd] +=
           vw.weight * worldMtx * mesh->pos[vw.vertexInd];
-      mesh->animNorm[vw.vertexInd] +=
+      mesh->outNorm[vw.vertexInd] +=
           vw.weight * worldMtx * mesh->norm[vw.vertexInd];
     }
   }

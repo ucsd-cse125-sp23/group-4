@@ -9,6 +9,7 @@
 uint32_t PObject::maxId = 1;
 
 #define VERT_PCNT 0.5
+#define TICKS_FALLEN_LAND 6
 
 void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   vec3f norm = normalize(vec3f(mtv));
@@ -17,7 +18,8 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
   if (self->vel.y < 0 &&
       norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
     self->onGround = COYOTE_TIME;
-    self->level->eventManager->fireLandEvent(self);
+    if (self->ticksFallen > TICKS_FALLEN_LAND)
+      self->level->eventManager->fireLandEvent(self);
   }
   if (other->isStatic()) {
     self->addPos(vec3f(mtv) * (mtv.w + 0.0001f));
@@ -32,7 +34,8 @@ void PObject::response(PObject* self, PObject* other, vec4f mtv) {
     if (other->vel.y < 0 &&
         norm.y > -0.1 * (std::abs(norm.x) + std::abs(norm.z))) {
       self->onGround = COYOTE_TIME;
-      self->level->eventManager->fireLandEvent(self);
+      if (self->ticksFallen > TICKS_FALLEN_LAND)
+        self->level->eventManager->fireLandEvent(self);
     }
 
     self->addPos(vec3f(mtv) * (mtv.w * 0.5f + 0.00005f));
@@ -79,15 +82,16 @@ void PObject::tick() {
   this->vel.y -= std::max(0.0f, PObject::modifyValue(1.0f, GRAVITY_MODIFIER));
 
   lastSurfaceNormal = vec3f(0, 0, 0);
+
+  move(this->vel);
+  freeze = false;
+
   if (onGround) {
-    if (this->vel.y > -0.1) ticksFallen = 0;
+    ticksFallen = 0;
   } else {
     ticksFallen++;
     lastSurfaceFriction = 0;
   }
-
-  move(this->vel);
-  freeze = false;
 }
 void PObject::move(vec3f dPos) {
   oPos = pos;
@@ -117,7 +121,8 @@ void PObject::move(vec3f dPos) {
       if (this->vel.y < 0 &&
           norm.y > VERT_PCNT * (std::abs(norm.x) + std::abs(norm.z))) {
         this->onGround = COYOTE_TIME;
-        this->level->eventManager->fireLandEvent(this);
+        if (this->ticksFallen > TICKS_FALLEN_LAND)
+          this->level->eventManager->fireLandEvent(this);
       }
 
       vec3f v = tangent(rDPos, norm);

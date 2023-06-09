@@ -85,6 +85,7 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/Texture.cpp
     ${PROJECT_SOURCE_DIR}/graphics/TextureCube.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Player.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/ItemBox.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Window.cpp
     ${PROJECT_SOURCE_DIR}/graphics/imported/parallel.cpp
     ${PROJECT_SOURCE_DIR}/graphics/AssimpAnimation.cpp
@@ -93,7 +94,8 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/AssimpNode.cpp
     ${PROJECT_SOURCE_DIR}/graphics/HUD.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Lobby.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/Start.cpp)
+    ${PROJECT_SOURCE_DIR}/graphics/Start.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/Leaderboard.cpp)
 
 add_executable(client ${SOURCES})
 target_include_directories(client
