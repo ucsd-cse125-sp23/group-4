@@ -96,6 +96,7 @@ void Scene::init(void) {
   mat->diffuse = vec4(0.9f, 0.9f, 0.9f, 1.0f);
   mat->emission = vec4(0.15f, 0.15f, 0.4f, 1.0f);
   mat->shininess = 200.0f;
+  // mat->blending = true;
   sceneResources->materials["Cloud"] = mat;
 
   sceneResources->materials["ceramic"] = new Material;
@@ -293,6 +294,7 @@ void Scene::init(void) {
   sceneResources->materials["skybox"]->shader =
       sceneResources->shaderPrograms["skybox"];
   sceneResources->materials["skybox"]->texture = skyboxCubemapTexture;
+  sceneResources->materials["skybox"]->skybox = true;
 
   sceneResources->models["skybox"] = new Model;
   sceneResources->models["skybox"]->mesh = sceneResources->meshes["skybox"];

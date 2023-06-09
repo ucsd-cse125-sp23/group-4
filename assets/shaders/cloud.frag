@@ -70,5 +70,5 @@ void main()
 	vec4 final = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
 
 	// Gamma correction
-	fragColor = vec4(pow(final.rgb, vec3(1.0/(gamma - 0.5))), 1);
+	fragColor = vec4(pow(final.rgb, vec3(1.0/(gamma - 0.5))), 0.8);
 }

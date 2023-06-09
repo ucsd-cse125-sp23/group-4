@@ -352,9 +352,20 @@ class MapObj : public Model {
 
       glDepthFunc(depthFunction);
 
+      glEnable(GL_CULL_FACE);
+
+      if (currMat.blending) {
+        // Enable blending (transparency)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      }
+
       mapmesh.mesh.draw();
 
       glDepthFunc(GL_LESS);
+
+      glDisable(GL_BLEND);
+      glDisable(GL_CULL_FACE);
 
       // deactivate the shader program    ---
       glUseProgram(0);
