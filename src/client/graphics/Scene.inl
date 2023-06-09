@@ -181,8 +181,20 @@ void Scene::init(void) {
 #pragma region Sounds
   // Sound palette
   SoundEffect* sfx = new SoundEffect();
+  sfx->load("assets/sounds/jump.wav");
   sceneResources->sounds["test"] = sfx;
-  sfx->load("assets/sounds/sound_test.wav");
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/jump2.wav");
+  sceneResources->sounds["sfx_jump"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/hurt.wav");
+  sceneResources->sounds["sfx_tag"] = sfx;
+  sfx = new SoundEffect();
+  sfx->load("assets/sounds/coin.wav");
+  sceneResources->sounds["sfx_item"] = sfx;
+  /*music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");*/
+  
 #pragma endregion
 
   // Setup particle effects

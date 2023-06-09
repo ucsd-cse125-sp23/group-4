@@ -122,9 +122,15 @@ void Player::eventLand() {
 
 void Player::eventItem() {
   // if (fx_item) fx_item->Emit(10);
+
+  // SFX! turning this off for now because item pick up is broken and spamed
+  // if (sfx_item) sfx_item->play(transform.position);
 }
 
 void Player::eventTag() {
+  // SFX!
+  if (sfx_tag) sfx_tag->play(transform.position);
+
   // animation
   if (pmodel) {
     pmodel->setAnimation(
