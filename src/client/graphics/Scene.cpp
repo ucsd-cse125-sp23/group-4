@@ -456,7 +456,7 @@ std::vector<std::pair<int, std::string>> Scene::rankPlayers() {
 }
 
 void Scene::draw() {
-  if (overtime > 4) {
+  if (overtime > 4 && Window::phase == GamePhase::GameOver) {
     glDisable(GL_DEPTH_TEST);
     leaderboard.draw();
     // leaderboard.drawPlayers(rankings);

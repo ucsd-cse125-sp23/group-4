@@ -11,7 +11,7 @@
 #include "client/graphics/core.h"
 class SoundEffect {
  public:
-  inline static float volumeGlobal = 1.0f;  // 0.0 to 1.0
+  inline static float volumeGlobal = 1.9f;  // 0.0 to 1.0
 
   void load(std::string filename) {
     sound = loadSound(filename);
