@@ -138,9 +138,7 @@ class Scene {
     // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
-    camera->SetPositionTarget(glm::vec3(0, 1, 1) *
-                              240.0f);  // before player spawns
-    camera->SetAzimuth(10);
+    this->setDefaultCamPos();
     localGameThings.push_back(camera);
 
     gameStart = false;
@@ -150,6 +148,13 @@ class Scene {
     node["world"] = new Node("world");
     music = new Music();
     music->load("assets/sounds/Dance_Powder.wav");
+  }
+
+  void setDefaultCamPos() {
+    // before player spawns
+    camera->SetPositionTarget(glm::vec3(0, 1, 1) * 240.0f);
+    camera->SetPositionPrev(glm::vec3(0, 1, 1) * 240.0f);
+    camera->SetAzimuth(10);
   }
 
   Player* createPlayer(int id, std::string skin);

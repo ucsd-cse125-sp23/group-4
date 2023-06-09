@@ -44,6 +44,10 @@ class Camera : public GameThing {
   void SetPositionTarget(glm::vec3 v) {
     position_target = v + glm::vec3(0, 4, 0);  // center above player
   }
+  void SetPositionPrev(glm::vec3 v) {
+    position_prev = v + glm::vec3(0, 4, 0);  // center above player
+  }
+
 
   void UpdateView();
   void UpdateView(Node* parent);
