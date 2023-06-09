@@ -27,8 +27,9 @@ class Start : public Scene, public InputListener {
     renderText = true;
     renderMain = false;
     camera->SetDistance(600.0);
+    camera->SetAzimuth(-180.0);
     camera->SetIncline(32.0);
-    camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
+    camera->SetPositionTarget(glm::vec3(104.0, 126.0, 6.0));
     timeOnFrame = 0;
     index = 0;
     offset = 0;
@@ -41,7 +42,7 @@ class Start : public Scene, public InputListener {
     }
 
     main.init("assets/UI/IMG_2510 2.PNG");
-    credits.init("assets/UI/IMG_2509 2.PNG");
+    credits.init("assets/UI/IMG_2728.PNG");
   }
 
   ~Start() { delete fr; }
@@ -49,8 +50,9 @@ class Start : public Scene, public InputListener {
   void reset() {
     renderText = true;
     camera->SetDistance(600.0);
+    camera->SetAzimuth(-180.0);
     camera->SetIncline(32.0);
-    camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
+    camera->SetPositionTarget(glm::vec3(104.0, 126.0, 6.0));
     timeOnFrame = 0;
     index = 0;
   }

@@ -336,7 +336,8 @@ void Scene::init(void) {
   racoon_prefab->setAnimation("walk");
   sceneResources->models["trash panda"] = racoon_prefab;
   sceneResources->models["trash panda"]->mesh = racoon_prefab;
-  sceneResources->models["trash panda"]->material = sceneResources->materials["toon"];
+  sceneResources->models["trash panda"]->material =
+      sceneResources->materials["toon"];
 
   AssimpModel* bee_prefab = new AssimpModel();
   bee_prefab->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
@@ -381,35 +382,14 @@ void Scene::init(void) {
   ///////////////////////////////////////////////////////
 
   // Add local game things
+  /**
   GameThing* thing_example = new GameThing;
   thing_example->name = "GT_teapot";
-  localGameThings.push_back(thing_example);
-
-  GameThing* thing_cube = new GameThing;
-  thing_cube->name = "GT_cube";
-  localGameThings.push_back(thing_cube);
-
-  GameThing* thing_modeltest = new GameThing;
-  thing_modeltest->name = "GT_playerTest";
-  localGameThings.push_back(thing_modeltest);
-
-  GameThing* thing_modeltestB = new GameThing;
-  thing_modeltestB->name = "GT_playerTestB";
-  localGameThings.push_back(thing_modeltestB);
+  localGameThings.push_back(thing_example);*/
 
   // Build the scene graph
-  node["teapot1"] = thing_example;
-  node["cubeTest"] = thing_cube;
-
   node["map"] = new Node("_map");
   node["map"]->model = sceneResources->models["map"];
-
-  thing_example->transform.position = vec3(-2.0f, 2.0f, 5.0f);  // gt only
-  node["teapot1"]->model = sceneResources->models["teapot1"];
-
-  thing_cube->transform.position = vec3(2.0f, 2.0f, 5.0f);
-  node["cubeTest"]->model = sceneResources->models["cubeTextured"];
-  node["cubeTest"]->transformMtx = translate(vec3(2, 2, 5));  // node translate
 
   node["skybox"] = new Node("_skybox");
   node["skybox"]->model = sceneResources->models["skybox"];
@@ -421,7 +401,7 @@ void Scene::init(void) {
   node["world"]->childnodes.push_back(node["skybox"]);
 
   // node["world"]->childnodes.push_back(node["teapot1"]);
-  node["world"]->childnodes.push_back(node["cubeTest"]);
+  // node["world"]->childnodes.push_back(node["cubeTest"]);
 
   node["world"]->childnodes.push_back(node["collision"]);
 

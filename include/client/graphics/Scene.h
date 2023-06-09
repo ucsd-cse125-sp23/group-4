@@ -121,7 +121,7 @@ class Scene {
   std::vector<GameThing*> localGameThings;
   std::unordered_map<int, GameThing*> networkGameThings;
   std::map<int, std::string> skins;
-  std::vector<std::string> rankings;
+  std::vector<std::pair<int, std::string>> rankings;
 
   Timer time;
   bool gameStart;
@@ -136,6 +136,9 @@ class Scene {
     // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
+    camera->SetPositionTarget(glm::vec3(0, 1, 1) *
+                              240.0f);  // before player spawns
+    camera->SetAzimuth(10);
     localGameThings.push_back(camera);
 
     gameStart = false;
@@ -192,7 +195,7 @@ class Scene {
   virtual void init(void);
   void init(std::map<int, message::LobbyPlayer> players);
   virtual void reset();
-  std::vector<std::string> rankPlayers();
+  std::vector<std::pair<int, std::string>> rankPlayers();
 
   message::UserStateUpdate pollUpdate();                 // broadcast to net
   void receiveState(message::GameStateUpdate newState);  // receive from net
