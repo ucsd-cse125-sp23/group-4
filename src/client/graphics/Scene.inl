@@ -84,6 +84,8 @@ void Scene::init(void) {
   sceneResources->shaderPrograms["water"] =
       LoadShaders("assets/shaders/shader.vert",
                   "assets/shaders/shaderx.frag");  // TODO(gfx team?)
+  sceneResources->shaderPrograms["cloud"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/cloud.frag");
   sceneResources->shaderPrograms["unlitx"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlitx.frag");
   sceneResources->shaderPrograms["toon"] =
@@ -126,6 +128,15 @@ void Scene::init(void) {
   mat->specular = vec4(0.15f, 0.15f, 0.1f, 1.0f);
   mat->shininess = 100.0f;
   sceneResources->materials["mapMaterialExample"] = mat;
+
+  mat = new Material;  // custom configured map material
+  mat->shader = sceneResources->shaderPrograms["cloud"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  mat->emission = vec4(0.15f, 0.15f, 0.4f, 1.0f);
+  mat->shininess = 200.0f;
+  // mat->blending = true;
+  sceneResources->materials["Cloud"] = mat;
 
   sceneResources->materials["ceramic"] = new Material;
   sceneResources->materials["ceramic"]->shader =
@@ -199,7 +210,8 @@ void Scene::init(void) {
   mtl->shader = sceneResources->shaderPrograms["unlitx"];
   mtl->texture = sceneResources->textures["star1-ptcl"];
   mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mtl->diffuse = vec4(0.1f, 0.4f, 0.9f, 1.0f);
+  mtl->diffuse = vec4(0.1f, 0.4f, 0.95f, 1.0f);
+  mtl->emission = vec4(0.0f, 0.0f, 0.2f, 1.0f);
   sceneResources->materials["star1.blue-ptcl"] = mtl;
 
   mtl = new Material;
@@ -325,6 +337,7 @@ void Scene::init(void) {
   sceneResources->materials["skybox"]->shader =
       sceneResources->shaderPrograms["skybox"];
   sceneResources->materials["skybox"]->texture = skyboxCubemapTexture;
+  sceneResources->materials["skybox"]->skybox = true;
 
   sceneResources->models["skybox"] = new Model;
   sceneResources->models["skybox"]->mesh = sceneResources->meshes["skybox"];

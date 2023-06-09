@@ -69,7 +69,7 @@ message::UserStateUpdate Player::pollInput() {
 }
 
 void Player::updateFromState(message::Player p) {
-  if (fx_tagStatus) fx_tagStatus->creationRate = p.is_tagged ? 5.0f : 0.0f;
+  if (fx_tagStatus) fx_tagStatus->creationRate = p.is_tagged ? 9.0f : 0.0f;
 
   score = p.score;
   tagged = p.is_tagged;
@@ -143,7 +143,7 @@ void Player::eventTag() {
 }
 
 void Player::eventTagged() {
-  if (fx_tag) fx_tag->Emit(15);
+  if (fx_tag) fx_tag->Emit(25);
 
   // animation
   if (pmodel) {

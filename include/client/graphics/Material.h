@@ -25,6 +25,9 @@ struct Material {
   glm::vec4 emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   float shininess = 10.0f;
 
+  bool blending = false;  // used in Model
+  bool skybox = false;    // used in Model
+
   void initUniformLocations() {
     // TODO(matthew) optimize glGetLocation call
   }

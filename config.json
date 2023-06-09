@@ -5,7 +5,8 @@
   "game_mode": "single-tagger",
   "player_count": 2,
   "escape_to_exit": true,
-  "map_draw_file": "assets/model/map-final-singlemap.obj",
+
+  "map_draw_file": "assets/model/map-final-singlemapSmooth.obj",
   "map_data_file": "assets/model/map-data.obj",
   "skin_dir": "assets/model/demo/",
   "skin_avocado": "demo-avocado.fbx",
