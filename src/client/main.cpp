@@ -120,12 +120,17 @@ void network_init() {
       Window::gameScene->receiveEvent_tag(body);
     };
 
+    auto game_over_handler = [](const message::GameOver& body) {
+      Window::phase = GamePhase::GameOver;
+    };
+
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, game_state_update_handler, lobby_update_handler,
         game_start_handler, jump_event_handler, land_event_handler,
-        item_pickup_event_handler, tag_event_handler, any_handler);
+        item_pickup_event_handler, tag_event_handler, game_over_handler,
+        any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
