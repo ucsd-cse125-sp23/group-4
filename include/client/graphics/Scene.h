@@ -181,7 +181,7 @@ class Scene {
     music->load("assets/sounds/Dance_Powder.wav");
   }
 
-  Player* createPlayer(int id);
+  Player* createPlayer(int id, std::string skin);
   void removePlayer(int id);
   void initFromServer(int myid);
   void setToUserFocus(GameThing* t);

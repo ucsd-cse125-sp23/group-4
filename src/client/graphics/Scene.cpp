@@ -27,7 +27,7 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-Player* Scene::createPlayer(int id) {
+Player* Scene::createPlayer(int id, std::string skin) {
   bool isUser = false;
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
 
