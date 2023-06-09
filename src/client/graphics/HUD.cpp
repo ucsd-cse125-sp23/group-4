@@ -191,6 +191,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
   y = 0;
   for (auto it = players.rbegin(); it != players.rend(); it++) {
     player = it->second;
+
     glViewport(x, y, bar_width, bar_height);
 
     /*int i, steps = 36;
@@ -215,6 +216,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     }*/
 
     str = player->name;
+    
     int score_s = player->score / 20.0;
     str += " " + std::to_string(score_s) + "s";
 
