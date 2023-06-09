@@ -109,6 +109,7 @@ bool Window::initializeObjects() {
         glfwMakeContextCurrent(loadingWindow);
 
         gameScene->init();
+        gameScene->setDefaultCamPos();
         loading_resources = false;
       },
       std::ref(gameScene));
@@ -254,8 +255,6 @@ void Window::update(GLFWwindow* window, float deltaTime) {
             glfwMakeContextCurrent(loadingWindow);
 
             gameScene->init();
-            // TODO: (Ask AJ music)
-            // gameScene->music->play();
 
             auto lobby = dynamic_cast<Lobby*>(gameScene);
             loading_resources = false;
@@ -281,6 +280,7 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
             gameScene->init(lobby->players);
             hud->init();
+            gameScene->setDefaultCamPos();
             loading_resources = false;
             client->write<message::GameLoaded>(my_pid);
           },
