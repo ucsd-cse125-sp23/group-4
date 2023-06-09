@@ -126,7 +126,6 @@ class Scene {
 
   Timer time;
   bool gameStart;
-  float timeOver;
   Leaderboard leaderboard;
   Music* music;
 
@@ -140,10 +139,7 @@ class Scene {
     camera->name = "_camera";
     localGameThings.push_back(camera);
 
-    time.time = 5.0f;
-    time.countdown = true;
     gameStart = false;
-    timeOver = 0;
 
     sceneResources = new SceneResourceMap();
     // the default scene graph already has one node named "world."

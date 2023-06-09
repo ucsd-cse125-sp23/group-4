@@ -206,14 +206,7 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
-void Scene::reset() {
-  time.time = 5.0f;
-  time.countdown = true;
-  gameStart = false;
-  timeOver = 0;
-
-  networkGameThings.clear();
-}
+void Scene::reset() { networkGameThings.clear(); }
 
 void Scene::animate(float delta) {
   // 2nd level animation process frame cap
@@ -244,13 +237,12 @@ void Scene::update(float delta) {
   if (gameStart) {
     for (auto& thing : localGameThings) thing->update(delta);
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
-    time.Update(delta);
   }
 
   if (time.time == 0) {
     gameStart = false;
-    timeOver += delta;
-    if (timeOver >= 3) {
+    //timeOver += delta;
+    //if (timeOver >= 3) {
       if (Window::phase != GamePhase::GameOver) {
         Window::phase = GamePhase::GameOver;
         // TODO: build new scene graph based on player rankings
@@ -259,7 +251,7 @@ void Scene::update(float delta) {
         for (auto& [i, g] : networkGameThings) {
           if (dynamic_cast<Player*>(g) != nullptr) {
             Player* player = dynamic_cast<Player*>(g);
-            float time = player->time.time;
+            float time = player->score / 20.0;
             player_times.push_back(std::make_pair(player, time));
           }
         }
@@ -302,9 +294,8 @@ void Scene::update(float delta) {
       }
     }
 
-    if (music) {
-      music->setEffectVolume();
-    }
+  if (music) {
+    music->setEffectVolume();
   }
 }
 
@@ -316,7 +307,8 @@ message::UserStateUpdate Scene::pollUpdate() {
 
 void Scene::receiveState(message::GameStateUpdate newState) {
   if (Window::loading_resources) return;
-  // if (Window::phase == GamePhase::GameOver) return;
+  // update game clock
+  if (Window::phase == GamePhase::Game) time.Update(newState.time_remaining);
 
   // update existing items, create new item if it doesn't exist
   for (auto& [id, player] : newState.players) {
@@ -416,7 +408,7 @@ std::vector<std::string> Scene::rankPlayers() {
     if (dynamic_cast<Player*>(g) != nullptr) {
       Player* player = dynamic_cast<Player*>(g);
       int p_id = player->id;
-      float time = player->time.time;
+      float time = player->score / 20.0;  // ticks to seconds
       player_times.push_back(std::make_pair(p_id, time));
     }
   }

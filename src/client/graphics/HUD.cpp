@@ -91,7 +91,7 @@ void HUD::draw(GLFWwindow* window) {
 
   drawLeaderboard(window, scale_x, players);
 
-  drawTime();
+  if (scene->gameStart) drawTime();
 
   // minimap stuff
   int map_height = (width / 5 > 250) ? 250 : width / 4;
@@ -125,7 +125,7 @@ void HUD::draw(GLFWwindow* window) {
 
   drawCountdown();
 
-  gameOver();
+  if (scene->gameStart) gameOver();
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_BLEND);
@@ -202,13 +202,22 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     glViewport(x, y, bar_width, bar_height);
     str = it->first;
     player = it->second;
-    Timer time = player->time;
-    str += " " + time.ToString();
+    int score_s = player->score / 20.0;
+    str += " " + std::to_string(score_s) + "s";
 
     glDisable(GL_DEPTH_TEST);
-    fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
-                   0.3 * scale,
-                   glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
+
+    // change text color of tagged player
+    if (player->tagged)
+      fr->RenderText(
+          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+          0.3 * scale,
+          glm::vec3(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0));  // orange
+    else
+      fr->RenderText(
+          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+          0.3 * scale,
+          glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));  // gray
     glEnable(GL_DEPTH_TEST);
 
     y += (bar_height / 1.5);
