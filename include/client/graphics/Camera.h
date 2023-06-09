@@ -35,7 +35,7 @@ class Camera : public GameThing {
   bool Fixed;
 
   Environment* env;
-  std::function<float(Ray)> raycastFunction;  // set this!!!
+  // std::function<float(Ray)> raycastFunction;
 
   Camera();
 

@@ -54,7 +54,7 @@ void Camera::UpdateView(glm::mat4 rootMtx) {
 
 float Camera::GetDistance(bool raycast, glm::mat4* rootMtxPtr) {
   float d = Distance;
-  if (raycast && rootMtxPtr) {
+  if (raycast && rootMtxPtr && env) {
     // Raycast from player to camera viewpoint!
     Ray plyrToCam = Ray();
     plyrToCam.src = vec3f(position_prev.x, position_prev.y, position_prev.z);

@@ -127,14 +127,9 @@ class Scene {
     // initializeLevel(coreEnv);    // not needed
 
     camera = camFromWindow;
-    camera->env = coreEnv;
+    // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
-    camera->raycastFunction = [this](Ray r) {
-      float dOut = 200.0f;
-      if (coreEnv) coreEnv->intersects(r, &dOut);
-      return dOut;
-    };
     localGameThings.push_back(camera);
 
     time.time = 300.0f;
