@@ -28,8 +28,8 @@
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
-#include "client/graphics/Leaderboard.h"
 #include "client/graphics/ItemBox.h"
+#include "client/graphics/Leaderboard.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
@@ -125,7 +125,6 @@ class Scene {
 
   Timer time;
   bool gameStart;
-  float timeOver;
   Leaderboard leaderboard;
   Music* music;
 
@@ -139,10 +138,7 @@ class Scene {
     camera->name = "_camera";
     localGameThings.push_back(camera);
 
-    time.time = 5.0f;
-    time.countdown = true;
     gameStart = false;
-    timeOver = 0;
 
     sceneResources = new SceneResourceMap();
 

@@ -242,7 +242,6 @@ void Scene::update(float delta) {
   if (gameStart) {
     for (auto& thing : localGameThings) thing->update(delta);
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
-    time.Update(delta);
   }
 
   if (Window::phase == GamePhase::GameOver) {
@@ -263,6 +262,9 @@ message::UserStateUpdate Scene::pollUpdate() {
 }
 
 void Scene::receiveState(message::GameStateUpdate newState) {
+  // update game clock
+  if (Window::phase == GamePhase::Game) time.Update(newState.time_remaining);
+
   // update existing items, create new item if it doesn't exist
   for (auto& [id, player] : newState.players) {
     std::string skin = "bee";
