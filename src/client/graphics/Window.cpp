@@ -42,6 +42,9 @@ Camera* Cam;
 Camera* lobbyCam;
 
 // Game stuff to render
+Start* Window::start;
+Scene* Window::lob;
+Scene* Window::game;
 Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;

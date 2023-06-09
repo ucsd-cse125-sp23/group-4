@@ -44,6 +44,9 @@ class Window {
   static float remainingLoadBuffer;
 
   // Objects to render
+  static Start* start;
+  static Scene* lob;
+  static Scene* game;
   static Scene* gameScene;
   static Load* loadScreen;
 
