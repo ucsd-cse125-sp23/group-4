@@ -137,7 +137,7 @@ void AssimpRotChannel::prep() {
   for (size_t i = 0; i < keyframes.size() - 1; i++) {
     AssimpRotKeyframe& rkf = keyframes[i];
     float dot = glm::dot(rkf.val, keyframes[i + 1].val);
-    if (glm::abs(dot) < SLERP_THRESHOLD) {
+    if (glm::abs(dot) > SLERP_THRESHOLD) {
       rkf.nextVal = dot >= 0 ? keyframes[i + 1].val : -keyframes[i + 1].val;
       rkf.theta = glm::acos(glm::dot(rkf.val, rkf.nextVal));
       rkf.invTheta = 1.0f / rkf.theta;

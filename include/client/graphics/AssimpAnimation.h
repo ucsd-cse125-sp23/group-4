@@ -65,7 +65,7 @@ struct AssimpRotChannel {
                  const A_ANIM_EXTRAP& extrapOut) const;
 
  private:
-  static const A_ANIM_QUART_INTERP INTERP_MODE = A_ANIM_QUART_INTERP::SLERP;
+  static const A_ANIM_QUART_INTERP INTERP_MODE = A_ANIM_QUART_INTERP::NONE;
 
   float timeStart, timeEnd, timeLen;
 };
