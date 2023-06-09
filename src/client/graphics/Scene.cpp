@@ -186,18 +186,18 @@ message::UserStateUpdate Scene::pollUpdate() {
 
 void Scene::receiveState(message::GameStateUpdate newState) {
   // update existing items, create new item if it doesn't exist
-  for (auto& [id, state] : newState.things) {
+  for (auto& [id, player] : newState.players) {
     // TODO: handle items besides Player as well
     if (!networkGameThings.count(id)) createPlayer(id);
 
     auto thing = networkGameThings.at(id);
-    thing->updateFromState(state);
+    thing->updateFromState(player);
   }
 
   // remove items that don't exist on the server anymore
   std::vector<int> removedIds;
   for (auto& [id, _] : networkGameThings)
-    if (!newState.things.count(id)) removedIds.push_back(id);
+    if (!newState.players.count(id)) removedIds.push_back(id);
 
   for (int id : removedIds) removePlayer(id);
 }

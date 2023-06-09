@@ -51,7 +51,7 @@ class Level {
   void tick();
 
   void spreadPlayers(std::vector<core::Player*> ps);
-  void restartGame();
+  std::vector<core::Player*> restartGame();
 
   void definePowerupSpawn(GlobalEffect* power, int weight = 1);
   void definePowerupDelayMin(size_t ticks);

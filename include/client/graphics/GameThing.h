@@ -74,11 +74,11 @@ class GameThing : public Node {
     return message::UserStateUpdate();
   }
 
-  virtual void updateFromState(message::GameStateUpdateItem state) {
+  virtual void updateFromState(message::Player p) {
     // update self from server input
-    glm::vec3 pos = glm::vec3(state.posx, state.posy, state.posz);
+    glm::vec3 pos = glm::vec3(p.posx, p.posy, p.posz);
     setPositionTarget(pos);
-    setHeading(state.heading);
+    setHeading(p.heading);
   }
 
   // transform helpers

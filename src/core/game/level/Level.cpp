@@ -178,9 +178,10 @@ Environment* Level::getEnvironment() { return environment; }
 void Level::spreadPlayers(std::vector<Player*> ps) {
   this->environment->placePlayers(rng, ps);
 }
-void Level::restartGame() {
+std::vector<Player*> Level::restartGame() {
   this->age = TAG_COOLDOWN;
-  if (gameMode != nullptr) this->gameMode->initPlayers(players);
+  if (gameMode != nullptr) return this->gameMode->initPlayers(players);
+  return {};
 }
 
 void Level::definePowerupSpawn(GlobalEffect* power, int weight) {
