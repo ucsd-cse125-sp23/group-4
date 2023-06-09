@@ -134,10 +134,11 @@ std::string GameStateUpdate::to_string() const {
 
   // clang-format off
   std::string str = std::string("") +
-    "    players: " + _players + "," +                      "\n"
-    "    items: " + _items + "," +                          "\n"
-    "    tagged_player: " + std::to_string(tagged_player) + "\n"
-    "    time_elapsed: " + std::to_string(time_elapsed) +   "\n";
+    "    players: " + _players + "," +                               "\n"
+    "    items: " + _items + "," +                                   "\n"
+    "    tagged_player: " + std::to_string(tagged_player) + ","      "\n"
+    "    time_elapsed: " + std::to_string(time_elapsed) + "s,"       "\n"
+    "    time_remaining: " + std::to_string(time_remaining) + "s," + "\n";
   // clang-format on
 
   return str;

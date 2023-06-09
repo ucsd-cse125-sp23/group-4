@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include <config/lib.hpp>
 #include <core/lib.hpp>
 #include <network/item.hpp>
@@ -111,6 +112,7 @@ void Game::tick() { level_->tick(); }
 void Game::restart() {
   clear_events();
   level_->restartGame();
+  start_time_ = std::chrono::steady_clock::now();
 
   // assign first tagged player
   for (auto& [pid, thing] : game_things_)
@@ -165,7 +167,17 @@ message::GameStateUpdate Game::to_network() {
                           powerup->getPos().x, powerup->getPos().y,
                           powerup->getPos().z};
 
-  float time_elapsed = (level_->getAge() - TAG_COOLDOWN) / 20.0;
+  auto now = std::chrono::steady_clock::now();
+  auto time_elapsed = now - start_time_;
+  auto time_remaining = Manager::TOTAL_GAME_DURATION - time_elapsed;
 
-  return {players, items, tagged_player_, time_elapsed};
+  auto time_elapsed_s =
+      std::chrono::duration_cast<std::chrono::duration<float>>(time_elapsed)
+          .count();
+
+  auto time_remaining_s =
+      std::chrono::duration_cast<std::chrono::duration<float>>(time_remaining)
+          .count();
+
+  return {players, items, tagged_player_, time_elapsed_s, time_remaining_s};
 }
