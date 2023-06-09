@@ -73,6 +73,7 @@ int main(int argc, char* argv[]) {
     manager.poll();  // check for game timer
     if (manager.status_ == Manager::Status::GameOver) {
       server.stop_tick();
+      server.write_all<message::GameOver>(manager.game_->get_scores());
       // TODO: cleanup manager
       // TODO: send game over to client
 
