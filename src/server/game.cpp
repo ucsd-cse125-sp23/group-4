@@ -121,6 +121,8 @@ void Game::restart() {
   start_time_ = std::chrono::steady_clock::now();
 }
 
+void Game::update_start() { start_time_ = std::chrono::steady_clock::now(); }
+
 std::vector<message::JumpEvent> Game::get_jump_events() {
   std::vector<message::JumpEvent> events;
   for (auto& e : jump_events_) events.push_back({get_pid(e.self)});

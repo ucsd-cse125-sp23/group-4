@@ -6,5 +6,5 @@ set(_SERVER_SOURCES
     ${tagguys_SOURCE_DIR}/src/core/util/global.cpp)
 
 add_executable(server ${_SERVER_SOURCES})
-target_link_libraries(server PRIVATE core network config Boost::asio)
+target_link_libraries(server PRIVATE core network Boost::asio)
 target_include_directories(server PRIVATE ${tagguys_SOURCE_DIR}/include)
