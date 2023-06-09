@@ -29,6 +29,8 @@ enum class Type {
   UserStateUpdate,
   LobbyUpdate,
   LobbyPlayerUpdate,
+  LobbyReady,
+  GameLoaded,
   GameStart,
   JumpEvent,
   LandEvent,
@@ -164,6 +166,26 @@ struct LobbyUpdate {
   }
 };
 
+struct LobbyReady {
+  int _;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& _;
+  }
+};
+
+struct GameLoaded {
+  int pid;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& pid;
+  }
+};
+
 struct GameStart {
   std::unordered_map<int, bool> client_states;
 
@@ -227,10 +249,10 @@ struct GameOver {
 };
 
 struct Message {
-  using Body =
-      boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate,
-                     LobbyUpdate, LobbyPlayerUpdate, GameStart, JumpEvent,
-                     LandEvent, ItemPickupEvent, TagEvent, GameOver>;
+  using Body = boost::variant<Assign, Greeting, Notify, GameStateUpdate,
+                              UserStateUpdate, LobbyUpdate, LobbyPlayerUpdate,
+                              LobbyReady, GameLoaded, GameStart, JumpEvent,
+                              LandEvent, ItemPickupEvent, TagEvent, GameOver>;
   Type type;
   Metadata metadata;
   Body body;

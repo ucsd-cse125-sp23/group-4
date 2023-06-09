@@ -12,12 +12,15 @@ class Manager {
  public:
   enum class Status {
     Lobby,
+    GameLoading,
+    GameCountdown,
     InGame,
     GameOver,
   };
 
   static std::size_t MAX_PLAYERS;
   static std::chrono::seconds TOTAL_GAME_DURATION;
+  static constexpr std::chrono::milliseconds COUNTDOWN_DURATION{3200};
 
   Manager();
 
@@ -26,6 +29,8 @@ class Manager {
   message::LobbyUpdate handle_lobby_update(const message::LobbyPlayerUpdate&);
   message::LobbyUpdate get_lobby_update();
   bool check_ready();
+  void handle_game_loaded(const message::GameLoaded&);
+  bool check_loaded();
   void handle_game_update(const message::UserStateUpdate&);
   void tick_game();
   void start_game();
@@ -40,6 +45,7 @@ class Manager {
     int pid;
     std::string skin;
     bool is_ready;
+    bool is_loaded;
   };
 
   boost::asio::io_context io_context_;

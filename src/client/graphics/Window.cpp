@@ -13,10 +13,12 @@
 #include <chrono>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <network/message.hpp>
 #include <string>
 #include <thread>
 
 #include "Camera.h"
+#include "GLFW/glfw3.h"
 #include "Input.h"
 #include "Scene.h"
 #include "config/lib.hpp"
@@ -50,7 +52,7 @@ Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;
 
-std::unique_ptr<Client> Window::client = nullptr;
+std::shared_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
 
 std::atomic<bool> Window::loading_resources{false};
@@ -154,8 +156,19 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
+
+  // TODO(ann): pick the right one
+
+  /* maximize window */
+  // glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
+  /* normal window */
   screenWindow = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
   loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+
+  /* full screen window */
+  // GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
+  // glfwGetPrimaryMonitor(), NULL);
 
   // Check if the window could not be created.
   if (!screenWindow) {
@@ -251,10 +264,10 @@ void Window::update(GLFWwindow* window, float deltaTime) {
           std::ref(gameScene));
 
     } else if (dynamic_cast<Lobby*>(gameScene) &&
-               phase == GamePhase::Game) {  // lobby -> game
+               phase == GamePhase::GameLoading) {  // lobby -> game
       gameScene->music->stop();
       loading_resources = true;
-      remainingLoadBuffer = 10;
+      // remainingLoadBuffer = 10;
       auto lobby = dynamic_cast<Lobby*>(gameScene);
       std::map<int, message::LobbyPlayer> ps = lobby->players;
       gameScene = new Scene(Cam);
@@ -263,14 +276,15 @@ void Window::update(GLFWwindow* window, float deltaTime) {
       glfwDestroyWindow(loadingWindow);
       loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
       subthread = std::thread(
-          [](Scene* gameScene, HUD* hud, Lobby* lobby) {
+          [](Scene* gameScene, HUD* hud, Lobby* lobby, int my_pid) {
             glfwMakeContextCurrent(loadingWindow);
 
             gameScene->init(lobby->players);
             hud->init();
             loading_resources = false;
+            client->write<message::GameLoaded>(my_pid);
           },
-          std::ref(gameScene), std::ref(hud), std::ref(lobby));
+          std::ref(gameScene), std::ref(hud), std::ref(lobby), my_pid);
     } else {
       gameScene->update(deltaTime);
     }
@@ -278,7 +292,8 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 }
 
 void Window::draw(GLFWwindow* window) {
-  // Gets events, including input such as keyboard and mouse or window resizing.
+  // Gets events, including input such as keyboard and mouse or window
+  // resizing.
   glfwPollEvents();
 
   // Clear the color and depth buffers.                     ******
@@ -286,7 +301,8 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  if (loading_resources || remainingLoadBuffer > 0) {
+  if (loading_resources || remainingLoadBuffer > 0 ||
+      phase == GamePhase::GameLoading) {
     loadScreen->draw();
   } else {
     // Render the objects.
