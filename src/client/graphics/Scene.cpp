@@ -240,7 +240,9 @@ void Scene::update(float delta) {
   }
 
   if (Window::phase == GamePhase::GameOver) {
-    gameStart = false;
+    overtime += delta;
+    if (overtime > 4) {
+      gameStart = false;
 
       node["world"]->childnodes.clear();
       camera->Reset();
@@ -275,6 +277,7 @@ void Scene::update(float delta) {
         rankings_ptr[i]->model->modelMtx = glm::mat4(1);
       }
     }
+  }
 
   if (music) {
     music->setEffectVolume();
@@ -419,7 +422,7 @@ std::vector<std::string> Scene::rankPlayers() {
 }
 
 void Scene::draw() {
-  if (Window::phase == GamePhase::GameOver) {
+  if (overtime > 4) {
     glDisable(GL_DEPTH_TEST);
     leaderboard.draw();
     // leaderboard.drawPlayers(rankings);
@@ -427,7 +430,7 @@ void Scene::draw() {
   }
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
-  if (Window::phase == GamePhase::GameOver)
+  if (overtime > 4)
     camera->UpdateView(glm::mat4(1));
   else
     camera->UpdateView();

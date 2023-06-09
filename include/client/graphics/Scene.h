@@ -125,6 +125,7 @@ class Scene {
   std::vector<Player*> rankings_ptr;
 
   Timer time;
+  float overtime;
   bool gameStart;
   Leaderboard leaderboard;
   Music* music;

@@ -331,7 +331,7 @@ void HUD::gameOver() {
   glfwGetWindowSize(window, &width, &height);
   float scale_x = static_cast<float>(width) / static_cast<float>(800);
   float scale_y = static_cast<float>(height) / static_cast<float>(600);
-  if (scene->time.time <= 0.1) {
+  if (Window::phase == GamePhase::GameOver) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     float w = fr->TextWidth("Time's Up!", offset * scale_y);
