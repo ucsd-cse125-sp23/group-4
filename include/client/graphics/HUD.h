@@ -15,6 +15,7 @@ class HUD {
 
   Scene* scene;
   Texture map;
+  Texture mapPlayer;
   Texture timer;
   std::vector<Texture> frames;
   std::map<std::string, Texture> player_bars;
@@ -26,6 +27,7 @@ class HUD {
   explicit HUD(Scene* scn) {
     scene = scn;
     map.init("assets/UI/IMG_2468.PNG");
+    mapPlayer.init("assets/UI/map_player_red_test.png");
     offset = 10;
     index = 0;
     lastTime = glfwGetTime();
@@ -62,6 +64,9 @@ class HUD {
   void drawBar(std::string skin);
 
   void drawMinimap();
+
+  void drawMinimapPlayer(const float& x, const float& y, const float& ccAngle,
+                         const float& ratio, const float& sca = 0.2f);
 
   void update();
 

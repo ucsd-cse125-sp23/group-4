@@ -88,6 +88,11 @@ void HUD::draw(GLFWwindow* window) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 position = player->transform.position;
       if (i == scene->_myPlayerId) {
+        drawMinimapPlayer(
+            -(position[2] - 23) / world_width,
+            -((position[0] - 33)) / world_height,
+            -player->camera->GetAzimuth() - 90.0f,
+            static_cast<float>(map_height) / static_cast<float>(map_width));
         glColor3f(1.0f, 0.0f, 0.0f);
       } else {
         glColor3f(0.0f, 0.0f, 1.0f);
@@ -148,9 +153,8 @@ void HUD::drawTime() {
 
   std::string game_time = scene->time.ToString();
 
-  fr->RenderText(size_x, size_y, game_time, size_x / 6,
-                 size_y / 2.25, 0.65f * scale_y,
-                 glm::vec3(1.0f, 0.0f, 0.0f));
+  fr->RenderText(size_x, size_y, game_time, size_x / 6, size_y / 2.25,
+                 0.65f * scale_y, glm::vec3(1.0f, 0.0f, 0.0f));
 
   glViewport(0, 0, width, height);
 }
@@ -187,7 +191,8 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     str += " " + time.ToString();
 
     glDisable(GL_DEPTH_TEST);
-    fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2, 0.3 * scale,
+    fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+                   0.3 * scale,
                    glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
     glEnable(GL_DEPTH_TEST);
 
@@ -241,6 +246,38 @@ void HUD::drawMinimap() {
   glVertex3f(1.0f, -1.0f, 0.0f);
 
   glEnd();
+
+  glDisable(GL_TEXTURE_2D);
+
+  glDisable(GL_BLEND);
+}
+
+void HUD::drawMinimapPlayer(const float& x, const float& y,
+                            const float& ccAngle, const float& ratio,
+                            const float& sca) {
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  mapPlayer.bindgl();
+  glEnable(GL_TEXTURE_2D);
+
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glPushMatrix();
+  glTranslatef(x, y, 0);
+  glRotatef(ccAngle, 0, 0, 1);
+  glScalef(1.0f, 1.0f, 1.0f);
+  glBegin(GL_QUADS);
+
+  glTexCoord2f(1, 0);
+  glVertex3f(+sca, +sca, 0.0f);
+  glTexCoord2f(0, 0);
+  glVertex3f(-sca, +sca, 0.0f);
+  glTexCoord2f(0, 1);
+  glVertex3f(-sca, -sca, 0.0f);
+  glTexCoord2f(1, 1);
+  glVertex3f(+sca, -sca, 0.0f);
+
+  glEnd();
+  glPopMatrix();
 
   glDisable(GL_TEXTURE_2D);
 
