@@ -52,6 +52,7 @@ class Player : public GameThing, InputListener {
   }
 
   message::UserStateUpdate pollInput();
+  void updateFromState(message::GameStateUpdateItem state);
 
   void eventJump();
   void eventLand();

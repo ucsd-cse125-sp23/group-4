@@ -62,25 +62,32 @@ message::UserStateUpdate Player::pollInput() {
 
   if (moving) {
     moveWorld = move(moveLocal);
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
-    }
-  } else {
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
-    }
-  }
-
-  if (jumping) {
-    if (pmodel) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
-    }
   }
 
   return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
+}
+
+void Player::updateFromState(message::GameStateUpdateItem state) {
+  // same as GameThing - update self from server input
+  glm::vec3 pos = glm::vec3(state.posx, state.posy, state.posz);
+  setPositionTarget(pos);
+  setHeading(state.heading);
+
+  // animation
+  if (pmodel) {
+    if (state.speed > 0.05f) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+    } else {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+    }
+
+    if (state.posy < 97.5f) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::FALL));
+    }
+  }
 }
 
 vec3 Player::move(vec3 movement) {
@@ -101,6 +108,12 @@ void Player::eventJump() {
 
   // SFX!
   // if (sfx_jump) sfx_jump->play(transform.position);
+
+  // animation
+  if (pmodel) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
+  }
 }
 
 void Player::eventLand() {
@@ -112,9 +125,19 @@ void Player::eventItem() {
 }
 
 void Player::eventTag() {
-  //
+  // animation
+  if (pmodel) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TAG));
+  }
 }
 
 void Player::eventTagged() {
   if (fx_tag) fx_tag->Emit(15);
+
+  // animation
+  if (pmodel) {
+    pmodel->setAnimation(
+        AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TRIP));
+  }
 }
