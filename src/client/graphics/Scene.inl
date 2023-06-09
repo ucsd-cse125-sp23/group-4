@@ -7,6 +7,7 @@
 #include "client/graphics/MapDataImporter.h"
 #include "client/graphics/MapObj.h"
 #include "client/graphics/Scene.h"
+#include "client/graphics/Window.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -16,6 +17,44 @@
 using namespace glm;
 
 void Scene::init(void) {
+  music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");
+
+  // globals --
+  _globalSceneResources.meshes["_gz-cube"] = new Cube();
+
+  _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
+  _globalSceneResources.meshes["_gz-xyz"]->init("assets/model/dev/_gizmo.obj");
+
+  _globalSceneResources.shaderPrograms["unlit"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
+
+  _globalSceneResources.materials["unlit"] = new Material;
+  _globalSceneResources.materials["unlit"]->shader =
+      _globalSceneResources.shaderPrograms["unlit"];
+  _globalSceneResources.materials["unlit"]->diffuse =
+      glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
+
+  _globalSceneResources.models["_gz-xyz"] = new Model;
+  _globalSceneResources.models["_gz-xyz"]->mesh =
+      _globalSceneResources.meshes["_gz-xyz"];
+  _globalSceneResources.models["_gz-xyz"]->material =
+      _globalSceneResources.materials["unlit"];
+  _globalSceneResources.models["_gz-xyz"]->modelMtx =
+      glm::scale(glm::vec3(1.0f));
+  _globalSceneResources.models["_gz-xyz"]->depthFunction = GL_ALWAYS;
+
+  _globalSceneResources.models["_gz-cube"] = new Model;
+  _globalSceneResources.models["_gz-cube"]->mesh =
+      _globalSceneResources.meshes["_gz-cube"];
+  _globalSceneResources.models["_gz-cube"]->material =
+      _globalSceneResources.materials["unlit"];
+  _globalSceneResources.models["_gz-cube"]->modelMtx =
+      glm::translate(glm::vec3(0.0f));
+  _globalSceneResources.models["_gz-cube"]->depthFunction = GL_ALWAYS;
+  // --
+
+
   auto config = get_config();
 
   // Create mesh palette
@@ -410,9 +449,12 @@ void Scene::init(void) {
 }
 
 void Scene::init(std::map<int, message::LobbyPlayer> players) {
+  //loading++;
+
   init();
 
   for (auto& [i, p] : players) {
     skins[i] = p.skin;
   }
+
 }

@@ -122,8 +122,10 @@ class Scene {
   std::unordered_map<int, GameThing*> networkGameThings;
   std::map<int, std::string> skins;
   std::vector<std::pair<int, std::string>> rankings;
+  std::vector<Player*> rankings_ptr;
 
   Timer time;
+  float overtime;
   bool gameStart;
   Leaderboard leaderboard;
   Music* music;
@@ -144,42 +146,6 @@ class Scene {
     gameStart = false;
 
     sceneResources = new SceneResourceMap();
-
-    // globals --
-    _globalSceneResources.meshes["_gz-cube"] = new Cube();
-
-    _globalSceneResources.meshes["_gz-xyz"] = new Obj();  // gizmo for debugging
-    _globalSceneResources.meshes["_gz-xyz"]->init(
-        "assets/model/dev/_gizmo.obj");
-
-    _globalSceneResources.shaderPrograms["unlit"] =
-        LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlit.frag");
-
-    _globalSceneResources.materials["unlit"] = new Material;
-    _globalSceneResources.materials["unlit"]->shader =
-        _globalSceneResources.shaderPrograms["unlit"];
-    _globalSceneResources.materials["unlit"]->diffuse =
-        glm::vec4(0.99f, 0.0f, 0.86f, 1.0f);
-
-    _globalSceneResources.models["_gz-xyz"] = new Model;
-    _globalSceneResources.models["_gz-xyz"]->mesh =
-        _globalSceneResources.meshes["_gz-xyz"];
-    _globalSceneResources.models["_gz-xyz"]->material =
-        _globalSceneResources.materials["unlit"];
-    _globalSceneResources.models["_gz-xyz"]->modelMtx =
-        glm::scale(glm::vec3(1.0f));
-    _globalSceneResources.models["_gz-xyz"]->depthFunction = GL_ALWAYS;
-
-    _globalSceneResources.models["_gz-cube"] = new Model;
-    _globalSceneResources.models["_gz-cube"]->mesh =
-        _globalSceneResources.meshes["_gz-cube"];
-    _globalSceneResources.models["_gz-cube"]->material =
-        _globalSceneResources.materials["unlit"];
-    _globalSceneResources.models["_gz-cube"]->modelMtx =
-        glm::translate(glm::vec3(0.0f));
-    _globalSceneResources.models["_gz-cube"]->depthFunction = GL_ALWAYS;
-    // --
-
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
     music = new Music();
@@ -205,6 +171,8 @@ class Scene {
   void receiveEvent_land(message::LandEvent e);
   void receiveEvent_item(message::ItemPickupEvent e);
   void receiveEvent_tag(message::TagEvent e);
+
+  void onGameOver();
 
   virtual void animate(float delta);
   virtual void update(float delta);

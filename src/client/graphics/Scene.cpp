@@ -32,6 +32,10 @@ SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
   return a.second > b.second;
 }
+bool cmpp(const std::pair<Player*, float>& a,
+          const std::pair<Player*, float>& b) {
+  return a.second > b.second;
+}
 
 Player* Scene::createPlayer(int id, std::string skin) {
   bool isUser = false;
@@ -236,14 +240,63 @@ void Scene::update(float delta) {
   }
 
   if (Window::phase == GamePhase::GameOver) {
-    // TODO: build new scene graph based on player rankings
-    node["world"]->childnodes.clear();
-    rankings = rankPlayers();
+    overtime += delta;
+    if (overtime > 4) {
+      gameStart = false;
+
+      node["world"]->childnodes.clear();
+      camera->Reset();
+      camera->transform.rotation = glm::vec3(0, 0, 0);
+      camera->transform.updateMtx(&camera->transformMtx);
+
+      for (int i = 0; i < rankings_ptr.size() && i < 4; i++) {
+        node["world"]->childnodes.push_back(rankings_ptr[i]);
+        glm::vec3 pos, rot;
+        switch (i) {
+          case 0:
+            pos = glm::vec3(2, -4, -6);
+            rot = glm::vec3(0, -180, 0);
+            break;
+          case 1:
+            pos = glm::vec3(10, -7, -8);
+            rot = glm::vec3(0, -190, 0);
+            break;
+          case 2:
+            pos = glm::vec3(-4, -10, -10);
+            rot = glm::vec3(0, -170, 0);
+            break;
+          case 3:
+            pos = glm::vec3(-16, -14, -20);
+            rot = glm::vec3(0, -150, 0);
+            break;
+        }
+        rankings_ptr[i]->setPosition(pos);
+
+        rankings_ptr[i]->transform.rotation = rot;
+        rankings_ptr[i]->transform.updateMtx(&(rankings_ptr[i]->transformMtx));
+        rankings_ptr[i]->model->modelMtx = glm::mat4(1);
+      }
+    }
   }
 
   if (music) {
     music->setEffectVolume();
   }
+}
+
+void Scene::onGameOver() {
+  rankings = rankPlayers();
+  std::vector<std::pair<Player*, float>> player_times;
+  for (auto& [i, g] : networkGameThings) {
+    if (dynamic_cast<Player*>(g) != nullptr) {
+      Player* player = dynamic_cast<Player*>(g);
+      float time = player->score / 20.0;
+      player_times.push_back(std::make_pair(player, time));
+    }
+  }
+  std::sort(player_times.begin(), player_times.end(), cmpp);
+  rankings_ptr.clear();
+  for (auto p : player_times) rankings_ptr.push_back(p.first);
 }
 
 message::UserStateUpdate Scene::pollUpdate() {
@@ -253,6 +306,7 @@ message::UserStateUpdate Scene::pollUpdate() {
 }
 
 void Scene::receiveState(message::GameStateUpdate newState) {
+  if (Window::loading_resources) return;
   // update game clock
   if (Window::phase == GamePhase::Game) time.Update(newState.time_remaining);
 
@@ -368,15 +422,18 @@ std::vector<std::pair<int, std::string>> Scene::rankPlayers() {
 }
 
 void Scene::draw() {
-  if (Window::phase == GamePhase::GameOver) {
+  if (overtime > 4) {
     glDisable(GL_DEPTH_TEST);
     leaderboard.draw();
-    leaderboard.drawPlayers(rankings);
+    // leaderboard.drawPlayers(rankings);
     glEnable(GL_DEPTH_TEST);
   }
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
-  camera->UpdateView();
+  if (overtime > 4)
+    camera->UpdateView(glm::mat4(1));
+  else
+    camera->UpdateView();
 
   DrawInfo drawInfo = DrawInfo();
   drawInfo.viewMtx = camera->GetViewMtx();  // required for certain lighting
