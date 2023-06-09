@@ -18,7 +18,7 @@ uniform vec3 LightDirections[] = {
 									normalize(vec3(-0.79, 1.0, -0.5))
 								 };
 uniform vec3 LightColors[] =     {
-									vec3(0.82, 0.64, 1.00),
+									vec3(0.82, 0.64, 1.00) * 1.5,
 									vec3(0.89, 0.71, 0.38)
 								 };
 
@@ -66,6 +66,8 @@ void main()
 		color = diffuseColor * 0.9;
 	}
 
+	color += lightsum * 0.3;
+
 
 	// Compute irradiance (sum of ambient & direct lighting)
 	vec3 irradiance = ambientColor + lightsum;
@@ -83,5 +85,5 @@ void main()
 	//fragColor = vec4(color, 1);
 
 	// Gamma correction
-	fragColor = vec4(pow(final.rgb, vec3(1.0/gamma)), 1);
+	fragColor = vec4(pow(final.rgb, vec3(1.0/(gamma + 0.2))), 1);
 }

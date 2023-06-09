@@ -9,19 +9,23 @@ uniform mat4 view;      // from world coord to eye coord
 uniform int renderMode;	// 0 = no texture, 1 = texture
 uniform sampler2D gSampler;
 
+uniform float gamma;
+
 // uniforms used for lighting
 uniform int nlights = 2;
 uniform vec3 LightDirections[] = {
 									normalize(vec3(-0.44, -0.47, 0.49)),
-									normalize(vec3(-0.79, 1.0, -0.5))
+									normalize(vec3(-0.79, 1.0, -0.5)),
+									normalize(vec3(1.0, 0.2, 0.0))
 								 };
 uniform vec3 LightColors[] =     {
 									vec3(0.82, 0.64, 1.00),
-									vec3(0.89, 0.71, 0.38)
+									vec3(0.89, 0.71, 0.38),
+									vec3(0.1, 0.2, 0.1) * 0.7
 								 };
 
 // colors
-vec3 worldAmbient = vec3(0, 1, 2) * 0.05;
+vec3 worldAmbient = vec3(0, 1, 2.2) * 0.05;
 uniform vec3 AmbientColor = vec3(0.1);
 uniform vec3 DiffuseColor;	// passed in from c++ side NOTE: you can also set the value here and then remove 
 							// color from the c++ side
@@ -68,6 +72,8 @@ void main()
 		texturedColor = vec4(1);
 	}
 
+	vec4 final = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
+
 	// Gamma correction
-	fragColor = vec4(emissionColor + sqrt(reflectance) * vec3(texturedColor), 1);
+	fragColor = vec4(pow(final.rgb, vec3(1.0/(gamma - 0.5))), 1);
 }
