@@ -40,6 +40,11 @@ void Scene::init(void) {
 #pragma region Shaders
   sceneResources->shaderPrograms["basic"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["map"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/shaderx.frag");
+  sceneResources->shaderPrograms["water"] =
+      LoadShaders("assets/shaders/shader.vert",
+                  "assets/shaders/shaderx.frag");  // TODO(gfx team?)
   sceneResources->shaderPrograms["unlitx"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlitx.frag");
   sceneResources->shaderPrograms["toon"] =
@@ -75,53 +80,13 @@ void Scene::init(void) {
   sceneResources->materials["wood"]->specular = vec4(0.3f, 0.15f, 0.1f, 1.0f);
   sceneResources->materials["wood"]->shininess = 100.0f;
 
-  mat = new Material;  // leaf
+  mat = new Material;  // custom configured map material
   mat->shader = sceneResources->shaderPrograms["basic"];
   mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   mat->diffuse = vec4(0.3f, 0.6f, 0.3f, 1.0f);
   mat->specular = vec4(0.15f, 0.15f, 0.1f, 1.0f);
   mat->shininess = 100.0f;
-  sceneResources->materials["l"] = mat;
-
-  mat = new Material;  // stem
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.66f, 0.77f, 0.6f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["stem"] = mat;
-
-  mat = new Material;  // tree trunk wood
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.46f, 0.15f, 0.1f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["treetrunk"] = mat;
-
-  mat = new Material;  // river water
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.16f, 0.15f, 0.9f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["river"] = mat;
-
-  mat = new Material;  // cloud
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.99f, 0.9f, 0.9f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 200.0f;
-  sceneResources->materials["Cloud"] = mat;
-
-  mat = new Material;  // ground
-  mat->shader = sceneResources->shaderPrograms["basic"];
-  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->diffuse = vec4(0.99f, 0.6f, 0.3f, 1.0f);
-  mat->specular = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-  mat->shininess = 100.0f;
-  sceneResources->materials["ground"] = mat;
+  sceneResources->materials["mapMaterialExample"] = mat;
 
   sceneResources->materials["ceramic"] = new Material;
   sceneResources->materials["ceramic"]->shader =
@@ -282,7 +247,8 @@ void Scene::init(void) {
   ///// maps:
   MapObj* mapVisuals = new MapObj();
   sceneResources->models["map"] = mapVisuals;
-  mapVisuals->init(config["map_draw_file"], sceneResources->materials);
+  mapVisuals->init(config["map_draw_file"], sceneResources->materials,
+                   sceneResources->shaderPrograms["map"]);
   mapVisuals->material = sceneResources->materials["marble"];
 
   ///// map data (collisions, fx, etc.):

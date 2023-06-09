@@ -11,6 +11,8 @@ void Start::update(float delta) {
 
   camera->SetAzimuth(camera->GetAzimuth() + (5 * delta));
 
+  camera->update(delta);
+
   if (index == frames.size() - 1 && timeOnFrame >= 1.25) {
     renderMain = true;
   }
