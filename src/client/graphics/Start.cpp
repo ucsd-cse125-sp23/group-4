@@ -25,6 +25,7 @@ void Start::update(float delta) {
   }
 
   if (renderMain &&
+      alpha == 1 &&
       Input::GetInputState(InputAction::Enter) == InputState::Press) {
     Window::phase = GamePhase::Lobby;
   }

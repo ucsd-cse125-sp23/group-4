@@ -122,6 +122,7 @@ class Scene {
   std::unordered_map<int, GameThing*> networkGameThings;
   std::map<int, std::string> skins;
   std::vector<std::string> rankings;
+  std::vector<Player*> rankings_ptr;
 
   Timer time;
   bool gameStart;
