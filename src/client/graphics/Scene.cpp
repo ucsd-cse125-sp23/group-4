@@ -263,7 +263,7 @@ void Scene::update(float delta) {
             break;
           case 1:
             pos = glm::vec3(10, -7, -8);
-            rot = glm::vec3(0, -190, -10);
+            rot = glm::vec3(0, -190, 0);
             break;
           case 2:
             pos = glm::vec3(-4, -10, -10);
