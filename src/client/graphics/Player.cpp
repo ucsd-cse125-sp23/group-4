@@ -79,6 +79,7 @@ void Player::updateFromState(message::Player p) {
     if (p.posy < 97.0f) {
       pmodel->setAnimation(
           AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::FALL));
+      if (sfx_fall) sfx_fall->play(transform.position);
     } else {
       if (p.is_moving) {
         pmodel->setAnimation(
