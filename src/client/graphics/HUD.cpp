@@ -183,8 +183,8 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     glViewport(x, y, bar_width, bar_height);
     str = it->first;
     player = it->second;
-    Timer time = player->time;
-    str += " " + time.ToString();
+    int score_s = player->score / 20.0;
+    str += " " + std::to_string(score_s) + "s";
 
     glDisable(GL_DEPTH_TEST);
     fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2, 0.3 * scale,
