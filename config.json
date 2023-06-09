@@ -7,7 +7,7 @@
 
   "map_draw_file": "assets/model/map-final-singlemap.obj",
   "map_data_file": "assets/model/map-data.obj",
-  "skin_dir": "assets/model/withUV/",
+  "skin_dir": "assets/animation/withUV/",
   "skin_trash panda": "Animation -Racoon.fbx",
   "skin_bee": "Animation -Bee.fbx",
   "skin_avocado": "Animation -Avocado.fbx",
