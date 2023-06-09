@@ -242,7 +242,7 @@ void Scene::update(float delta) {
     for (auto& thing : localGameThings) thing->update(delta);
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
   }
-
+  if (music) music->setEffectVolume();
   if (Window::phase == GamePhase::GameOver) {
     overtime += delta;
     if (overtime > 4) {
