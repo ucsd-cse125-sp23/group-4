@@ -3,6 +3,7 @@
   "server_port": 2400,
   "game_duration": 45,
   "game_mode": "single-tagger",
+
   "player_count": 1,
 
   "escape_to_exit": true,

@@ -142,7 +142,7 @@ void Camera::update(float dt) {
 
 void Camera::Reset() {
   FOV = 45.0f;
-  Aspect = 1.33f;
+  Aspect = 16.0f / 9.0f;
   NearClip = 0.1f;
   FarClip = 1500.0f;
 

@@ -10,6 +10,7 @@
 #include <imgui_impl_opengl3.h>
 #include <stddef.h>
 
+#include <chrono>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <string>
@@ -34,6 +35,10 @@ const char* Window::windowTitle = "tagguys :O";
 GamePhase Window::phase;
 message::LobbyUpdate Window::lobby_state;
 
+GLFWwindow *Window::loadingWindow, *Window::screenWindow;
+std::thread Window::subthread;
+float Window::remainingLoadBuffer;
+
 Camera* Cam;
 Camera* lobbyCam;
 
@@ -48,7 +53,7 @@ HUD* Window::hud;
 std::unique_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
 
-std::atomic<bool> loading_resources{false};
+std::atomic<bool> Window::loading_resources{false};
 
 // Interaction Variables
 bool LeftDown, RightDown;
@@ -83,21 +88,28 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
-  start = new Start(Cam);
-  start->init();
-  start->reset();
-  lob = new Lobby(lobbyCam);
-  lob->init();
-  game = new Scene(Cam);
-  hud = new HUD(game);
-  gameScene = start;
-  loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
 
   glfwMakeContextCurrent(window);
   glfwShowWindow(window);
   glfwFocusWindow(window);
+  loadScreen = new Load();
+
+  loading_resources = true;
+  remainingLoadBuffer = 5;
+  gameScene = new Start(Cam);
+
+  glfwDestroyWindow(loadingWindow);
+  loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+  subthread = std::thread(
+      [](Scene* gameScene) {
+        glfwMakeContextCurrent(loadingWindow);
+
+        gameScene->init();
+        loading_resources = false;
+      },
+      std::ref(gameScene));
 
   return true;
 }
@@ -142,18 +154,18 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
-  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
-                                        NULL /*glfwGetPrimaryMonitor()*/, NULL);
+  screenWindow = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
 
   // Check if the window could not be created.
-  if (!window) {
+  if (!screenWindow) {
     std::cerr << "Failed to open GLFW window." << std::endl;
     glfwTerminate();
     return NULL;
   }
 
   // Make the context of the window.
-  glfwMakeContextCurrent(window);
+  glfwMakeContextCurrent(screenWindow);
 
 #ifndef __APPLE__
   // On Windows and Linux, we need GLEW to provide modern OpenGL functionality.
@@ -182,9 +194,9 @@ GLFWwindow* Window::createWindow(int width, int height) {
   MouseX = MouseY = 0;
 
   // Call the resize callback to make sure things get drawn immediately.
-  Window::resizeCallback(window, width, height);
+  Window::resizeCallback(screenWindow, width, height);
 
-  return window;
+  return screenWindow;
 }
 
 void Window::resizeCallback(GLFWwindow* window, int width, int height) {
@@ -209,29 +221,59 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
 
 void Window::update(GLFWwindow* window, float deltaTime) {
-  if (!dynamic_cast<Lobby*>(gameScene) &&
-      phase == GamePhase::Lobby) {  // start -> lobby
-    resetCamera();
-    lob->reset();
-    gameScene = lob;
-    auto lobby = dynamic_cast<Lobby*>(gameScene);
-    lobby->receiveState(lobby_state);
-  } else if (dynamic_cast<Lobby*>(gameScene) &&
-             phase == GamePhase::Game) {  // lobby -> game
-    auto lobby = dynamic_cast<Lobby*>(gameScene);
-    gameScene = new Scene(Cam);
-
-    gameScene->music->play();
-    glfwHideWindow(window);
-    gameScene->init(lobby->players);
-    hud = new HUD(gameScene);
-    loading_resources = false;
-
-    glfwMakeContextCurrent(window);
-    glfwShowWindow(window);
-    glfwFocusWindow(window);
+  if (loading_resources || remainingLoadBuffer > 0) {
+    loadScreen->update();
+    remainingLoadBuffer -= deltaTime;
   } else {
-    gameScene->update(deltaTime);
+    if (subthread.joinable()) subthread.join();
+    if (dynamic_cast<Start*>(gameScene) &&
+        phase == GamePhase::Lobby) {  // start -> lobby
+      resetCamera();
+
+      loading_resources = true;
+      remainingLoadBuffer = 5;
+      gameScene = new Lobby(lobbyCam);
+      gameScene->music->play();
+      glfwDestroyWindow(loadingWindow);
+      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+      subthread = std::thread(
+          [](Scene* gameScene) {
+            glfwMakeContextCurrent(loadingWindow);
+
+            gameScene->init();
+            // TODO: (Ask AJ music)
+            // gameScene->music->play();
+
+            auto lobby = dynamic_cast<Lobby*>(gameScene);
+            loading_resources = false;
+            lobby->receiveState(lobby_state);
+          },
+          std::ref(gameScene));
+
+    } else if (dynamic_cast<Lobby*>(gameScene) &&
+               phase == GamePhase::Game) {  // lobby -> game
+      gameScene->music->stop();
+      loading_resources = true;
+      remainingLoadBuffer = 10;
+      auto lobby = dynamic_cast<Lobby*>(gameScene);
+      std::map<int, message::LobbyPlayer> ps = lobby->players;
+      gameScene = new Scene(Cam);
+      hud = new HUD(gameScene);
+      gameScene->music->play();
+      glfwDestroyWindow(loadingWindow);
+      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
+      subthread = std::thread(
+          [](Scene* gameScene, HUD* hud, Lobby* lobby) {
+            glfwMakeContextCurrent(loadingWindow);
+
+            gameScene->init(lobby->players);
+            hud->init();
+            loading_resources = false;
+          },
+          std::ref(gameScene), std::ref(hud), std::ref(lobby));
+    } else {
+      gameScene->update(deltaTime);
+    }
   }
 }
 
@@ -244,9 +286,14 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  // Render the objects.
-  gameScene->draw();
-  if (phase == GamePhase::Game) hud->draw(window);
+  if (loading_resources || remainingLoadBuffer > 0) {
+    loadScreen->draw();
+  } else {
+    // Render the objects.
+    gameScene->draw();
+    if (phase == GamePhase::Game || phase == GamePhase::GameOver)
+      hud->draw(window);
+  }
 
   Input::handle(false);
   if (_debugmode) {

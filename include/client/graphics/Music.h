@@ -3,7 +3,7 @@
 #pragma once
 class Music {
  public:
-  inline static float volumeGlobal = 0.2f;  // 0.0 to 1.0
+  inline static float volumeGlobal = 0.4f;  // 0.0 to 1.0
 
   void load(std::string filename) {
     if (!loadSound(filename)) {

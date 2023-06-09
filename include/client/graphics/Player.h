@@ -36,6 +36,7 @@ class Player : public GameThing, InputListener {
   SoundEffect* sfx_jump;
   SoundEffect* sfx_item;
   SoundEffect* sfx_tag;
+  SoundEffect* sfx_fall;
   int score;  // number of ticks not it
   bool tagged;
 
