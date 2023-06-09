@@ -2,9 +2,11 @@
 
 #include "core/util/global.h"
 
-uint32_t Player::maxId = 1;
+using namespace core;  // NOLINT
 
-Player::Player()
+uint32_t core::Player::maxId = 1;
+
+core::Player::Player()
     : PObject(PLAYER_BOUNDING_SHAPE, PLAYER_LAYER, 0, false),
       look(vec3f(1.0f, 0.0f, 0.0f)) {
   this->pid = Player::maxId++;
@@ -15,11 +17,11 @@ Player::Player()
       TAGGED_STATUS_MODIFIER, new TaggedStatusModifierData(nullptr)));
 }
 
-Player::~Player() {}
+core::Player::~Player() {}
 
-void Player::tick() { PObject::tick(); }
+void core::Player::tick() { PObject::tick(); }
 
-void Player::onTrigger(PObject* other) {
+void core::Player::onTrigger(PObject* other) {
   if (Player* pOther = dynamic_cast<Player*>(other)) {
     vec3f dp = this->getPos() - pOther->getPos();
     float depth = PLAYER_RADIUS * 2 - length(dp);

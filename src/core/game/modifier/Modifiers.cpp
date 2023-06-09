@@ -101,7 +101,7 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
     }
   }
 }
-bool TaggedStatusModifier::isIt(Player* player) {
+bool TaggedStatusModifier::isIt(core::Player* player) {
   return static_cast<TaggedStatusModifierData*>(
              player->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get())
       ->isIt;

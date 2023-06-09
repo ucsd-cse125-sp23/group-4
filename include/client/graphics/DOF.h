@@ -67,7 +67,11 @@ struct DOFr : public DOF {
     initMax = inithi;
   }
 
-  explicit DOFr(float v) { DOFr(v, v, v); }
+  explicit DOFr(float v) {
+    DOFr(v, v, v);
+    min = v;
+    max = v;
+  }
 
   const float GetRandomValue(void) { return Tools::random(min, max); }
 

@@ -10,6 +10,8 @@ using glm::mat4x4;
 using glm::vec3;
 using glm::vec4;
 
+using namespace client;  // NOLINT
+
 void Player::animate(float dt) {
   // traverse animation bones (SLOW)
   if (pmodel) pmodel->update(dt);
@@ -23,6 +25,7 @@ void Player::update(float dt) {
   if (fx_land) fx_land->update(dt);
   if (fx_item) fx_item->update(dt);
   if (fx_tag) fx_tag->update(dt);
+  if (fx_tagStatus) fx_tagStatus->update(dt);
 
   if (tagged) time.Update(dt);
 }
@@ -68,10 +71,7 @@ message::UserStateUpdate Player::pollInput() {
 }
 
 void Player::updateFromState(message::Player p) {
-  // same as game thing - update self from server input
-  glm::vec3 pos = glm::vec3(p.posx, p.posy, p.posz);
-  setPositionTarget(pos);
-  setHeading(p.heading);
+  if (fx_tagStatus) fx_tagStatus->creationRate = state.is_tagged ? 5.0f : 0.0f;
 
   // animation
   if (pmodel) {
@@ -88,6 +88,8 @@ void Player::updateFromState(message::Player p) {
       }
     }
   }
+
+  GameThing::updateFromState(state);
 }
 
 vec3 Player::move(vec3 movement) {

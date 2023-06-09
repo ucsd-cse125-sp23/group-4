@@ -12,8 +12,9 @@ struct Settings {
 
   SettingsStructs::Lights lightConfig = SettingsStructs::Lights();
 
-  void gui() {
+  void gui(float* fov) {
     ImGui::Begin("game settings +++");
+    ImGui::SliderFloat("FOV", fov, 30.0f, 200.0f);
     ImGui::DragFloat("gamma", &gammaCorrection, 0.2f, 0.01f, 5.0f);
     ImGui::Separator();
     ImGui::DragFloat("sfx  volume", &SoundEffect::volumeGlobal, 0.2f, 0.0f,

@@ -43,6 +43,10 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
+// #include "core/game/level/Environment.h"
+
+using namespace client;  // NOLINT
+
 class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
@@ -102,6 +106,8 @@ class Scene {
 
   SceneResourceMap* sceneResources;
 
+  Environment* coreEnv;
+
   Camera* camera;
   Player* myPlayer = nullptr;
 
@@ -119,10 +125,15 @@ class Scene {
   Music* music;
 
   explicit Scene(Camera* camFromWindow) {
+    coreEnv = new Environment();
+    // initializeLevel(coreEnv);    // not needed
+
     camera = camFromWindow;
+    // camera->env = coreEnv;    // raycasts: uncomment this (its broken)
     node["_camera"] = camera;
     camera->name = "_camera";
     localGameThings.push_back(camera);
+
     time.time = 300.0f;
     time.countdown = true;
     gameStart = false;
@@ -201,5 +212,7 @@ class Scene {
     }
     if (music) delete music;
     delete sceneResources;
+
+    delete coreEnv;
   }
 };
