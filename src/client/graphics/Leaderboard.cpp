@@ -8,6 +8,11 @@ Leaderboard::Leaderboard() {
   icons["duck"].init("assets/UI/IMG_2374.PNG");
   icons["avocado"].init("assets/UI/IMG_2375.PNG");
   icons["bee"].init("assets/UI/IMG_2377.PNG");
+
+  name_tags[1].init("assets/UI/Group 21.png");
+  name_tags[2].init("assets/UI/Group 20.png");
+  name_tags[3].init("assets/UI/Group 22.png");
+  name_tags[4].init("assets/UI/Group 19.png");
 }
 
 void Leaderboard::draw() {
@@ -55,7 +60,7 @@ void Leaderboard::draw() {
   glEnable(GL_DEPTH_TEST);
 }
 
-void Leaderboard::drawPlayers(std::vector<std::string> rankings) {
+void Leaderboard::drawPlayers(std::vector<std::pair<int, std::string>> rankings) {
   glDisable(GL_DEPTH_TEST);
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;
@@ -74,9 +79,12 @@ void Leaderboard::drawPlayers(std::vector<std::string> rankings) {
                          static_cast<int>(0.58 * height),
                          static_cast<int>(0.48 * height)};
   int count = 0;
-  for (auto skin : rankings) {
+  for (auto rank : rankings) {
+    auto id = rank.first;
+    auto skin = rank.second;
     std::pair<int, int> position = viewports[count];
     glViewport(position.first, position.second, scale[count], scale[count]);
+
     icons[skin].bindgl();
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_QUADS);
@@ -92,6 +100,24 @@ void Leaderboard::drawPlayers(std::vector<std::string> rankings) {
 
     glTexCoord2f(0.0f, 0.0f);
     glVertex2f(-1 * flip, 1);
+
+    glEnd();
+
+    name_tags[id].bindgl();
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(-0.5, 0.35);
+
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(0.5, 0.35);
+
+    glTexCoord2f(1, 0);
+    glVertex2f(0.5, 0.8);
+
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(-0.5, 0.8);
 
     glEnd();
 

@@ -11,6 +11,8 @@ class Leaderboard {
   FontRenderer* fr = new FontRenderer("assets/fonts/Atma-SemiBold.ttf");
   Texture background;
   std::map<std::string, Texture> icons;
+  std::map<int, Texture> name_tags;
+
   int flip = 1;
   int frames = 0;
   Leaderboard();
@@ -19,5 +21,5 @@ class Leaderboard {
 
   void draw();
 
-  void drawPlayers(std::vector<std::string> rankings);
+  void drawPlayers(std::vector<std::pair<int, std::string>> rankings);
 };

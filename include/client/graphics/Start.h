@@ -41,7 +41,7 @@ class Start : public Scene, public InputListener {
     }
 
     main.init("assets/UI/IMG_2510 2.PNG");
-    credits.init("assets/UI/IMG_2509 2.PNG");
+    credits.init("assets/UI/IMG_2728.PNG");
   }
 
   ~Start() { delete fr; }
