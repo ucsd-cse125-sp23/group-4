@@ -3,6 +3,15 @@ Mesh is an abstract class for a 3D rendered object.
 *****************************************************/
 
 #pragma once
+// clang-format off
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+#endif
+// clang-format on
+#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <string>
@@ -29,8 +38,10 @@ class Mesh {
 
   virtual void draw(void) {
     if (!vao) {
-      glGenVertexArrays(1, &vao);
-      glBindVertexArray(vao);
+      if (glfwGetWindowAttrib(glfwGetCurrentContext(), GLFW_VISIBLE)) {
+          glGenVertexArrays(1, &vao);
+          glBindVertexArray(vao);
+      }
 
       // 0th attribute: position
       glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
