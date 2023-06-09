@@ -321,7 +321,7 @@ void Scene::onGameOver() {
       p->pmodel->setAnimation(AssimpAnimation::AC_TO_NAME.at(
           useFirst ? AssimpAnimation::PLAYER_AC::PLACE3_1
                    : AssimpAnimation::PLAYER_AC::PLACE3_2));
-    } else if (i == 4) {
+    } else if (i == 3) {
       p->pmodel->setAnimation(AssimpAnimation::AC_TO_NAME.at(
           useFirst ? AssimpAnimation::PLAYER_AC::PLACE4_1
                    : AssimpAnimation::PLAYER_AC::PLACE4_2));
