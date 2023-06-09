@@ -30,7 +30,7 @@ class Level {
   int freeSpaces;
 
  public:
-  std::map<uint32_t, Player*> players;
+  std::map<uint32_t, core::Player*> players;
   PObjectCollection objects;
 
   EventManager* eventManager;
@@ -50,8 +50,8 @@ class Level {
   Environment* getEnvironment();
   void tick();
 
-  void spreadPlayers(std::vector<Player*> ps);
-  std::vector<Player*> restartGame();
+  void spreadPlayers(std::vector<core::Player*> ps);
+  std::vector<core::Player*> restartGame();
 
   void definePowerupSpawn(GlobalEffect* power, int weight = 1);
   void definePowerupDelayMin(size_t ticks);

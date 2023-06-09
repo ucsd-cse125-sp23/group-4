@@ -17,6 +17,8 @@
 #include "PlayerModel.h"
 #include "Timer.h"
 
+namespace client {
+
 class Player : public GameThing, InputListener {
  public:
   float speed = 10;
@@ -30,6 +32,7 @@ class Player : public GameThing, InputListener {
   ParticleSystem* fx_land;
   ParticleSystem* fx_item;
   ParticleSystem* fx_tag;
+  ParticleSystem* fx_tagStatus;
   SoundEffect* sfx_jump;
   SoundEffect* sfx_item;
   SoundEffect* sfx_tag;
@@ -46,6 +49,7 @@ class Player : public GameThing, InputListener {
     fx_land = nullptr;
     fx_item = nullptr;
     fx_tag = nullptr;
+    fx_tagStatus = nullptr;
   }
 
   ~Player() {
@@ -60,6 +64,8 @@ class Player : public GameThing, InputListener {
 
   message::UserStateUpdate pollInput();
 
+  void updateFromState(message::Player state) override;
+
   void eventJump();
   void eventLand();
   void eventItem();
@@ -72,3 +78,5 @@ class Player : public GameThing, InputListener {
 
   void faceDirection(glm::vec3 direction);
 };
+
+}  // namespace client

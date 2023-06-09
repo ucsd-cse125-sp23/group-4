@@ -84,7 +84,7 @@ void ParticleSystem::draw(const DrawInfo info, const glm::mat4& parentMtx) {
   parentMtxCache = parentMtx;
 
   glm::mat4 m = parentMtx * transformMtx;
-  if (worldSpace) m = glm::mat4(1);
+  if (worldSpace) m = transformMtx;
 
   for (Particle* p : particles) {
     p->draw(info, m);  // draw particles

@@ -4,6 +4,8 @@
 
 #include "core/util/global.h"
 
+using core::Player;
+
 ContextAwareGlobalEffect::ContextAwareGlobalEffect(GlobalEffect* effect,
                                                    Targets target)
     : effect(effect), target(target) {}

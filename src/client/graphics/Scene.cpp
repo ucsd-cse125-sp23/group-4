@@ -103,7 +103,7 @@ Player* Scene::createPlayer(int id) {
   fx = new ParticleSystem(*ptclRef);
   fx->Reset(false);
   fx->name += "." + playername;
-  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.position = glm::vec3(0, 0.5f, 0);
   fx->transform.updateMtx(&fx->transformMtx);
   player->childnodes.push_back(fx);
   player->fx_item = fx;
@@ -111,10 +111,20 @@ Player* Scene::createPlayer(int id) {
   fx = new ParticleSystem(*ptclRef);
   fx->Reset(false);  // important!!!
   fx->name += "." + playername;
-  fx->transform.position = glm::vec3(0, 0, 0);
+  fx->transform.position = glm::vec3(0, 0.5f, 0);
   fx->transform.updateMtx(&fx->transformMtx);
   player->childnodes.push_back(fx);
   player->fx_tag = fx;
+
+  ParticleSystem* ptclRef2 =
+      dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_isTagged"]);
+  fx = new ParticleSystem(*ptclRef2);
+  fx->Reset(false);  // important!!!
+  fx->name += "." + playername;
+  fx->transform.position = glm::vec3(0, 1.0f, 0);
+  fx->transform.updateMtx(&fx->transformMtx);
+  player->childnodes.push_back(fx);
+  player->fx_tagStatus = fx;
 
   // ---
 
@@ -295,7 +305,7 @@ void Scene::draw() {
 Settings settings;  // define extern var
 
 void Scene::gui() {
-  settings.gui();
+  settings.gui(&camera->FOV);
 
   ImGui::Begin("scene debug +++");
 
