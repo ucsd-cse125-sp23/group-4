@@ -170,7 +170,7 @@ void Level::addPObject(PObject* obj) {
   obj->level = this;
   if (auto player = dynamic_cast<Player*>(obj)) players[player->pid] = player;
   for (auto pair : obj->getModifiers())
-    for (auto inst : pair.second) inst->get()->level = this;
+    for (auto pair2 : pair.second) pair2.second->get()->level = this;
 }
 std::uint64_t Level::getAge() { return age; }
 Environment* Level::getEnvironment() { return environment; }

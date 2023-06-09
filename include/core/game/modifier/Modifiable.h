@@ -9,25 +9,25 @@
 
 class Modifiable {
  private:
-  std::map<Modifier*, std::vector<ModifierInstance*>> modifiers;
+  std::map<Modifier*, std::map<size_t,ModifierInstance*>> modifiers;
 
  public:
   virtual ~Modifiable() {}
   void addModifierInstance(ModifierInstance* instance) {
     if (modifiers.count(instance->getModifier()) == 0)
-      modifiers[instance->getModifier()] = std::vector<ModifierInstance*>();
-    modifiers[instance->getModifier()].push_back(instance);
+      modifiers[instance->getModifier()] = std::map<size_t,ModifierInstance*>();
+    modifiers[instance->getModifier()][instance->id()] = instance;
   }
   bool hasModifier(Modifier* modifier) {
     return modifiers.count(modifier) != 0 && modifiers[modifier].size() > 0;
   }
   bool removeModifierInstance(ModifierInstance* instance) {
     if (modifiers.count(instance->getModifier()) != 0) {
-      auto list = modifiers[instance->getModifier()];
-      auto ite = find(list.begin(), list.end(), instance);
-      if (ite != list.end()) {
-        delete (*ite);
-        list.erase(ite);
+      auto map = modifiers[instance->getModifier()];
+      auto ite = map.find(instance->id());
+      if (ite != map.end()) {
+        delete (*ite).second;
+        map.erase(ite);
         return true;
       }
     }
@@ -35,7 +35,7 @@ class Modifiable {
   }
   bool removeModifier(Modifier* modifier) {
     if (modifiers.count(modifier) != 0) {
-      for (ModifierInstance* instance : modifiers[modifier]) delete instance;
+      for (auto pair : modifiers[modifier]) delete pair.second;
       modifiers[modifier].clear();
       return true;
     }
@@ -43,27 +43,27 @@ class Modifiable {
   }
   void removeMarkedModifier() {
     for (auto& pair : modifiers) {
-      for (int i = 0; i < pair.second.size(); i++) {
-        if (pair.second[i]->get()->markedRemove) {
-          delete pair.second[i];
-          pair.second[i] = pair.second.back();
-          pair.second.pop_back();
-          i--;
+      for (auto pair2 : pair.second) {
+        if (pair2.second->get()->markedRemove) {
+          delete pair2.second;
+          pair.second.erase(pair2.first);
         }
       }
     }
   }
-  const std::map<Modifier*, std::vector<ModifierInstance*>> getModifiers() {
+  const std::map<Modifier*, std::map<size_t,ModifierInstance*>> getModifiers() {
     return modifiers;
   }
   const std::vector<ModifierInstance*> getModifiers(Modifier* modifier) {
-    return modifiers[modifier];
+    std::vector<ModifierInstance*> ret;
+    for (auto pair : modifiers[modifier]) ret.push_back(pair.second);
+    return ret;
   }
   void tick() {
     for (auto pair : modifiers) {
-      for (auto instance : pair.second) {
-        pair.first->modify(this, instance->get());
-        instance->get()->markExpired();
+      for (auto pair2 : pair.second) {
+        pair.first->modify(this, pair2.second->get());
+        pair2.second->get()->markExpired();
       }
     }
     removeMarkedModifier();

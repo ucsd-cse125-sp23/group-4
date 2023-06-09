@@ -23,7 +23,7 @@ std::pair<Player*, ControlModifierData*> initializePlayer(Level* level) {
   Player* player = new Player();
   ControlModifierData* controlData = new ControlModifierData(level);
   player->addModifierInstance(
-      new ModifierInstance(CONTROL_MODIFIER, controlData));
+      new ModifierInstance(CONTROL_MODIFIER, controlData, 0));
   level->addPObject(player);
   return std::make_pair(player, controlData);
 }
