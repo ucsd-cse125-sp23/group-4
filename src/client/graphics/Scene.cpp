@@ -121,7 +121,7 @@ Player* Scene::createPlayer(int id) {
   fx = new ParticleSystem(*ptclRef2);
   fx->Reset(false);  // important!!!
   fx->name += "." + playername;
-  fx->transform.position = glm::vec3(0, 0.5f, 0);
+  fx->transform.position = glm::vec3(0, 1.0f, 0);
   fx->transform.updateMtx(&fx->transformMtx);
   player->childnodes.push_back(fx);
   player->fx_tagStatus = fx;
