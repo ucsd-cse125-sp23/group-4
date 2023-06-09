@@ -25,9 +25,19 @@ Server::Server(int port, AcceptHandler accept_handler,
   io_context_.run();
 }
 
-void Server::start_tick() { tick(); }
+void Server::start_tick() {
+  should_tick_ = true;
+  tick();
+}
+
+void Server::stop_tick() {
+  should_tick_ = false;
+  timer_.cancel();
+}
 
 void Server::tick() {
+  if (!should_tick_) return;
+
   auto prev_time = std::chrono::steady_clock::now();
   timer_.expires_from_now(TICK_RATE);
   timer_.async_wait([this, prev_time](const boost::system::error_code& ec) {

@@ -2,5 +2,8 @@
   "server_address": "localhost",
   "server_port": 2400,
   "map_draw_file": "assets/model/map-visual.obj",
-  "map_data_file": "assets/model/map-data.obj"
+  "map_data_file": "assets/model/map-data.obj",
+  "player_count": 2,
+  "game_duration": 300,
+  "game_mode": "single-tagger"
 }
