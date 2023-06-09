@@ -52,9 +52,8 @@ int main(int argc, char* argv[]) {
 
           // if all clients are ready, start the game
           if (manager.check_ready()) {
-            manager.game_.start();  // initialized tagged player
+            manager.start_game();
             server.write_all<message::GameStart>();
-            manager.game_.restart_game();
             server.start_tick();
           }
         };
@@ -71,21 +70,29 @@ int main(int argc, char* argv[]) {
                           const message::Message& m, Server& server) {};
 
   auto tick_handler = [&manager](Server& server) {
+    manager.poll();  // check for game timer
+
+    if (manager.status_ == Manager::Status::GameOver) {
+      server.stop_tick();
+      server.write_all<message::GameOver>(manager.game_->get_scores());
+      return;
+    }
+
     // advance game, send update to client
     manager.tick_game();
     auto update = manager.get_game_update();
     server.write_all<message::GameStateUpdate>(update);
 
     // notify clients of events
-    for (auto&& e : manager.game_.get_jump_events())
+    for (auto&& e : manager.game_->get_jump_events())
       server.write_all<message::JumpEvent>(e);
-    for (auto&& e : manager.game_.get_land_events())
+    for (auto&& e : manager.game_->get_land_events())
       server.write_all<message::LandEvent>(e);
-    for (auto&& e : manager.game_.get_item_pickup_events())
+    for (auto&& e : manager.game_->get_item_pickup_events())
       server.write_all<message::ItemPickupEvent>(e);
-    for (auto&& e : manager.game_.get_tag_events())
+    for (auto&& e : manager.game_->get_tag_events())
       server.write_all<message::TagEvent>(e);
-    manager.game_.clear_events();
+    manager.game_->clear_events();
   };
 
   auto config = get_config();

@@ -32,6 +32,7 @@
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
+#include "client/graphics/Music.h"
 #include "client/graphics/Node.h"
 #include "client/graphics/Obj.h"
 #include "client/graphics/ParticleSystem.h"
@@ -43,7 +44,6 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
-
 class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
@@ -119,6 +119,7 @@ class Scene {
   bool gameStart;
   float timeOver;
   Leaderboard leaderboard;
+  Music* music;
 
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
@@ -169,6 +170,8 @@ class Scene {
 
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
+    music = new Music();
+    music->load("assets/sounds/Dance_Powder.wav");
   }
 
   Player* createPlayer(int id);
@@ -203,7 +206,7 @@ class Scene {
         delete entry.second;
       }
     }
-
+    if (music) delete music;
     delete sceneResources;
   }
 };

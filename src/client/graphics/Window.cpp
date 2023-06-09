@@ -218,6 +218,9 @@ void Window::update(GLFWwindow* window, float deltaTime) {
              phase == GamePhase::Game) {  // lobby -> game
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     gameScene = game;
+    gameScene->music->play();
+    glfwHideWindow(window);
+    loading_resources = true;
     std::thread x(&Load::load, loadScreen, window);
     loading_resources = true;
     glfwHideWindow(window);
@@ -310,7 +313,8 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
         Cam->Fixed = !(Cam->Fixed);
         break;
       case GLFW_KEY_X:
-        gameScene->sceneResources->sounds["test"]->play();  // temporary
+        gameScene->sceneResources->sounds["test"]->play(
+            glm::vec3(0.0, 0.0, 0.0));  // temporary
         break;
       default:
         break;
@@ -362,7 +366,8 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && (phase == GamePhase::Lobby || phase == GamePhase::Game)) {
+  if ((RightDown || LeftDown) &&
+      (phase == GamePhase::Lobby || phase == GamePhase::Game)) {
     Cam->CamDrag(dx, dy);
   }
 }

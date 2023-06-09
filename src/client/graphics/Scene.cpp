@@ -44,10 +44,9 @@ Player* Scene::createPlayer(int id) {
   // LOAD PLAYER ASSETS ---
   // copy into a new model object
   Model* myModel;
-  if (dynamic_cast<AssimpModel*>(
-          sceneResources->models[skins[id]])) {
-    AssimpModel* amRef = dynamic_cast<AssimpModel*>(
-        sceneResources->models[skins[id]]);
+  if (dynamic_cast<AssimpModel*>(sceneResources->models[skins[id]])) {
+    AssimpModel* amRef =
+        dynamic_cast<AssimpModel*>(sceneResources->models[skins[id]]);
     AssimpModel* am = new AssimpModel(*amRef);
     myModel = am;
     player->pmodel = am;
@@ -73,6 +72,18 @@ Player* Scene::createPlayer(int id) {
   // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
+  // sound effects
+  SoundEffect* sfxRef =
+      dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_jump"]);
+
+  auto sfx = new SoundEffect(*sfxRef);
+  player->sfx_jump = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_item"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_item = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_tag"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_tag = sfx;
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
@@ -163,6 +174,9 @@ void Scene::update(float delta) {
     for (auto& thing : localGameThings) thing->update(delta);
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
     time.Update(delta);
+    if (music) {
+      music->setEffectVolume();
+    }
   }
 
   if (time.time == 0) {
@@ -174,7 +188,8 @@ void Scene::update(float delta) {
       node["world"]->childnodes.clear();
     }
     if (Window::phase == GamePhase::GameOver) {
-      if (timeOver >= 8 && Input::GetInputState(InputAction::Enter) == InputState::Press) {
+      if (timeOver >= 8 &&
+          Input::GetInputState(InputAction::Enter) == InputState::Press) {
         Window::phase = GamePhase::Lobby;
         reset();
       }
@@ -189,23 +204,21 @@ message::UserStateUpdate Scene::pollUpdate() {
 }
 
 void Scene::receiveState(message::GameStateUpdate newState) {
-  if (Window::phase == GamePhase::Game) {
-    // update existing items, create new item if it doesn't exist
-    for (auto& [id, state] : newState.things) {
-      // TODO: handle items besides Player as well
-      if (!networkGameThings.count(id)) createPlayer(id);
+  // update existing items, create new item if it doesn't exist
+  for (auto& [id, player] : newState.players) {
+    // TODO: handle items besides Player as well
+    if (!networkGameThings.count(id)) createPlayer(id);
 
-      auto thing = networkGameThings.at(id);
-      thing->updateFromState(state);
-    }
-
-    // remove items that don't exist on the server anymore
-    std::vector<int> removedIds;
-    for (auto& [id, _] : networkGameThings)
-      if (!newState.things.count(id)) removedIds.push_back(id);
-
-    for (int id : removedIds) removePlayer(id);
+    auto thing = networkGameThings.at(id);
+    thing->updateFromState(player);
   }
+
+  // remove items that don't exist on the server anymore
+  std::vector<int> removedIds;
+  for (auto& [id, _] : networkGameThings)
+    if (!newState.players.count(id)) removedIds.push_back(id);
+
+  for (int id : removedIds) removePlayer(id);
 }
 
 #pragma region receiveEvent
