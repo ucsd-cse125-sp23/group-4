@@ -83,7 +83,7 @@ void Player::updateFromState(message::GameStateUpdateItem state) {
           AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
     }
 
-    if (state.posy < 97.5f) {
+    if (state.posy < 97.0f) {
       pmodel->setAnimation(
           AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::FALL));
     }
