@@ -70,9 +70,14 @@ int main(int argc, char* argv[]) {
                           const message::Message& m, Server& server) {};
 
   auto tick_handler = [&manager](Server& server) {
+    manager.poll();  // check for game timer
     if (manager.status_ == Manager::Status::GameOver) {
       server.stop_tick();
       // TODO: cleanup manager
+      // TODO: send game over to client
+
+      std::cout << "game over detected" << std::endl;
+      return;
     }
 
     // advance game, send update to client

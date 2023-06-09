@@ -75,6 +75,8 @@ void Manager::start_game() {
   });
 }
 
+void Manager::poll() { io_context_.poll(); }
+
 message::GameStateUpdate Manager::get_game_update() {
   return {game_->to_network()};
 }
