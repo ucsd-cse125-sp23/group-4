@@ -4,8 +4,7 @@
 
 #include "core/util/global.h"
 
-NTaggersTimeGameMode::NTaggersTimeGameMode(int n) : GameMode(true), n(n) {
-}
+NTaggersTimeGameMode::NTaggersTimeGameMode(int n) : GameMode(true), n(n) {}
 void NTaggersTimeGameMode::registerTrackers(Level* l) {
   GameMode::registerTrackers(l);
 
