@@ -229,7 +229,6 @@ void Window::update(GLFWwindow* window, float deltaTime) {
             lobby->receiveState(lobby_state);
           },
           std::ref(gameScene));
-      //*/
 
     } else if (dynamic_cast<Lobby*>(gameScene) &&
                phase == GamePhase::Game) {  // lobby -> game
@@ -237,14 +236,17 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
       auto lobby = dynamic_cast<Lobby*>(gameScene);
       std::map<int, message::LobbyPlayer> ps = lobby->players;
-      gameScene = new Start(Cam);
-      //hud = new HUD(gameScene);
+      gameScene = new Scene(Cam);
+      hud = new HUD(gameScene);
+
+      glfwDestroyWindow(loadingWindow);
+      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
       subthread = std::thread(
           [](Scene* gameScene, HUD* hud, Lobby* lobby) {
             glfwMakeContextCurrent(loadingWindow);
 
-            gameScene->init();
-            //hud->init();
+            gameScene->init(lobby->players);
+            hud->init();
             loading_resources = false;
           },
           std::ref(gameScene), std::ref(hud), std::ref(lobby));
@@ -268,7 +270,7 @@ void Window::draw(GLFWwindow* window) {
   } else {
     // Render the objects.
     gameScene->draw();
-    //if (phase == GamePhase::Game) hud->draw(window);
+    if (phase == GamePhase::Game) hud->draw(window);
   }
 
   Input::handle(false);
