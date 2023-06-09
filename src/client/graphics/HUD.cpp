@@ -222,10 +222,8 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     // change text color of tagged player
     if (it->first == scene->_myPlayerId)
-      fr->RenderText(
-          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
-          0.3 * scale,
-          glm::vec3(0.0, 1.0, 0.0)); 
+      fr->RenderText(bar_width, bar_height, str, bar_width / 2.5,
+                     bar_height / 2, 0.3 * scale, glm::vec3(0.0, 1.0, 0.0));
     else if (player->tagged)
       fr->RenderText(
           bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
