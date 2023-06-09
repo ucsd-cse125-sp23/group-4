@@ -25,6 +25,17 @@ void Start::update(float delta) {
   }
 }
 
+void Start::init() {
+  Scene::init();
+  for (int i = 1; i < 33; i++) {
+    Texture frame;
+    std::string filename = "assets/image/tagguys_open/frame_" +
+                           std::to_string(i) + "_delay-0.1s.png";
+    frame.init(filename.c_str());
+    frames.push_back(frame);
+  }
+}
+
 void Start::draw() {
   Scene::draw();
   glEnable(GL_CULL_FACE);

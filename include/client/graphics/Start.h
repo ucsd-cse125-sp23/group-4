@@ -26,14 +26,9 @@ class Start : public Scene, public InputListener {
     camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
     timeOnFrame = 0;
     index = 0;
-    for (int i = 1; i < 33; i++) {
-      Texture frame;
-      std::string filename = "assets/image/tagguys_open/frame_" +
-                             std::to_string(i) + "_delay-0.1s.png";
-      frame.init(filename.c_str());
-      frames.push_back(frame);
-    }
   }
+
+  void init(void) override;
 
   void draw() override;
 

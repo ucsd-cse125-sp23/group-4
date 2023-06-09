@@ -1,7 +1,6 @@
 #include "Lobby.h"
 
 void Lobby::init(void) {
-  //loading++;
   // Create a mesh palette
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
@@ -150,5 +149,21 @@ void Lobby::init(void) {
   }
   buildSceneTree();
 
-  loading--;
+  background.init("assets/image/character_select.png");
+  flag.init("assets/image/flag.png");
+
+  ready_icons["trash panda"].init("assets/UI/IMG_2421.PNG");
+  icons["trash panda"].init("assets/UI/IMG_2422.PNG");
+  icons["bee"].init("assets/UI/IMG_2423.PNG");
+  ready_icons["bee"].init("assets/UI/IMG_2424.PNG");
+  icons["avocado"].init("assets/UI/IMG_2425.PNG");
+  ready_icons["avocado"].init("assets/UI/IMG_2426.PNG");
+  icons["duck"].init("assets/UI/IMG_2427.PNG");
+  ready_icons["duck"].init("assets/UI/IMG_2428.PNG");
+  icons["cat"].init("assets/UI/IMG_2429.PNG");
+  ready_icons["cat"].init("assets/UI/IMG_2430.PNG");
+  icons["unicorn"].init("assets/UI/IMG_2431.PNG");
+  ready_icons["unicorn"].init("assets/UI/IMG_2432.PNG");
+  icons["waffle"].init("assets/UI/IMG_2436.PNG");
+  ready_icons["waffle"].init("assets/UI/IMG_2437.PNG");
 }

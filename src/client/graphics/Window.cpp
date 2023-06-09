@@ -47,7 +47,7 @@ int Window::my_pid = -1;
 
 Camera* Cam;
 
-std::atomic<bool> loading_resources{false};
+std::atomic<bool> Window::loading_resources{false};
 
 // Interaction Variables
 bool LeftDown, RightDown;
@@ -82,16 +82,25 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
-  gameScene = new Start(Cam);
-  gameScene->init();
-  loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
-  gameScene->init();
 
   glfwMakeContextCurrent(window);
   glfwShowWindow(window);
   glfwFocusWindow(window);
+  loadScreen = new Load();
+
+  
+  loading_resources = true;
+  gameScene = new Start(Cam);
+  subthread = std::thread(
+      [](Scene* gameScene) {
+        glfwMakeContextCurrent(loadingWindow);
+
+        gameScene->init();
+        loading_resources = false;
+      },
+      std::ref(gameScene));
 
   return true;
 }
@@ -201,30 +210,47 @@ void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
 void Window::update(GLFWwindow* window, float deltaTime) {
   if (loading_resources) {
     loadScreen->update();
-  } else if (dynamic_cast<Start*>(gameScene) &&
-      phase == GamePhase::Lobby) {  // start -> lobby
-    resetCamera();
-    gameScene = new Lobby(Cam);
-    gameScene->init();
-    auto lobby = dynamic_cast<Lobby*>(gameScene);
-    lobby->receiveState(lobby_state);
-  } else if (dynamic_cast<Lobby*>(gameScene) &&
-             phase == GamePhase::Game) {  // lobby -> game
-    auto lobby = dynamic_cast<Lobby*>(gameScene);
-    gameScene = new Scene(Cam);
-    loading_resources = true;
-
-    HUD** hudPtr = &hud;
-    subthread = std::thread([=](Scene* gameScene, HUD** hud) {
-          glfwMakeContextCurrent(loadingWindow);
-
-          gameScene->init(lobby->players);
-          *hudPtr = new HUD(gameScene);
-          loading_resources = false;
-      },
-      std::ref(gameScene), std::ref(hudPtr));
   } else {
-    gameScene->update(deltaTime);
+    if (subthread.joinable()) subthread.join();
+    if (dynamic_cast<Start*>(gameScene) &&
+        phase == GamePhase::Lobby) {  // start -> lobby
+      resetCamera();
+
+      loading_resources = true;
+      gameScene = new Lobby(Cam);
+      subthread = std::thread(
+          [](Scene* gameScene) {
+            glfwMakeContextCurrent(loadingWindow);
+
+            gameScene->init();
+
+            auto lobby = dynamic_cast<Lobby*>(gameScene);
+            loading_resources = false;
+            lobby->receiveState(lobby_state);
+          },
+          std::ref(gameScene));
+      //*/
+
+    } else if (dynamic_cast<Lobby*>(gameScene) &&
+               phase == GamePhase::Game) {  // lobby -> game
+      loading_resources = true;
+
+      auto lobby = dynamic_cast<Lobby*>(gameScene);
+      std::map<int, message::LobbyPlayer> ps = lobby->players;
+      gameScene = new Start(Cam);
+      //hud = new HUD(gameScene);
+      subthread = std::thread(
+          [](Scene* gameScene, HUD* hud, Lobby* lobby) {
+            glfwMakeContextCurrent(loadingWindow);
+
+            gameScene->init();
+            //hud->init();
+            loading_resources = false;
+          },
+          std::ref(gameScene), std::ref(hud), std::ref(lobby));
+    } else {
+      gameScene->update(deltaTime);
+    }
   }
 }
 
@@ -242,7 +268,7 @@ void Window::draw(GLFWwindow* window) {
   } else {
     // Render the objects.
     gameScene->draw();
-    if (phase == GamePhase::Game) hud->draw(window);
+    //if (phase == GamePhase::Game) hud->draw(window);
   }
 
   Input::handle(false);

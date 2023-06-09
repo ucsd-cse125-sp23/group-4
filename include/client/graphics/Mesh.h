@@ -37,11 +37,11 @@ class Mesh {
   virtual void init(const char* s) {}
 
   virtual void draw(void) {
-    if (!vao) {
-      if (glfwGetWindowAttrib(glfwGetCurrentContext(), GLFW_VISIBLE)) {
-          glGenVertexArrays(1, &vao);
-          glBindVertexArray(vao);
-      }
+    //if (!vao) {
+    //  if (glfwGetWindowAttrib(glfwGetCurrentContext(), GLFW_VISIBLE)) {
+    //      glGenVertexArrays(1, &vao);
+    //      glBindVertexArray(vao);
+    //  }
 
       // 0th attribute: position
       glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
@@ -60,13 +60,13 @@ class Mesh {
 
       // indices
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
-    } else {
-      glBindVertexArray(vao);
-    }
+    //} else {
+    //  glBindVertexArray(vao);
+    //}
     // unbind the buffers, vao
     glDrawElements(mode, count, type, 0);  // uses indices
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    //glBindVertexArray(0);
   }
 
   void creategl() {
@@ -126,9 +126,6 @@ class Mesh {
   void cleargl() {
     // Delete the VBOs and the VAO.
     if(vao) glDeleteBuffers(1, &vao);
-    glDeleteBuffers(1, &buffers[0]);
-    glDeleteBuffers(1, &buffers[1]);
-    glDeleteBuffers(1, &buffers[2]);
-    glDeleteBuffers(1, &buffers[3]);
+    glDeleteBuffers(4, &buffers[0]);
   }
 };

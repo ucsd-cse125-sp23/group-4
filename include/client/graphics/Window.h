@@ -40,6 +40,7 @@ class Window {
 
   static GLFWwindow *loadingWindow, *screenWindow;
   static std::thread subthread;
+  static std::atomic<bool> loading_resources;
 
   // Objects to render
   static Load* loadScreen;
