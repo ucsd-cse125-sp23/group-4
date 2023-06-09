@@ -10,7 +10,7 @@ uniform int renderMode;	// 0 = no texture, 1 = texture
 uniform sampler2D gSampler;
 
 // uniforms used for lighting
-uniform int nlights;
+uniform int nlights = 2;
 uniform vec3 LightDirections[] = {
 									normalize(vec3(1, 5, 2)),
 									normalize(vec3(-5, -1, -3))
@@ -43,7 +43,7 @@ void main()
 
 	vec3 lightsum = vec3(0.0);
 
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < nlights; i++){
         lightsum += LightColors[i] * max(0, dot(LightDirections[i], fragNormal));
     }
 

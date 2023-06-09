@@ -84,6 +84,7 @@ bool Window::initializeObjects() {
   phase = GamePhase::Start;
   start = new Start(Cam);
   start->init();
+  start->reset();
   lob = new Lobby(lobbyCam);
   lob->init();
   game = new Scene(Cam);
