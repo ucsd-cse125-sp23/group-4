@@ -98,21 +98,9 @@ bool Window::initializeObjects() {
   glfwFocusWindow(window);
   loadScreen = new Load();
 
-  loading_resources = true;
-  remainingLoadBuffer = 5;
   gameScene = new Start(Cam);
-
-  glfwDestroyWindow(loadingWindow);
-  loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
-  subthread = std::thread(
-      [](Scene* gameScene) {
-        glfwMakeContextCurrent(loadingWindow);
-
-        gameScene->init();
-        gameScene->setDefaultCamPos();
-        loading_resources = false;
-      },
-      std::ref(gameScene));
+  gameScene->init();
+  gameScene->setDefaultCamPos();
 
   return true;
 }
@@ -244,47 +232,31 @@ void Window::update(GLFWwindow* window, float deltaTime) {
         phase == GamePhase::Lobby) {  // start -> lobby
       resetCamera();
 
-      loading_resources = true;
-      remainingLoadBuffer = 5;
       gameScene = new Lobby(lobbyCam);
       gameScene->music->play();
-      glfwDestroyWindow(loadingWindow);
-      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
-      subthread = std::thread(
-          [](Scene* gameScene) {
-            glfwMakeContextCurrent(loadingWindow);
+      
+      
 
-            gameScene->init();
+      gameScene->init();
 
-            auto lobby = dynamic_cast<Lobby*>(gameScene);
-            loading_resources = false;
-            lobby->receiveState(lobby_state);
-          },
-          std::ref(gameScene));
+      auto lobby = dynamic_cast<Lobby*>(gameScene);
+      lobby->receiveState(lobby_state);
 
     } else if (dynamic_cast<Lobby*>(gameScene) &&
                phase == GamePhase::GameLoading) {  // lobby -> game
       gameScene->music->stop();
-      loading_resources = true;
-      // remainingLoadBuffer = 10;
+
       auto lobby = dynamic_cast<Lobby*>(gameScene);
       std::map<int, message::LobbyPlayer> ps = lobby->players;
       gameScene = new Scene(Cam);
       hud = new HUD(gameScene);
       gameScene->music->play();
-      glfwDestroyWindow(loadingWindow);
-      loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
-      subthread = std::thread(
-          [](Scene* gameScene, HUD* hud, Lobby* lobby, int my_pid) {
-            glfwMakeContextCurrent(loadingWindow);
 
-            gameScene->init(lobby->players);
-            hud->init();
-            gameScene->setDefaultCamPos();
-            loading_resources = false;
-            client->write<message::GameLoaded>(my_pid);
-          },
-          std::ref(gameScene), std::ref(hud), std::ref(lobby), my_pid);
+      gameScene->init(lobby->players);
+      hud->init();
+      gameScene->setDefaultCamPos();
+      client->write<message::GameLoaded>(my_pid);
+      
     } else {
       gameScene->update(deltaTime);
     }
@@ -301,16 +273,10 @@ void Window::draw(GLFWwindow* window) {
 
   glLoadIdentity();
 
-  if (loading_resources || remainingLoadBuffer > 0 ||
-      phase == GamePhase::GameLoading) {
-    loadScreen->draw();
-  } else {
     // Render the objects.
     gameScene->draw();
-    if (phase == GamePhase::Game ||
-        (phase == GamePhase::GameOver && gameScene->overtime < 4))
-      hud->draw(window);
-  }
+    if (phase == GamePhase::Game || (phase == GamePhase::GameOver && gameScene->overtime < 4))
+        hud->draw(window);
 
   Input::handle(false);
   if (_debugmode) {

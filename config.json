@@ -3,7 +3,7 @@
   "server_port": 2400,
   "game_duration": 45,
   "game_mode": "single-tagger",
-  "player_count": 2,
+  "player_count": 4,
   "escape_to_exit": true,
 
   "map_draw_file": "assets/model/map-final-singlemapSmooth.obj",
