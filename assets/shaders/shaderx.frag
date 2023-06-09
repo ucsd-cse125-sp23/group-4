@@ -15,17 +15,17 @@ uniform float gamma;
 uniform int nlights = 2;
 uniform vec3 LightDirections[] = {
 									normalize(vec3(-0.44, -0.47, 0.49)),
-									normalize(vec3(-0.79, 1.0, -0.5)),
-									normalize(vec3(1.0, 0.2, 0.0))
+									normalize(vec3(0.79, 1.3, -0.5)),
+									normalize(vec3(0.0, 0.2, 1.0))
 								 };
 uniform vec3 LightColors[] =     {
-									vec3(0.82, 0.64, 1.00),
+									vec3(0.82, 0.58, 1.00),
 									vec3(0.89, 0.71, 0.38),
 									vec3(0.1, 0.2, 0.1) * 0.7
 								 };
 
 // colors
-vec3 worldAmbient = vec3(0, 1, 2.2) * 0.05;
+vec3 worldAmbient = vec3(0, 1, 2) * 0.05;
 uniform vec3 AmbientColor = vec3(0.1);
 uniform vec3 DiffuseColor;	// passed in from c++ side NOTE: you can also set the value here and then remove 
 							// color from the c++ side
@@ -52,7 +52,11 @@ void main()
 	vec3 lightsum = vec3(0.0);
 
 	for (int i = 0; i < nlights; i++){
-        lightsum += LightColors[i] * max(0, dot(LightDirections[i], fragNormal));
+		vec3 halfwayv = normalize(viewdir + LightDirections[i]);  // hj
+
+		float spec = length(specularColor) * pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
+
+        lightsum += LightColors[i] * (max(0, dot(LightDirections[i], fragNormal) + spec));
     }
 
 	// Compute irradiance (sum of ambient & direct lighting)
@@ -60,11 +64,6 @@ void main()
 
 	// Diffuse reflectance
 	vec3 reflectance = irradiance * diffuseColor;
-
-	vec3 halfwayv = normalize(viewdir + LightDirections[0]);  // hj = half-way direction between v to lj
-
-	// Add in specular
-	reflectance += specularColor * pow(max(dot(normalize(fragNormal), halfwayv), 0.0), shininess);
 
 	// sampled texture color
 	vec4 texturedColor = texture2D(gSampler, texCoord0.st);
