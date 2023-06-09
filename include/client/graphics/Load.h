@@ -83,6 +83,7 @@ class Load {
     Texture curFrame = frames[index];
     curFrame.bindgl();
     glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
 
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_QUADS);
@@ -98,6 +99,7 @@ class Load {
 
     glEnd();
 
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_TEXTURE_2D);
 
     glDisable(GL_BLEND);
