@@ -68,7 +68,12 @@ Game::Game() {
   }
   environment->setDeathHeight(mapData.fallBoundY);
   level_ = initializeLevel(environment);
-  applyGameMode(level_, new NTaggersTimeGameMode(Manager::MAX_PLAYERS - 1));
+  if (config["game_mode"] == "single-tagger")
+    applyGameMode(level_, new NTaggersTimeGameMode(1));
+  else if (config["game_mode"] == "multi-tagger")
+    applyGameMode(level_, new NTaggersTimeGameMode(Manager::MAX_PLAYERS - 1));
+  else
+    applyGameMode(level_, new NTaggersTimeGameMode(1));
 
   // register event handlers
   auto jump_handler = [this](JumpEvent&& e) { jump_events_.push_back(e); };

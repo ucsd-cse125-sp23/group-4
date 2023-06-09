@@ -5,4 +5,5 @@
   "map_data_file": "assets/model/map-data.obj",
   "player_count": 2,
   "game_duration": 300
+  "game_mode": "multi-tagger"
 }
