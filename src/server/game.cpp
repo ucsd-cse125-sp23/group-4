@@ -61,6 +61,12 @@ Game::Game() {
   for (auto zerof : mapData.groups["zerof"]) {
     environment->addConvex(zerof.vertices, 0.0f);
   }
+  for (auto stem : mapData.groups["stem"]) {
+    environment->addConvex(stem.vertices, 3.0f);
+  }
+  for (auto stem : mapData.groups["mushroom"]) {
+    environment->addConvex(stem.vertices, 2.4f);
+  }
   for (auto spawn : mapData.spawnPoints) {
     map_spawn_points.push_back(spawn.point);
     environment->addPlayerSpawnpoint(spawn.point);
