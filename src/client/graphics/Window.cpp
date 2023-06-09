@@ -238,7 +238,8 @@ void Window::update(GLFWwindow* window, float deltaTime) {
             glfwMakeContextCurrent(loadingWindow);
 
             gameScene->init();
-            gameScene->music->play();
+            //TODO(Ask AJ music)
+            //gameScene->music->play();
 
             auto lobby = dynamic_cast<Lobby*>(gameScene);
             loading_resources = false;
