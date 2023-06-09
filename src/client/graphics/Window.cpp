@@ -10,11 +10,11 @@
 #include <imgui_impl_opengl3.h>
 #include <stddef.h>
 
+#include <chrono>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <string>
 #include <thread>
-#include <chrono>
 
 #include "Camera.h"
 #include "Input.h"
@@ -42,6 +42,9 @@ Camera* Cam;
 Camera* lobbyCam;
 
 // Game stuff to render
+Start* Window::start;
+Scene* Window::lob;
+Scene* Window::game;
 Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;
@@ -92,7 +95,6 @@ bool Window::initializeObjects() {
   glfwFocusWindow(window);
   loadScreen = new Load();
 
-  
   loading_resources = true;
   remainingLoadBuffer = 5;
   gameScene = new Start(Cam);
@@ -238,8 +240,8 @@ void Window::update(GLFWwindow* window, float deltaTime) {
             glfwMakeContextCurrent(loadingWindow);
 
             gameScene->init();
-            //TODO: (Ask AJ music)
-            //gameScene->music->play();
+            // TODO: (Ask AJ music)
+            // gameScene->music->play();
 
             auto lobby = dynamic_cast<Lobby*>(gameScene);
             loading_resources = false;

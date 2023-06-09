@@ -168,9 +168,8 @@ void HUD::drawTime() {
 
   std::string game_time = scene->time.ToString();
 
-  fr->RenderText(size_x, size_y, game_time, size_x / 6,
-                 size_y / 2.25, 0.65f * scale_y,
-                 glm::vec3(1.0f, 0.0f, 0.0f));
+  fr->RenderText(size_x, size_y, game_time, size_x / 6, size_y / 2.25,
+                 0.65f * scale_y, glm::vec3(1.0f, 0.0f, 0.0f));
 
   glViewport(0, 0, width, height);
 }
@@ -207,7 +206,8 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     str += " " + time.ToString();
 
     glDisable(GL_DEPTH_TEST);
-    fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2, 0.3 * scale,
+    fr->RenderText(bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
+                   0.3 * scale,
                    glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));
     glEnable(GL_DEPTH_TEST);
 

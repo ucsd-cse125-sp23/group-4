@@ -28,8 +28,8 @@
 #include "client/graphics/Camera.h"
 #include "client/graphics/Cube.h"
 #include "client/graphics/GameThing.h"
-#include "client/graphics/Leaderboard.h"
 #include "client/graphics/ItemBox.h"
+#include "client/graphics/Leaderboard.h"
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
@@ -147,6 +147,8 @@ class Scene {
     sceneResources = new SceneResourceMap();
     // the default scene graph already has one node named "world."
     node["world"] = new Node("world");
+    music = new Music();
+    music->load("assets/sounds/Dance_Powder.wav");
   }
 
   Player* createPlayer(int id, std::string skin);

@@ -38,11 +38,13 @@ class Start : public Scene, public InputListener {
 
   void reset() {
     renderText = true;
+    renderMain = false;
     camera->SetDistance(600.0);
     camera->SetIncline(32.0);
     camera->SetPositionTarget(glm::vec3(124.0, 116.0, 6.0));
     timeOnFrame = 0;
     index = 0;
+    offset = 0;
   }
 
   void init(void) override;
