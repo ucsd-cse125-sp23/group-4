@@ -47,7 +47,9 @@ void Start::update(float delta) {
     }
   }
 
-  if (alpha == 1 && (Input::GetInputState(InputAction::MoveJump) == InputState::Release || Input::GetInputState(InputAction::MoveJump) == InputState::None)) {
+  if (alpha == 1 &&
+      (Input::GetInputState(InputAction::MoveJump) == InputState::Release ||
+       Input::GetInputState(InputAction::MoveJump) == InputState::None)) {
     offset -= (3 * delta);
     if (offset < 0) {
       offset = 0;
