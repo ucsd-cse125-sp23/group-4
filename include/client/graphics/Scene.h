@@ -43,7 +43,7 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
-//#include "core/game/level/Environment.h"
+// #include "core/game/level/Environment.h"
 
 using namespace client;  // NOLINT
 
