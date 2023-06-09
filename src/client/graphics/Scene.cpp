@@ -84,6 +84,10 @@ Player* Scene::createPlayer(int id, std::string skin) {
   sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_tag"]);
   sfx = new SoundEffect(*sfxRef);
   player->sfx_tag = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_fall"]);
+  sfx = new SoundEffect(*sfxRef);
+  sfx->setEffectVolume(.025f);
+  player->sfx_fall = sfx;
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
@@ -238,7 +242,7 @@ void Scene::update(float delta) {
     for (auto& thing : localGameThings) thing->update(delta);
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
   }
-
+  if (music) music->setEffectVolume();
   if (Window::phase == GamePhase::GameOver) {
     overtime += delta;
     if (overtime > 4) {
@@ -323,6 +327,25 @@ void Scene::onGameOver() {
                    : AssimpAnimation::PLAYER_AC::PLACE4_2));
     }
   }
+
+  if (music) {
+    music->setEffectVolume();
+  }
+}
+
+void Scene::onGameOver() {
+  rankings = rankPlayers();
+  std::vector<std::pair<Player*, float>> player_times;
+  for (auto& [i, g] : networkGameThings) {
+    if (dynamic_cast<Player*>(g) != nullptr) {
+      Player* player = dynamic_cast<Player*>(g);
+      float time = player->score / 20.0;
+      player_times.push_back(std::make_pair(player, time));
+    }
+  }
+  std::sort(player_times.begin(), player_times.end(), cmpp);
+  rankings_ptr.clear();
+  for (auto p : player_times) rankings_ptr.push_back(p.first);
 }
 
 message::UserStateUpdate Scene::pollUpdate() {

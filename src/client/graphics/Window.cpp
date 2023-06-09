@@ -233,7 +233,7 @@ void Window::update(GLFWwindow* window, float deltaTime) {
       loading_resources = true;
       remainingLoadBuffer = 5;
       gameScene = new Lobby(lobbyCam);
-
+      gameScene->music->play();
       glfwDestroyWindow(loadingWindow);
       loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
       subthread = std::thread(
@@ -252,13 +252,14 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
     } else if (dynamic_cast<Lobby*>(gameScene) &&
                phase == GamePhase::Game) {  // lobby -> game
+      gameScene->music->stop();
       loading_resources = true;
       remainingLoadBuffer = 10;
       auto lobby = dynamic_cast<Lobby*>(gameScene);
       std::map<int, message::LobbyPlayer> ps = lobby->players;
       gameScene = new Scene(Cam);
       hud = new HUD(gameScene);
-
+      gameScene->music->play();
       glfwDestroyWindow(loadingWindow);
       loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
       subthread = std::thread(

@@ -4,6 +4,7 @@
 
 void Lobby::init(void) {
   // Create a mesh palette
+
   sceneResources->meshes["player"] =
       new Obj();  // can only be tied to one object? (not a static
                   // resource)
@@ -67,7 +68,7 @@ void Lobby::init(void) {
     skThing->transform.rotation = glm::vec3(-10.0f, 180.0f, 0.0f);
     skThing->model = sceneResources->models[skName];
   }
-
+  
   ///////////////////////////////////////////////////////
   printf("\nLobby: done loading resources!\n");
   ///////////////////////////////////////////////////////
