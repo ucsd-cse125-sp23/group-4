@@ -229,7 +229,7 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
       loading_resources = true;
       remainingLoadBuffer = 5;
-      gameScene = new Lobby(Cam);
+      gameScene = new Lobby(lobbyCam);
 
       glfwDestroyWindow(loadingWindow);
       loadingWindow = glfwCreateWindow(1, 1, "Loader", NULL, screenWindow);
