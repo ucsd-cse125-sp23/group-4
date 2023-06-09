@@ -81,6 +81,12 @@ class GameThing : public Node {
     setHeading(p.heading);
   }
 
+  virtual void updateFromState(message::Item p) {
+    // update self from server input
+    glm::vec3 pos = glm::vec3(p.posx, p.posy, p.posz);
+    transform.position = pos;  // no lerp
+  }
+
   // transform helpers
   const float t_rate =
       std::chrono::duration_cast<std::chrono::duration<double>>(

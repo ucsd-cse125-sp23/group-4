@@ -120,12 +120,17 @@ void network_init() {
       Window::gameScene->receiveEvent_tag(body);
     };
 
+    auto game_over_handler = [](const message::GameOver& body) {
+      Window::phase = GamePhase::GameOver;
+    };
+
     auto any_handler = [](const message::Message::Body&) {};
 
     auto message_handler = boost::make_overloaded_function(
         assign_handler, game_state_update_handler, lobby_update_handler,
         game_start_handler, jump_event_handler, land_event_handler,
-        item_pickup_event_handler, tag_event_handler, any_handler);
+        item_pickup_event_handler, tag_event_handler, game_over_handler,
+        any_handler);
     boost::apply_visitor(message_handler, m.body);
   };
 
@@ -203,7 +208,7 @@ int main(int argc, char* argv[]) {
     if (Window::phase == GamePhase::Game) {
       // handle updates to server
       num_updates_to_send += time_since_prev_frame / min_time_between_updates;
-      while (num_updates_to_send >= 1.0) {
+      if (num_updates_to_send >= 1.0) {
         message::UserStateUpdate user_update = Window::gameScene->pollUpdate();
 
         // check if update if valid
@@ -212,10 +217,11 @@ int main(int argc, char* argv[]) {
         if (user_update.id == Window::gameScene->_myPlayerId)
           Window::client->write<message::UserStateUpdate>(user_update);
 
-        Window::animate(min_time_between_updates);  // update player anims
+        // update player anims (SLOW)
+        Window::animate(min_time_between_updates * num_updates_to_send);
 
         update_count++;
-        num_updates_to_send--;
+        num_updates_to_send = 0;
       }
     }
 

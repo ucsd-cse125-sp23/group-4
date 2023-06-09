@@ -39,6 +39,9 @@ class Window {
   static message::LobbyUpdate lobby_state;
 
   // Objects to render
+  static Start* start;
+  static Scene* lob;
+  static Scene* game;
   static Scene* gameScene;
   static Load* loadScreen;
   static HUD* hud;

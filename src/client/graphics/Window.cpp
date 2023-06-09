@@ -33,15 +33,19 @@ const char* Window::windowTitle = "tagguys :O";
 GamePhase Window::phase;
 message::LobbyUpdate Window::lobby_state;
 
+Camera* Cam;
+Camera* lobbyCam;
+
 // Game stuff to render
+Start* Window::start;
+Scene* Window::lob;
+Scene* Window::game;
 Scene* Window::gameScene;
 Load* Window::loadScreen;
 HUD* Window::hud;
 
 std::unique_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
-
-Camera* Cam;
 
 std::atomic<bool> loading_resources{false};
 
@@ -78,12 +82,16 @@ bool Window::initializeProgram(GLFWwindow* window) {
 
 bool Window::initializeObjects() {
   phase = GamePhase::Start;
-  gameScene = new Start(Cam);
-  gameScene->init();
+  start = new Start(Cam);
+  start->init();
+  lob = new Lobby(lobbyCam);
+  lob->init();
+  game = new Scene(Cam);
+  hud = new HUD(game);
+  gameScene = start;
   loadScreen = new Load();
 
   GLFWwindow* window = glfwGetCurrentContext();
-  gameScene->init();
 
   glfwMakeContextCurrent(window);
   glfwShowWindow(window);
@@ -132,7 +140,8 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   // Create the GLFW window.
-  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, windowTitle,
+                                        NULL /*glfwGetPrimaryMonitor()*/, NULL);
 
   // Check if the window could not be created.
   if (!window) {
@@ -163,6 +172,9 @@ GLFWwindow* Window::createWindow(int width, int height) {
   Cam = new Camera();
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
+  lobbyCam = new Camera();
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+
   // initialize the interaction variables
   LeftDown = RightDown = false;
   MouseX = MouseY = 0;
@@ -184,6 +196,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
   // ImGui::WindowSize(w, h)?
 }
@@ -194,11 +207,11 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 void Window::animate(float deltaTime) { gameScene->animate(deltaTime); }
 
 void Window::update(GLFWwindow* window, float deltaTime) {
-  if (dynamic_cast<Start*>(gameScene) &&
+  if (!dynamic_cast<Lobby*>(gameScene) &&
       phase == GamePhase::Lobby) {  // start -> lobby
     resetCamera();
-    gameScene = new Lobby(Cam);
-    gameScene->init();
+    lob->reset();
+    gameScene = lob;
     auto lobby = dynamic_cast<Lobby*>(gameScene);
     lobby->receiveState(lobby_state);
   } else if (dynamic_cast<Lobby*>(gameScene) &&
@@ -208,12 +221,9 @@ void Window::update(GLFWwindow* window, float deltaTime) {
 
     gameScene->music->play();
     glfwHideWindow(window);
-    loading_resources = true;
-    std::thread x(&Load::load, loadScreen, window);
     gameScene->init(lobby->players);
     hud = new HUD(gameScene);
     loading_resources = false;
-    x.join();
 
     glfwMakeContextCurrent(window);
     glfwShowWindow(window);
@@ -291,7 +301,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_R:
         resetCamera();
         break;
-      case GLFW_KEY_TAB:
+      case GLFW_KEY_LEFT_CONTROL:
         _debugmode = !_debugmode;
         break;
       case GLFW_KEY_C:
@@ -351,7 +361,8 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && phase == GamePhase::Game) {
+  if ((RightDown || LeftDown) &&
+      (phase == GamePhase::Lobby || phase == GamePhase::Game)) {
     Cam->CamDrag(dx, dy);
   }
 }
