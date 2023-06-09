@@ -26,11 +26,10 @@ class SoundEffect {
   void play(glm::vec3 pos) {
     sound.setPosition(pos.x, pos.y, pos.z);
     setEffectVolume();
-    sf::Vector3f a = sound.getPosition();
-    sf::Vector3f b = sf::Listener::getPosition();
-    std::cerr << "sound pos" << a.x << " " << a.y << " " << a.z << std::endl;
-    std::cerr << "listner pos" << b.x << " " << b.y << " " << b.z << std::endl;
-    sound.play();
+    if (sound.getStatus() != sf::Sound::Status::Playing) {
+      sound.play();
+    }
+    
   }
   void loop() { sound.setLoop(true); }
   
