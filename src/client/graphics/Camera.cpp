@@ -4,6 +4,8 @@
 
 #include "Camera.h"
 
+#include <SFML/Audio.hpp>
+
 #include "Input.h"
 
 using glm::mat4x4;
@@ -80,7 +82,8 @@ void Camera::CamZoom(float y) {
 void Camera::update(float dt) {
   // interpolate camera
   position_prev = glm::lerp(position_prev, position_target, lerpSpeed * dt);
-
+  sf::Listener::setPosition(position_target.x, position_target.y,
+                            position_target.z);
   if (!Fixed) return;
 
   vec3 moveLocal = vec3(0);

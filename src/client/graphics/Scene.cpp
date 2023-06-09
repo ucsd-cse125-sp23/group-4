@@ -69,6 +69,18 @@ Player* Scene::createPlayer(int id) {
   // animations TODO(?)
   // player->pmodel->setAnimation("walk");  // TODO: make this automated
 
+  // sound effects
+  SoundEffect* sfxRef =
+      dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_jump"]);
+
+  auto sfx = new SoundEffect(*sfxRef);
+  player->sfx_jump = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_item"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_item = sfx;
+  sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_tag"]);
+  sfx = new SoundEffect(*sfxRef);
+  player->sfx_tag = sfx;
   // particle emitters
   ParticleSystem* ptclRef =
       dynamic_cast<ParticleSystem*>(sceneResources->prefabs["ptcl_jump"]);
@@ -150,6 +162,9 @@ void Scene::update(float delta) {
   for (auto& [_, thing] : networkGameThings) thing->update(delta);
   if (gameStart) {
     time.Update(delta);
+    if (music) {
+      music->setEffectVolume();
+    }
   }
 }
 
