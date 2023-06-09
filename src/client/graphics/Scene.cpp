@@ -163,8 +163,16 @@ void Scene::setToUserFocus(GameThing* t) {
 }
 
 void Scene::animate(float delta) {
+  // 2nd level animation process frame cap
+  num_updates_to_send += delta / min_time_between_animate;
+
+  if (num_updates_to_send < 1) return;
+  delta = min_time_between_animate * num_updates_to_send;
+
   for (auto& thing : localGameThings) thing->animate(delta);
   for (auto& [_, thing] : networkGameThings) thing->animate(delta);
+
+  num_updates_to_send = 0;
 }
 
 void Scene::update(float delta) {
