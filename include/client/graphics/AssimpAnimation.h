@@ -122,8 +122,8 @@ class AssimpAnimation {
     IDLE = 0,
     WALK,
     TAG,
-    JUMP,
     FALL,
+    JUMP,
     TRIP,
     LOBBY1,
     LOBBY2,
@@ -180,7 +180,7 @@ class AssimpAnimation {
   float currTimeInMs = 0.0f;
   std::string currAnimName;
 
-  // Blending props - dissolve (idle, walk, jump)
+  // Blending props - dissolve (idle, walk)
   PLAYER_AC baseAnim, dissolveAnim;
   std::map<std::string, BlendPose> poseMap;
   bool isDissolve = false;
@@ -188,7 +188,7 @@ class AssimpAnimation {
   float timeDissolve = 0.0f;
   float timeDissolveMult = 1.0f;
 
-  // Blending props - play then dissolve
+  // Blending props - play then dissolve (jump, trip)
   bool isPlayThenDissolve = false;
   float timePlayThenDissolve = 0.0f;
 
@@ -200,4 +200,8 @@ class AssimpAnimation {
 
   // Blending props - cycle emote (winning animations)
   bool isEmote = false, isEmoteCyc = false;
+
+  // Blending props - falling
+  bool isFall = false, isFallRecovering = false;
+  float timeFall = 0.0f;
 };

@@ -442,6 +442,10 @@ void AssimpAnimation::update(float deltaTimeInMs) {
 
   bool doneDissolve = false;
   poseMap.clear();
+  if (isFall || isFallRecovering) {
+    timeFall += deltaTimeInMs;
+  }
+
   if (isPlayThenDissolve) {
     AssimpAnimationClip& play = animMap.at(AC_TO_NAME.at(baseAnim));
     if ((timePlayThenDissolve + deltaTimeInMs) * play.tps > play.duration) {
@@ -469,6 +473,9 @@ void AssimpAnimation::update(float deltaTimeInMs) {
         isDissolve = false;
         isDissolveReversed = false;
       } else {
+        if (isFallRecovering) {
+          isFallRecovering = false;
+        }
         isDissolve = false;
         baseAnim = dissolveAnim;
         currAnimName = AC_TO_NAME.at(baseAnim);
@@ -482,11 +489,17 @@ void AssimpAnimation::update(float deltaTimeInMs) {
 
       if (isAPlayThenDissolve(baseAnim) || isALobbyEmote(baseAnim)) {
         clip0.update(timePlayThenDissolve, poseMap, true);
+      } else if (isFall) {
+        clip0.update(currTimeInMs - deltaTimeInMs, poseMap, true);
+      } else if (isFallRecovering) {
+        clip0.update(timeFall, poseMap, true);
       } else {
         clip0.update(currTimeInMs, poseMap, true);
       }
       if (isALobbyEmote(dissolveAnim)) {
         clip1.update(0.0f, poseMap, false);
+      } else if (isFall) {
+        clip1.update(timeFall, poseMap, false);
       } else {
         clip1.update(currTimeInMs, poseMap, false);
       }
@@ -578,8 +591,7 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 
   if (isAPlayThenDissolve(ac)) {
-    if (baseAnim == PLAYER_AC::TRIP ||
-        (baseAnim == PLAYER_AC::FALL && ac == PLAYER_AC::JUMP)) {
+    if (baseAnim == PLAYER_AC::TRIP || isFall) {
       return;
     }
 
@@ -596,9 +608,21 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
   }
 
   if (ac == PLAYER_AC::IDLE || ac == PLAYER_AC::WALK) {
-    if (isPlayThenDissolve || isAPlayThenDissolve(baseAnim)) {
+    if (isPlayThenDissolve || isAPlayThenDissolve(baseAnim) ||
+        isFallRecovering) {
       // No blending if player switch between idle & walk when jump is
       // dissolving out :(
+      dissolveAnim = ac;
+      return;
+    }
+    if (isFall) {
+      currTimeInMs = 0.0f;
+      isFall = false;
+      isFallRecovering = true;
+      isDissolve = true;
+      isDissolveReversed = false;
+      timeDissolve = 0.0f;
+      timeDissolveMult = 10.0f;
       dissolveAnim = ac;
       return;
     }
@@ -623,6 +647,21 @@ void AssimpAnimation::blendAnimation(const PLAYER_AC& ac) {
       // forward dissolve
       isDissolveReversed = false;
     }
+  }
+
+  // idea:
+  //   dissolve from current idle/walk pose to fall
+  //   keep playing fall
+  //   if any other animation happens
+  if (ac == PLAYER_AC::FALL && !isFall) {
+    isDissolve = true;
+    isDissolveReversed = false;
+    timeDissolve = 0.0f;
+    timeDissolveMult = 10.0f;
+    dissolveAnim = ac;
+    isFall = true;
+    isFallRecovering = false;
+    timeFall = 0.0f;
   }
 
   if (ac == PLAYER_AC::TAG && !isTag) {
@@ -662,6 +701,9 @@ void AssimpAnimation::reset() {
   timeTag = 0.0f;
   isEmote = false;
   isEmoteCyc = false;
+  isFall = false;
+  isFallRecovering = false;
+  timeFall = 0.0f;
 }
 
 void AssimpAnimation::setEmote(const PLAYER_AC& ac) {
