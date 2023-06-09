@@ -327,6 +327,50 @@ void Scene::init(void) {
   sceneResources->models["PREFAB_player.model"]->mesh = am;
   sceneResources->models["PREFAB_player.model"]->material =
       sceneResources->materials["toon"];
+
+  AssimpModel* racoon_prefab = new AssimpModel();
+  racoon_prefab->loadAssimp("assets/animation/withUV/Animation -Racoon.fbx");
+  racoon_prefab->setAnimation("walk");
+  sceneResources->models["trash panda"] = racoon_prefab;
+  sceneResources->models["trash panda"]->mesh = racoon_prefab;
+  sceneResources->models["trash panda"]->material = sceneResources->materials["toon"];
+
+  AssimpModel* bee_prefab = new AssimpModel();
+  bee_prefab->loadAssimp("assets/animation/withUV/Animation -Bee.fbx");
+  bee_prefab->setAnimation("walk");
+  sceneResources->models["bee"] = bee_prefab;
+  sceneResources->models["bee"]->material = sceneResources->materials["toon"];
+  sceneResources->models["bee"]->mesh = bee_prefab;
+
+  AssimpModel* cat_prefab = new AssimpModel();
+  cat_prefab->loadAssimp("assets/animation/withUV/Animation -Cat.fbx");
+  cat_prefab->setAnimation("walk");
+  sceneResources->models["cat"] = cat_prefab;
+  sceneResources->models["cat"]->material = sceneResources->materials["toon"];
+  sceneResources->models["cat"]->mesh = bee_prefab;
+
+  AssimpModel* avocado_prefab = new AssimpModel();
+  avocado_prefab->loadAssimp("assets/animation/withUV/Animation -Avocado.fbx");
+  avocado_prefab->setAnimation("walk");
+  sceneResources->models["avocado"] = avocado_prefab;
+  sceneResources->models["avocado"]->mesh = avocado_prefab;
+  sceneResources->models["avocado"]->material =
+      sceneResources->materials["toon"];
+
+  AssimpModel* duck_prefab = new AssimpModel();
+  duck_prefab->loadAssimp("assets/animation/withUV/Animation -Duck.fbx");
+  duck_prefab->setAnimation("walk");
+  sceneResources->models["duck"] = duck_prefab;
+  sceneResources->models["duck"]->mesh = duck_prefab;
+  sceneResources->models["duck"]->material = sceneResources->materials["toon"];
+
+  AssimpModel* unicorn_prefab = new AssimpModel();
+  unicorn_prefab->loadAssimp("assets/animation/withUV/Animation - Unicorn.fbx");
+  unicorn_prefab->setAnimation("walk");
+  sceneResources->models["unicorn"] = unicorn_prefab;
+  sceneResources->models["unicorn"]->mesh = unicorn_prefab;
+  sceneResources->models["unicorn"]->material =
+      sceneResources->materials["toon"];
 #pragma endregion
 
   ///////////////////////////////////////////////////////
@@ -387,26 +431,6 @@ void Scene::init(void) {
 
 void Scene::init(std::map<int, message::LobbyPlayer> players) {
   init();
-
-  Model* racoon_prefab = new Model;
-  sceneResources->models["trash panda"] = racoon_prefab;
-  racoon_prefab->mesh = sceneResources->meshes["playermodel"];
-  racoon_prefab->material = sceneResources->materials["toon.blue"];
-
-  Model* bee_prefab = new Model;
-  sceneResources->models["bee"] = bee_prefab;
-  bee_prefab->mesh = sceneResources->meshes["playermodel"];
-  bee_prefab->material = sceneResources->materials["marble"];
-
-  Model* avocado_prefab = new Model;
-  sceneResources->models["avocado"] = avocado_prefab;
-  avocado_prefab->mesh = sceneResources->meshes["playermodel"];
-  avocado_prefab->material = sceneResources->materials["ceramic"];
-
-  Model* duck_prefab = new Model;
-  sceneResources->models["duck"] = duck_prefab;
-  duck_prefab->mesh = sceneResources->meshes["playermodel"];
-  duck_prefab->material = sceneResources->materials["silver"];
 
   for (auto& [i, p] : players) {
     skins[i] = p.skin;

@@ -10,11 +10,12 @@
 
 class HUD {
  public:
-  FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
+  FontRenderer* fr = new FontRenderer("assets/fonts/Atma-SemiBold.ttf");
   FontRenderer* fr_dev = new FontRenderer("assets/fonts/Roboto-Black.ttf");
 
   Scene* scene;
   Texture map;
+  Texture timer;
   std::vector<Texture> frames;
   std::map<std::string, Texture> player_bars;
   int index;
@@ -39,6 +40,8 @@ class HUD {
       frames.push_back(frame);
     }
 
+    timer.init("assets/UI/IMG_2658.PNG");
+
     player_bars["trash panda"].init("assets/UI/bar-racoon.png");
     player_bars["bee"].init("assets/UI/bar-bee.png");
     player_bars["avocado"].init("assets/UI/bar-avocado.png");
@@ -46,9 +49,12 @@ class HUD {
     player_bars["cat"].init("assets/UI/bar-cat.png");
     player_bars["unicorn"].init("assets/UI/bar-unicorn.png");
     player_bars["waffle"].init("assets/UI/bar-waffle.png");
+    player_bars["bear"].init("assets/UI/Group 6 (1).png");
   }
 
   void draw(GLFWwindow* window);
+
+  void drawTime();
 
   void drawLeaderboard(GLFWwindow* window, float scale,
                        std::map<std::string, Player*> players);
@@ -62,4 +68,6 @@ class HUD {
   void drawCountdown();
 
   void gameOver();
+
+  void reset();
 };

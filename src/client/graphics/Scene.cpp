@@ -28,6 +28,11 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
+
+bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
+  return a.second < b.second;
+}
+
 Player* Scene::createPlayer(int id, std::string skin) {
   bool isUser = false;
   if (_myPlayerId >= 0 && _myPlayerId == id) isUser = true;
@@ -45,15 +50,18 @@ Player* Scene::createPlayer(int id, std::string skin) {
   // LOAD PLAYER ASSETS ---
   // copy into a new model object
   Model* myModel;
-  if (dynamic_cast<AssimpModel*>(
-          sceneResources->models["PREFAB_player.model"])) {
-    AssimpModel* amRef = dynamic_cast<AssimpModel*>(
-        sceneResources->models["PREFAB_player.model"]);
+  if (dynamic_cast<AssimpModel*>(sceneResources->models[skins[id]])) {
+    AssimpModel* amRef =
+        dynamic_cast<AssimpModel*>(sceneResources->models[skins[id]]);
     AssimpModel* am = new AssimpModel(*amRef);
     myModel = am;
     player->pmodel = am;
   } else {
-    myModel = new Model(*sceneResources->models[skins[id]]);
+    if (sceneResources->models[skins[id]]) {
+      myModel = new Model(*sceneResources->models[skins[id]]);
+    } else {
+      myModel = new Model(*sceneResources->models["PREFAB_player.model"]);
+    }
   }
   player->model = myModel;
   // TODO(matthew) set material here! if needed
@@ -204,6 +212,15 @@ void Scene::setToUserFocus(GameThing* t) {
   t->childnodes.push_back(camera);  // parent camera to player
 }
 
+void Scene::reset() {
+  time.time = 5.0f;
+  time.countdown = true;
+  gameStart = false;
+  timeOver = 0;
+
+  networkGameThings.clear();
+}
+
 void Scene::animate(float delta) {
   // 2nd level animation process frame cap
   double fpsMin = (1.0 / fpsCapParam);
@@ -230,10 +247,22 @@ void Scene::animate(float delta) {
 }
 
 void Scene::update(float delta) {
-  for (auto& thing : localGameThings) thing->update(delta);
-  for (auto& [_, thing] : networkGameThings) thing->update(delta);
   if (gameStart) {
+    for (auto& thing : localGameThings) thing->update(delta);
+    for (auto& [_, thing] : networkGameThings) thing->update(delta);
     time.Update(delta);
+  }
+
+  if (time.time == 0) {
+    gameStart = false;
+    timeOver += delta;
+    if (timeOver >= 3 && Window::phase != GamePhase::GameOver) {
+      Window::phase = GamePhase::GameOver;
+      // TODO: build new scene graph based on player rankings
+      node["world"]->childnodes.clear();
+      rankings = rankPlayers();
+    }
+    
     if (music) {
       music->setEffectVolume();
     }
@@ -324,7 +353,32 @@ void Scene::receiveEvent_tag(message::TagEvent e) {
 
 #pragma endregion
 
+std::vector<std::string> Scene::rankPlayers() {
+  std::vector<std::pair<int, float>> player_times;
+  for (auto& [i, g] : networkGameThings) {
+    if (dynamic_cast<Player*>(g) != nullptr) {
+      Player* player = dynamic_cast<Player*>(g);
+      int p_id = player->id;
+      float time = player->time.time;
+      player_times.push_back(std::make_pair(p_id, time));
+    }
+  }
+  std::sort(player_times.begin(), player_times.end(), cmp);
+
+  std::vector<std::string> rankings;
+  for (auto& [i, _] : player_times) {
+    rankings.push_back(skins[i]);
+  }
+  return rankings;
+}
+
 void Scene::draw() {
+  if (Window::phase == GamePhase::GameOver) {
+    glDisable(GL_DEPTH_TEST);
+    leaderboard.draw();
+    leaderboard.drawPlayers(rankings);
+    glEnable(GL_DEPTH_TEST);
+  }
   // Pre-draw sequence:
   if (myPlayer) camera->SetPositionTarget(myPlayer->transform.position);
   camera->UpdateView();

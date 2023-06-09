@@ -15,9 +15,10 @@ class Lobby : public Scene, public InputListener {
  public:
   FontRenderer* fr = new FontRenderer("assets/fonts/Roboto-Black.ttf");
   Texture background;
-  Texture flag;
+  Texture highlight;
+  Texture point;
   std::vector<std::string> skin_names{
-      "trash panda", "bee", "avocado", "duck", "cat", "unicorn", "waffle"};
+      "trash panda", "bee", "avocado", "duck", "cat", "unicorn", "waffle", "bear"};
   std::map<std::string, Texture> icons;
   std::map<std::string, Texture> ready_icons;
   std::map<int, message::LobbyPlayer> players;
@@ -31,6 +32,7 @@ class Lobby : public Scene, public InputListener {
   ~Lobby();
 
   void init(void) override;
+  void reset(void) override;
   void update(float delta) override;
   void receiveState(message::LobbyUpdate newState);
   void buildSceneTree();

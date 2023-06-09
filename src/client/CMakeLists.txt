@@ -94,7 +94,8 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/graphics/AssimpNode.cpp
     ${PROJECT_SOURCE_DIR}/graphics/HUD.cpp
     ${PROJECT_SOURCE_DIR}/graphics/Lobby.cpp
-    ${PROJECT_SOURCE_DIR}/graphics/Start.cpp)
+    ${PROJECT_SOURCE_DIR}/graphics/Start.cpp
+    ${PROJECT_SOURCE_DIR}/graphics/Leaderboard.cpp)
 
 add_executable(client ${SOURCES})
 target_include_directories(client
