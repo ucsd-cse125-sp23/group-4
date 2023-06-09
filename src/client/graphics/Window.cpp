@@ -38,6 +38,9 @@ GLFWwindow *Window::loadingWindow, *Window::screenWindow;
 std::thread Window::subthread;
 float Window::remainingLoadBuffer;
 
+Camera* Cam;
+Camera* lobbyCam;
+
 // Game stuff to render
 Scene* Window::gameScene;
 Load* Window::loadScreen;
@@ -45,8 +48,6 @@ HUD* Window::hud;
 
 std::unique_ptr<Client> Window::client = nullptr;
 int Window::my_pid = -1;
-
-Camera* Cam;
 
 std::atomic<bool> Window::loading_resources{false};
 
@@ -182,6 +183,9 @@ GLFWwindow* Window::createWindow(int width, int height) {
   Cam = new Camera();
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
+  lobbyCam = new Camera();
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+
   // initialize the interaction variables
   LeftDown = RightDown = false;
   MouseX = MouseY = 0;
@@ -203,6 +207,7 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 
   Cam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
+  lobbyCam->SetAspect(static_cast<float>(width) / static_cast<float>(height));
 
   // ImGui::WindowSize(w, h)?
 }
@@ -233,6 +238,7 @@ void Window::update(GLFWwindow* window, float deltaTime) {
             glfwMakeContextCurrent(loadingWindow);
 
             gameScene->init();
+            gameScene->music->play();
 
             auto lobby = dynamic_cast<Lobby*>(gameScene);
             loading_resources = false;
@@ -339,14 +345,15 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
       case GLFW_KEY_R:
         resetCamera();
         break;
-      case GLFW_KEY_TAB:
+      case GLFW_KEY_LEFT_CONTROL:
         _debugmode = !_debugmode;
         break;
       case GLFW_KEY_C:
         Cam->Fixed = !(Cam->Fixed);
         break;
       case GLFW_KEY_X:
-        gameScene->sceneResources->sounds["test"]->play();  // temporary
+        gameScene->sceneResources->sounds["test"]->play(
+            glm::vec3(0.0, 0.0, 0.0));  // temporary
         break;
       default:
         break;
@@ -398,7 +405,8 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && phase == GamePhase::Game) {
+  if ((RightDown || LeftDown) &&
+      (phase == GamePhase::Lobby || phase == GamePhase::Game)) {
     Cam->CamDrag(dx, dy);
   }
 }

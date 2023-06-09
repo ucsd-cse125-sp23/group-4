@@ -65,7 +65,7 @@ struct AssimpRotChannel {
                  const A_ANIM_EXTRAP& extrapOut) const;
 
  private:
-  static const A_ANIM_QUART_INTERP INTERP_MODE = A_ANIM_QUART_INTERP::SLERP;
+  static const A_ANIM_QUART_INTERP INTERP_MODE = A_ANIM_QUART_INTERP::NONE;
 
   float timeStart, timeEnd, timeLen;
 };
@@ -118,7 +118,27 @@ class AssimpAnimationClip {
 
 class AssimpAnimation {
  public:
-  enum class PLAYER_AC { IDLE, WALK, JUMP, TAG };
+  enum class PLAYER_AC {
+    IDLE = 0,
+    WALK,
+    TAG,
+    FALL,
+    JUMP,
+    TRIP,
+    LOBBY1,
+    LOBBY2,
+    LOBBY3,
+    LOBBY4,
+    PLACE1_1,
+    PLACE1_2,
+    PLACE2_1,
+    PLACE2_2,
+    PLACE3_1,
+    PLACE3_2,
+    PLACE4_1,
+    PLACE4_2
+  };
+  static const char EMOTE_CYC_SUFFIX[];
   static const std::map<PLAYER_AC, std::string> AC_TO_NAME;
   static const std::map<std::string, PLAYER_AC> NAME_TO_AC;
 
@@ -137,7 +157,20 @@ class AssimpAnimation {
   static const float MS_DISSOLVE, MS_JUMP;
   static const std::vector<std::string> NODES_TAG;
 
+  static bool isAPlayThenDissolve(const PLAYER_AC& ac) {
+    return ac >= PLAYER_AC::JUMP && ac <= PLAYER_AC::TRIP;
+  }
+  static bool isALobbyEmote(const PLAYER_AC& ac) {
+    return ac >= PLAYER_AC::LOBBY1 && ac <= PLAYER_AC::LOBBY4;
+  }
+  static bool isAEmote(const PLAYER_AC& ac) {
+    return ac >= PLAYER_AC::PLACE1_1 && ac <= PLAYER_AC::PLACE4_2;
+  }
+
   void blendAnimation(const PLAYER_AC& ac);
+  void setLobby(const PLAYER_AC& ac);
+  void reset();
+  void setEmote(const PLAYER_AC& ac);
 
   bool isPlayer = false;
   std::map<std::string, AssimpAnimationClip> animMap;
@@ -147,20 +180,28 @@ class AssimpAnimation {
   float currTimeInMs = 0.0f;
   std::string currAnimName;
 
-  // Blending props - dissolve (idle, walk, jump)
+  // Blending props - dissolve (idle, walk)
   PLAYER_AC baseAnim, dissolveAnim;
   std::map<std::string, BlendPose> poseMap;
   bool isDissolve = false;
   bool isDissolveReversed = false;
   float timeDissolve = 0.0f;
-  float msCurrent = 1.0f;
-  // jump takes jump animation duration + MS_JUMP amount of time
-  bool isJump = false;
-  float timeJump = 0.0f;
+  float timeDissolveMult = 1.0f;
+
+  // Blending props - play then dissolve (jump, trip)
+  bool isPlayThenDissolve = false;
+  float timePlayThenDissolve = 0.0f;
 
   // Blending props - replace (tag)
   // tag takes tag animatio duration amount of time (no blending for now)
   bool isTag = false, isTagReversed = false;
   float timeTag = 0.0f;
   std::vector<size_t> ind_tag;
+
+  // Blending props - cycle emote (winning animations)
+  bool isEmote = false, isEmoteCyc = false;
+
+  // Blending props - falling
+  bool isFall = false, isFallRecovering = false;
+  float timeFall = 0.0f;
 };

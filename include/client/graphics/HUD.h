@@ -10,11 +10,12 @@
 
 class HUD {
  public:
-  FontRenderer* fr = new FontRenderer("assets/fonts/Violety Crumble.ttf");
+  FontRenderer* fr = new FontRenderer("assets/fonts/Atma-SemiBold.ttf");
   FontRenderer* fr_dev = new FontRenderer("assets/fonts/Roboto-Black.ttf");
 
   Scene* scene;
   Texture map;
+  Texture timer;
   std::vector<Texture> frames;
   std::map<std::string, Texture> player_bars;
   int index;
@@ -36,6 +37,8 @@ class HUD {
 
   void draw(GLFWwindow* window);
 
+  void drawTime();
+
   void drawLeaderboard(GLFWwindow* window, float scale,
                        std::map<std::string, Player*> players);
 
@@ -48,4 +51,6 @@ class HUD {
   void drawCountdown();
 
   void gameOver();
+
+  void reset();
 };

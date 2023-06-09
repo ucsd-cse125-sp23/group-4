@@ -25,9 +25,12 @@ struct Material {
   glm::vec4 emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   float shininess = 10.0f;
 
+  void initUniformLocations() {
+    // TODO(matthew) optimize glGetLocation call
+  }
+
   void setUniforms(const glm::mat4& viewProjMtx, const glm::mat4& viewMtx,
                    const glm::mat4& model) {
-    // TODO: optimize this glGetLocation call out to an init func?
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, GL_FALSE,
                        reinterpret_cast<const float*>(&viewProjMtx));
     glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE,
@@ -52,8 +55,18 @@ struct Material {
     }
     glUniform1i(glGetUniformLocation(shader, "renderMode"), mode);
 
-    float gamma = settings.gammaCorrection;  // Window::gammaCorrection;
+    float gamma = settings.gammaCorrection;
     glUniform1f(glGetUniformLocation(shader, "gamma"), gamma);
+
+    // lighting
+    /*
+    glUniform1i(glGetUniformLocation(shader, "enableLighting"),
+                settings.enableLights);
+    glUniform1i(glGetUniformLocation(shader, "nlights"), 2);
+    glUniform4fv(glGetUniformLocation(shader, "LightDirections"),
+                 GLsizei(2), &LightDirections[0][0]);
+    glUniform4fv(glGetUniformLocation(shader, "LightColors"), GLsizei(2),
+                 &LightColors[0][0]);*/
 
     // TODO: implement other shader cases + their uniform vars here! vvv
 

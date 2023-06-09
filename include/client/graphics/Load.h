@@ -104,5 +104,4 @@ class Load {
 
     glDisable(GL_BLEND);
   }
-
 };

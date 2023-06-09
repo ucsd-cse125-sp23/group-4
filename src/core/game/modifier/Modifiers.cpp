@@ -101,7 +101,7 @@ void TaggedStatusModifier::modify(Modifiable* obj, ModifierData* data) {
     }
   }
 }
-bool TaggedStatusModifier::isIt(Player* player) {
+bool TaggedStatusModifier::isIt(core::Player* player) {
   return static_cast<TaggedStatusModifierData*>(
              player->getModifiers(TAGGED_STATUS_MODIFIER)[0]->get())
       ->isIt;
@@ -163,7 +163,7 @@ void EffectStorageModifier::addEffect(PObject* obj, Effect effect,
         {effect, obj->level->getAge() + duration});
   }
 }
-std::vector<Effect> queryEffects(PObject* obj) {
+std::vector<Effect> EffectStorageModifier::queryEffects(PObject* obj) {
   std::vector<Effect> ret;
   for (auto m : obj->getModifiers(EFFECT_STORAGE_MODIFIER)) {
     for (auto e : static_cast<EffectStorageModifierData*>(m->get())->effects)
