@@ -38,11 +38,11 @@ void HUD::draw(GLFWwindow* window) {
       Player* player = dynamic_cast<Player*>(e);
       glm::vec3 color;
       if (ind == scene->_myPlayerId) {
-        color = glm::vec3(0.0f, 1.0f, 0.0f);
+        color = glm::vec3(255.0 / 256.0, 0.0, 115.0 / 256.0);
       } else if (player->tagged) {
-        color = glm::vec3(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0);
+        color = glm::vec3(147.0 / 256.0, 0.0, 232.0 / 256.0);
       } else {
-        color = glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0);
+        color = glm::vec3(0.0, 0.0, 0.0);
       }
       auto name = player->name;
       players[ind] = player;
@@ -117,11 +117,11 @@ void HUD::draw(GLFWwindow* window) {
       glm::vec3 position = player->transform.position;
 
       if (i == scene->_myPlayerId) {
-        glColor3f(0.0f, 1.0f, 0.0f);
+        glColor3f(255.0 / 256.0, 0.0f, 115.0 / 256.0);
       } else if (player->tagged) {
-        glColor3f(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0);
+        glColor3f(147.0 / 256.0, 0.0, 232.0 / 256.0);
       } else {
-        glColor3f(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0);
+        glColor3f(0.0, 0.0, 0.0);
       }
       glPointSize(10);
       glBegin(GL_POINTS);
@@ -214,27 +214,6 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
 
     glViewport(x, y, bar_width, bar_height);
 
-    /*int i, steps = 36;
-    float a = 0.0, b = 0.0, r = 1.0, phi, dphi = 2. * M_PI / (float)(steps);
-    if (it->first == scene->_myPlayerId) {
-      glViewport(x + bar_width / 5, y + bar_height / 3, bar_width / 5,
-                 bar_width / 5);
-      glColor3f(0.0f, 1.0f, 0.0f);
-      glEnable(GL_LINE_STIPPLE);
-      glLineStipple(1, 0xff);
-      glLineWidth(5);
-
-      glBegin(GL_LINE_LOOP);
-      for (i = 0, phi = 0.0; i < steps; i++, phi += dphi)
-        glVertex3f(a + r * cos(phi), b + r * sin(phi), 0.0);
-
-      glEnd();
-
-      glDisable(GL_LINE_STIPPLE);
-
-      glViewport(x, y, bar_width, bar_height);
-    }*/
-
     str = player->name;
 
     int score_s = player->score / 20.0;
@@ -245,17 +224,15 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     // change text color of tagged player
     if (it->first == scene->_myPlayerId)
       fr->RenderText(bar_width, bar_height, str, bar_width / 2.5,
-                     bar_height / 2, 0.3 * scale, glm::vec3(0.0, 1.0, 0.0));
+                     bar_height / 2, 0.3 * scale,
+                     glm::vec3(255.0 / 256.0, 0.0, 115.0 / 256.0));
     else if (player->tagged)
-      fr->RenderText(
-          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
-          0.3 * scale,
-          glm::vec3(251.0 / 256.0, 133.0 / 256.0, 0.0 / 256.0));  // orange
+      fr->RenderText(bar_width, bar_height, str, bar_width / 2.5,
+                     bar_height / 2, 0.3 * scale,
+                     glm::vec3(147.0 / 256.0, 0.0, 232.0 / 256.0));
     else
-      fr->RenderText(
-          bar_width, bar_height, str, bar_width / 2.5, bar_height / 2,
-          0.3 * scale,
-          glm::vec3(137.0 / 256.0, 177.0 / 256.0, 185.0 / 256.0));  // gray
+      fr->RenderText(bar_width, bar_height, str, bar_width / 2.5,
+                     bar_height / 2, 0.3 * scale, glm::vec3(0.0, 0.0, 0.0));
     glEnable(GL_DEPTH_TEST);
 
     y += (bar_height / 1.5);
