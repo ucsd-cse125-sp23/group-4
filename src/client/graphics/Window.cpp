@@ -290,7 +290,8 @@ void Window::draw(GLFWwindow* window) {
   } else {
     // Render the objects.
     gameScene->draw();
-    if (phase == GamePhase::Game || phase == GamePhase::GameOver)
+    if (phase == GamePhase::Game ||
+        (phase == GamePhase::GameOver && gameScene->overtime < 4))
       hud->draw(window);
   }
 
