@@ -361,7 +361,8 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
   }
 
   // Rotate camera
-  if ((RightDown || LeftDown) && (phase == GamePhase::Lobby || phase == GamePhase::Game)) {
+  if ((RightDown || LeftDown) &&
+      (phase == GamePhase::Lobby || phase == GamePhase::Game)) {
     Cam->CamDrag(dx, dy);
   }
 }
