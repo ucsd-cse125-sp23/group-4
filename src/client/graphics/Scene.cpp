@@ -252,7 +252,7 @@ void Scene::update(float delta) {
       node["world"]->childnodes.clear();
       rankings = rankPlayers();
     }
-    
+
     if (music) {
       music->setEffectVolume();
     }
