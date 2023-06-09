@@ -144,6 +144,13 @@ void Scene::init(void) {
   sceneResources->materials["star1-ptcl"] = mtl;
 
   mtl = new Material;
+  mtl->shader = sceneResources->shaderPrograms["unlitx"];
+  mtl->texture = sceneResources->textures["star1-ptcl"];
+  mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mtl->diffuse = vec4(0.1f, 0.4f, 0.9f, 1.0f);
+  sceneResources->materials["star1.blue-ptcl"] = mtl;
+
+  mtl = new Material;
   mtl->shader = sceneResources->shaderPrograms["toon"];
   mtl->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
   mtl->diffuse = vec4(0.9f, 0.82f, 0.9f, 1.0f);
@@ -194,13 +201,13 @@ void Scene::init(void) {
   sceneResources->sounds["sfx_item"] = sfx;
   /*music = new Music();
   music->load("assets/sounds/Dance_Powder.wav");*/
-  
+
 #pragma endregion
 
   // Setup particle effects
 #pragma region Particles
   ParticleSystem* ptcl = new ParticleSystem();
-  ptcl->name = "GT_particle1";
+  ptcl->name = "GT_particle_test";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
   ptcl->materialRef = sceneResources->materials["stars-ptcl"];
   ptcl->transform.position = vec3(0, 3, 0);
@@ -209,16 +216,14 @@ void Scene::init(void) {
   // node["particleTest"] = ptcl;
   // node["world"]->childnodes.push_back(node["particleTest"]);
 
-  /*
   ptcl = new ParticleSystem();
-  ptcl->name = "GT_particle2";
+  ptcl->name = "GTptcl_stars";
   ptcl->meshRef = sceneResources->meshes["particleQuad"];
-  ptcl->materialRef = sceneResources->materials["stars-ptcl"];
-  ptcl->transform.position = vec3(10, 9, 3);
-  ptcl->transform.updateMtx(&ptcl->transformMtx);
-  localGameThings.push_back(ptcl);
-  node["particleTest2"] = ptcl;
-  node["world"]->childnodes.push_back(node["particleTest2"]);*/
+  ptcl->materialRef = sceneResources->materials["star1-ptcl"];
+  ptcl->worldSpace = true;
+  ptcl->creationRate = 0;
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-10, 10), DOFr(-10, 10)};
+  sceneResources->prefabs["ptcl_stars"] = ptcl;
 
   ptcl = new ParticleSystem();
   ptcl->name = "GTptcl_jump";
@@ -226,8 +231,21 @@ void Scene::init(void) {
   ptcl->materialRef = sceneResources->materials["star1-ptcl"];
   ptcl->worldSpace = true;
   ptcl->creationRate = 0;
-  ptcl->initVelocity = {DOFr(-10, 10), DOFr(-0, 0, 0), DOFr(-10, 10)};
+  ptcl->initVelocity = {DOFr(-10, 10), DOFr(12), DOFr(-10, 10)};
+  ptcl->gravity.SetValue(-0.01f);
+  ptcl->drag.SetValue(5.0f);
+  ptcl->lifespan.SetMinMax(0.9f, 0.95f);
   sceneResources->prefabs["ptcl_jump"] = ptcl;
+
+  ptcl = new ParticleSystem();
+  ptcl->name = "GTptcl_isTagged";
+  ptcl->meshRef = sceneResources->meshes["particleQuad"];
+  ptcl->materialRef = sceneResources->materials["star1.blue-ptcl"];
+  ptcl->worldSpace = true;
+  ptcl->creationRate = 0;
+  ptcl->lifespan.SetMinMax(0.6f, 0.8f);
+  ptcl->gravity.SetValue(-0.1f);
+  sceneResources->prefabs["ptcl_isTagged"] = ptcl;
 #pragma endregion
 
   // Skybox setup

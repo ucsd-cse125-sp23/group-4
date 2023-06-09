@@ -25,6 +25,7 @@ void Player::update(float dt) {
   if (fx_land) fx_land->update(dt);
   if (fx_item) fx_item->update(dt);
   if (fx_tag) fx_tag->update(dt);
+  if (fx_tagStatus) fx_tagStatus->update(dt);
 
   if (tagged) time.Update(dt);
 }
@@ -83,6 +84,12 @@ message::UserStateUpdate Player::pollInput() {
   }
 
   return {id, moveWorld.x, 0, moveWorld.z, jumping, azimuth};
+}
+
+void Player::updateFromState(message::GameStateUpdateItem state) {
+  if (fx_tagStatus) fx_tagStatus->creationRate = state.is_tagged ? 5.0f : 0.0f;
+
+  GameThing::updateFromState(state);
 }
 
 vec3 Player::move(vec3 movement) {
