@@ -168,8 +168,11 @@ void Lobby::init(void) {
 
   buildSceneTree();
 
-  background.init("assets/image/character_select.png");
-  flag.init("assets/image/flag.png");
+
+
+  background.init("assets/UI/Group 8.png");
+  highlight.init("assets/UI/Vector 15 (1).png");
+  point.init("assets/UI/Polygon 6 (1).png");
 
   ready_icons["trash panda"].init("assets/UI/IMG_2421.PNG");
   icons["trash panda"].init("assets/UI/IMG_2422.PNG");
@@ -185,4 +188,6 @@ void Lobby::init(void) {
   ready_icons["unicorn"].init("assets/UI/IMG_2432.PNG");
   icons["waffle"].init("assets/UI/IMG_2436.PNG");
   ready_icons["waffle"].init("assets/UI/IMG_2437.PNG");
+  icons["bear"].init("assets/UI/IMG_2491.PNG");
+  ready_icons["bear"].init("assets/UI/IMG_2492.PNG");
 }

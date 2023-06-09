@@ -10,6 +10,7 @@ void HUD::init() {
     frame.init(filename.c_str());
     frames.push_back(frame);
   }
+  timer.init("assets/UI/IMG_2658.PNG");
 
   player_bars["trash panda"].init("assets/UI/bar-racoon.png");
   player_bars["bee"].init("assets/UI/bar-bee.png");
@@ -18,6 +19,7 @@ void HUD::init() {
   player_bars["cat"].init("assets/UI/bar-cat.png");
   player_bars["unicorn"].init("assets/UI/bar-unicorn.png");
   player_bars["waffle"].init("assets/UI/bar-waffle.png");
+  player_bars["bear"].init("assets/UI/Group 6 (1).png");
 }
 
 void HUD::draw(GLFWwindow* window) {

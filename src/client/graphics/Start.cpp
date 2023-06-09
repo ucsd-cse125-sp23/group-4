@@ -64,6 +64,9 @@ void Start::init() {
     frame.init(filename.c_str());
     frames.push_back(frame);
   }
+
+  main.init("assets/UI/IMG_2510 2.PNG");
+  credits.init("assets/UI/IMG_2509 2.PNG");
 }
 
 void Start::draw() {

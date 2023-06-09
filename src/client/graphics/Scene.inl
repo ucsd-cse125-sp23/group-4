@@ -17,6 +17,9 @@
 using namespace glm;
 
 void Scene::init(void) {
+  music = new Music();
+  music->load("assets/sounds/Dance_Powder.wav");
+
   // globals --
   _globalSceneResources.meshes["_gz-cube"] = new Cube();
 
