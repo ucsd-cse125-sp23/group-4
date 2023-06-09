@@ -7,6 +7,7 @@
 #include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
+#include "core/game/modifier/LaunchModifier.h"
 #include "core/util/global.h"
 
 ModifierData::ModifierData(Level* level, std::uint64_t duration)
@@ -171,4 +172,17 @@ std::vector<Effect> EffectStorageModifier::queryEffects(PObject* obj) {
     break;
   }
   return ret;
+}
+
+
+LaunchModifier::LaunchModifier() {}
+void LaunchModifier::modify(Modifiable* obj, ModifierData* data) {
+  if (PObject* pObj = dynamic_cast<PObject*>(obj)) {
+    LaunchModifierData* cData = static_cast<LaunchModifierData*>(data);
+    if (!cData->boosted) {
+      vec3f force = normalize(pObj->getPos() - cData->pos) * cData->boost;
+      pObj->vel += force;
+      cData->boosted = true;
+    }
+  }
 }

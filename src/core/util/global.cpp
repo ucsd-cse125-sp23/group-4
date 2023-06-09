@@ -14,6 +14,7 @@ float GRAVITY_STRENGTH = 0.2f;
 int PLAYER_LAYER = 0;
 int ENVIRONMENT_LAYER = 1;
 int POWER_LAYER = 2;
+int ENVIRONMENTAL_EFFECT_LAYER = 3;
 
 float PLAYER_RADIUS = 1.3f;
 float PLAYER_HEIGHT = 1.0f;
@@ -31,6 +32,7 @@ NumberModifier* GRAVITY_MODIFIER = new NumberModifier();
 SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
 AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
 FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
+LaunchModifier* LAUNCH_MODIFIER = new LaunchModifier();
 
 EffectStorageModifier* EFFECT_STORAGE_MODIFIER = new EffectStorageModifier();
 
@@ -41,7 +43,7 @@ GlobalEffect* SPEEDBOOST_EFFECT =
       for (auto target : targets) {
         target->addModifierInstance(new ModifierInstance(
             SPEEDBOOST_MODIFIER,
-            new SpeedBoostModifierData(level, 100, 0.25f)));
+            new SpeedBoostModifierData(level, 100, 0.25f), 0));
         EffectStorageModifier::addEffect(target, Effect::Speed, 100);
       }
     });
@@ -50,7 +52,7 @@ GlobalEffect* SLOWDOWN_EFFECT =
       for (auto target : targets) {
         target->addModifierInstance(new ModifierInstance(
             SPEEDBOOST_MODIFIER,
-            new SpeedBoostModifierData(level, 100, -0.25f)));
+            new SpeedBoostModifierData(level, 100, -0.25f), 1));
         EffectStorageModifier::addEffect(target, Effect::Slow, 100);
       }
     });
@@ -58,7 +60,7 @@ GlobalEffect* FREEZE_EFFECT =
     new StaticGlobalEffect([](Level* level, std::vector<PObject*> targets) {
       for (auto target : targets) {
         target->addModifierInstance(new ModifierInstance(
-            FREEZE_MODIFIER, new FreezeModifierData(level, 40)));
+            FREEZE_MODIFIER, new FreezeModifierData(level, 40), 0));
         EffectStorageModifier::addEffect(target, Effect::Freeze, 40);
       }
     });
@@ -67,7 +69,7 @@ GlobalEffect* REVERSE_EFFECT =
       for (auto target : targets) {
         target->addModifierInstance(new ModifierInstance(
             SPEEDBOOST_MODIFIER,
-            new SpeedBoostModifierData(level, 100, -2.0f)));
+            new SpeedBoostModifierData(level, 100, -2.0f), 2));
         EffectStorageModifier::addEffect(target, Effect::Confuse, 100);
       }
     });
@@ -76,7 +78,7 @@ GlobalEffect* SLOW_FALL_EFFECT =
       for (auto target : targets) {
         target->addModifierInstance(new ModifierInstance(
             GRAVITY_MODIFIER,
-            new NumberModifierData(level, Operation::MULTIPLY, 0.5, 200)));
+            new NumberModifierData(level, Operation::MULTIPLY, 0.5, 200), 1));
         EffectStorageModifier::addEffect(target, Effect::ReducedGravity, 200);
       }
     });
@@ -85,7 +87,7 @@ GlobalEffect* FAST_FALL_EFFECT =
       for (auto target : targets) {
         target->addModifierInstance(new ModifierInstance(
             GRAVITY_MODIFIER,
-            new NumberModifierData(level, Operation::MULTIPLY, 2, 200)));
+            new NumberModifierData(level, Operation::MULTIPLY, 2, 200), 2));
         EffectStorageModifier::addEffect(target, Effect::IncreasedGravity, 200);
       }
     });
@@ -94,7 +96,7 @@ extern GlobalEffect* SLIPPERY_EFFECT =
       for (auto target : targets) {
         target->addModifierInstance(new ModifierInstance(
             FRICTION_MODIFIER,
-            new NumberModifierData(level, Operation::MULTIPLY, 0.01, 400)));
+            new NumberModifierData(level, Operation::MULTIPLY, 0.01, 400), 0));
         EffectStorageModifier::addEffect(target, Effect::SlipperyPhysics, 400);
       }
     });

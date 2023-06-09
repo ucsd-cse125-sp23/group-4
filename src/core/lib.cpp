@@ -15,6 +15,8 @@ Level* initializeLevel(Environment* environment) {
                           ENVIRONMENT_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER, PLAYER_LAYER);
   level->setCollisionType(CollisionType::TRIGGER, POWER_LAYER, PLAYER_LAYER);
+  level->setCollisionType(CollisionType::TRIGGER, PLAYER_LAYER,
+                          ENVIRONMENTAL_EFFECT_LAYER);
 
   return level;
 }
@@ -23,7 +25,7 @@ std::pair<Player*, ControlModifierData*> initializePlayer(Level* level) {
   Player* player = new Player();
   ControlModifierData* controlData = new ControlModifierData(level);
   player->addModifierInstance(
-      new ModifierInstance(CONTROL_MODIFIER, controlData));
+      new ModifierInstance(CONTROL_MODIFIER, controlData, 0));
   level->addPObject(player);
   return std::make_pair(player, controlData);
 }

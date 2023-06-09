@@ -8,6 +8,8 @@
 #include "core/game/modifier/ControlModifier.h"
 #include "core/game/physics/Player.h"
 #include "core/game/physics/PowerUp.h"
+#include "core/game/physics/Mushroom.h"
+#include "core/game/physics/River.h"
 #include "core/util/global.h"
 
 Level* initializeLevel(Environment* environment);

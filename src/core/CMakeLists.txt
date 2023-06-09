@@ -23,6 +23,8 @@ set(_CORE_SOURCES
     ${PROJECT_SOURCE_DIR}/game/physics/Player.cpp
     ${PROJECT_SOURCE_DIR}/game/physics/PObject.cpp
     ${PROJECT_SOURCE_DIR}/game/physics/PowerUp.cpp
+    ${PROJECT_SOURCE_DIR}/game/physics/Mushroom.cpp
+    ${PROJECT_SOURCE_DIR}/game/physics/River.cpp
 
     ${PROJECT_SOURCE_DIR}/math/ConvexShape.cpp
 

@@ -11,6 +11,7 @@
 #include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
+#include "core/game/modifier/LaunchModifier.h"
 #include "core/math/shape/CapsuleShape.h"
 #include "core/math/shape/OffsetShape.h"
 #include "core/math/shape/SphereShape.h"
@@ -27,6 +28,7 @@ extern float PLAYER_HEIGHT;
 extern int PLAYER_LAYER;       // = 0;
 extern int ENVIRONMENT_LAYER;  // = 1;
 extern int POWER_LAYER;        // = 2;
+extern int ENVIRONMENTAL_EFFECT_LAYER;  // = 3;
 
 extern SphereShape* POWERUP_BASE_SHAPE;
 extern CapsuleShape* PLAYER_BASE_SHAPE;
@@ -41,6 +43,7 @@ extern TaggedStatusModifier* TAGGED_STATUS_MODIFIER;
 extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern AttractModifier* ATTRACT_MODIFIER;
 extern FreezeModifier* FREEZE_MODIFIER;
+extern LaunchModifier* LAUNCH_MODIFIER;
 
 extern EffectStorageModifier* EFFECT_STORAGE_MODIFIER;
 
