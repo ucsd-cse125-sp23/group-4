@@ -11,6 +11,7 @@
 #include "core/game/modifier/NumberModifier.h"
 #include "core/game/modifier/SpeedBoostModifier.h"
 #include "core/game/modifier/TaggedStatusModifier.h"
+#include "core/game/modifier/LaunchModifier.h"
 #include "core/math/shape/CapsuleShape.h"
 #include "core/math/shape/OffsetShape.h"
 #include "core/math/shape/SphereShape.h"
@@ -41,6 +42,7 @@ extern TaggedStatusModifier* TAGGED_STATUS_MODIFIER;
 extern SpeedBoostModifier* SPEEDBOOST_MODIFIER;
 extern AttractModifier* ATTRACT_MODIFIER;
 extern FreezeModifier* FREEZE_MODIFIER;
+extern LaunchModifier* LAUNCH_MODIFIER;
 
 extern EffectStorageModifier* EFFECT_STORAGE_MODIFIER;
 

@@ -31,6 +31,7 @@ NumberModifier* GRAVITY_MODIFIER = new NumberModifier();
 SpeedBoostModifier* SPEEDBOOST_MODIFIER = new SpeedBoostModifier();
 AttractModifier* ATTRACT_MODIFIER = new AttractModifier();
 FreezeModifier* FREEZE_MODIFIER = new FreezeModifier();
+LaunchModifier* LAUNCH_MODIFIER = new LaunchModifier();
 
 EffectStorageModifier* EFFECT_STORAGE_MODIFIER = new EffectStorageModifier();
 
