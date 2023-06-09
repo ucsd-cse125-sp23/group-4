@@ -101,7 +101,6 @@ void Lobby::drawBackground() {
   glVertex2f(-1, 1);
 
   glEnd();
-
 }
 
 void Lobby::drawPlayers() {
@@ -113,8 +112,8 @@ void Lobby::drawPlayers() {
   float scale_x = static_cast<float>(width) / static_cast<float>(800);
   float scale_y = static_cast<float>(height) / static_cast<float>(600);
 
-  int size = height/3;
-  
+  int size = height / 3;
+
   int num_players = players.size();
   float spacing = 10.0;
   if (num_players > 4) {
@@ -131,7 +130,7 @@ void Lobby::drawPlayers() {
     std::string name = play.skin;
 
     glViewport(x, y, size, size);
-    
+
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -201,7 +200,8 @@ void Lobby::drawPlayers() {
       if (players.size() % 2 == 1) {
         num_left++;
       }
-      x = (width - (spacing * scale_x)) - (num_left * size / 1.5) - (size / 3.0);
+      x = (width - (spacing * scale_x)) - (num_left * size / 1.5) -
+          (size / 3.0);
     }
   }
   glViewport(0, 0, width, height);

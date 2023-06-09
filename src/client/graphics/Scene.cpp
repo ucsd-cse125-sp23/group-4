@@ -28,7 +28,6 @@ bool Scene::_freecam = false;
 bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
-
 bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
   return a.second < b.second;
 }
@@ -262,7 +261,7 @@ void Scene::update(float delta) {
       node["world"]->childnodes.clear();
       rankings = rankPlayers();
     }
-    
+
     if (music) {
       music->setEffectVolume();
     }
