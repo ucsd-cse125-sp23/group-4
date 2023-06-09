@@ -73,6 +73,7 @@ class Camera : public GameThing {
   }
 
   float FOV;  // Field of View Angle (degrees)
+
  private:
   // Perspective controls
   // float FOV;       // Field of View Angle (degrees)
