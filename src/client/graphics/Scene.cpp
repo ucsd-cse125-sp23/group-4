@@ -239,7 +239,7 @@ void Scene::update(float delta) {
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
   }
 
-  if (time.time == 0) {
+  if (time.time <= 0) {
     gameStart = false;
     //timeOver += delta;
     //if (timeOver >= 3) {

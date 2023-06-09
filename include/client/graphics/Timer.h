@@ -4,7 +4,7 @@
 class Timer {
  public:
   float time;
-  Timer() { time = 0.0f; }
+  Timer() { time = 300.0f; }
 
   void Update(float seconds_remaining) { time = seconds_remaining; }
 
