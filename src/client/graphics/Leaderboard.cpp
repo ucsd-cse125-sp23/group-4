@@ -60,7 +60,8 @@ void Leaderboard::draw() {
   glEnable(GL_DEPTH_TEST);
 }
 
-void Leaderboard::drawPlayers(std::vector<std::pair<int, std::string>> rankings) {
+void Leaderboard::drawPlayers(
+    std::vector<std::pair<int, std::string>> rankings) {
   glDisable(GL_DEPTH_TEST);
   GLFWwindow* window = glfwGetCurrentContext();
   int width, height;

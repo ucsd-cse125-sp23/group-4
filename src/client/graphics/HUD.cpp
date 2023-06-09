@@ -216,7 +216,7 @@ void HUD::drawLeaderboard(GLFWwindow* window, float scale,
     }*/
 
     str = player->name;
-    
+
     int score_s = player->score / 20.0;
     str += " " + std::to_string(score_s) + "s";
 
