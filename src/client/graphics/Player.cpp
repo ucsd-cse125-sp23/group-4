@@ -62,84 +62,21 @@ message::UserStateUpdate Player::pollInput() {
 
   if (moving) {
     moveWorld = move(moveLocal);
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
+    }
   } else {
+    if (pmodel) {
+      pmodel->setAnimation(
+          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
+    }
   }
 
   if (jumping) {
     if (pmodel) {
       pmodel->setAnimation(
           AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::JUMP));
-    }
-  }
-
-  if (pmodel) {
-    if (Input::GetInputState(InputAction::WALK) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::WALK));
-    }
-    if (Input::GetInputState(InputAction::IDLE) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::IDLE));
-    }
-    if (Input::GetInputState(InputAction::TRIP) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TRIP));
-    }
-    if (Input::GetInputState(InputAction::FALL) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::FALL));
-    }
-    if (Input::GetInputState(InputAction::WINNING11) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE1_1));
-    }
-    if (Input::GetInputState(InputAction::WINNING12) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE1_2));
-    }
-    if (Input::GetInputState(InputAction::WINNING21) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE2_1));
-    }
-    if (Input::GetInputState(InputAction::WINNING22) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE2_2));
-    }
-    if (Input::GetInputState(InputAction::WINNING31) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE3_1));
-    }
-    if (Input::GetInputState(InputAction::WINNING32) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE3_2));
-    }
-    if (Input::GetInputState(InputAction::WINNING41) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE4_1));
-    }
-    if (Input::GetInputState(InputAction::WINNING42) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::PLACE4_2));
-    }
-    if (Input::GetInputState(InputAction::LOBBY1) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::LOBBY1));
-    }
-    if (Input::GetInputState(InputAction::LOBBY2) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::LOBBY2));
-    }
-    if (Input::GetInputState(InputAction::LOBBY3) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::LOBBY3));
-    }
-    if (Input::GetInputState(InputAction::LOBBY4) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::LOBBY4));
-    }
-    if (Input::GetInputState(InputAction::TAG) != InputState::None) {
-      pmodel->setAnimation(
-          AssimpAnimation::AC_TO_NAME.at(AssimpAnimation::PLAYER_AC::TAG));
     }
   }
 
