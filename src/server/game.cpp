@@ -31,10 +31,11 @@ bool GameThing::is_tagged() const {
   return TaggedStatusModifier::isIt(player_);
 }
 
-message::Player GameThing::to_network() const {
-  int score = level_->getAge() - TAG_COOLDOWN -
-              level_->gameMode->queryScore(id_);  // number of ticks not tagged
+int GameThing::get_score() const {
+  return level_->getAge() - TAG_COOLDOWN - level_->gameMode->queryScore(id_);
+}
 
+message::Player GameThing::to_network() const {
   auto effects = EffectStorageModifier::queryEffects(player_);
 
   return {
@@ -43,7 +44,7 @@ message::Player GameThing::to_network() const {
       player_->getPos().y,
       player_->getPos().z,
       heading_,
-      score,
+      get_score(),
       length(player_->vel),
       player_->ticksFallen,
       player_->onGround,
@@ -147,6 +148,13 @@ std::vector<message::TagEvent> Game::get_tag_events() {
     events.push_back({get_pid(e.tagger), get_pid(e.tagee)});
 
   return events;
+}
+
+std::unordered_map<int, int> Game::get_scores() {
+  std::unordered_map<int, int> scores;
+  for (auto& [pid, thing] : game_things_) scores[pid] = thing.get_score();
+
+  return scores;
 }
 
 void Game::clear_events() {

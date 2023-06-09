@@ -18,6 +18,7 @@ class GameThing {
   void update(const message::UserStateUpdate& update);
   void remove();
   bool is_tagged() const;
+  int get_score() const;
   message::Player to_network() const;
 
  private:
@@ -41,6 +42,7 @@ class Game {
   std::vector<message::LandEvent> get_land_events();
   std::vector<message::ItemPickupEvent> get_item_pickup_events();
   std::vector<message::TagEvent> get_tag_events();
+  std::unordered_map<int, int> get_scores();
   void clear_events();
   message::GameStateUpdate to_network();
 
