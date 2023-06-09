@@ -59,10 +59,11 @@ Type get_type(const Message::Body& body) {
     return Type::ItemPickupEvent;
   };
   auto tag_event = [](const TagEvent&) { return Type::TagEvent; };
+  auto game_over = [](const GameOver&) { return Type::GameOver; };
   auto overload = boost::make_overloaded_function(
       assign, greeting, notify, game_state, user_state, lobby_update,
       lobby_player_update, game_start, jump_event, land_event,
-      item_pickup_event, tag_event);
+      item_pickup_event, tag_event, game_over);
   return boost::apply_visitor(overload, body);
 }
 
@@ -206,6 +207,22 @@ std::string TagEvent::to_string() const {
     "      tagger: " + std::to_string(tagger) + "," +     "\n"
     "      taggee: " + std::to_string(taggee) + "\n";
   // clang-format on
+  return str;
+}
+
+std::string GameOver::to_string() const {
+  std::string scores = "[\n";
+  for (auto& [pid, score] : client_scores)
+    scores +=
+        "      {" + std::to_string(pid) + ", " + std::to_string(score) + "},\n";
+
+  scores += "    ]";
+
+  // clang-format off
+  std::string str = std::string("") +
+    "    client_scores: " + scores + "," + "\n";
+  // clang-format on
+
   return str;
 }
 

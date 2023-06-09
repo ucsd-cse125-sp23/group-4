@@ -34,6 +34,7 @@ enum class Type {
   LandEvent,
   ItemPickupEvent,
   TagEvent,
+  GameOver,
 };
 
 struct Metadata {
@@ -215,11 +216,21 @@ struct TagEvent {
   }
 };
 
+struct GameOver {
+  std::unordered_map<int, int> client_scores;
+
+  std::string to_string() const;
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned int) {
+    ar& client_scores;
+  }
+};
+
 struct Message {
   using Body =
       boost::variant<Assign, Greeting, Notify, GameStateUpdate, UserStateUpdate,
                      LobbyUpdate, LobbyPlayerUpdate, GameStart, JumpEvent,
-                     LandEvent, ItemPickupEvent, TagEvent>;
+                     LandEvent, ItemPickupEvent, TagEvent, GameOver>;
   Type type;
   Metadata metadata;
   Body body;
