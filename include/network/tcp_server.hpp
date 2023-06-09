@@ -25,6 +25,7 @@ class Server {
          TickHandler);
 
   void start_tick();
+  void stop_tick();
   void write(const ClientID&, const message::Message&);
   void write_all(message::Message&);
   template <typename T, typename... Args>
@@ -51,6 +52,7 @@ class Server {
   std::unordered_map<ClientID, std::unique_ptr<Connection<message::Message>>,
                      boost::hash<ClientID>>
       connections_;
+  bool should_tick_ = false;
 };
 
 template <typename T, typename... Args>
