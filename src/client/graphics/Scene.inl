@@ -45,6 +45,8 @@ void Scene::init(void) {
   sceneResources->shaderPrograms["water"] =
       LoadShaders("assets/shaders/shader.vert",
                   "assets/shaders/shaderx.frag");  // TODO(gfx team?)
+  sceneResources->shaderPrograms["cloud"] =
+      LoadShaders("assets/shaders/shader.vert", "assets/shaders/cloud.frag");
   sceneResources->shaderPrograms["unlitx"] =
       LoadShaders("assets/shaders/shader.vert", "assets/shaders/unlitx.frag");
   sceneResources->shaderPrograms["toon"] =
@@ -87,6 +89,14 @@ void Scene::init(void) {
   mat->specular = vec4(0.15f, 0.15f, 0.1f, 1.0f);
   mat->shininess = 100.0f;
   sceneResources->materials["mapMaterialExample"] = mat;
+
+  mat = new Material;  // custom configured map material
+  mat->shader = sceneResources->shaderPrograms["cloud"];
+  mat->ambient = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+  mat->diffuse = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+  mat->emission = vec4(0.15f, 0.15f, 0.4f, 1.0f);
+  mat->shininess = 200.0f;
+  sceneResources->materials["Cloud"] = mat;
 
   sceneResources->materials["ceramic"] = new Material;
   sceneResources->materials["ceramic"]->shader =
