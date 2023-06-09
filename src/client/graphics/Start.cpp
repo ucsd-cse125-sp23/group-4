@@ -71,11 +71,11 @@ void Start::init() {
 
 void Start::draw() {
   Scene::draw();
+  glDisable(GL_DEPTH_TEST);
+  drawName();
   if (renderMain) {
     drawMain();
   }
-  drawName();
-  glDisable(GL_DEPTH_TEST);
   drawCredits();
   glEnable(GL_DEPTH_TEST);
 }
