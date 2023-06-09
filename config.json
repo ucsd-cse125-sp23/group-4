@@ -3,7 +3,15 @@
   "server_port": 2400,
   "map_draw_file": "assets/model/map-final-singlemap.obj",
   "map_data_file": "assets/model/map-data.obj",
-  "player_count": 2,
+  "skin_dir": "assets/model/withUV/",
+  "skin_trash panda": "Animation -Racoon.fbx",
+  "skin_bee": "Animation -Bee.fbx",
+  "skin_avocado": "Animation -Avocado.fbx",
+  "skin_duck": "Animation -Duck.fbx",
+  "skin_cat": "Animation -Cat.fbx",
+  "skin_unicorn": "Animation -Unicorn.fbx",
+  "skin_waffle": "Animation -Bee.fbx",
+  "player_count": 1,
   "game_duration": 300,
   "game_mode": "single-tagger"
 }
