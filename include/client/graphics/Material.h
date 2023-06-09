@@ -59,14 +59,16 @@ struct Material {
     glUniform1f(glGetUniformLocation(shader, "gamma"), gamma);
 
     // lighting
-    /*
-    glUniform1i(glGetUniformLocation(shader, "enableLighting"),
-                settings.enableLights);
-    glUniform1i(glGetUniformLocation(shader, "nlights"), 2);
-    glUniform4fv(glGetUniformLocation(shader, "LightDirections"),
-                 GLsizei(2), &LightDirections[0][0]);
-    glUniform4fv(glGetUniformLocation(shader, "LightColors"), GLsizei(2),
-                 &LightColors[0][0]);*/
+    if (settings.lightConfig.enableLights) {
+      int nLights = settings.lightConfig.GetLightDirections().size();
+      glUniform1i(glGetUniformLocation(shader, "nlights"), nLights);
+      glUniform4fv(glGetUniformLocation(shader, "LightDirections"),
+                   GLsizei(nLights),
+                   &settings.lightConfig.GetLightDirections()[0][0]);
+      glUniform4fv(glGetUniformLocation(shader, "LightColors"),
+                   GLsizei(nLights),
+                   &settings.lightConfig.GetLightColors()[0][0]);
+    }
 
     // TODO: implement other shader cases + their uniform vars here! vvv
 
