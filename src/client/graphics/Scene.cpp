@@ -30,11 +30,11 @@ bool Scene::_gizmos = false;
 SceneResourceMap Scene::_globalSceneResources = SceneResourceMap();
 
 bool cmp(const std::pair<int, float>& a, const std::pair<int, float>& b) {
-  return a.second < b.second;
+  return a.second > b.second;
 }
 bool cmpp(const std::pair<Player*, float>& a,
           const std::pair<Player*, float>& b) {
-  return a.second < b.second;
+  return a.second > b.second;
 }
 
 Player* Scene::createPlayer(int id, std::string skin) {
@@ -239,26 +239,8 @@ void Scene::update(float delta) {
     for (auto& [_, thing] : networkGameThings) thing->update(delta);
   }
 
-  if (time.time <= 0) {
+  if (Window::phase == GamePhase::GameOver) {
     gameStart = false;
-    //timeOver += delta;
-    //if (timeOver >= 3) {
-      if (Window::phase != GamePhase::GameOver) {
-        Window::phase = GamePhase::GameOver;
-        // TODO: build new scene graph based on player rankings
-        rankings = rankPlayers();
-        std::vector<std::pair<Player*, float>> player_times;
-        for (auto& [i, g] : networkGameThings) {
-          if (dynamic_cast<Player*>(g) != nullptr) {
-            Player* player = dynamic_cast<Player*>(g);
-            float time = player->score / 20.0;
-            player_times.push_back(std::make_pair(player, time));
-          }
-        }
-        std::sort(player_times.begin(), player_times.end(), cmpp);
-        rankings_ptr.clear();
-        for (auto p : player_times) rankings_ptr.push_back(p.first);
-      }
 
       node["world"]->childnodes.clear();
       camera->Reset();
@@ -297,6 +279,21 @@ void Scene::update(float delta) {
   if (music) {
     music->setEffectVolume();
   }
+}
+
+void Scene::onGameOver() {
+  rankings = rankPlayers();
+  std::vector<std::pair<Player*, float>> player_times;
+  for (auto& [i, g] : networkGameThings) {
+    if (dynamic_cast<Player*>(g) != nullptr) {
+      Player* player = dynamic_cast<Player*>(g);
+      float time = player->score / 20.0;
+      player_times.push_back(std::make_pair(player, time));
+    }
+  }
+  std::sort(player_times.begin(), player_times.end(), cmpp);
+  rankings_ptr.clear();
+  for (auto p : player_times) rankings_ptr.push_back(p.first);
 }
 
 message::UserStateUpdate Scene::pollUpdate() {

@@ -122,6 +122,7 @@ void network_init() {
 
     auto game_over_handler = [](const message::GameOver& body) {
       Window::phase = GamePhase::GameOver;
+      Window::gameScene->onGameOver();
     };
 
     auto any_handler = [](const message::Message::Body&) {};

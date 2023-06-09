@@ -168,6 +168,8 @@ class Scene {
   void receiveEvent_item(message::ItemPickupEvent e);
   void receiveEvent_tag(message::TagEvent e);
 
+  void onGameOver();
+
   virtual void animate(float delta);
   virtual void update(float delta);
 
