@@ -81,10 +81,7 @@ Game::Game() {
   auto item_pickup_handler = [this](PickupEvent&& e) {
     item_pickup_events_.push_back(e);
   };
-  auto tag_handler = [this](TaggingEvent&& e) {
-    tagged_player_ = get_pid(e.tagee);  // changed tagged player
-    tag_events_.push_back(e);
-  };
+  auto tag_handler = [this](TaggingEvent&& e) { tag_events_.push_back(e); };
   level_->eventManager->registerEventHandler(jump_handler);
   level_->eventManager->registerEventHandler(land_handler);
   level_->eventManager->registerEventHandler(item_pickup_handler);
@@ -114,10 +111,6 @@ void Game::restart() {
   clear_events();
   level_->restartGame();
   start_time_ = std::chrono::steady_clock::now();
-
-  // assign first tagged player
-  for (auto& [pid, thing] : game_things_)
-    if (thing.is_tagged()) tagged_player_ = pid;
 }
 
 std::vector<message::JumpEvent> Game::get_jump_events() {
@@ -187,5 +180,5 @@ message::GameStateUpdate Game::to_network() {
       std::chrono::duration_cast<std::chrono::duration<float>>(time_remaining)
           .count();
 
-  return {players, items, tagged_player_, time_elapsed_s, time_remaining_s};
+  return {players, items, time_elapsed_s, time_remaining_s};
 }

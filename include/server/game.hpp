@@ -53,7 +53,6 @@ class Game {
   std::vector<PickupEvent> item_pickup_events_;
   std::vector<TaggingEvent> tag_events_;
   std::chrono::time_point<std::chrono::steady_clock> start_time_;
-  int tagged_player_ = -1;
   Level* level_;
   std::vector<vec3f> map_spawn_points;
   // TODO: add other map things here...

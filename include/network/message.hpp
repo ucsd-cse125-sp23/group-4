@@ -116,14 +116,13 @@ struct Item {
 struct GameStateUpdate {
   std::unordered_map<int, Player> players;
   std::unordered_map<int, Item> items;
-  int tagged_player;
   float time_elapsed;
   float time_remaining;
 
   std::string to_string() const;
   template <typename Archive>
   void serialize(Archive& ar, unsigned int) {
-    ar& players& items& tagged_player& time_elapsed& time_remaining;
+    ar& players& items& time_elapsed& time_remaining;
   }
 };
 
