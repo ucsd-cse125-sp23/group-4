@@ -42,7 +42,7 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
-#include "core/game/level/Environment.h"
+//#include "core/game/level/Environment.h"
 
 using namespace client;  // NOLINT
 
@@ -124,14 +124,15 @@ class Scene {
 
   explicit Scene(Camera* camFromWindow) {
     coreEnv = new Environment();
-    //initializeLevel(coreEnv);
+    // initializeLevel(coreEnv);    // not needed
 
     camera = camFromWindow;
+    camera->env = coreEnv;
     node["_camera"] = camera;
     camera->name = "_camera";
     camera->raycastFunction = [this](Ray r) {
-      float dOut = 100;
-      coreEnv->intersects(r, &dOut);
+      float dOut = 200.0f;
+      if (coreEnv) coreEnv->intersects(r, &dOut);
       return dOut;
     };
     localGameThings.push_back(camera);

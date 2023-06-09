@@ -5,7 +5,6 @@
 #include "Camera.h"
 
 #include "Input.h"
-#include "core/game/level/Environment.h"
 
 using glm::mat4x4;
 using glm::vec3;
@@ -61,17 +60,24 @@ float Camera::GetDistance(bool raycast, glm::mat4* rootMtxPtr) {
     plyrToCam.src = vec3f(position_prev.x, position_prev.y, position_prev.z);
 
     glm::mat4 camMtx = glm::mat4(1);
-    camMtx[3][2] += d + 2.0f;
+    camMtx[3][2] += maxDist + 2.0f;
 
     camMtx = glm::eulerAngleY(glm::radians(-Azimuth)) *
              glm::eulerAngleX(glm::radians(-Incline)) * camMtx;
     camMtx = *rootMtxPtr * camMtx;
     glm::vec3 camPos = glm::vec3(camMtx[3]);
 
-    plyrToCam.dir = plyrToCam.src - vec3f(camPos.x, camPos.y, camPos.z);
+    glm::vec3 dir = camPos - position_prev;
 
-    d = raycastFunction(plyrToCam);
-    //gameEnv->intersects(plyrToCam, &d);
+    plyrToCam.dir = vec3f(dir.x, dir.y, dir.z);
+
+    // float dResult = raycastFunction(plyrToCam);
+    float dResult = 1000.0f;
+
+    env->intersectsLoop(plyrToCam, &dResult);
+
+    d = dir.length() * dResult;
+    // gameEnv->intersects(plyrToCam, &d);
   }
   return std::min(Distance, d);
 }
@@ -89,7 +95,7 @@ void Camera::CamZoom(float y) {
 
   const float rate = 0.05f;
   float dist = glm::clamp(Distance * (1.0f - static_cast<float>(y) * rate),
-                          6.0f, 150.0f);
+                          6.0f, maxDist);
   SetDistance(dist);
 }
 

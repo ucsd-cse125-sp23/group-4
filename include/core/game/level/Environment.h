@@ -30,6 +30,7 @@ class Environment {
   std::vector<PObject*> collides(BoundingShape* shape);
   std::vector<PObject*> collides(PObject* self);
   std::vector<PObject*> intersects(Ray ray, float* closest);
+  std::vector<PObject*> intersectsLoop(Ray ray, float* closest);
   std::pair<PObject*, vec4f> mtv(PObject* self);
   std::pair<PObject*, vec4f> ccd(PObject* self, vec3f dPos,
                                  std::set<PObject*> ignore = {});

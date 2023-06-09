@@ -192,13 +192,28 @@ std::vector<PObject*> Environment::intersects(Ray ray, float* closest) {
           stack.push(curr->left);
           stack.push(curr->right);
         } else {
-          d = curr->obj->getBounds()->intersects(ray);
+          auto self = curr->obj;
+          d = self->getBounds()->intersects(ray);
           if (d >= 0) {
             if (d < currd) currd = d;
             hits.push_back(curr->obj);
           }
         }
       }
+    }
+  }
+
+  if (closest) *closest = currd;
+  return hits;
+}
+std::vector<PObject*> Environment::intersectsLoop(Ray ray, float* closest) {
+  std::vector<PObject*> hits;
+  float currd = 200.0f;
+  for (auto curr : collisions) {
+    float d = curr->getBounds()->intersects(ray);
+    if (d >= 0) {
+      if (d < currd) currd = d;
+      hits.push_back(curr);
     }
   }
 

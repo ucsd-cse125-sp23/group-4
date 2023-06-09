@@ -11,6 +11,7 @@
 
 #include "client/graphics/GameThing.h"
 #include "client/graphics/core.h"
+#include "core/game/level/Environment.h"
 #include "core/math/Ray.h"
 #include "glm/gtx/euler_angles.hpp"
 
@@ -33,7 +34,8 @@ class Camera : public GameThing {
  public:
   bool Fixed;
 
-  std::function<float(Ray)> raycastFunction;    // set this!!!
+  Environment* env;
+  std::function<float(Ray)> raycastFunction;  // set this!!!
 
   Camera();
 
@@ -79,8 +81,9 @@ class Camera : public GameThing {
 
   // Polar controls
   float Distance;  // Distance of the camera eye position to the origin (meters)
-  float Azimuth;   // Rotation of the camera eye position around the Y axis
-                   // (degrees)
+  float maxDist = 150.0f;
+  float Azimuth;  // Rotation of the camera eye position around the Y axis
+                  // (degrees)
   float
       Incline;  // Angle of the camera eye position over the XZ plane (degrees)
 
