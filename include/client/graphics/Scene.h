@@ -31,6 +31,7 @@
 #include "client/graphics/Material.h"
 #include "client/graphics/Mesh.h"
 #include "client/graphics/Model.h"
+#include "client/graphics/Music.h"
 #include "client/graphics/Node.h"
 #include "client/graphics/Obj.h"
 #include "client/graphics/ParticleSystem.h"
@@ -42,8 +43,6 @@
 #include "client/graphics/TextureCube.h"
 #include "client/graphics/Timer.h"
 #include "client/graphics/shader.h"
-#include "client/graphics/SoundEffect.h"
-#include "client/graphics/Music.h"
 class SceneResourceMap {
  public:
   // The following are containers of object pointers serving as "prefabs" to be
@@ -100,7 +99,7 @@ class Scene {
   static bool _freecam;
   static bool _gizmos;
   static SceneResourceMap _globalSceneResources;
-  
+
   SceneResourceMap* sceneResources;
 
   Camera* camera;
@@ -118,7 +117,7 @@ class Scene {
   Timer time;
   bool gameStart;
   Music* music;
-  
+
   explicit Scene(Camera* camFromWindow) {
     camera = camFromWindow;
     node["_camera"] = camera;
@@ -127,8 +126,7 @@ class Scene {
     time.time = 300.0f;
     time.countdown = true;
     gameStart = false;
-    
-    
+
     sceneResources = new SceneResourceMap();
 
     // globals --

@@ -1,6 +1,6 @@
 #include <SFML/Audio.hpp>
 #include <string>
-#pragma once 
+#pragma once
 class Music {
  public:
   inline static float volumeGlobal = 0.2f;  // 0.0 to 1.0

@@ -7,6 +7,7 @@
 
 #include <SFML/Audio.hpp>
 #include <string>
+
 #include "core.h"
 class SoundEffect {
  public:
@@ -29,10 +30,9 @@ class SoundEffect {
     if (sound.getStatus() != sf::Sound::Status::Playing) {
       sound.play();
     }
-    
   }
   void loop() { sound.setLoop(true); }
-  
+
   void stop() { sound.stop(); }
 
  private:
@@ -43,7 +43,7 @@ class SoundEffect {
 
   sf::Sound loadSound(std::string filename) {
     bool success = buf.loadFromFile(filename);
-    
+
     if (!success) {
       printf(("SoundEffect: Failed to load " + filename + ".\n").c_str());
       return sf::Sound(buf);

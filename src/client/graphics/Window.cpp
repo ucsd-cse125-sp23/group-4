@@ -298,7 +298,8 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
         Cam->Fixed = !(Cam->Fixed);
         break;
       case GLFW_KEY_X:
-        gameScene->sceneResources->sounds["test"]->play(glm::vec3(0.0,0.0,0.0));  // temporary
+        gameScene->sceneResources->sounds["test"]->play(
+            glm::vec3(0.0, 0.0, 0.0));  // temporary
         break;
       default:
         break;

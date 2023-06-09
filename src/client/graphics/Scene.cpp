@@ -72,7 +72,7 @@ Player* Scene::createPlayer(int id) {
   // sound effects
   SoundEffect* sfxRef =
       dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_jump"]);
- 
+
   auto sfx = new SoundEffect(*sfxRef);
   player->sfx_jump = sfx;
   sfxRef = dynamic_cast<SoundEffect*>(sceneResources->sounds["sfx_item"]);
@@ -158,7 +158,6 @@ void Scene::animate(float delta) {
 }
 
 void Scene::update(float delta) {
-
   for (auto& thing : localGameThings) thing->update(delta);
   for (auto& [_, thing] : networkGameThings) thing->update(delta);
   if (gameStart) {
