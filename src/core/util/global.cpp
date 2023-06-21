@@ -8,7 +8,7 @@
 int COYOTE_TIME = 5;
 int TAG_COOLDOWN = 20;
 float MOVE_VELOCITY = 1.8f;
-float JUMP_VELOCITY = 1.7f;
+float JUMP_VELOCITY = 1.8f;
 float GRAVITY_STRENGTH = 0.2f;
 
 int PLAYER_LAYER = 0;
@@ -16,7 +16,7 @@ int ENVIRONMENT_LAYER = 1;
 int POWER_LAYER = 2;
 
 float PLAYER_RADIUS = 1.3f;
-float PLAYER_HEIGHT = 1.0f;
+float PLAYER_HEIGHT = 4.7f;
 
 SphereShape* POWERUP_BASE_SHAPE = new SphereShape(0.4);
 CapsuleShape* PLAYER_BASE_SHAPE =
